@@ -14,6 +14,7 @@ import {
   Node,
   BackgroundVariant,
   ReactFlowInstance,
+  ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -26,6 +27,12 @@ const nodeTypes = {
   agent: AgentNode,
   task: TaskNode,
   tool: ToolNode,
+};
+
+const defaultEdgeOptions = {
+  type: 'smoothstep',
+  animated: true,
+  style: { stroke: '#818cf8', strokeWidth: 2 },
 };
 
 interface CanvasProps {
@@ -56,6 +63,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         addEdge(
           {
             ...params,
+            type: 'smoothstep',
             animated: true,
             style: { stroke: '#818cf8', strokeWidth: 2 },
           },
@@ -150,6 +158,8 @@ export const Canvas: React.FC<CanvasProps> = ({
         onDragOver={onDragOver}
         onSelectionChange={onSelectionChange as any}
         nodeTypes={nodeTypes as any}
+        defaultEdgeOptions={defaultEdgeOptions}
+        connectionMode={ConnectionMode.Loose}
         fitView
         colorMode="dark"
         className="bg-slate-950"

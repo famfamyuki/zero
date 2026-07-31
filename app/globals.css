@@ -31,12 +31,27 @@ body {
   background: #334155;
 }
 
-/* React Flow custom overrides */
+/* React Flow custom overrides & handle hit area expansion */
 .react-flow__handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 14px !important;
+  height: 14px !important;
+  transition: all 0.2s ease-in-out !important;
 }
 
-.react-flow__node {
-  border-radius: 0.75rem !important;
+.react-flow__handle::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 9999px;
+  background: transparent;
+  cursor: crosshair;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.35) !important;
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.9) !important;
+  border-color: #ffffff !important;
 }

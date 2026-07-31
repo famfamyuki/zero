@@ -49,7 +49,7 @@ export const TaskNode = memo(({ data, selected }: NodeProps<any>) => {
         type="target"
         position={Position.Left}
         id="target"
-        className="w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full hover:scale-125 transition-transform"
+        className="!w-4 !h-4 bg-emerald-500 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-emerald-500/50 cursor-pointer"
       />
 
       {/* Output Handle (Task connecting to subsequent Task or Crew) */}
@@ -57,7 +57,7 @@ export const TaskNode = memo(({ data, selected }: NodeProps<any>) => {
         type="source"
         position={Position.Right}
         id="source"
-        className="w-3.5 h-3.5 bg-emerald-400 border-2 border-slate-900 rounded-full hover:scale-125 transition-transform"
+        className="!w-4 !h-4 bg-emerald-400 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-emerald-400/50 cursor-pointer"
       />
     </div>
   );

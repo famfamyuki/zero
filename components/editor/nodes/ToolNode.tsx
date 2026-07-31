@@ -45,12 +45,20 @@ export const ToolNode = memo(({ data, selected }: NodeProps<any>) => {
         <p className="text-[11px] text-slate-400 line-clamp-2">{toolData.description || 'Prebuilt CrewAI Integration'}</p>
       </div>
 
+      {/* Input Handle (Flexible target handle for Loose connection mode) */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="target"
+        className="!w-4 !h-4 bg-amber-500 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-amber-500/50 cursor-pointer"
+      />
+
       {/* Output Handle (Tool connecting to Agent or Task) */}
       <Handle
         type="source"
         position={Position.Right}
         id="source"
-        className="w-3.5 h-3.5 bg-amber-400 border-2 border-slate-900 rounded-full hover:scale-125 transition-transform"
+        className="!w-4 !h-4 bg-amber-400 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-amber-400/50 cursor-pointer"
       />
     </div>
   );
