@@ -1,11 +1,10 @@
 # AgentGraph Studio
 
-A visual workflow editor and code generator for CrewAI multi-agent systems.
+Visual AI Agent Workflow Builder & Code Generator for CrewAI.
 
-## Features
-- Visual Drag & Drop Canvas (React Flow)
-- Client-side CrewAI Python Transpiler
-- Pre-built Templates Marketplace
-- Supabase & Stripe Integration
+- Web Editor: Next.js + React Flow
+- Transpiler: Zero-cost Client-side CrewAI Generator
+- Marketplace: Supabase & Stripe Integration
 
-Deployed on Vercel.
+Author Email: sycldy13snyqufu@outlook.jp
+Timestamp: 2026-07-31T11:47:12.986Z
