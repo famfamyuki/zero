@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sliders, Bot, CheckSquare, Wrench, Settings, Trash2, Cpu } from 'lucide-react';
+import { Sliders, Bot, CheckSquare, Wrench, Settings, Trash2, Cpu, Sparkles, ExternalLink } from 'lucide-react';
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig } from '@/types/editor';
 
 interface InspectorProps {
@@ -144,6 +144,36 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <option value="claude-3-5-sonnet-20240620">Anthropic: Claude 3.5 Sonnet</option>
                 <option value="ollama/llama3">Local Ollama: Llama 3</option>
               </select>
+            </div>
+
+            {/* Pro Tip Recommended Tools */}
+            <div className="mt-2.5 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 space-y-1.5 text-[11px]">
+              <div className="flex items-center gap-1.5 text-slate-400 font-medium">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>Pro Tip (推奨開発ツール)</span>
+              </div>
+              <p className="text-slate-400 leading-normal">
+                💡 高速な推論が必要ですか？{' '}
+                <a
+                  href="https://groq.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-400 hover:text-indigo-300 underline font-medium inline-flex items-center gap-0.5"
+                >
+                  Groq API の無料枠はこちら <ExternalLink className="w-2.5 h-2.5 inline" />
+                </a>
+              </p>
+              <p className="text-slate-400 leading-normal">
+                💡 ベクトルDBをお探しなら{' '}
+                <a
+                  href="https://pinecone.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-400 hover:text-indigo-300 underline font-medium inline-flex items-center gap-0.5"
+                >
+                  Pinecone がおすすめです <ExternalLink className="w-2.5 h-2.5 inline" />
+                </a>
+              </p>
             </div>
           </div>
 

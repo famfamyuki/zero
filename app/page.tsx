@@ -16,6 +16,8 @@ const STORAGE_KEY = 'agentgraph_active_flow';
 
 const initialDefaultPreset = PRESET_TEMPLATES[0];
 
+import { Code2, Zap } from 'lucide-react';
+
 export default function EditorPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode>(
     initialDefaultPreset.graphData.nodes
@@ -202,6 +204,23 @@ export default function EditorPage() {
         onLoadPreset={handleLoadPreset}
         nodeCount={nodes.length}
       />
+
+      {/* Developer & Marketer Target Value Proposition Banner */}
+      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-violet-950 border-b border-indigo-900/50 px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 z-20 shadow-md">
+        <div className="flex items-center gap-2.5">
+          <div className="w-5 h-5 rounded-md bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-300 shrink-0">
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
+          </div>
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+            <span className="font-extrabold text-xs text-white tracking-wide uppercase bg-indigo-600/40 px-2 py-0.5 rounded border border-indigo-500/40">
+              Visual Builder for CrewAI - No Vendor Lock-in
+            </span>
+            <span className="text-xs text-slate-300">
+              ブラウザ上でAIエージェントを設計し、実行可能な生のPythonコード（<code className="text-indigo-300 font-mono">main.py</code>）を1秒で出力します。APIキーの入力不要・100%ローカル実行対応。
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Purchase Success Banner */}
       {purchaseSuccessMessage && (

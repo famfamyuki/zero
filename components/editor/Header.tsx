@@ -41,7 +41,9 @@ export const Header: React.FC<HeaderProps> = ({
               Zero Cost
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 hidden sm:block">Visual AI Agent Workflow Builder & Code Transpiler</p>
+          <p className="text-[10px] text-slate-400 hidden sm:block">
+            Visual Builder for CrewAI • No Vendor Lock-in (Raw Python Export)
+          </p>
         </div>
       </div>
 
