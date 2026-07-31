@@ -2,11 +2,17 @@
 
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { Bot, Cpu, Sparkles } from 'lucide-react';
+import { Bot, Cpu, Sparkles, Settings } from 'lucide-react';
 import { AgentNodeData } from '@/types/editor';
 
-export const AgentNode = memo(({ data, selected }: NodeProps<any>) => {
+export const AgentNode = memo(({ id, data, selected }: NodeProps<any>) => {
   const agentData = data as AgentNodeData;
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const event = new CustomEvent('open-node-inspector', { detail: { nodeId: id } });
+    window.dispatchEvent(event);
+  };
 
   return (
     <div
@@ -24,9 +30,18 @@ export const AgentNode = memo(({ data, selected }: NodeProps<any>) => {
           </div>
           <span className="font-semibold text-xs text-indigo-200 tracking-wide uppercase">Agent Node</span>
         </div>
-        <div className="flex items-center gap-1 text-[10px] text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-800/40">
-          <Cpu className="w-3 h-3 text-indigo-400" />
-          <span>{agentData.model || 'gpt-4o'}</span>
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 text-[10px] text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-800/40">
+            <Cpu className="w-3 h-3 text-indigo-400" />
+            <span>{agentData.model || 'gpt-4o'}</span>
+          </div>
+          <button
+            onClick={handleEditClick}
+            className="p-1 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800/60 text-indigo-300 transition"
+            title="Edit Node Details"
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
@@ -43,7 +58,7 @@ export const AgentNode = memo(({ data, selected }: NodeProps<any>) => {
         </div>
       </div>
 
-      {/* Input Handle (Tools or Tasks connecting to Agent) */}
+      {/* Input Handle */}
       <Handle
         type="target"
         position={Position.Left}
@@ -51,7 +66,7 @@ export const AgentNode = memo(({ data, selected }: NodeProps<any>) => {
         className="!w-4 !h-4 bg-indigo-500 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-indigo-500/50 cursor-pointer"
       />
 
-      {/* Output Handle (Agent connecting to Tasks) */}
+      {/* Output Handle */}
       <Handle
         type="source"
         position={Position.Right}

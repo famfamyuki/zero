@@ -2,11 +2,17 @@
 
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { CheckSquare, ArrowRightCircle } from 'lucide-react';
+import { CheckSquare, ArrowRightCircle, Settings } from 'lucide-react';
 import { TaskNodeData } from '@/types/editor';
 
-export const TaskNode = memo(({ data, selected }: NodeProps<any>) => {
+export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
   const taskData = data as TaskNodeData;
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const event = new CustomEvent('open-node-inspector', { detail: { nodeId: id } });
+    window.dispatchEvent(event);
+  };
 
   return (
     <div
@@ -24,11 +30,20 @@ export const TaskNode = memo(({ data, selected }: NodeProps<any>) => {
           </div>
           <span className="font-semibold text-xs text-emerald-200 tracking-wide uppercase">Task Node</span>
         </div>
-        {taskData.asyncExecution && (
-          <span className="text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/40">
-            Async
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {taskData.asyncExecution && (
+            <span className="text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/40">
+              Async
+            </span>
+          )}
+          <button
+            onClick={handleEditClick}
+            className="p-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 transition"
+            title="Edit Node Details"
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Body Content */}
@@ -44,7 +59,7 @@ export const TaskNode = memo(({ data, selected }: NodeProps<any>) => {
         </div>
       </div>
 
-      {/* Input Handle (Agent connecting to Task or preceding Task) */}
+      {/* Input Handle */}
       <Handle
         type="target"
         position={Position.Left}
@@ -52,7 +67,7 @@ export const TaskNode = memo(({ data, selected }: NodeProps<any>) => {
         className="!w-4 !h-4 bg-emerald-500 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-emerald-500/50 cursor-pointer"
       />
 
-      {/* Output Handle (Task connecting to subsequent Task or Crew) */}
+      {/* Output Handle */}
       <Handle
         type="source"
         position={Position.Right}

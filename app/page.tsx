@@ -56,6 +56,23 @@ export default function EditorPage() {
     }
   }, [setNodes, setEdges]);
 
+  // Listen for explicit node edit clicks (gear button on node card)
+  useEffect(() => {
+    const handleOpenInspector = (e: Event) => {
+      const customEvt = e as CustomEvent<{ nodeId: string }>;
+      const nodeId = customEvt.detail?.nodeId;
+      if (nodeId) {
+        const target = nodes.find((n) => n.id === nodeId);
+        if (target) setSelectedNode(target);
+      }
+      if (window.innerWidth < 768) {
+        setIsMobileInspectorOpen(true);
+      }
+    };
+    window.addEventListener('open-node-inspector', handleOpenInspector);
+    return () => window.removeEventListener('open-node-inspector', handleOpenInspector);
+  }, [nodes]);
+
   // Handle Preset Loading
   const handleLoadPreset = useCallback(
     (template: WorkflowTemplate) => {
@@ -114,9 +131,6 @@ export default function EditorPage() {
   // Node Selection Handler
   const handleNodeSelect = useCallback((node: CustomNode | null) => {
     setSelectedNode(node);
-    if (node && window.innerWidth < 768) {
-      setIsMobileInspectorOpen(true);
-    }
   }, []);
 
   // Update Node Data Field

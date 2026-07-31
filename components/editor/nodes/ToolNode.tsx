@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { Wrench, Globe, Search, Folder, FileText, Code2 } from 'lucide-react';
+import { Wrench, Globe, Search, Folder, FileText, Code2, Settings } from 'lucide-react';
 import { ToolNodeData } from '@/types/editor';
 
 const toolIcons: Record<string, React.ReactNode> = {
@@ -14,9 +14,15 @@ const toolIcons: Record<string, React.ReactNode> = {
   CustomTool: <Code2 className="w-4 h-4 text-amber-400" />,
 };
 
-export const ToolNode = memo(({ data, selected }: NodeProps<any>) => {
+export const ToolNode = memo(({ id, data, selected }: NodeProps<any>) => {
   const toolData = data as ToolNodeData;
   const icon = toolIcons[toolData.toolType] || <Wrench className="w-4 h-4 text-amber-400" />;
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const event = new CustomEvent('open-node-inspector', { detail: { nodeId: id } });
+    window.dispatchEvent(event);
+  };
 
   return (
     <div
@@ -34,9 +40,18 @@ export const ToolNode = memo(({ data, selected }: NodeProps<any>) => {
           </div>
           <span className="font-semibold text-xs text-amber-200 tracking-wide uppercase">Tool Node</span>
         </div>
-        <span className="text-[10px] text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800/40 font-mono">
-          {toolData.toolType || 'Tool'}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800/40 font-mono">
+            {toolData.toolType || 'Tool'}
+          </span>
+          <button
+            onClick={handleEditClick}
+            className="p-1 rounded-lg bg-amber-950/80 hover:bg-amber-900 border border-amber-800/60 text-amber-300 transition"
+            title="Edit Node Details"
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Body Content */}
@@ -45,7 +60,7 @@ export const ToolNode = memo(({ data, selected }: NodeProps<any>) => {
         <p className="text-[11px] text-slate-400 line-clamp-2">{toolData.description || 'Prebuilt CrewAI Integration'}</p>
       </div>
 
-      {/* Input Handle (Flexible target handle for Loose connection mode) */}
+      {/* Input Handle */}
       <Handle
         type="target"
         position={Position.Left}
@@ -53,7 +68,7 @@ export const ToolNode = memo(({ data, selected }: NodeProps<any>) => {
         className="!w-4 !h-4 bg-amber-500 border-2 border-slate-900 rounded-full hover:scale-125 hover:border-white transition-all shadow-md shadow-amber-500/50 cursor-pointer"
       />
 
-      {/* Output Handle (Tool connecting to Agent or Task) */}
+      {/* Output Handle */}
       <Handle
         type="source"
         position={Position.Right}
