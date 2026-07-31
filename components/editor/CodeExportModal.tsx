@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Copy, Check, Download, Code2, Terminal, ExternalLink } from 'lucide-react';
+import { X, Copy, Check, Download, Code2, Terminal, ExternalLink, Sparkles } from 'lucide-react';
 
 interface CodeExportModalProps {
   isOpen: boolean;
@@ -79,6 +79,49 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({ isOpen, onClos
           >
             CrewAI Docs <ExternalLink className="w-3 h-3" />
           </a>
+        </div>
+
+        {/* Recommended Server & Cloud Infrastructure (Affiliate Section) */}
+        <div className="px-6 py-3 bg-slate-900/90 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+          <div className="flex items-center gap-1.5 font-semibold text-slate-200">
+            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>🚀 24/7 本番運用・推奨インフラ環境 (Recommended Server & API Stack)</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+            <a
+              href="https://www.hetzner.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-600/60 hover:bg-slate-900 transition flex flex-col gap-0.5 group shadow-sm"
+            >
+              <span className="font-semibold text-indigo-300 group-hover:underline flex items-center justify-between">
+                Hetzner Cloud VPS <ExternalLink className="w-2.5 h-2.5" />
+              </span>
+              <span className="text-slate-400 text-[10px]">24時間エージェント常時実行用 高コスパサーバー</span>
+            </a>
+            <a
+              href="https://www.digitalocean.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-600/60 hover:bg-slate-900 transition flex flex-col gap-0.5 group shadow-sm"
+            >
+              <span className="font-semibold text-indigo-300 group-hover:underline flex items-center justify-between">
+                DigitalOcean ($200) <ExternalLink className="w-2.5 h-2.5" />
+              </span>
+              <span className="text-slate-400 text-[10px]">Python / Docker用 クラウドサーバー</span>
+            </a>
+            <a
+              href="https://groq.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-600/60 hover:bg-slate-900 transition flex flex-col gap-0.5 group shadow-sm"
+            >
+              <span className="font-semibold text-indigo-300 group-hover:underline flex items-center justify-between">
+                Groq API (高速推論) <ExternalLink className="w-2.5 h-2.5" />
+              </span>
+              <span className="text-slate-400 text-[10px]">LLM呼び出し無料枠・超高速レスポンスAPI</span>
+            </a>
+          </div>
         </div>
 
         {/* Modal Footer Actions */}

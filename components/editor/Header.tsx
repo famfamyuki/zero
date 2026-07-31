@@ -83,8 +83,8 @@ export const Header: React.FC<HeaderProps> = ({
           href="/templates"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm"
         >
-          <ShoppingBag className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="hidden sm:inline">Marketplace</span>
+          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="hidden sm:inline">Free Templates</span>
         </Link>
 
         {/* JSON Import/Export */}

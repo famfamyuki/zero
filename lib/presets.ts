@@ -101,9 +101,9 @@ export const PRESET_TEMPLATES: WorkflowTemplate[] = [
     id: 'code-audit-refactor',
     title: '🛡️ Automated Code Auditor & Security Refactor',
     description: '3-node workflow that inspects local directories, identifies security flaws, and outputs refactored code with unit tests.',
-    price: 15,
+    price: 0,
     category: 'Engineering',
-    badge: 'PRO',
+    badge: 'FREE',
     previewNodesCount: { agents: 2, tasks: 2, tools: 2 },
     graphData: {
       crewConfig: {
@@ -197,9 +197,9 @@ export const PRESET_TEMPLATES: WorkflowTemplate[] = [
     id: 'market-financial-analyst',
     title: '📊 Financial Market Intelligence & Stock Analyst',
     description: 'Gather stock metrics, market sentiments, and competitor data to synthesize Wall St. style investment memos.',
-    price: 29,
+    price: 0,
     category: 'Finance',
-    badge: 'ENTERPRISE',
+    badge: 'FREE',
     previewNodesCount: { agents: 2, tasks: 2, tools: 1 },
     graphData: {
       crewConfig: {

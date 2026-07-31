@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ShoppingBag, Sparkles, Bot, CheckSquare, Wrench, ShieldCheck, Zap, ExternalLink, CreditCard, Check } from 'lucide-react';
+import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid } from 'lucide-react';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
@@ -12,21 +12,19 @@ export default function TemplatesPage() {
   const router = useRouter();
   const [templates, setTemplates] = useState<WorkflowTemplate[]>(PRESET_TEMPLATES);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadSupabaseTemplates() {
       try {
         const { data, error } = await supabase.from('templates').select('*');
         if (data && data.length > 0 && !error) {
-          // Merge Supabase database templates with fallback presets
           const formattedSupabase: WorkflowTemplate[] = data.map((item: any) => ({
             id: item.id,
             title: item.title,
             description: item.description,
-            price: item.price || 0,
+            price: 0,
             category: item.category || 'General',
-            badge: item.badge || (item.price > 0 ? 'PRO' : 'FREE'),
+            badge: 'FREE',
             previewNodesCount: item.preview_nodes_count || { agents: 2, tasks: 2, tools: 1 },
             graphData: item.graph_data,
           }));
@@ -48,32 +46,9 @@ export default function TemplatesPage() {
     ? templates
     : templates.filter((t) => t.category === selectedCategory);
 
-  const handleUseFreeTemplate = (template: WorkflowTemplate) => {
+  const handleUseTemplate = (template: WorkflowTemplate) => {
     localStorage.setItem('agentgraph_active_flow', JSON.stringify(template.graphData));
     router.push('/');
-  };
-
-  const handleBuyTemplate = async (template: WorkflowTemplate) => {
-    setLoadingTemplateId(template.id);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId: template.id }),
-      });
-      const data = await res.json();
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || 'Failed to initiate Stripe Checkout');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Checkout error');
-    } finally {
-      setLoadingTemplateId(null);
-    }
   };
 
   return (
@@ -89,14 +64,14 @@ export default function TemplatesPage() {
           </Link>
           <div className="h-4 w-px bg-slate-800" />
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-indigo-400" />
-            <h1 className="font-extrabold text-base text-slate-100 tracking-tight">CrewAI Template Marketplace</h1>
+            <LayoutGrid className="w-5 h-5 text-indigo-400" />
+            <h1 className="font-extrabold text-base text-slate-100 tracking-tight">CrewAI Free Template Library</h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-amber-400" /> Supabase + Stripe Ready
+          <span className="text-xs text-emerald-400 bg-emerald-950/80 border border-emerald-800/40 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium">
+            <Zap className="w-3.5 h-3.5 text-emerald-400" /> 100% Free & Open Source
           </span>
         </div>
       </header>
@@ -104,14 +79,14 @@ export default function TemplatesPage() {
       {/* Hero Section */}
       <section className="relative py-12 px-6 border-b border-slate-800/80 overflow-hidden bg-gradient-to-b from-indigo-950/40 via-slate-950 to-slate-950">
         <div className="max-w-5xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-800/50 text-indigo-300 text-xs font-semibold shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Production-Grade AI Agent Architectures
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/50 text-emerald-300 text-xs font-semibold shadow-inner">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Unlimited Access • No Paywalls
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-emerald-200">
             Prebuilt CrewAI Workflow Templates
           </h2>
           <p className="text-sm text-slate-400 max-w-2xl mx-auto">
-            Instantly deploy pre-configured multi-agent systems. Free templates load directly onto your canvas, while premium templates unlock advanced enterprise agent pipelines.
+            Instantly deploy pre-configured multi-agent systems onto your canvas. All templates are 100% free with raw Python code export.
           </p>
 
           {/* Category Filter Pills */}
@@ -147,14 +122,8 @@ export default function TemplatesPage() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/80 px-2.5 py-1 rounded-full border border-indigo-800/40">
                     {template.category}
                   </span>
-                  <span
-                    className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${
-                      template.price === 0
-                        ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/40'
-                        : 'bg-amber-950/80 text-amber-300 border-amber-800/40'
-                    }`}
-                  >
-                    {template.badge || (template.price === 0 ? 'FREE' : 'PRO')}
+                  <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-emerald-950/80 text-emerald-400 border-emerald-800/40">
+                    FREE
                   </span>
                 </div>
 
@@ -185,30 +154,19 @@ export default function TemplatesPage() {
               {/* Card Footer / Action */}
               <div className="p-4 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-slate-500">Price</span>
-                  <p className="text-base font-extrabold text-slate-100">
-                    {template.price === 0 ? 'Free' : `$${template.price}`}
+                  <span className="text-xs text-slate-500">Access</span>
+                  <p className="text-sm font-extrabold text-emerald-400">
+                    100% Free
                   </p>
                 </div>
 
-                {template.price === 0 ? (
-                  <button
-                    onClick={() => handleUseFreeTemplate(template)}
-                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold flex items-center gap-1.5 transition"
-                  >
-                    <Check className="w-4 h-4 text-emerald-400" />
-                    <span>Load Template</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleBuyTemplate(template)}
-                    disabled={loadingTemplateId === template.id}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition disabled:opacity-50"
-                  >
-                    <CreditCard className="w-4 h-4" />
-                    <span>{loadingTemplateId === template.id ? 'Redirecting...' : 'Buy Template'}</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => handleUseTemplate(template)}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20"
+                >
+                  <Check className="w-4 h-4 text-white" />
+                  <span>Load Template</span>
+                </button>
               </div>
             </div>
           ))}
@@ -217,7 +175,7 @@ export default function TemplatesPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500 bg-slate-950">
-        AgentGraph Studio • Zero Running Cost Client-Side Transpiler • Supabase & Stripe Powered
+        AgentGraph Studio • 100% Free Open Source AI Agent Builder • Zero Vendor Lock-in
       </footer>
     </div>
   );
