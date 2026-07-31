@@ -11,14 +11,11 @@ import { CodeExportModal } from '@/components/editor/CodeExportModal';
 import { CustomNode, CrewConfig, WorkflowTemplate, GraphData } from '@/types/editor';
 import { transpileToCrewAI } from '@/lib/transpiler/crewai';
 import { PRESET_TEMPLATES } from '@/lib/presets';
+import { Code2, Zap, Layers, Sliders } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
-
 const initialDefaultPreset = PRESET_TEMPLATES[0];
-
-import { Code2, Zap } from 'lucide-react';
-
-import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function EditorPage() {
   const { t } = useLanguage();
@@ -38,65 +35,48 @@ export default function EditorPage() {
   const [generatedCode, setGeneratedCode] = useState('');
   const [purchaseSuccessMessage, setPurchaseSuccessMessage] = useState<string | null>(null);
 
-  // Load state from localStorage or query params on initial mount
+  // Mobile Drawer State
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isMobileInspectorOpen, setIsMobileInspectorOpen] = useState(false);
+
+  // Load from LocalStorage or Active Flow
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const searchParams = new URLSearchParams(window.location.search);
-    const isSuccess = searchParams.get('success');
-    const templateId = searchParams.get('template_id');
-
-    if (isSuccess === 'true' && templateId) {
-      const template = PRESET_TEMPLATES.find((t) => t.id === templateId);
-      if (template) {
-        setNodes(template.graphData.nodes);
-        setEdges(template.graphData.edges);
-        setCrewConfig(template.graphData.crewConfig);
-        setPurchaseSuccessMessage(`🎉 Successfully purchased and unlocked "${template.title}"!`);
-
-        // Confetti celebration
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
-
-        // Clean up URL parameters
-        window.history.replaceState({}, '', '/');
-        return;
-      }
-    }
-
-    // Otherwise load from localStorage if available
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
         const parsed: GraphData = JSON.parse(saved);
         if (parsed.nodes && parsed.edges) {
           setNodes(parsed.nodes);
           setEdges(parsed.edges);
           if (parsed.crewConfig) setCrewConfig(parsed.crewConfig);
         }
-      } catch (err) {
-        console.error('Failed to parse saved graph:', err);
       }
+    } catch (e) {
+      console.error('Failed to load active flow:', e);
     }
   }, [setNodes, setEdges]);
 
-  // Save state to localStorage on node/edge/config changes
-  useEffect(() => {
-    if (nodes.length > 0) {
-      const graphData: GraphData = { nodes, edges, crewConfig };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(graphData));
-    }
-  }, [nodes, edges, crewConfig]);
+  // Handle Preset Loading
+  const handleLoadPreset = useCallback(
+    (template: WorkflowTemplate) => {
+      setNodes(template.graphData.nodes);
+      setEdges(template.graphData.edges);
+      setCrewConfig(template.graphData.crewConfig);
+      setSelectedNode(null);
+      confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+    },
+    [setNodes, setEdges]
+  );
 
-  // Node selection sync
+  // Node Selection Handler
   const handleNodeSelect = useCallback((node: CustomNode | null) => {
     setSelectedNode(node);
+    if (node && window.innerWidth < 768) {
+      setIsMobileInspectorOpen(true);
+    }
   }, []);
 
-  // Update selected node data from Inspector
+  // Update Node Data Field
   const handleUpdateNodeData = useCallback(
     (nodeId: string, newData: Record<string, unknown>) => {
       setNodes((nds) =>
@@ -113,45 +93,31 @@ export default function EditorPage() {
           return node;
         })
       );
-      setSelectedNode((prev) =>
-        prev && prev.id === nodeId ? { ...prev, data: { ...prev.data, ...newData } } : prev
-      );
+      setSelectedNode((prev) => (prev && prev.id === nodeId ? { ...prev, data: { ...prev.data, ...newData } } : prev));
     },
     [setNodes]
   );
 
-  // Delete node from Canvas or Inspector
+  // Delete Node Handler
   const handleDeleteNode = useCallback(
     (nodeId: string) => {
-      setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-      setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
-      setSelectedNode(null);
+      setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+      setSelectedNode((prev) => (prev && prev.id === nodeId ? null : prev));
     },
     [setNodes, setEdges]
   );
 
-  // Load preset template
-  const handleLoadPreset = useCallback(
-    (tmpl: WorkflowTemplate) => {
-      setNodes(tmpl.graphData.nodes);
-      setEdges(tmpl.graphData.edges);
-      setCrewConfig(tmpl.graphData.crewConfig);
-      setSelectedNode(null);
-    },
-    [setNodes, setEdges]
-  );
-
-  // Clear Canvas
+  // Clear Canvas Handler
   const handleClearCanvas = useCallback(() => {
-    if (confirm('Are you sure you want to clear the canvas?')) {
+    if (window.confirm('Clear all nodes and connections?')) {
       setNodes([]);
       setEdges([]);
       setSelectedNode(null);
-      localStorage.removeItem(STORAGE_KEY);
     }
   }, [setNodes, setEdges]);
 
-  // Transpile to Python Code
+  // Transpile CrewAI Python Code
   const handleGenerateCode = useCallback(() => {
     const code = transpileToCrewAI(nodes, edges, crewConfig);
     setGeneratedCode(code);
@@ -242,7 +208,11 @@ export default function EditorPage() {
       {/* Main Workspace Area */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left Palette & Presets Sidebar */}
-        <Sidebar onLoadPreset={handleLoadPreset} />
+        <Sidebar
+          onLoadPreset={handleLoadPreset}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
 
         {/* Central React Flow Canvas */}
         <Canvas
@@ -255,6 +225,31 @@ export default function EditorPage() {
           onNodeSelect={handleNodeSelect}
         />
 
+        {/* Mobile Floating Drawer Toolbar */}
+        <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-slate-900/90 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl">
+          <button
+            onClick={() => {
+              setIsMobileSidebarOpen(!isMobileSidebarOpen);
+              setIsMobileInspectorOpen(false);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+          >
+            <Layers className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Palette</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setIsMobileInspectorOpen(!isMobileInspectorOpen);
+              setIsMobileSidebarOpen(false);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-md"
+          >
+            <Sliders className="w-3.5 h-3.5 text-white" />
+            <span>Inspector</span>
+          </button>
+        </div>
+
         {/* Right Parameter Inspector Panel */}
         <Inspector
           selectedNode={selectedNode}
@@ -262,6 +257,8 @@ export default function EditorPage() {
           onDeleteNode={handleDeleteNode}
           crewConfig={crewConfig}
           onUpdateCrewConfig={(newConfig) => setCrewConfig((prev) => ({ ...prev, ...newConfig }))}
+          isMobileOpen={isMobileInspectorOpen}
+          onCloseMobile={() => setIsMobileInspectorOpen(false)}
         />
       </div>
 
