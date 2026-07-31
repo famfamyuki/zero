@@ -87,37 +87,37 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Language Switcher Toggle */}
         <button
           onClick={toggleLanguage}
           title="Switch Language / 言語切り替え"
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-indigo-600/60 hover:text-indigo-300 transition"
+          className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-indigo-600/60 hover:text-indigo-300 transition shrink-0"
         >
           <Globe className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="font-semibold">{lang === 'en' ? 'EN' : '日本語'}</span>
+          <span className="font-semibold text-[11px] sm:text-xs">{lang === 'en' ? 'EN' : '日本語'}</span>
         </button>
 
         <Link
           href="/templates"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0"
         >
           <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="hidden sm:inline">{t('freeTemplates')}</span>
+          <span>{t('freeTemplates')}</span>
         </Link>
 
-        {/* JSON Import/Export */}
+        {/* JSON Import/Export (Desktop) */}
         <button
           onClick={onExportJson}
           title={t('exportJson')}
-          className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition"
+          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition"
         >
           <Download className="w-4 h-4" />
         </button>
 
         <label
           title={t('importJson')}
-          className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition cursor-pointer"
+          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition cursor-pointer"
         >
           <Upload className="w-4 h-4" />
           <input type="file" accept=".json" onChange={onImportJson} className="hidden" />
@@ -126,19 +126,20 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onClearCanvas}
           title={t('clearCanvas')}
-          className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:bg-red-950/40 hover:border-red-900/60 transition"
+          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:bg-red-950/40 hover:border-red-900/60 transition"
         >
           <Trash2 className="w-4 h-4" />
         </button>
 
-        {/* Transpile Button */}
+        {/* Transpile Code Button */}
         <button
           onClick={onGenerateCode}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:brightness-110 active:scale-95 transition"
+          className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:brightness-110 active:scale-95 transition shrink-0"
         >
           <Code2 className="w-4 h-4" />
-          <span>{t('generatePython')}</span>
-          <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+          <span className="hidden sm:inline">{t('generatePython')}</span>
+          <span className="sm:hidden font-semibold">Python</span>
+          <Sparkles className="w-3 h-3 text-amber-300 animate-pulse hidden sm:inline" />
         </button>
       </div>
     </header>

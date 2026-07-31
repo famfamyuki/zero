@@ -8,16 +8,24 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface SidebarProps {
   onLoadPreset: (tmpl: WorkflowTemplate) => void;
+  onAddNode?: (nodeType: NodeType) => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, isMobileOpen = false, onCloseMobile }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, onAddNode, isMobileOpen = false, onCloseMobile }) => {
   const { lang, t } = useLanguage();
 
   const onDragStart = (event: React.DragEvent, nodeType: NodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleNodeClick = (nodeType: NodeType) => {
+    if (onAddNode) {
+      onAddNode(nodeType);
+      if (onCloseMobile) onCloseMobile();
+    }
   };
 
   return (
@@ -64,7 +72,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, isMobileOpen = f
             <div
               draggable
               onDragStart={(e) => onDragStart(e, 'agent')}
-              className="group cursor-grab active:cursor-grabbing p-3 rounded-xl bg-slate-900/80 border border-indigo-900/40 hover:border-indigo-600/70 hover:bg-slate-900 transition-all shadow-md hover:shadow-indigo-500/10 flex items-center gap-3"
+              onClick={() => handleNodeClick('agent')}
+              className="group cursor-pointer active:scale-95 p-3 rounded-xl bg-slate-900/80 border border-indigo-900/40 hover:border-indigo-600/70 hover:bg-slate-900 transition-all shadow-md hover:shadow-indigo-500/10 flex items-center gap-3"
             >
               <div className="w-9 h-9 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform shrink-0">
                 <Bot className="w-5 h-5" />
@@ -79,7 +88,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, isMobileOpen = f
             <div
               draggable
               onDragStart={(e) => onDragStart(e, 'task')}
-              className="group cursor-grab active:cursor-grabbing p-3 rounded-xl bg-slate-900/80 border border-emerald-900/40 hover:border-emerald-600/70 hover:bg-slate-900 transition-all shadow-md hover:shadow-emerald-500/10 flex items-center gap-3"
+              onClick={() => handleNodeClick('task')}
+              className="group cursor-pointer active:scale-95 p-3 rounded-xl bg-slate-900/80 border border-emerald-900/40 hover:border-emerald-600/70 hover:bg-slate-900 transition-all shadow-md hover:shadow-emerald-500/10 flex items-center gap-3"
             >
               <div className="w-9 h-9 rounded-lg bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform shrink-0">
                 <CheckSquare className="w-5 h-5" />
@@ -94,7 +104,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, isMobileOpen = f
             <div
               draggable
               onDragStart={(e) => onDragStart(e, 'tool')}
-              className="group cursor-grab active:cursor-grabbing p-3 rounded-xl bg-slate-900/80 border border-amber-900/40 hover:border-amber-600/70 hover:bg-slate-900 transition-all shadow-md hover:shadow-amber-500/10 flex items-center gap-3"
+              onClick={() => handleNodeClick('tool')}
+              className="group cursor-pointer active:scale-95 p-3 rounded-xl bg-slate-900/80 border border-amber-900/40 hover:border-amber-600/70 hover:bg-slate-900 transition-all shadow-md hover:shadow-amber-500/10 flex items-center gap-3"
             >
               <div className="w-9 h-9 rounded-lg bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform shrink-0">
                 <Wrench className="w-5 h-5" />

@@ -31,27 +31,44 @@ body {
   background: #334155;
 }
 
-/* React Flow custom overrides & handle hit area expansion */
+/* React Flow custom overrides & touch handle hit area expansion */
 .react-flow__handle {
-  width: 14px !important;
-  height: 14px !important;
+  width: 16px !important;
+  height: 16px !important;
   transition: all 0.2s ease-in-out !important;
+  border-width: 2px !important;
 }
 
 .react-flow__handle::before {
   content: '';
   position: absolute;
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
+  top: -14px;
+  left: -14px;
+  right: -14px;
+  bottom: -14px;
   border-radius: 9999px;
   background: transparent;
   cursor: crosshair;
 }
 
-.react-flow__handle:hover {
-  transform: scale(1.35) !important;
-  box-shadow: 0 0 12px rgba(129, 140, 248, 0.9) !important;
+/* Touch targets on mobile screens */
+@media (max-width: 768px) {
+  .react-flow__handle {
+    width: 20px !important;
+    height: 20px !important;
+    border-width: 2.5px !important;
+  }
+  .react-flow__handle::before {
+    top: -18px;
+    left: -18px;
+    right: -18px;
+    bottom: -18px;
+  }
+}
+
+.react-flow__handle:hover,
+.react-flow__handle:active {
+  transform: scale(1.4) !important;
+  box-shadow: 0 0 16px rgba(129, 140, 248, 1) !important;
   border-color: #ffffff !important;
 }

@@ -147,6 +147,12 @@ export const Canvas: React.FC<CanvasProps> = ({
 
   return (
     <div className="w-full h-full flex-1 relative bg-slate-950" ref={reactFlowWrapper}>
+      {/* Mobile Touch Guidance Tip */}
+      <div className="md:hidden absolute top-3 left-3 z-20 pointer-events-none bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] text-slate-300 shadow-lg flex items-center gap-1.5">
+        <span className="text-amber-400 font-bold">💡</span>
+        <span>拡大すると端の丸（Handle）が繋がりやすくなります</span>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -165,14 +171,14 @@ export const Canvas: React.FC<CanvasProps> = ({
         className="bg-slate-950"
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
-        <Controls className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl" />
+        <Controls className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl !left-3 !bottom-20 md:!bottom-4 md:!left-4" />
         <MiniMap
           nodeColor={(n) => {
             if (n.type === 'agent') return '#6366f1';
             if (n.type === 'task') return '#10b981';
             return '#f59e0b';
           }}
-          className="!bg-slate-900/90 !border-slate-800 !rounded-xl overflow-hidden shadow-2xl"
+          className="hidden sm:block !bg-slate-900/90 !border-slate-800 !rounded-xl overflow-hidden shadow-2xl"
           maskColor="rgba(15, 23, 42, 0.7)"
         />
       </ReactFlow>

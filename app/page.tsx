@@ -8,7 +8,7 @@ import { Sidebar } from '@/components/editor/Sidebar';
 import { Canvas } from '@/components/editor/Canvas';
 import { Inspector } from '@/components/editor/Inspector';
 import { CodeExportModal } from '@/components/editor/CodeExportModal';
-import { CustomNode, CrewConfig, WorkflowTemplate, GraphData } from '@/types/editor';
+import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { transpileToCrewAI } from '@/lib/transpiler/crewai';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { Code2, Zap, Layers, Sliders } from 'lucide-react';
@@ -66,6 +66,49 @@ export default function EditorPage() {
       confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
     },
     [setNodes, setEdges]
+  );
+
+  // Add Node from Tap/Click Handler (Mobile Ergonomics)
+  const handleAddNode = useCallback(
+    (type: NodeType) => {
+      let data: AgentNodeData | TaskNodeData | ToolNodeData;
+      if (type === 'agent') {
+        data = {
+          label: 'New Agent',
+          role: 'AI Specialist',
+          goal: 'Perform analysis and execution',
+          backstory: 'Expert assistant in specialized domain',
+          model: 'gpt-4o',
+          verbose: true,
+          allowDelegation: false,
+        };
+      } else if (type === 'task') {
+        data = {
+          label: 'New Task',
+          description: 'Define specific task details here',
+          expectedOutput: 'Clear summary output format',
+          asyncExecution: false,
+        };
+      } else {
+        data = {
+          label: 'New Tool',
+          toolType: 'SerperDevTool',
+          description: 'Search Google API Tool',
+        };
+      }
+
+      const offset = (nodes.length % 5) * 35;
+      const newNode: CustomNode = {
+        id: `${type}-${Date.now()}`,
+        type,
+        position: { x: 200 + offset, y: 150 + offset },
+        data,
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+      setSelectedNode(newNode);
+    },
+    [nodes.length, setNodes]
   );
 
   // Node Selection Handler
@@ -210,6 +253,7 @@ export default function EditorPage() {
         {/* Left Palette & Presets Sidebar */}
         <Sidebar
           onLoadPreset={handleLoadPreset}
+          onAddNode={handleAddNode}
           isMobileOpen={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
