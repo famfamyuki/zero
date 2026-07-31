@@ -18,7 +18,11 @@ const initialDefaultPreset = PRESET_TEMPLATES[0];
 
 import { Code2, Zap } from 'lucide-react';
 
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+
 export default function EditorPage() {
+  const { t } = useLanguage();
+
   const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode>(
     initialDefaultPreset.graphData.nodes
   );
@@ -213,10 +217,10 @@ export default function EditorPage() {
           </div>
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
             <span className="font-extrabold text-xs text-white tracking-wide uppercase bg-indigo-600/40 px-2 py-0.5 rounded border border-indigo-500/40">
-              Visual Builder for CrewAI - No Vendor Lock-in
+              {t('mainCopy')}
             </span>
             <span className="text-xs text-slate-300">
-              ブラウザ上でAIエージェントを設計し、実行可能な生のPythonコード（<code className="text-indigo-300 font-mono">main.py</code>）を1秒で出力します。APIキーの入力不要・100%ローカル実行対応。
+              {t('subCopy')}
             </span>
           </div>
         </div>

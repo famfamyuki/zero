@@ -4,12 +4,15 @@ import React from 'react';
 import { Bot, CheckSquare, Wrench, Sparkles, Layers, Info } from 'lucide-react';
 import { NodeType, WorkflowTemplate } from '@/types/editor';
 import { PRESET_TEMPLATES } from '@/lib/presets';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface SidebarProps {
   onLoadPreset: (tmpl: WorkflowTemplate) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
+  const { t } = useLanguage();
+
   const onDragStart = (event: React.DragEvent, nodeType: NodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
@@ -21,9 +24,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
       <div>
         <div className="flex items-center gap-2 mb-3 text-slate-400">
           <Layers className="w-4 h-4 text-indigo-400" />
-          <h3 className="text-xs font-bold uppercase tracking-wider">Node Palette</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider">{t('nodePalette')}</h3>
         </div>
-        <p className="text-[11px] text-slate-400 mb-3">Drag nodes onto the canvas to assemble your Crew AI flow.</p>
+        <p className="text-[11px] text-slate-400 mb-3">{t('nodePaletteSub')}</p>
 
         <div className="space-y-2.5">
           {/* Agent Node Item */}
@@ -36,8 +39,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
               <Bot className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition">Agent Node</h4>
-              <p className="text-[10px] text-slate-400">Autonomous role with goal & backstory</p>
+              <h4 className="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition">{t('agentNodeTitle')}</h4>
+              <p className="text-[10px] text-slate-400">{t('agentNodeSub')}</p>
             </div>
           </div>
 
@@ -51,8 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
               <CheckSquare className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition">Task Node</h4>
-              <p className="text-[10px] text-slate-400">Specific assignment & expected output</p>
+              <h4 className="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition">{t('taskNodeTitle')}</h4>
+              <p className="text-[10px] text-slate-400">{t('taskNodeSub')}</p>
             </div>
           </div>
 
@@ -66,8 +69,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
               <Wrench className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition">Tool Node</h4>
-              <p className="text-[10px] text-slate-400">Integration tool (Serper, Scraper, etc.)</p>
+              <h4 className="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition">{t('toolNodeTitle')}</h4>
+              <p className="text-[10px] text-slate-400">{t('toolNodeSub')}</p>
             </div>
           </div>
         </div>
@@ -79,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
       <div>
         <div className="flex items-center gap-2 mb-3 text-slate-400">
           <Sparkles className="w-4 h-4 text-violet-400" />
-          <h3 className="text-xs font-bold uppercase tracking-wider">Starter Crew Templates</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider">{t('starterTemplates')}</h3>
         </div>
 
         <div className="space-y-2">
@@ -104,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
 
       <div className="mt-auto p-3 rounded-xl bg-indigo-950/30 border border-indigo-900/40 flex items-start gap-2.5 text-[11px] text-indigo-300">
         <Info className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-        <p>Connect Tool → Agent, Agent → Task, and Task → Task to define execution order.</p>
+        <p>{t('sidebarTip')}</p>
       </div>
     </aside>
   );

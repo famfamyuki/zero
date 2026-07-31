@@ -7,9 +7,11 @@ import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid }
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function TemplatesPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [templates, setTemplates] = useState<WorkflowTemplate[]>(PRESET_TEMPLATES);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -60,18 +62,18 @@ export default function TemplatesPage() {
             href="/"
             className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 transition bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Canvas
+            <ArrowLeft className="w-4 h-4" /> {t('backToCanvas')}
           </Link>
           <div className="h-4 w-px bg-slate-800" />
           <div className="flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-indigo-400" />
-            <h1 className="font-extrabold text-base text-slate-100 tracking-tight">CrewAI Free Template Library</h1>
+            <h1 className="font-extrabold text-base text-slate-100 tracking-tight">{t('templatesTitle')}</h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-xs text-emerald-400 bg-emerald-950/80 border border-emerald-800/40 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium">
-            <Zap className="w-3.5 h-3.5 text-emerald-400" /> 100% Free & Open Source
+            <Zap className="w-3.5 h-3.5 text-emerald-400" /> {t('freeAndOpenBadge')}
           </span>
         </div>
       </header>
@@ -80,13 +82,13 @@ export default function TemplatesPage() {
       <section className="relative py-12 px-6 border-b border-slate-800/80 overflow-hidden bg-gradient-to-b from-indigo-950/40 via-slate-950 to-slate-950">
         <div className="max-w-5xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/50 text-emerald-300 text-xs font-semibold shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Unlimited Access • No Paywalls
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> {t('noPaywallsBadge')}
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-emerald-200">
-            Prebuilt CrewAI Workflow Templates
+            {t('templatesTitle')}
           </h2>
           <p className="text-sm text-slate-400 max-w-2xl mx-auto">
-            Instantly deploy pre-configured multi-agent systems onto your canvas. All templates are 100% free with raw Python code export.
+            {t('templatesSub')}
           </p>
 
           {/* Category Filter Pills */}
@@ -154,9 +156,9 @@ export default function TemplatesPage() {
               {/* Card Footer / Action */}
               <div className="p-4 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-slate-500">Access</span>
+                  <span className="text-xs text-slate-500">{t('access')}</span>
                   <p className="text-sm font-extrabold text-emerald-400">
-                    100% Free
+                    {t('freeAccess')}
                   </p>
                 </div>
 
@@ -165,7 +167,7 @@ export default function TemplatesPage() {
                   className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20"
                 >
                   <Check className="w-4 h-4 text-white" />
-                  <span>Load Template</span>
+                  <span>{t('loadTemplateBtn')}</span>
                 </button>
               </div>
             </div>
@@ -175,7 +177,7 @@ export default function TemplatesPage() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500 bg-slate-950">
-        AgentGraph Studio • 100% Free Open Source AI Agent Builder • Zero Vendor Lock-in
+        {t('templatesFooter')}
       </footer>
     </div>
   );
