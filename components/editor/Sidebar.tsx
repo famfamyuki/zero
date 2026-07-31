@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const onDragStart = (event: React.DragEvent, nodeType: NodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset }) => {
               className="w-full text-left p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80 hover:border-slate-700 hover:bg-slate-900 transition text-xs flex flex-col gap-1 group"
             >
               <span className="font-semibold text-slate-300 group-hover:text-indigo-300 transition truncate">
-                {tmpl.title}
+                {lang === 'ja' && tmpl.titleJa ? tmpl.titleJa : (tmpl.titleEn || tmpl.title)}
               </span>
               <div className="flex items-center gap-2 text-[10px] text-slate-500">
                 <span>{tmpl.previewNodesCount.agents} Agents</span>

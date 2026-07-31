@@ -11,7 +11,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function TemplatesPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [templates, setTemplates] = useState<WorkflowTemplate[]>(PRESET_TEMPLATES);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -23,11 +23,15 @@ export default function TemplatesPage() {
           const formattedSupabase: WorkflowTemplate[] = data.map((item: any) => ({
             id: item.id,
             title: item.title,
+            titleEn: item.title_en || item.title,
+            titleJa: item.title_ja || item.title,
             description: item.description,
+            descriptionEn: item.description_en || item.description,
+            descriptionJa: item.description_ja || item.description,
             price: 0,
-            category: item.category || 'General',
+            category: item.category || 'BUSINESS',
             badge: 'FREE',
-            previewNodesCount: item.preview_nodes_count || { agents: 2, tasks: 2, tools: 1 },
+            previewNodesCount: item.preview_nodes_count || { agents: 2, tasks: 2, tools: 2 },
             graphData: item.graph_data,
           }));
           setTemplates((prev) => {
@@ -42,7 +46,7 @@ export default function TemplatesPage() {
     loadSupabaseTemplates();
   }, []);
 
-  const categories = ['All', 'Content Creation', 'Engineering', 'Finance'];
+  const categories = ['All', 'MARKETING', 'CONTENT', 'BUSINESS'];
 
   const filteredTemplates = selectedCategory === 'All'
     ? templates
@@ -51,6 +55,19 @@ export default function TemplatesPage() {
   const handleUseTemplate = (template: WorkflowTemplate) => {
     localStorage.setItem('agentgraph_active_flow', JSON.stringify(template.graphData));
     router.push('/');
+  };
+
+  const getCategoryBadgeClass = (category: string) => {
+    switch (category) {
+      case 'MARKETING':
+        return 'text-purple-300 bg-purple-950/80 border-purple-800/40';
+      case 'CONTENT':
+        return 'text-sky-300 bg-sky-950/80 border-sky-800/40';
+      case 'BUSINESS':
+        return 'text-emerald-300 bg-emerald-950/80 border-emerald-800/40';
+      default:
+        return 'text-indigo-400 bg-indigo-950/80 border-indigo-800/40';
+    }
   };
 
   return (
@@ -113,65 +130,70 @@ export default function TemplatesPage() {
       {/* Template Grid */}
       <main className="max-w-6xl mx-auto px-6 py-12 flex-1 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTemplates.map((template) => (
-            <div
-              key={template.id}
-              className="rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-indigo-600/60 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden group"
-            >
-              {/* Card Header */}
-              <div className="p-6 space-y-3 flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-950/80 px-2.5 py-1 rounded-full border border-indigo-800/40">
-                    {template.category}
-                  </span>
-                  <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-emerald-950/80 text-emerald-400 border-emerald-800/40">
-                    FREE
-                  </span>
-                </div>
+          {filteredTemplates.map((template) => {
+            const title = lang === 'ja' && template.titleJa ? template.titleJa : (template.titleEn || template.title);
+            const description = lang === 'ja' && template.descriptionJa ? template.descriptionJa : (template.descriptionEn || template.description);
 
-                <h3 className="text-lg font-bold text-slate-100 group-hover:text-indigo-300 transition">
-                  {template.title}
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
-                  {template.description}
-                </p>
+            return (
+              <div
+                key={template.id}
+                className="rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-indigo-600/60 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden group"
+              >
+                {/* Card Header */}
+                <div className="p-6 space-y-3 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getCategoryBadgeClass(template.category)}`}>
+                      {template.category}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-emerald-950/80 text-emerald-400 border-emerald-800/40">
+                      FREE
+                    </span>
+                  </div>
 
-                {/* Node Composition Summary */}
-                <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <Bot className="w-4 h-4 text-indigo-400" />
-                    <span>{template.previewNodesCount.agents} Agents</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckSquare className="w-4 h-4 text-emerald-400" />
-                    <span>{template.previewNodesCount.tasks} Tasks</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Wrench className="w-4 h-4 text-amber-400" />
-                    <span>{template.previewNodesCount.tools} Tools</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Footer / Action */}
-              <div className="p-4 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between">
-                <div>
-                  <span className="text-xs text-slate-500">{t('access')}</span>
-                  <p className="text-sm font-extrabold text-emerald-400">
-                    {t('freeAccess')}
+                  <h3 className="text-base font-bold text-slate-100 group-hover:text-indigo-300 transition leading-snug">
+                    {title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
+                    {description}
                   </p>
+
+                  {/* Node Composition Summary */}
+                  <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
+                    <div className="flex items-center gap-1.5">
+                      <Bot className="w-4 h-4 text-indigo-400" />
+                      <span>{template.previewNodesCount.agents} Agents</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckSquare className="w-4 h-4 text-emerald-400" />
+                      <span>{template.previewNodesCount.tasks} Tasks</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Wrench className="w-4 h-4 text-amber-400" />
+                      <span>{template.previewNodesCount.tools} Tools</span>
+                    </div>
+                  </div>
                 </div>
 
-                <button
-                  onClick={() => handleUseTemplate(template)}
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20"
-                >
-                  <Check className="w-4 h-4 text-white" />
-                  <span>{t('loadTemplateBtn')}</span>
-                </button>
+                {/* Card Footer / Action */}
+                <div className="p-4 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-slate-500">{t('access')}</span>
+                    <p className="text-sm font-extrabold text-emerald-400">
+                      {t('freeAccess')}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => handleUseTemplate(template)}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20"
+                  >
+                    <Check className="w-4 h-4 text-white" />
+                    <span>{t('loadTemplateBtn')}</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 

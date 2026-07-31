@@ -45,9 +45,13 @@ export interface GraphData {
 export interface WorkflowTemplate {
   id: string;
   title: string;
+  titleEn?: string;
+  titleJa?: string;
   description: string;
+  descriptionEn?: string;
+  descriptionJa?: string;
   price: number; // 0 for free
-  category: string;
+  category: 'MARKETING' | 'CONTENT' | 'BUSINESS' | string;
   badge?: string;
   previewNodesCount: {
     agents: number;

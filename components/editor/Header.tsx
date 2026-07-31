@@ -69,7 +69,9 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => onLoadPreset(tmpl)}
                 className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-xs text-slate-200 flex items-center justify-between group/item"
               >
-                <span className="truncate">{tmpl.title}</span>
+                <span className="truncate">
+                  {lang === 'ja' && tmpl.titleJa ? tmpl.titleJa : (tmpl.titleEn || tmpl.title)}
+                </span>
                 <span className="text-[10px] text-indigo-400 opacity-0 group-hover/item:opacity-100 font-semibold">
                   Load
                 </span>
