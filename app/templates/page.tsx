@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid } from 'lucide-react';
+import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid, Globe } from 'lucide-react';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
@@ -11,7 +11,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function TemplatesPage() {
   const router = useRouter();
-  const { lang, t } = useLanguage();
+  const { lang, setLanguage, t } = useLanguage();
   const [templates, setTemplates] = useState<WorkflowTemplate[]>(PRESET_TEMPLATES);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
@@ -89,6 +89,16 @@ export default function TemplatesPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Language Switcher Toggle */}
+          <button
+            onClick={() => setLanguage(lang === 'en' ? 'ja' : 'en')}
+            title="Switch Language / 言語切り替え"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-indigo-600/60 hover:text-indigo-300 transition"
+          >
+            <Globe className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="font-semibold">{lang === 'en' ? 'EN' : '日本語'}</span>
+          </button>
+
           <span className="text-xs text-emerald-400 bg-emerald-950/80 border border-emerald-800/40 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium">
             <Zap className="w-3.5 h-3.5 text-emerald-400" /> {t('freeAndOpenBadge')}
           </span>
