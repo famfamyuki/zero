@@ -106,11 +106,10 @@ export default function TemplatesPage() {
             href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-300/40"
+            className="hidden sm:flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all shrink-0 flex-shrink-0 border border-emerald-300/40 min-w-max whitespace-nowrap"
           >
-            <Rocket className="w-3.5 h-3.5 text-white animate-bounce" />
-            <span className="hidden sm:inline">{t('deployConoHaHeader')}</span>
-            <span className="sm:hidden font-extrabold text-[11px]">{lang === 'ja' ? '🚀 24h稼働' : '🚀 24/7 VPS'}</span>
+            <Rocket className="w-3.5 h-3.5 text-white animate-bounce shrink-0" />
+            <span>{t('deployConoHaHeader')}</span>
             <ExternalLink className="w-3 h-3 text-white/90 shrink-0" />
           </a>
         </div>
