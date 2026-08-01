@@ -219,9 +219,36 @@ export default function TemplatesPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500 bg-slate-950">
+      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500 bg-slate-950 pb-20 sm:pb-6">
         {t('templatesFooter')}
       </footer>
+
+      {/* Dedicated Mobile Bottom Sticky ConoHa VPS Affiliate Banner (sm:hidden) */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <div className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+            <Rocket className="w-3.5 h-3.5 animate-bounce" />
+          </div>
+          <div className="truncate">
+            <span className="font-extrabold text-[11px] text-emerald-300 block leading-tight truncate">
+              {lang === 'ja' ? '24時間自動実行用 ConoHa VPS' : '24/7 CrewAI Server'}
+            </span>
+            <span className="text-[9px] text-slate-400 block truncate">
+              {lang === 'ja' ? '月額定額・高速SSD' : 'Fixed Monthly • Fast SSD'}
+            </span>
+          </div>
+        </div>
+
+        <a
+          href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-[11px] shadow-lg shadow-emerald-500/40 shrink-0 border border-emerald-300/40 whitespace-nowrap active:scale-95 transition"
+        >
+          <span>{lang === 'ja' ? '🚀 サーバー構築' : '🚀 Deploy VPS'}</span>
+          <ExternalLink className="w-3 h-3 text-white/90" />
+        </a>
+      </div>
     </div>
   );
 }

@@ -31,33 +31,33 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-4 flex items-center justify-between shrink-0 z-30">
+    <header className="h-14 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0 z-30 gap-2 overflow-x-auto sm:overflow-visible">
       {/* Brand / Logo */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-emerald-500 p-0.5 shadow-lg shadow-indigo-500/20">
+      <div className="flex items-center gap-2.5 shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-emerald-500 p-0.5 shadow-lg shadow-indigo-500/20 shrink-0">
           <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-indigo-400">
             <Network className="w-4 h-4" />
           </div>
         </div>
-        <div>
+        <div className="shrink-0">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-sm tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-200 to-emerald-300">
+            <span className="font-extrabold text-sm tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-200 to-emerald-300 whitespace-nowrap">
               {t('appName')}
             </span>
-            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/40">
+            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/40 whitespace-nowrap hidden xs:inline-block">
               {t('zeroCostBadge')}
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 hidden sm:block">
+          <p className="text-[10px] text-slate-400 hidden md:block whitespace-nowrap">
             {t('subTitle')}
           </p>
         </div>
       </div>
 
       {/* Center Quick Presets & Status */}
-      <div className="hidden lg:flex items-center gap-2">
+      <div className="hidden lg:flex items-center gap-2 shrink-0">
         <div className="relative group">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-slate-700 transition">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-slate-700 transition whitespace-nowrap">
             <FolderOpen className="w-3.5 h-3.5 text-indigo-400" />
             <span>{t('loadPreset')}</span>
           </button>
@@ -81,18 +81,18 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <span className="text-xs text-slate-500">|</span>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-slate-400 whitespace-nowrap">
           <strong className="text-indigo-400">{nodeCount}</strong> {t('nodesCount')}
         </span>
       </div>
 
       {/* Right Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {/* Language Switcher Toggle */}
         <button
           onClick={toggleLanguage}
           title="Switch Language / 言語切り替え"
-          className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-indigo-600/60 hover:text-indigo-300 transition shrink-0"
+          className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-indigo-600/60 hover:text-indigo-300 transition shrink-0 whitespace-nowrap"
         >
           <Globe className="w-3.5 h-3.5 text-indigo-400" />
           <span className="font-semibold text-[11px] sm:text-xs">{lang === 'en' ? 'EN' : '日本語'}</span>
@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <Link
           href="/templates"
-          className="hidden sm:flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0"
+          className="hidden sm:flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0 whitespace-nowrap"
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span>{t('freeTemplates')}</span>
@@ -110,14 +110,14 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onExportJson}
           title={t('exportJson')}
-          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition"
+          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition shrink-0"
         >
           <Download className="w-4 h-4" />
         </button>
 
         <label
           title={t('importJson')}
-          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition cursor-pointer"
+          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700 transition cursor-pointer shrink-0"
         >
           <Upload className="w-4 h-4" />
           <input type="file" accept=".json" onChange={onImportJson} className="hidden" />
@@ -126,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onClearCanvas}
           title={t('clearCanvas')}
-          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:bg-red-950/40 hover:border-red-900/60 transition"
+          className="hidden md:block p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:bg-red-950/40 hover:border-red-900/60 transition shrink-0"
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -134,23 +134,22 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Export Python Code Button */}
         <button
           onClick={onGenerateCode}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold text-xs hover:bg-emerald-950/40 transition shrink-0"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold text-xs hover:bg-emerald-950/40 transition shrink-0 whitespace-nowrap"
         >
           <Code2 className="w-4 h-4 text-emerald-400" />
           <span className="hidden sm:inline">{t('generatePython')}</span>
           <span className="sm:hidden font-bold">Code</span>
         </button>
 
-        {/* ConoHa VPS Persistent High-Visibility Header CTA Button */}
+        {/* ConoHa VPS Persistent High-Visibility Header CTA Button (Desktop & Tablet) */}
         <a
           href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-300/40"
+          className="hidden sm:flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-300/40 min-w-max whitespace-nowrap"
         >
-          <Rocket className="w-3.5 h-3.5 text-white animate-bounce" />
-          <span className="hidden sm:inline">{t('deployConoHaHeader')}</span>
-          <span className="sm:hidden font-extrabold text-[11px]">{lang === 'ja' ? '🚀 24h稼働' : '🚀 24/7 VPS'}</span>
+          <Rocket className="w-3.5 h-3.5 text-white animate-bounce shrink-0" />
+          <span>{t('deployConoHaHeader')}</span>
           <ExternalLink className="w-3 h-3 text-white/90 shrink-0" />
         </a>
       </div>

@@ -300,7 +300,7 @@ export default function EditorPage() {
         />
 
         {/* Mobile Floating Drawer & Navigation Toolbar */}
-        <div className="md:hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
+        <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -320,24 +320,12 @@ export default function EditorPage() {
             <span>Templates</span>
           </Link>
 
-          {/* ConoHa VPS Direct Affiliate Button */}
-          <a
-            href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/40 shrink-0 border border-emerald-300/40"
-          >
-            <Rocket className="w-3.5 h-3.5 text-white animate-bounce" />
-            <span>{lang === 'ja' ? '24h稼働(ConoHa)' : 'Deploy 24/7'}</span>
-            <ExternalLink className="w-3 h-3 text-white/90" />
-          </a>
-
           <button
             onClick={handleGenerateCode}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-emerald-300 font-extrabold text-[11px] transition border border-emerald-500/40 shrink-0"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/30 shrink-0"
           >
-            <Code2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Code</span>
+            <Code2 className="w-3.5 h-3.5 text-slate-950" />
+            <span>Export Code</span>
           </button>
 
           <button
@@ -350,6 +338,33 @@ export default function EditorPage() {
             <Sliders className="w-3.5 h-3.5 text-slate-300" />
             <span>Inspector</span>
           </button>
+        </div>
+
+        {/* Dedicated Mobile Bottom Sticky ConoHa VPS Affiliate Banner (sm:hidden) */}
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <div className="w-7 h-7 rounded-lg bg-emerald-600/30 border border-emerald-500/50 flex items-center justify-center text-emerald-400 shrink-0">
+              <Rocket className="w-3.5 h-3.5 animate-bounce" />
+            </div>
+            <div className="truncate">
+              <span className="font-extrabold text-[11px] text-emerald-300 block leading-tight truncate">
+                {lang === 'ja' ? '24時間自動実行用 ConoHa VPS' : '24/7 CrewAI Server'}
+              </span>
+              <span className="text-[9px] text-slate-400 block truncate">
+                {lang === 'ja' ? '月額定額・高速SSD' : 'Fixed Monthly • Fast SSD'}
+              </span>
+            </div>
+          </div>
+
+          <a
+            href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-[11px] shadow-lg shadow-emerald-500/40 shrink-0 border border-emerald-300/40 whitespace-nowrap active:scale-95 transition"
+          >
+            <span>{lang === 'ja' ? '🚀 サーバー構築' : '🚀 Deploy VPS'}</span>
+            <ExternalLink className="w-3 h-3 text-white/90" />
+          </a>
         </div>
 
         {/* Right Parameter Inspector Panel */}
