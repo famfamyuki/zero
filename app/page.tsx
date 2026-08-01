@@ -73,6 +73,21 @@ export default function EditorPage() {
     return () => window.removeEventListener('open-node-inspector', handleOpenInspector);
   }, [nodes]);
 
+  // Listen for explicit node delete clicks from node card action toolbar
+  useEffect(() => {
+    const handleDeleteEvent = (e: Event) => {
+      const customEvt = e as CustomEvent<{ nodeId: string }>;
+      const nodeId = customEvt.detail?.nodeId;
+      if (nodeId) {
+        setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+        setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+        setSelectedNode((prev) => (prev && prev.id === nodeId ? null : prev));
+      }
+    };
+    window.addEventListener('delete-node-id', handleDeleteEvent);
+    return () => window.removeEventListener('delete-node-id', handleDeleteEvent);
+  }, [setNodes, setEdges]);
+
   // Handle Preset Loading
   const handleLoadPreset = useCallback(
     (template: WorkflowTemplate) => {

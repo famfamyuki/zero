@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
-import { CheckSquare, ArrowRightCircle, Settings } from 'lucide-react';
+import { CheckSquare, ArrowRightCircle, Settings, Trash2 } from 'lucide-react';
 import { TaskNodeData } from '@/types/editor';
 
 export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
@@ -14,16 +14,42 @@ export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
     window.dispatchEvent(event);
   };
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const event = new CustomEvent('delete-node-id', { detail: { nodeId: id } });
+    window.dispatchEvent(event);
+  };
+
   return (
     <div
-      className={`relative min-w-[260px] rounded-xl bg-slate-900/90 border transition-all duration-200 shadow-xl backdrop-blur-md overflow-hidden ${
+      className={`relative min-w-[260px] rounded-xl bg-slate-900/90 border transition-all duration-200 shadow-xl backdrop-blur-md ${
         selected
           ? 'border-emerald-500 ring-2 ring-emerald-500/40 shadow-emerald-500/20'
           : 'border-emerald-950/80 hover:border-emerald-700/60'
       }`}
     >
+      {/* Floating Action Toolbar on Node Selection (Touch Ergonomics) */}
+      {selected && (
+        <div className="absolute -top-11 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 bg-slate-900 border border-emerald-500/80 p-1 rounded-full shadow-2xl animate-in zoom-in-95 duration-150 shrink-0">
+          <button
+            onClick={handleEditClick}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition"
+          >
+            <Settings className="w-3 h-3" />
+            <span>Edit</span>
+          </button>
+          <button
+            onClick={handleDeleteClick}
+            className="p-1 rounded-full bg-red-950/80 hover:bg-red-900 text-red-400 border border-red-800/60 transition"
+            title="Delete Node"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Header Bar */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900/80 px-4 py-2.5 border-b border-emerald-900/40 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900/80 px-4 py-2.5 border-b border-emerald-900/40 flex items-center justify-between rounded-t-xl">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
             <CheckSquare className="w-4 h-4" />

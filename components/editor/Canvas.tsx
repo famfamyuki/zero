@@ -32,7 +32,8 @@ const nodeTypes = {
 const defaultEdgeOptions = {
   type: 'smoothstep',
   animated: true,
-  style: { stroke: '#818cf8', strokeWidth: 2 },
+  interactionWidth: 30, // Expanded touch hit target for edges (30px)
+  style: { stroke: '#818cf8', strokeWidth: 2.5 },
 };
 
 interface CanvasProps {
@@ -65,7 +66,8 @@ export const Canvas: React.FC<CanvasProps> = ({
             ...params,
             type: 'smoothstep',
             animated: true,
-            style: { stroke: '#818cf8', strokeWidth: 2 },
+            interactionWidth: 30,
+            style: { stroke: '#818cf8', strokeWidth: 2.5 },
           },
           eds
         )
@@ -145,12 +147,30 @@ export const Canvas: React.FC<CanvasProps> = ({
     [onNodeSelect]
   );
 
+  // Handle explicit node tap (single tap without drag)
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    // Dispatch open-node-inspector for explicit tap
+    const customEvt = new CustomEvent('open-node-inspector', { detail: { nodeId: node.id } });
+    window.dispatchEvent(customEvt);
+  }, []);
+
+  // Handle edge tap to delete connection easily on touch devices
+  const onEdgeClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => {
+      event.stopPropagation();
+      if (window.confirm('Delete this connection? / この接続線を削除しますか？')) {
+        setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      }
+    },
+    [setEdges]
+  );
+
   return (
     <div className="w-full h-full flex-1 relative bg-slate-950" ref={reactFlowWrapper}>
       {/* Mobile Touch Guidance Tip */}
       <div className="md:hidden absolute top-3 left-3 z-20 pointer-events-none bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] text-slate-300 shadow-lg flex items-center gap-1.5">
         <span className="text-amber-400 font-bold">💡</span>
-        <span>拡大すると端の丸（Handle）が繋がりやすくなります</span>
+        <span>タップで詳細表示・線タップで削除できます</span>
       </div>
 
       <ReactFlow
@@ -162,10 +182,17 @@ export const Canvas: React.FC<CanvasProps> = ({
         onInit={setReactFlowInstance}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
         onSelectionChange={onSelectionChange as any}
         nodeTypes={nodeTypes as any}
         defaultEdgeOptions={defaultEdgeOptions}
         connectionMode={ConnectionMode.Loose}
+        panOnScroll={true}
+        zoomOnPinch={true}
+        zoomOnDoubleClick={false}
+        selectNodesOnDrag={false}
+        elevateNodesOnSelect={true}
         fitView
         colorMode="dark"
         className="bg-slate-950"

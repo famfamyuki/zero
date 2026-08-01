@@ -26,7 +26,7 @@ export const Inspector: React.FC<InspectorProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  const containerClasses = `w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/80 backdrop-blur-md p-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 md:z-20 fixed md:relative inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none ${
+  const containerClasses = `w-full max-w-sm md:w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/80 backdrop-blur-md p-4 pb-32 md:pb-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 md:z-20 fixed md:relative inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none ${
     isMobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
   }`;
 
