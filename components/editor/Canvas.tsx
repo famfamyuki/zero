@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import {
   ReactFlow,
   Controls,
+  ControlButton,
   Background,
   MiniMap,
   useNodesState,
@@ -17,6 +18,8 @@ import {
   ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { Maximize2, Minimize2 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 import { AgentNode } from './nodes/AgentNode';
 import { TaskNode } from './nodes/TaskNode';
@@ -39,8 +42,8 @@ const defaultEdgeOptions = {
 interface CanvasProps {
   nodes: CustomNode[];
   edges: Edge[];
-  onNodesChange: any;
-  onEdgesChange: any;
+  onNodesChange: (changes: any) => void;
+  onEdgesChange: (changes: any) => void;
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   onNodeSelect: (node: CustomNode | null) => void;
@@ -56,23 +59,44 @@ export const Canvas: React.FC<CanvasProps> = ({
   onNodeSelect,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const [reactFlowInstance, setReactFlowInstance] = React.useState<ReactFlowInstance | null>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const { lang } = useLanguage();
+
+  // Fullscreen API toggle
+  const toggleFullscreen = useCallback(() => {
+    if (!reactFlowWrapper.current) return;
+
+    if (!document.fullscreenElement) {
+      if (reactFlowWrapper.current.requestFullscreen) {
+        reactFlowWrapper.current.requestFullscreen();
+      } else if ((reactFlowWrapper.current as any).webkitRequestFullscreen) {
+        (reactFlowWrapper.current as any).webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      }
+    }
+  }, []);
+
+  // Listen to fullscreen changes (including Esc key exit)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   const onConnect = useCallback(
-    (params: Connection) => {
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...params,
-            type: 'smoothstep',
-            animated: true,
-            interactionWidth: 30,
-            style: { stroke: '#818cf8', strokeWidth: 2.5 },
-          },
-          eds
-        )
-      );
-    },
+    (params: Connection) => setEdges((eds) => addEdge({ ...params, ...defaultEdgeOptions }, eds)),
     [setEdges]
   );
 
@@ -98,22 +122,21 @@ export const Canvas: React.FC<CanvasProps> = ({
       });
 
       let data: AgentNodeData | TaskNodeData | ToolNodeData;
-
       if (type === 'agent') {
         data = {
           label: 'New Agent',
-          role: 'AI Specialist',
-          goal: 'Perform analysis and execution',
-          backstory: 'Expert assistant in specialized domain',
-          model: 'gpt-4o',
+          role: 'AI Assistant',
+          goal: 'Perform requested tasks efficiently.',
+          backstory: 'An expert AI agent persona.',
+          model: 'gpt-4o-mini',
           verbose: true,
           allowDelegation: false,
         };
       } else if (type === 'task') {
         data = {
           label: 'New Task',
-          description: 'Define specific task details here',
-          expectedOutput: 'Clear summary output format',
+          description: 'Detailed instructions for this task...',
+          expectedOutput: 'Markdown formatted summary report',
           asyncExecution: false,
         };
       } else {
@@ -165,6 +188,14 @@ export const Canvas: React.FC<CanvasProps> = ({
     [setEdges]
   );
 
+  const fullscreenTooltipText = isFullscreen
+    ? lang === 'ja'
+      ? '全画面表示を解除'
+      : 'Exit Fullscreen'
+    : lang === 'ja'
+    ? '全画面表示'
+    : 'Fullscreen';
+
   return (
     <div className="w-full h-full flex-1 relative bg-slate-950" ref={reactFlowWrapper}>
       {/* Mobile Touch Guidance Tip */}
@@ -198,7 +229,21 @@ export const Canvas: React.FC<CanvasProps> = ({
         className="bg-slate-950"
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
-        <Controls className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl !left-3 !bottom-20 md:!bottom-4 md:!left-4" />
+        <Controls className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl !left-3 !bottom-24 md:!bottom-4 md:!left-4">
+          <ControlButton
+            onClick={toggleFullscreen}
+            title={fullscreenTooltipText}
+            aria-label={fullscreenTooltipText}
+            className="!bg-slate-900 hover:!bg-slate-800 !text-slate-300 transition"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <Maximize2 className="w-4 h-4 text-indigo-400" />
+            )}
+          </ControlButton>
+        </Controls>
+
         <MiniMap
           nodeColor={(n) => {
             if (n.type === 'agent') return '#6366f1';
