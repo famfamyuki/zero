@@ -73,7 +73,7 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Header */}
-      <header className="h-16 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+      <header className="h-16 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 gap-2 overflow-x-auto no-scrollbar sm:overflow-visible">
         <div className="flex items-center gap-2 sm:gap-4">
           <Link
             href="/"

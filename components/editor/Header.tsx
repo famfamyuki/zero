@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0 z-30 gap-2 overflow-x-auto sm:overflow-visible">
+    <header className="h-14 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0 z-30 gap-2 overflow-x-auto no-scrollbar sm:overflow-visible">
       {/* Brand / Logo */}
       <div className="flex items-center gap-2.5 shrink-0">
         <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-emerald-500 p-0.5 shadow-lg shadow-indigo-500/20 shrink-0">

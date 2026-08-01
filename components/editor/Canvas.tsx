@@ -229,7 +229,11 @@ export const Canvas: React.FC<CanvasProps> = ({
         className="bg-slate-950"
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
-        <Controls className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl !left-3 !bottom-24 md:!bottom-4 md:!left-4">
+        <Controls
+          showFitView={false}
+          showInteractive={false}
+          className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl !left-3 !bottom-24 md:!bottom-4 md:!left-4"
+        >
           <ControlButton
             onClick={toggleFullscreen}
             title={fullscreenTooltipText}

@@ -72,3 +72,12 @@ body {
   box-shadow: 0 0 16px rgba(129, 140, 248, 1) !important;
   border-color: #ffffff !important;
 }
+
+/* Utility to hide scrollbars for smooth overflow navigation */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
