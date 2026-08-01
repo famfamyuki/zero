@@ -12,14 +12,14 @@ import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNod
 import { transpileToCrewAI } from '@/lib/transpiler/crewai';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import Link from 'next/link';
-import { Code2, Zap, Layers, Sliders, Sparkles } from 'lucide-react';
+import { Code2, Zap, Layers, Sliders, Sparkles, Rocket, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
 
 export default function EditorPage() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<CustomNode>(
     initialDefaultPreset.graphData.nodes
@@ -320,12 +320,24 @@ export default function EditorPage() {
             <span>Templates</span>
           </Link>
 
+          {/* ConoHa VPS Direct Affiliate Button */}
+          <a
+            href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/40 shrink-0 border border-emerald-300/40"
+          >
+            <Rocket className="w-3.5 h-3.5 text-white animate-bounce" />
+            <span>{lang === 'ja' ? '24h稼働(ConoHa)' : 'Deploy 24/7'}</span>
+            <ExternalLink className="w-3 h-3 text-white/90" />
+          </a>
+
           <button
             onClick={handleGenerateCode}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/30 shrink-0"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-emerald-300 font-extrabold text-[11px] transition border border-emerald-500/40 shrink-0"
           >
-            <Code2 className="w-3.5 h-3.5 text-slate-950" />
-            <span>Export Code</span>
+            <Code2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Code</span>
           </button>
 
           <button

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid, Globe } from 'lucide-react';
+import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid, Globe, Rocket, ExternalLink } from 'lucide-react';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { supabase } from '@/lib/supabase';
@@ -101,9 +101,18 @@ export default function TemplatesPage() {
             <span className="font-semibold text-[11px] sm:text-xs">{lang === 'en' ? 'EN' : '日本語'}</span>
           </button>
 
-          <span className="hidden sm:flex text-xs text-emerald-400 bg-emerald-950/80 border border-emerald-800/40 px-3 py-1.5 rounded-lg items-center gap-1.5 font-medium">
-            <Zap className="w-3.5 h-3.5 text-emerald-400" /> {t('freeAndOpenBadge')}
-          </span>
+          {/* ConoHa VPS Persistent High-Visibility Header CTA Button */}
+          <a
+            href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-300/40"
+          >
+            <Rocket className="w-3.5 h-3.5 text-white animate-bounce" />
+            <span className="hidden sm:inline">{t('deployConoHaHeader')}</span>
+            <span className="sm:hidden font-extrabold text-[11px]">{lang === 'ja' ? '🚀 24h稼働' : '🚀 24/7 VPS'}</span>
+            <ExternalLink className="w-3 h-3 text-white/90 shrink-0" />
+          </a>
         </div>
       </header>
 

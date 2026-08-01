@@ -14,6 +14,7 @@ export const translations = {
     importJson: 'Import JSON',
     clearCanvas: 'Clear Canvas',
     generatePython: 'Export Code (Python)',
+    deployConoHaHeader: '🚀 Deploy 24/7 (ConoHa VPS)',
 
     // Catchphrase Banner
     mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
@@ -98,6 +99,7 @@ export const translations = {
     importJson: 'JSONインポート',
     clearCanvas: 'キャンバス消去',
     generatePython: 'コード出力 (Python)',
+    deployConoHaHeader: '🚀 24時間稼働させる (ConoHa VPS)',
 
     // Catchphrase Banner
     mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Network, Code2, Download, Upload, Trash2, Sparkles, FolderOpen, Globe } from 'lucide-react';
+import { Network, Code2, Download, Upload, Trash2, Sparkles, FolderOpen, Globe, Rocket, ExternalLink } from 'lucide-react';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Center Quick Presets & Status */}
-      <div className="hidden md:flex items-center gap-2">
+      <div className="hidden lg:flex items-center gap-2">
         <div className="relative group">
           <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-slate-700 transition">
             <FolderOpen className="w-3.5 h-3.5 text-indigo-400" />
@@ -100,11 +100,10 @@ export const Header: React.FC<HeaderProps> = ({
 
         <Link
           href="/templates"
-          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0"
+          className="hidden sm:flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0"
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span className="hidden sm:inline">{t('freeTemplates')}</span>
-          <span className="sm:hidden font-semibold text-[11px] text-amber-300">Templates</span>
+          <span>{t('freeTemplates')}</span>
         </Link>
 
         {/* JSON Import/Export (Desktop) */}
@@ -132,16 +131,28 @@ export const Header: React.FC<HeaderProps> = ({
           <Trash2 className="w-4 h-4" />
         </button>
 
-        {/* Export Python Code CTA Button */}
+        {/* Export Python Code Button */}
         <button
           onClick={onGenerateCode}
-          className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-600 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-400/50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold text-xs hover:bg-emerald-950/40 transition shrink-0"
         >
-          <Code2 className="w-4 h-4 text-emerald-200" />
+          <Code2 className="w-4 h-4 text-emerald-400" />
           <span className="hidden sm:inline">{t('generatePython')}</span>
-          <span className="sm:hidden font-extrabold text-amber-300">Export</span>
-          <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse hidden sm:inline" />
+          <span className="sm:hidden font-bold">Code</span>
         </button>
+
+        {/* ConoHa VPS Persistent High-Visibility Header CTA Button */}
+        <a
+          href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-300/40"
+        >
+          <Rocket className="w-3.5 h-3.5 text-white animate-bounce" />
+          <span className="hidden sm:inline">{t('deployConoHaHeader')}</span>
+          <span className="sm:hidden font-extrabold text-[11px]">{lang === 'ja' ? '🚀 24h稼働' : '🚀 24/7 VPS'}</span>
+          <ExternalLink className="w-3 h-3 text-white/90 shrink-0" />
+        </a>
       </div>
     </header>
   );
