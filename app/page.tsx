@@ -321,13 +321,21 @@ export default function EditorPage() {
           </Link>
 
           <button
+            onClick={handleGenerateCode}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/30 shrink-0"
+          >
+            <Code2 className="w-3.5 h-3.5 text-slate-950" />
+            <span>Export Code</span>
+          </button>
+
+          <button
             onClick={() => {
               setIsMobileInspectorOpen(!isMobileInspectorOpen);
               setIsMobileSidebarOpen(false);
             }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition shadow-md shrink-0"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
           >
-            <Sliders className="w-3.5 h-3.5 text-white" />
+            <Sliders className="w-3.5 h-3.5 text-slate-300" />
             <span>Inspector</span>
           </button>
         </div>

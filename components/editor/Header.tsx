@@ -132,15 +132,15 @@ export const Header: React.FC<HeaderProps> = ({
           <Trash2 className="w-4 h-4" />
         </button>
 
-        {/* Transpile Code Button */}
+        {/* Export Python Code CTA Button */}
         <button
           onClick={onGenerateCode}
-          className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:brightness-110 active:scale-95 transition shrink-0"
+          className="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-600 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-400/50"
         >
-          <Code2 className="w-4 h-4" />
+          <Code2 className="w-4 h-4 text-emerald-200" />
           <span className="hidden sm:inline">{t('generatePython')}</span>
-          <span className="sm:hidden font-semibold">Python</span>
-          <Sparkles className="w-3 h-3 text-amber-300 animate-pulse hidden sm:inline" />
+          <span className="sm:hidden font-extrabold text-amber-300">Export</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse hidden sm:inline" />
         </button>
       </div>
     </header>
