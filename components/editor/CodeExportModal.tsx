@@ -11,7 +11,7 @@ interface CodeExportModalProps {
 }
 
 export const CodeExportModal: React.FC<CodeExportModalProps> = ({ isOpen, onClose, code }) => {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -83,14 +83,21 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({ isOpen, onClos
           </a>
         </div>
 
-        {/* Recommended Server & Cloud Infrastructure (Affiliate Section) */}
+        {/* Recommended Server & Cloud Infrastructure (ConoHa VPS Production Affiliate) */}
         <div className="px-6 py-4 bg-slate-900/90 border-t border-slate-800 space-y-2.5 text-xs text-slate-300">
-          <div className="flex items-center gap-1.5 font-semibold text-slate-200">
-            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>{t('readyToDeployTitle')}</span>
+          <div className="flex items-center justify-between font-semibold text-slate-200">
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+              <span>{t('readyToDeployTitle')}</span>
+            </div>
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-800/40">
+              100% Recommended
+            </span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-            {/* Cloudways Managed Cloud */}
+
+          <div className="w-full">
+            {/* Cloudways Managed Cloud (Temporarily disabled pending approval) */}
+            {/*
             <a
               href="https://www.cloudways.com"
               target="_blank"
@@ -102,44 +109,30 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({ isOpen, onClos
               </span>
               <span className="text-slate-400 text-[10px] truncate">{t('cloudwaysSub')}</span>
             </a>
+            */}
 
-            {/* ConoHa VPS (Japan) */}
+            {/* ConoHa VPS Production Affiliate Button */}
             <a
-              href="https://www.conoha.jp/vps/"
+              href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-600/60 hover:bg-slate-900 transition flex flex-col gap-0.5 group shadow-sm"
+              className="w-full p-3.5 rounded-xl bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border border-indigo-500/60 hover:border-indigo-400 hover:bg-slate-900 transition-all flex items-center justify-between group shadow-xl shadow-indigo-600/10"
             >
-              <span className="font-semibold text-indigo-300 group-hover:underline flex items-center justify-between">
-                ConoHa VPS <ExternalLink className="w-2.5 h-2.5" />
-              </span>
-              <span className="text-slate-400 text-[10px] truncate">{t('conohaSub')}</span>
-            </a>
-
-            {/* Hetzner Cloud VPS */}
-            <a
-              href="https://www.hetzner.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-600/60 hover:bg-slate-900 transition flex flex-col gap-0.5 group shadow-sm"
-            >
-              <span className="font-semibold text-indigo-300 group-hover:underline flex items-center justify-between">
-                Hetzner Cloud <ExternalLink className="w-2.5 h-2.5" />
-              </span>
-              <span className="text-slate-400 text-[10px] truncate">{t('hetznerSub')}</span>
-            </a>
-
-            {/* DigitalOcean */}
-            <a
-              href="https://www.digitalocean.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-600/60 hover:bg-slate-900 transition flex flex-col gap-0.5 group shadow-sm"
-            >
-              <span className="font-semibold text-indigo-300 group-hover:underline flex items-center justify-between">
-                DigitalOcean <ExternalLink className="w-2.5 h-2.5" />
-              </span>
-              <span className="text-slate-400 text-[10px] truncate">{t('digitalOceanSub')}</span>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 shrink-0 font-extrabold text-xs shadow-inner">
+                  VPS
+                </div>
+                <div>
+                  <span className="font-bold text-sm text-indigo-200 group-hover:text-white transition flex items-center gap-1.5">
+                    {t('conohaTitle')} <ExternalLink className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                  </span>
+                  <span className="text-slate-400 text-xs block mt-0.5">{t('conohaSub')}</span>
+                </div>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 group-hover:brightness-110 text-white font-bold text-xs transition shrink-0 hidden sm:flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
+                <span>{lang === 'ja' ? 'ConoHa VPS を見る' : 'Deploy on ConoHa VPS'}</span>
+                <ExternalLink className="w-3.5 h-3.5 text-white" />
+              </div>
             </a>
           </div>
         </div>
