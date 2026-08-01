@@ -100,10 +100,11 @@ export const Header: React.FC<HeaderProps> = ({
 
         <Link
           href="/templates"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0"
         >
-          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-          <span>{t('freeTemplates')}</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span className="hidden sm:inline">{t('freeTemplates')}</span>
+          <span className="sm:hidden font-semibold text-[11px] text-amber-300">Templates</span>
         </Link>
 
         {/* JSON Import/Export (Desktop) */}

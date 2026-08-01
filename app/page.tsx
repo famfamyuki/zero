@@ -11,7 +11,8 @@ import { CodeExportModal } from '@/components/editor/CodeExportModal';
 import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { transpileToCrewAI } from '@/lib/transpiler/crewai';
 import { PRESET_TEMPLATES } from '@/lib/presets';
-import { Code2, Zap, Layers, Sliders } from 'lucide-react';
+import Link from 'next/link';
+import { Code2, Zap, Layers, Sliders, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
@@ -236,7 +237,7 @@ export default function EditorPage() {
   );
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-[100dvh] h-[100dvh] w-full max-w-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Navigation Header */}
       <Header
         onGenerateCode={handleGenerateCode}
@@ -248,16 +249,16 @@ export default function EditorPage() {
       />
 
       {/* Developer & Marketer Target Value Proposition Banner */}
-      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-violet-950 border-b border-indigo-900/50 px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 z-20 shadow-md">
-        <div className="flex items-center gap-2.5">
+      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-violet-950 border-b border-indigo-900/50 px-3 sm:px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 z-20 shadow-md">
+        <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-md bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-300 shrink-0">
             <Zap className="w-3.5 h-3.5 text-amber-400" />
           </div>
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
-            <span className="font-extrabold text-xs text-white tracking-wide uppercase bg-indigo-600/40 px-2 py-0.5 rounded border border-indigo-500/40">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="font-extrabold text-[10px] sm:text-xs text-white tracking-wide uppercase bg-indigo-600/40 px-1.5 py-0.5 rounded border border-indigo-500/40">
               {t('mainCopy')}
             </span>
-            <span className="text-xs text-slate-300">
+            <span className="text-[11px] sm:text-xs text-slate-300">
               {t('subCopy')}
             </span>
           </div>
@@ -298,25 +299,33 @@ export default function EditorPage() {
           onNodeSelect={handleNodeSelect}
         />
 
-        {/* Mobile Floating Drawer Toolbar */}
-        <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-slate-900/90 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl">
+        {/* Mobile Floating Drawer & Navigation Toolbar */}
+        <div className="md:hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
               setIsMobileInspectorOpen(false);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
           >
             <Layers className="w-3.5 h-3.5 text-indigo-400" />
             <span>Palette</span>
           </button>
+
+          <Link
+            href="/templates"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-semibold transition shrink-0 border border-amber-500/30"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Templates</span>
+          </Link>
 
           <button
             onClick={() => {
               setIsMobileInspectorOpen(!isMobileInspectorOpen);
               setIsMobileSidebarOpen(false);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-md"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition shadow-md shrink-0"
           >
             <Sliders className="w-3.5 h-3.5 text-white" />
             <span>Inspector</span>

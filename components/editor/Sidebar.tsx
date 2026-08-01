@@ -39,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, onAddNode, isMob
       )}
 
       <aside
-        className={`w-72 md:w-64 border-r border-slate-800 bg-slate-950/95 md:bg-slate-950/80 backdrop-blur-md p-4 flex flex-col gap-5 overflow-y-auto shrink-0 z-40 md:z-20 fixed md:relative inset-y-0 left-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none ${
+        className={`w-72 max-w-[85vw] md:w-64 border-r border-slate-800 bg-slate-950/95 md:bg-slate-950/80 backdrop-blur-md p-4 pb-24 md:pb-4 flex flex-col gap-5 overflow-y-auto shrink-0 z-40 md:z-20 fixed md:relative inset-y-0 left-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
