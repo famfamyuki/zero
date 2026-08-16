@@ -4,7 +4,7 @@ import React from 'react';
 import { Sliders, Bot, CheckSquare, Wrench, Settings, Trash2, Sparkles, ExternalLink, X } from 'lucide-react';
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig } from '@/types/editor';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { LLM_MODEL_GROUPS, DEFAULT_LLM_MODEL } from '@/lib/models';
+import { LLM_MODEL_GROUPS, DEFAULT_LLM_MODEL, CUSTOM_MODEL_VALUE, isKnownModel } from '@/lib/models';
 
 interface InspectorProps {
   selectedNode: CustomNode | null;
@@ -90,20 +90,30 @@ export const Inspector: React.FC<InspectorProps> = ({
               <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('managerLlm')}</label>
                 <select
-                  value={crewConfig.managerLlm || DEFAULT_LLM_MODEL}
-                  onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value })}
+                  value={isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) ? (crewConfig.managerLlm || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
+                  onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
                   className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                 >
                   {LLM_MODEL_GROUPS.map((group) => (
                     <optgroup key={group.group} label={group.group} className="bg-slate-900 text-slate-300 font-semibold">
                       {group.models.map((model) => (
                         <option key={model.value} value={model.value} className="bg-slate-950 text-slate-100 font-normal">
-                          {model.label}
+                          {model.label}{model.badge ? ` · ${model.badge}` : ''}
                         </option>
                       ))}
                     </optgroup>
                   ))}
+                  <option value={CUSTOM_MODEL_VALUE}>{t('customModel')}</option>
                 </select>
+                {!isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) && (
+                  <input
+                    type="text"
+                    value={crewConfig.managerLlm || ''}
+                    onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value })}
+                    placeholder={t('customModelPlaceholder')}
+                    className="mt-2 w-full rounded-lg border border-indigo-800/70 bg-slate-900 px-3 py-2 font-mono text-xs text-slate-100 focus:border-indigo-500"
+                  />
+                )}
               </div>
             )}
 
@@ -192,20 +202,30 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('llmModel')}</label>
                 <div className="relative">
                   <select
-                    value={(selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL}
-                    onChange={(e) => onUpdateNodeData(selectedNode.id, { model: e.target.value })}
+                    value={isKnownModel((selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL) ? ((selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
+                    onChange={(e) => onUpdateNodeData(selectedNode.id, { model: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
                     className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-indigo-500"
                   >
                     {LLM_MODEL_GROUPS.map((group) => (
                       <optgroup key={group.group} label={group.group} className="bg-slate-900 text-slate-300 font-semibold">
                         {group.models.map((model) => (
                           <option key={model.value} value={model.value} className="bg-slate-950 text-slate-100 font-normal">
-                            {model.label}
+                            {model.label}{model.badge ? ` · ${model.badge}` : ''}
                           </option>
                         ))}
                       </optgroup>
                     ))}
+                    <option value={CUSTOM_MODEL_VALUE}>{t('customModel')}</option>
                   </select>
+                  {!isKnownModel((selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL) && (
+                    <input
+                      type="text"
+                      value={(selectedNode.data as AgentNodeData).model || ''}
+                      onChange={(e) => onUpdateNodeData(selectedNode.id, { model: e.target.value })}
+                      placeholder={t('customModelPlaceholder')}
+                      className="mt-2 w-full rounded-lg border border-indigo-800/70 bg-slate-900 px-3 py-2 font-mono text-xs text-slate-100 focus:border-indigo-500"
+                    />
+                  )}
                 </div>
               </div>
 

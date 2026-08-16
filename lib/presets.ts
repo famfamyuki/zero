@@ -1351,6 +1351,9 @@ export const PRESET_TEMPLATES: WorkflowTemplate[] = BASE_PRESET_TEMPLATES.map((t
       ...node,
       data: {
         ...node.data,
+        ...(node.type === 'agent' && (node.data as { model?: string }).model === 'anthropic/claude-3-5-sonnet-latest'
+          ? { model: 'anthropic/claude-sonnet-5' }
+          : {}),
         ...(TEMPLATE_GRAPH_REFINEMENTS[template.id]?.nodeData[node.id] || {}),
       },
     })) as CustomNode[],

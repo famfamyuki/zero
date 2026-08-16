@@ -7,6 +7,7 @@ import { validateGraph } from '../lib/transpiler/validation';
 import { transpileToCrewAI, generateProjectFiles } from '../lib/transpiler/crewai';
 import { PRESET_TEMPLATES } from '../lib/presets';
 import { translations } from '../lib/i18n/translations';
+import { LLM_MODEL_OPTIONS, isKnownModel } from '../lib/models';
 
 describe('CrewAI Exporter & Graph Validation Test Suite', () => {
   // Helper to validate Python AST using local python
@@ -451,5 +452,29 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assert.ok(research);
     const researchCode = transpileToCrewAI(research.graphData.nodes, research.graphData.edges, research.graphData.crewConfig);
     assert.match(researchCode, /"research_question": "Replace with research question"/);
+  });
+
+  test('24. Model catalog spans current and legacy providers and accepts local models without an OpenAI key', () => {
+    const requiredModels = [
+      'gpt-5.6-sol',
+      'anthropic/claude-sonnet-5',
+      'anthropic/claude-sonnet-4-6',
+      'anthropic/claude-3-5-sonnet-latest',
+      'gemini/gemini-3.7-flash',
+      'gemini/gemini-2.5-pro',
+      'groq/openai/gpt-oss-120b',
+      'ollama/qwen3',
+    ];
+    requiredModels.forEach((model) => assert.ok(isKnownModel(model), model));
+    assert.equal(new Set(LLM_MODEL_OPTIONS.map((model) => model.value)).size, LLM_MODEL_OPTIONS.length, 'model IDs must be unique');
+
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const localNodes = nodes.map((node) => node.type === 'agent'
+      ? { ...node, data: { ...node.data, model: 'ollama/qwen3' } }
+      : node) as CustomNode[];
+    const project = generateProjectFiles(localNodes, edges, crewConfig);
+    const envFile = project.files.find((file) => file.path === '.env.example');
+    assert.ok(envFile);
+    assert.doesNotMatch(envFile.content, /OPENAI_API_KEY/);
   });
 });

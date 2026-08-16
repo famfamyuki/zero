@@ -1,7 +1,7 @@
 export interface ModelOption {
   value: string;
   label: string;
-  badge?: string;
+  badge?: 'RECOMMENDED' | 'LATEST' | 'PREVIEW' | 'LEGACY' | 'LOCAL';
 }
 
 export interface ModelGroup {
@@ -9,65 +9,126 @@ export interface ModelGroup {
   models: ModelOption[];
 }
 
+export const CUSTOM_MODEL_VALUE = '__custom_model__';
 export const DEFAULT_LLM_MODEL = 'gpt-5.6-terra';
 
+// Text-generation models compatible with CrewAI/LiteLLM provider prefixes.
+// Provider catalogs change frequently, so the Inspector also accepts any custom model ID.
 export const LLM_MODEL_GROUPS: ModelGroup[] = [
   {
-    group: 'OpenAI (GPT-5.6 & Reasoning)',
+    group: 'OpenAI — GPT-5.6 (Current)',
     models: [
-      { value: 'gpt-5.6-terra', label: 'gpt-5.6-terra (Balanced • Recommended)' },
-      { value: 'gpt-5.6-sol', label: 'gpt-5.6-sol (Highest Performance)' },
-      { value: 'gpt-5.6-luna', label: 'gpt-5.6-luna (Fast & Low Cost)' },
-      { value: 'o3-mini', label: 'o3-mini (High-Speed Reasoning)' },
-      { value: 'o1', label: 'o1 (Deep Reasoning)' },
+      { value: 'gpt-5.6-sol', label: 'GPT-5.6 Sol — highest capability', badge: 'LATEST' },
+      { value: 'gpt-5.6-terra', label: 'GPT-5.6 Terra — balanced', badge: 'RECOMMENDED' },
+      { value: 'gpt-5.6-luna', label: 'GPT-5.6 Luna — fast / low cost', badge: 'LATEST' },
+      { value: 'gpt-5.6', label: 'GPT-5.6 alias', badge: 'LATEST' },
     ],
   },
   {
-    group: 'Anthropic (Claude 3.7 & 3.5)',
+    group: 'OpenAI — Previous & Reasoning',
     models: [
-      { value: 'anthropic/claude-3-7-sonnet-latest', label: 'Claude 3.7 Sonnet (Hybrid Reasoning)' },
-      { value: 'anthropic/claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet' },
-      { value: 'anthropic/claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku (Fast)' },
-      { value: 'anthropic/claude-3-opus-latest', label: 'Claude 3 Opus' },
+      { value: 'gpt-5.5', label: 'GPT-5.5', badge: 'LEGACY' },
+      { value: 'gpt-5.4', label: 'GPT-5.4', badge: 'LEGACY' },
+      { value: 'gpt-5', label: 'GPT-5', badge: 'LEGACY' },
+      { value: 'gpt-4.1', label: 'GPT-4.1', badge: 'LEGACY' },
+      { value: 'gpt-4.1-mini', label: 'GPT-4.1 mini', badge: 'LEGACY' },
+      { value: 'gpt-4.1-nano', label: 'GPT-4.1 nano', badge: 'LEGACY' },
+      { value: 'gpt-4o', label: 'GPT-4o', badge: 'LEGACY' },
+      { value: 'gpt-4o-mini', label: 'GPT-4o mini', badge: 'LEGACY' },
+      { value: 'o4-mini', label: 'o4-mini reasoning', badge: 'LEGACY' },
+      { value: 'o3', label: 'o3 reasoning', badge: 'LEGACY' },
+      { value: 'o3-mini', label: 'o3-mini reasoning', badge: 'LEGACY' },
+      { value: 'o1', label: 'o1 reasoning', badge: 'LEGACY' },
+      { value: 'o1-mini', label: 'o1-mini reasoning', badge: 'LEGACY' },
     ],
   },
   {
-    group: 'Google (Gemini 2.5 & 2.0)',
+    group: 'Anthropic — Claude 5 (Current)',
     models: [
-      { value: 'gemini/gemini-2.5-pro', label: 'Gemini 2.5 Pro (State of the Art)' },
-      { value: 'gemini/gemini-2.5-flash', label: 'Gemini 2.5 Flash (Ultra Fast)' },
-      { value: 'gemini/gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-      { value: 'gemini/gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+      { value: 'anthropic/claude-fable-5', label: 'Claude Fable 5 — highest capability', badge: 'LATEST' },
+      { value: 'anthropic/claude-opus-5', label: 'Claude Opus 5 — complex agentic work', badge: 'LATEST' },
+      { value: 'anthropic/claude-sonnet-5', label: 'Claude Sonnet 5 — balanced', badge: 'RECOMMENDED' },
     ],
   },
   {
-    group: 'Groq / Meta & DeepSeek (Ultra-Fast)',
+    group: 'Anthropic — Claude 4.x',
     models: [
-      { value: 'groq/llama-3.3-70b-versatile', label: 'Llama 3.3 70B (Versatile)' },
-      { value: 'groq/llama-3.1-8b-instant', label: 'Llama 3.1 8B (Instant)' },
-      { value: 'groq/deepseek-r1-distill-llama-70b', label: 'DeepSeek R1 Distill 70B' },
+      { value: 'anthropic/claude-opus-4-8', label: 'Claude Opus 4.8', badge: 'LEGACY' },
+      { value: 'anthropic/claude-opus-4-7', label: 'Claude Opus 4.7', badge: 'LEGACY' },
+      { value: 'anthropic/claude-opus-4-6', label: 'Claude Opus 4.6', badge: 'LEGACY' },
+      { value: 'anthropic/claude-sonnet-4-6', label: 'Claude Sonnet 4.6', badge: 'LEGACY' },
+      { value: 'anthropic/claude-opus-4-5', label: 'Claude Opus 4.5', badge: 'LEGACY' },
+      { value: 'anthropic/claude-sonnet-4-5', label: 'Claude Sonnet 4.5', badge: 'LEGACY' },
+      { value: 'anthropic/claude-haiku-4-5', label: 'Claude Haiku 4.5 — fast', badge: 'LEGACY' },
     ],
   },
   {
-    group: 'Local / Ollama (Self-Hosted & Offline)',
+    group: 'Anthropic — Claude 3.x (Provider-dependent legacy)',
     models: [
-      { value: 'ollama/llama3.3', label: 'Ollama: llama3.3' },
-      { value: 'ollama/deepseek-r1', label: 'Ollama: deepseek-r1' },
-      { value: 'ollama/qwen2.5', label: 'Ollama: qwen2.5' },
-      { value: 'ollama/mistral', label: 'Ollama: mistral' },
+      { value: 'anthropic/claude-3-7-sonnet-latest', label: 'Claude 3.7 Sonnet', badge: 'LEGACY' },
+      { value: 'anthropic/claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet', badge: 'LEGACY' },
+      { value: 'anthropic/claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku', badge: 'LEGACY' },
+      { value: 'anthropic/claude-3-opus-latest', label: 'Claude 3 Opus', badge: 'LEGACY' },
     ],
   },
   {
-    group: 'Legacy Models (Backward Compatibility)',
+    group: 'Google — Gemini 3.x (Current)',
     models: [
-      { value: 'gpt-4o', label: 'OpenAI: gpt-4o' },
-      { value: 'gpt-4o-mini', label: 'OpenAI: gpt-4o-mini' },
-      { value: 'o1-mini', label: 'OpenAI: o1-mini' },
-      { value: 'anthropic/claude-3-5-sonnet-20240620', label: 'Claude 3.5 Sonnet (2024-06-20)' },
-      { value: 'anthropic/claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (2024-10-22)' },
-      { value: 'gemini/gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
-      { value: 'groq/llama3-70b-8192', label: 'Llama 3 70B (Legacy Groq)' },
-      { value: 'ollama/llama3', label: 'Ollama: llama3 (Legacy)' },
+      { value: 'gemini/gemini-3.7-flash', label: 'Gemini 3.7 Flash', badge: 'LATEST' },
+      { value: 'gemini/gemini-3.6-flash', label: 'Gemini 3.6 Flash', badge: 'LATEST' },
+      { value: 'gemini/gemini-3.5-flash', label: 'Gemini 3.5 Flash', badge: 'RECOMMENDED' },
+      { value: 'gemini/gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', badge: 'LATEST' },
+      { value: 'gemini/gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', badge: 'LATEST' },
+      { value: 'gemini/gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro Preview', badge: 'PREVIEW' },
+      { value: 'gemini/gemini-3.1-pro-preview-customtools', label: 'Gemini 3.1 Pro Preview — custom tools', badge: 'PREVIEW' },
+      { value: 'gemini/gemini-3-flash-preview', label: 'Gemini 3 Flash Preview', badge: 'PREVIEW' },
+    ],
+  },
+  {
+    group: 'Google — Gemini 2.x (Previous)',
+    models: [
+      { value: 'gemini/gemini-2.5-pro', label: 'Gemini 2.5 Pro', badge: 'LEGACY' },
+      { value: 'gemini/gemini-2.5-flash', label: 'Gemini 2.5 Flash', badge: 'LEGACY' },
+      { value: 'gemini/gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash-Lite', badge: 'LEGACY' },
+      { value: 'gemini/gemini-2.0-flash', label: 'Gemini 2.0 Flash', badge: 'LEGACY' },
+      { value: 'gemini/gemini-2.0-flash-lite', label: 'Gemini 2.0 Flash-Lite', badge: 'LEGACY' },
+    ],
+  },
+  {
+    group: 'GroqCloud — Production Text Models',
+    models: [
+      { value: 'groq/openai/gpt-oss-120b', label: 'GPT-OSS 120B on Groq', badge: 'RECOMMENDED' },
+      { value: 'groq/openai/gpt-oss-20b', label: 'GPT-OSS 20B on Groq', badge: 'LATEST' },
+      { value: 'groq/llama-3.3-70b-versatile', label: 'Llama 3.3 70B Versatile', badge: 'LEGACY' },
+      { value: 'groq/llama-3.1-8b-instant', label: 'Llama 3.1 8B Instant', badge: 'LEGACY' },
+      { value: 'groq/groq/compound', label: 'Groq Compound system', badge: 'LATEST' },
+      { value: 'groq/groq/compound-mini', label: 'Groq Compound Mini system', badge: 'LATEST' },
+    ],
+  },
+  {
+    group: 'GroqCloud — Preview Text Models',
+    models: [
+      { value: 'groq/minimaxai/minimax-m2.7', label: 'MiniMax M2.7 (Enterprise Preview)', badge: 'PREVIEW' },
+      { value: 'groq/qwen/qwen3.6-27b', label: 'Qwen 3.6 27B (Preview)', badge: 'PREVIEW' },
+    ],
+  },
+  {
+    group: 'Ollama — Local Models (install separately)',
+    models: [
+      { value: 'ollama/llama3.3', label: 'Llama 3.3', badge: 'LOCAL' },
+      { value: 'ollama/deepseek-r1', label: 'DeepSeek R1', badge: 'LOCAL' },
+      { value: 'ollama/qwen3', label: 'Qwen 3', badge: 'LOCAL' },
+      { value: 'ollama/gemma3', label: 'Gemma 3', badge: 'LOCAL' },
+      { value: 'ollama/mistral-small3.1', label: 'Mistral Small 3.1', badge: 'LOCAL' },
+      { value: 'ollama/llama3.2', label: 'Llama 3.2', badge: 'LOCAL' },
+      { value: 'ollama/qwen2.5', label: 'Qwen 2.5', badge: 'LOCAL' },
+      { value: 'ollama/mistral', label: 'Mistral', badge: 'LOCAL' },
     ],
   },
 ];
+
+export const LLM_MODEL_OPTIONS = LLM_MODEL_GROUPS.flatMap((group) => group.models);
+
+export function isKnownModel(value?: string): boolean {
+  return Boolean(value && LLM_MODEL_OPTIONS.some((model) => model.value === value));
+}

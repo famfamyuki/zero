@@ -76,8 +76,10 @@ function suggestedInputValue(variable: string): string {
 
 export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig): string[] {
   const keys = new Set<string>();
+  let sawModel = false;
 
   const checkModel = (modelStr?: string) => {
+    sawModel = true;
     const m = normalizeModel(modelStr).toLowerCase();
     if (m.startsWith('openai/')) keys.add('OPENAI_API_KEY');
     else if (m.startsWith('anthropic/')) keys.add('ANTHROPIC_API_KEY');
@@ -100,7 +102,7 @@ export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig)
     }
   });
 
-  if (keys.size === 0) {
+  if (keys.size === 0 && !sawModel) {
     keys.add('OPENAI_API_KEY');
   }
 
