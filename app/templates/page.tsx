@@ -21,7 +21,7 @@ export default function TemplatesPage() {
       try {
         const { data, error } = await getSupabase().from('templates').select('*');
         if (data && data.length > 0 && !error) {
-          const formattedSupabase: WorkflowTemplate[] = data.map((item: any) => ({
+          const formattedSupabase: WorkflowTemplate[] = data.map((item) => ({
             id: item.id,
             title: item.title,
             titleEn: item.title_en || item.title,

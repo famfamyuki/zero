@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process';
 import { CustomNode, CrewConfig } from '../types/editor';
 import { Edge } from '@xyflow/react';
 import { validateGraph } from '../lib/transpiler/validation';
-import { transpileToCrewAI, generateProjectFiles } from '../lib/transpiler/crewai';
+import { transpileToCrewAI, generateProjectFiles, getRequiredEnvVars, normalizeModel } from '../lib/transpiler/crewai';
 import { PRESET_TEMPLATES } from '../lib/presets';
 import { translations } from '../lib/i18n/translations';
 import { LLM_MODEL_OPTIONS, isKnownModel } from '../lib/models';
@@ -459,7 +459,6 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
       'gpt-5.6-sol',
       'anthropic/claude-sonnet-5',
       'anthropic/claude-sonnet-4-6',
-      'anthropic/claude-3-5-sonnet-latest',
       'gemini/gemini-3.7-flash',
       'gemini/gemini-2.5-pro',
       'groq/openai/gpt-oss-120b',
@@ -476,5 +475,48 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     const envFile = project.files.find((file) => file.path === '.env.example');
     assert.ok(envFile);
     assert.doesNotMatch(envFile.content, /OPENAI_API_KEY/);
+  });
+
+  test('25. Missing tool types are rejected before broken Python can be generated', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const brokenNodes = nodes.map((node) => node.id === 'tool-1'
+      ? { ...node, data: { ...node.data, toolType: undefined } }
+      : node) as CustomNode[];
+    const validation = validateGraph(brokenNodes, edges, crewConfig);
+    assert.equal(validation.isValid, false);
+    assert.ok(validation.errors.some((error) => error.code === 'MISSING_TOOL_TYPE'));
+    assert.throws(() => transpileToCrewAI(brokenNodes, edges, crewConfig), /MISSING_TOOL_TYPE/);
+  });
+
+  test('26. Memory and RAG exports include their default OpenAI embedding dependency', () => {
+    const { nodes, crewConfig } = createSampleGraph();
+    const localNodes = nodes.map((node) => {
+      if (node.type === 'agent') return { ...node, data: { ...node.data, model: 'ollama/qwen3' } };
+      if (node.id === 'tool-1') return { ...node, data: { ...node.data, toolType: 'TXTSearchTool' } };
+      return node;
+    }) as CustomNode[];
+    assert.ok(getRequiredEnvVars(localNodes, { ...crewConfig, memory: true }).includes('OPENAI_API_KEY'));
+    assert.ok(getRequiredEnvVars(localNodes, { ...crewConfig, memory: false }).includes('OPENAI_API_KEY'));
+  });
+
+  test('27. Provider normalization handles o4 and DeepSeek without misrouting', () => {
+    assert.equal(normalizeModel('o4-mini'), 'openai/o4-mini');
+    assert.equal(normalizeModel('deepseek-chat'), 'deepseek/deepseek-chat');
+  });
+
+  test('28. Literal JSON braces are escaped while declared input placeholders remain active', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const jsonNodes = nodes.map((node) => node.id === 'task-1'
+      ? { ...node, data: { ...node.data, description: 'Read {repository_path} and return {"status": "ok"}' } }
+      : node) as CustomNode[];
+    const code = transpileToCrewAI(jsonNodes, edges, crewConfig);
+    assert.ok(code.includes('Read {repository_path} and return {{\\"status\\": \\"ok\\"}}'));
+    assertValidPythonSyntax(code);
+  });
+
+  test('29. Retired Claude 3 API models are not offered as runnable options', () => {
+    assert.equal(isKnownModel('anthropic/claude-3-7-sonnet-latest'), false);
+    assert.equal(isKnownModel('anthropic/claude-3-5-sonnet-latest'), false);
+    assert.equal(isKnownModel('anthropic/claude-3-opus-latest'), false);
   });
 });

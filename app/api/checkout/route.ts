@@ -2,9 +2,31 @@ import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 
+function getCheckoutBaseUrl(): string {
+  const configuredUrl = process.env.APP_BASE_URL
+    || (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : undefined)
+    || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : undefined);
+
+  if (!configuredUrl) {
+    throw new Error('APP_BASE_URL is not configured');
+  }
+
+  const url = new URL(configuredUrl);
+  if (url.protocol !== 'https:' && !(url.protocol === 'http:' && url.hostname === 'localhost')) {
+    throw new Error('APP_BASE_URL must use HTTPS');
+  }
+  return url.origin;
+}
+
 export async function POST(req: Request) {
   try {
-    const { templateId } = await req.json();
+    const payload: unknown = await req.json().catch(() => null);
+    if (!payload || typeof payload !== 'object' || typeof (payload as { templateId?: unknown }).templateId !== 'string') {
+      return NextResponse.json({ error: 'templateId must be a string' }, { status: 400 });
+    }
+    const templateId = (payload as { templateId: string }).templateId;
 
     const template = PRESET_TEMPLATES.find((t) => t.id === templateId);
 
@@ -12,7 +34,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Template not found' }, { status: 404 });
     }
 
-    const origin = req.headers.get('origin') || 'http://localhost:3000';
+    if (!Number.isFinite(template.price) || template.price <= 0) {
+      return NextResponse.json({ error: 'This template does not require checkout' }, { status: 400 });
+    }
+
+    const origin = getCheckoutBaseUrl();
 
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],

@@ -63,15 +63,6 @@ export const LLM_MODEL_GROUPS: ModelGroup[] = [
     ],
   },
   {
-    group: 'Anthropic — Claude 3.x (Provider-dependent legacy)',
-    models: [
-      { value: 'anthropic/claude-3-7-sonnet-latest', label: 'Claude 3.7 Sonnet', badge: 'LEGACY' },
-      { value: 'anthropic/claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet', badge: 'LEGACY' },
-      { value: 'anthropic/claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku', badge: 'LEGACY' },
-      { value: 'anthropic/claude-3-opus-latest', label: 'Claude 3 Opus', badge: 'LEGACY' },
-    ],
-  },
-  {
     group: 'Google — Gemini 3.x (Current)',
     models: [
       { value: 'gemini/gemini-3.7-flash', label: 'Gemini 3.7 Flash', badge: 'LATEST' },

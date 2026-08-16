@@ -108,6 +108,18 @@ export function validateGraph(
   const taskNodes = (nodes || []).filter((n) => n?.type === 'task');
   const toolNodes = (nodes || []).filter((n) => n?.type === 'tool');
 
+  toolNodes.forEach((toolNode) => {
+    const data = (toolNode.data || {}) as Partial<ToolNodeData>;
+    if (!data.toolType) {
+      errors.push({
+        code: 'MISSING_TOOL_TYPE',
+        message: `Tool "${data.label || toolNode.id}" (${toolNode.id}) has no tool type selected.`,
+        nodeId: toolNode.id,
+        suggestion: 'Choose a Tool Type in the inspector before exporting.',
+      });
+    }
+  });
+
   if (agentNodes.length === 0) {
     errors.push({
       code: 'NO_AGENTS',

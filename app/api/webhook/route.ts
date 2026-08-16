@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe';
-import { getSupabase } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     // Record purchase transaction in Supabase if purchases table exists
     try {
-      await getSupabase().from('purchases').insert([
+      const { error } = await getSupabaseAdmin().from('purchases').insert([
         {
           stripe_session_id: session.id,
           template_id: session.metadata?.templateId,
@@ -42,8 +42,10 @@ export async function POST(req: Request) {
           created_at: new Date().toISOString(),
         },
       ]);
+      if (error) throw error;
     } catch (dbErr) {
-      console.log('Database logging notice:', dbErr);
+      console.error('Purchase logging failed:', dbErr);
+      return NextResponse.json({ error: 'Purchase logging failed' }, { status: 500 });
     }
   }
 

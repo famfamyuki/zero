@@ -24,6 +24,7 @@ export function normalizeModel(rawModel?: string): string {
     model.startsWith('anthropic/') ||
     model.startsWith('gemini/') ||
     model.startsWith('groq/') ||
+    model.startsWith('deepseek/') ||
     model.startsWith('ollama/')
   ) {
     return model;
@@ -33,6 +34,7 @@ export function normalizeModel(rawModel?: string): string {
     lower.startsWith('gpt-') ||
     lower.startsWith('o1') ||
     lower.startsWith('o3') ||
+    lower.startsWith('o4') ||
     lower.startsWith('text-davinci') ||
     lower.startsWith('dall-e')
   ) {
@@ -40,7 +42,7 @@ export function normalizeModel(rawModel?: string): string {
   }
   if (lower.includes('claude')) return `anthropic/${model}`;
   if (lower.includes('gemini')) return `gemini/${model}`;
-  if (lower.includes('deepseek')) return `groq/${model}`;
+  if (lower.includes('deepseek')) return `deepseek/${model}`;
   if (lower.includes('llama')) return `groq/${model}`;
   return model;
 }
@@ -49,6 +51,14 @@ export function escapePythonString(str?: string): string {
   return JSON.stringify(str || '')
     .replace(/\u2028/g, '\\u2028')
     .replace(/\u2029/g, '\\u2029');
+}
+
+function escapeCrewAIInterpolation(str: string | undefined, inputVariables: string[]): string {
+  let escaped = String(str || '').replace(/\{/g, '{{').replace(/\}/g, '}}');
+  inputVariables.forEach((variable) => {
+    escaped = escaped.replaceAll(`{{${variable}}}`, `{${variable}}`);
+  });
+  return escaped;
 }
 
 function allocatePythonName(base: string, used: Set<string>): string {
@@ -85,6 +95,7 @@ export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig)
     else if (m.startsWith('anthropic/')) keys.add('ANTHROPIC_API_KEY');
     else if (m.startsWith('gemini/')) keys.add('GEMINI_API_KEY');
     else if (m.startsWith('groq/')) keys.add('GROQ_API_KEY');
+    else if (m.startsWith('deepseek/')) keys.add('DEEPSEEK_API_KEY');
   };
 
   if (crewConfig?.process === 'hierarchical' && crewConfig.managerLlm) {
@@ -101,6 +112,12 @@ export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig)
       if (data?.toolType === 'GithubSearchTool') keys.add('GITHUB_TOKEN');
     }
   });
+
+  if (crewConfig?.memory) keys.add('OPENAI_API_KEY');
+  const ragToolTypes = new Set(['CSVSearchTool', 'TXTSearchTool', 'PDFSearchTool', 'MDXSearchTool']);
+  if ((nodes || []).some((node) => node.type === 'tool' && ragToolTypes.has(String((node.data as ToolNodeData)?.toolType)))) {
+    keys.add('OPENAI_API_KEY');
+  }
 
   if (keys.size === 0 && !sawModel) {
     keys.add('OPENAI_API_KEY');
@@ -313,7 +330,7 @@ if missing_vars:
       const taskLabel = String((task?.data as TaskNodeData)?.label || taskId).replace(/"""/g, '');
       code += `class ${className}(BaseModel):
     """Validated output for ${taskLabel}."""
-    result: Any = Field(description="Structured task result matching the requested output")
+    result: dict[str, Any] = Field(description="Structured task result matching the requested output")
 
 
 `;
@@ -372,9 +389,9 @@ if missing_vars:
       const llmVarName = usedModelsMap.get(normModel) || 'llm';
 
       code += `${varName} = Agent(
-    role=${escapePythonString(data?.role || 'AI Agent')},
-    goal=${escapePythonString(data?.goal || 'Achieve objective')},
-    backstory=${escapePythonString(data?.backstory || 'An intelligent assistant.')},
+    role=${escapePythonString(escapeCrewAIInterpolation(data?.role || 'AI Agent', validation.inputVariables))},
+    goal=${escapePythonString(escapeCrewAIInterpolation(data?.goal || 'Achieve objective', validation.inputVariables))},
+    backstory=${escapePythonString(escapeCrewAIInterpolation(data?.backstory || 'An intelligent assistant.', validation.inputVariables))},
     verbose=${data?.verbose !== false ? 'True' : 'False'},
     allow_delegation=${data?.allowDelegation ? 'True' : 'False'},
     tools=${toolsList},
@@ -422,8 +439,8 @@ if missing_vars:
       }
 
       code += `${varName} = Task(
-    description=${escapePythonString(data?.description || 'Perform task')},
-    expected_output=${escapePythonString(data?.expectedOutput || 'Task result summary')},
+    description=${escapePythonString(escapeCrewAIInterpolation(data?.description || 'Perform task', validation.inputVariables))},
+    expected_output=${escapePythonString(escapeCrewAIInterpolation(data?.expectedOutput || 'Task result summary', validation.inputVariables))},
     ${agentAssignment}${toolsList}${contextList}${outputSchema}async_execution=${data?.asyncExecution ? 'True' : 'False'}
 )
 
@@ -555,7 +572,7 @@ from typing import Any
       const className = taskSchemaClassName(t, idx);
       schemasContent += `class ${className}(BaseModel):
     """Structured output schema for task: ${data.label || t.id}."""
-    result: Any = Field(description="Structured task result matching the requested output")
+    result: dict[str, Any] = Field(description="Structured task result matching the requested output")
 
 
 `;
