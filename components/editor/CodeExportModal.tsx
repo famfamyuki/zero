@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   X,
   Copy,
@@ -119,7 +119,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
   const [activeTabPath, setActiveTabPath] = useState<string>('main.py');
   const [copied, setCopied] = useState(false);
   const [showWarnings, setShowWarnings] = useState(false);
-  const deploymentOptionsRef = useRef<HTMLDivElement>(null);
+  const [showDeploymentOptions, setShowDeploymentOptions] = useState(true);
 
   // Close on Escape key
   useEffect(() => {
@@ -241,14 +241,14 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
 
           {/* Export Mode Toggle & Close */}
           <div className="flex items-center gap-2">
-            {!hasErrors && (
+            {!hasErrors && !showDeploymentOptions && (
               <button
                 type="button"
-                onClick={() => deploymentOptionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                onClick={() => setShowDeploymentOptions(true)}
                 className="hidden items-center gap-1.5 rounded-lg border border-emerald-600/50 bg-emerald-950/50 px-2.5 py-1.5 text-xs font-bold text-emerald-200 transition hover:border-emerald-400 hover:bg-emerald-900/60 md:flex"
               >
                 <Rocket className="h-3.5 w-3.5" />
-                <span>{lang === 'ja' ? 'VPSを見る' : 'View VPS options'}</span>
+                <span>{lang === 'ja' ? 'サーバー案内を表示' : 'Show server offers'}</span>
               </button>
             )}
 
@@ -290,6 +290,74 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
             </button>
           </div>
         </div>
+
+        {!hasErrors && showDeploymentOptions && (
+          <div className="shrink-0 border-b border-orange-700/50 bg-gradient-to-r from-orange-950/95 via-slate-950 to-emerald-950/95 px-3 py-2.5 sm:px-5">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <Sparkles className="h-4 w-4 shrink-0 text-amber-400" />
+                <span className="truncate text-xs font-bold text-slate-100">{t('readyToDeployTitle')}</span>
+                <span className="hidden rounded-full border border-amber-300/60 bg-amber-300 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-orange-950 sm:inline-flex">
+                  24/7 Auto Execution
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDeploymentOptions(false)}
+                className="shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
+                aria-label={lang === 'ja' ? 'サーバー案内を非表示' : 'Hide server offers'}
+              >
+                {lang === 'ja' ? '非表示' : 'Hide'}
+              </button>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <a
+                href="https://unified.cloudways.com/signup?id=2194173&coupon=SUMMER404"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex min-w-0 items-center justify-between gap-3 rounded-xl border-2 border-orange-400/80 bg-gradient-to-r from-orange-900 to-amber-800 px-3 py-2.5 shadow-lg shadow-orange-950/40 transition hover:from-orange-800 hover:to-amber-700"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <strong className="text-xs font-black text-orange-50 sm:text-sm">{t('cloudwaysTitle')}</strong>
+                    <span className="rounded-full bg-amber-300 px-1.5 py-0.5 text-[9px] font-black text-orange-950">40% OFF</span>
+                  </div>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[10px] text-orange-100/90">
+                    <span>{t('cloudwaysDeadline')}</span>
+                    <code className="font-mono font-bold text-amber-200">SUMMER404</code>
+                  </div>
+                </div>
+                <span className="flex shrink-0 items-center gap-1 rounded-lg bg-orange-500 px-2.5 py-2 text-[10px] font-black text-white ring-1 ring-orange-200/70 group-hover:bg-orange-400 sm:text-xs">
+                  {t('cloudwaysCtaBtn')}
+                  <ExternalLink className="h-3 w-3" />
+                </span>
+              </a>
+
+              <a
+                href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex min-w-0 items-center justify-between gap-3 rounded-xl border border-emerald-500/60 bg-emerald-950/80 px-3 py-2.5 shadow-lg shadow-emerald-950/30 transition hover:border-emerald-400 hover:bg-emerald-900/80"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/50 bg-emerald-600/25">
+                    <Terminal className="h-4 w-4 text-emerald-300" />
+                  </div>
+                  <div className="min-w-0">
+                    <strong className="block truncate text-xs font-bold text-emerald-100 sm:text-sm">{t('conohaTitle')}</strong>
+                    <span className="text-[10px] text-emerald-200/80">{t('conohaJapanBadge')} · Python / Docker</span>
+                  </div>
+                </div>
+                <span className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 px-2.5 py-2 text-[10px] font-black text-white group-hover:from-emerald-500 group-hover:to-green-500 sm:text-xs">
+                  {t('conohaCtaBtn')}
+                  <ExternalLink className="h-3 w-3" />
+                </span>
+              </a>
+            </div>
+            <p className="mt-1.5 text-center text-[9px] leading-tight text-slate-500">{t('affiliateDisclosure')}</p>
+          </div>
+        )}
 
         {/* Validation Errors Panel (Blocking) */}
         {hasErrors && (
@@ -460,86 +528,6 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
           </a>
         </div>
 
-        {/* Affiliate Deployment Banner */}
-          <div
-            ref={deploymentOptionsRef}
-            className="relative scroll-mt-12 px-5 py-4 bg-gradient-to-r from-indigo-950/70 via-slate-900 to-emerald-950/70 border-t border-indigo-800/50 space-y-3 text-xs transition-all"
-          >
-            <div className="flex items-center justify-between font-semibold text-slate-200">
-              <div className="flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-                <span className="text-emerald-300 font-bold">{t('readyToDeployTitle')}</span>
-              </div>
-
-              <span className="hidden sm:inline-block text-[10px] font-extrabold text-slate-950 bg-amber-400 px-2.5 py-0.5 rounded-full border border-amber-300 shadow-md uppercase tracking-wider">
-                24/7 Auto Execution
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="relative overflow-hidden rounded-2xl border-2 border-orange-400/80 bg-gradient-to-r from-orange-950 via-orange-900/80 to-amber-950 p-4 shadow-xl shadow-orange-950/50 sm:p-5">
-                <div className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-orange-400/15 blur-2xl" aria-hidden="true" />
-                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-300/60 bg-orange-500/25 shadow-inner">
-                      <Rocket className="h-5 w-5 text-orange-200" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="mb-1.5 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-amber-300/70 bg-amber-300 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-orange-950">
-                          {t('cloudwaysRecommendedBadge')}
-                        </span>
-                        <span className="rounded-full border border-orange-300/50 bg-orange-500/20 px-2.5 py-1 text-[10px] font-bold text-orange-100">
-                          {t('cloudwaysDeadline')}
-                        </span>
-                      </div>
-                      <strong className="block text-sm font-black leading-snug text-orange-100 sm:text-base">{t('cloudwaysTitle')}</strong>
-                      <p className="mt-1 text-[11px] leading-relaxed text-orange-50/90 sm:text-xs">{t('cloudwaysSub')}</p>
-                      <code className="mt-2 inline-block rounded-md border border-orange-300/50 bg-slate-950/50 px-2.5 py-1 font-mono text-[11px] font-bold text-amber-200">
-                        {t('cloudwaysPromoCode')}
-                      </code>
-                    </div>
-                  </div>
-                  <a
-                    href="https://unified.cloudways.com/signup?id=2194173&coupon=SUMMER404"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex w-full shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-3 text-center text-xs font-black text-white shadow-lg shadow-orange-950/50 ring-1 ring-orange-200/60 transition hover:from-orange-400 hover:to-amber-300 sm:w-auto sm:min-w-60"
-                  >
-                    <span>{t('cloudwaysCtaBtn')}</span>
-                    <ExternalLink className="h-3.5 w-3.5 text-white" />
-                  </a>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-emerald-500/50 bg-emerald-950/35 p-3 shadow-lg sm:p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-2.5">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-500/50 bg-emerald-600/25">
-                      <Terminal className="h-4 w-4 text-emerald-300" />
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <strong className="text-sm text-emerald-200">{t('conohaTitle')}</strong>
-                        <span className="rounded-full border border-emerald-500/40 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-200">{t('conohaJapanBadge')}</span>
-                      </div>
-                      <p className="mt-1 text-[11px] leading-relaxed text-slate-300">{t('conohaSub')}</p>
-                    </div>
-                  </div>
-                  <a
-                    href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-2.5 text-center text-xs font-extrabold text-white shadow-md shadow-emerald-500/20 transition hover:from-emerald-500 hover:to-green-500 sm:w-auto"
-                  >
-                    <span>{t('conohaCtaBtn')}</span>
-                    <ExternalLink className="h-3 w-3 text-white" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            <p className="text-center text-[10px] leading-relaxed text-slate-500">{t('affiliateDisclosure')}</p>
-          </div>
           </div>
         )}
 
