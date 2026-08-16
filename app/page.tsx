@@ -346,6 +346,24 @@ export default function EditorPage() {
     setIsCodeModalOpen(true);
   }, []);
 
+  const handleEditExportError = useCallback((nodeId?: string) => {
+    setIsCodeModalOpen(false);
+    if (!nodeId) return;
+
+    const targetNode = nodes.find((node) => node.id === nodeId);
+    if (!targetNode) return;
+
+    setNodes((currentNodes) =>
+      currentNodes.map((node) => ({ ...node, selected: node.id === nodeId }))
+    );
+    setSelectedNode(targetNode);
+    setIsInspectorOpen(true);
+    setIsMobileSidebarOpen(false);
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId } }));
+    });
+  }, [nodes, setNodes]);
+
   // Export Graph JSON
   const handleExportJson = useCallback(() => {
     const data: GraphData = { nodes, edges, crewConfig };
@@ -592,6 +610,7 @@ export default function EditorPage() {
       <CodeExportModal
         isOpen={isCodeModalOpen}
         onClose={() => setIsCodeModalOpen(false)}
+        onEditNode={handleEditExportError}
         nodes={nodes}
         edges={edges}
         crewConfig={crewConfig}

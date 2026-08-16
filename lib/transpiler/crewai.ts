@@ -423,12 +423,16 @@ export function generateProjectFiles(
   mode: ExportMode = 'scaffold'
 ): ProjectExportResult {
   const validation = validateGraph(nodes, edges, crewConfig, mode);
-  const mainCode = validation.isValid
-    ? transpileToCrewAI(nodes, edges, crewConfig, mode)
-    : `# Validation Errors:\n${validation.errors.map((e) => {
-        const suggestion = e.suggestion ? `\n#   Fix: ${e.suggestion}` : '';
-        return `# - [${e.code}] ${e.message}${suggestion}`;
-      }).join('\n')}\n`;
+  if (!validation.isValid) {
+    return {
+      mode,
+      validation,
+      files: [],
+      mainCode: '',
+    };
+  }
+
+  const mainCode = transpileToCrewAI(nodes, edges, crewConfig, mode);
 
   const files: ProjectFile[] = [];
 

@@ -71,6 +71,27 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const { lang } = useLanguage();
 
+  useEffect(() => {
+    const handleFocusNode = (event: Event) => {
+      const nodeId = (event as CustomEvent<{ nodeId?: string }>).detail?.nodeId;
+      if (!nodeId || !reactFlowInstance) return;
+
+      const node = nodes.find((item) => item.id === nodeId);
+      if (!node) return;
+
+      const width = node.measured?.width || node.width || 280;
+      const height = node.measured?.height || node.height || 120;
+      void reactFlowInstance.setCenter(
+        node.position.x + width / 2,
+        node.position.y + height / 2,
+        { zoom: 1, duration: 450 }
+      );
+    };
+
+    window.addEventListener('focus-flow-node', handleFocusNode);
+    return () => window.removeEventListener('focus-flow-node', handleFocusNode);
+  }, [nodes, reactFlowInstance]);
+
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge({ ...params, ...defaultEdgeOptions }, eds)),
     [setEdges]

@@ -20,6 +20,8 @@ import {
   Hammer,
   FileCode2,
   FolderGit2,
+  ArrowLeft,
+  MapPin,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { CustomNode, CrewConfig, ExportMode } from '@/types/editor';
@@ -45,9 +47,59 @@ function getLocalizedSuggestion(error: ValidationError, lang: 'en' | 'ja'): stri
   }
 }
 
+function getLocalizedErrorMessage(
+  error: ValidationError,
+  lang: 'en' | 'ja',
+  nodes: CustomNode[],
+  edges: Edge[]
+): string {
+  if (lang === 'en') return error.message;
+
+  const node = error.nodeId ? nodes.find((item) => item.id === error.nodeId) : undefined;
+  const nodeLabel = String(node?.data?.label || error.nodeId || '対象ノード');
+
+  switch (error.code) {
+    case 'MULTIPLE_AGENTS_PER_TASK': {
+      const assignedAgentIds = new Set<string>();
+      const assignedAgentId = node?.type === 'task'
+        ? (node.data as { assignedAgentId?: string }).assignedAgentId
+        : undefined;
+      if (assignedAgentId) assignedAgentIds.add(assignedAgentId);
+
+      edges.forEach((edge) => {
+        const source = nodes.find((item) => item.id === edge.source);
+        const target = nodes.find((item) => item.id === edge.target);
+        if (edge.target === error.nodeId && source?.type === 'agent') assignedAgentIds.add(source.id);
+        if (edge.source === error.nodeId && target?.type === 'agent') assignedAgentIds.add(target.id);
+      });
+
+      const agentNames = Array.from(assignedAgentIds).map((agentId) => {
+        const agent = nodes.find((item) => item.id === agentId);
+        const agentData = agent?.data as { role?: string; label?: string } | undefined;
+        return String(agentData?.role || agentData?.label || agentId);
+      });
+      return `Task「${nodeLabel}」に${agentNames.length}人のAgentが割り当てられています。主担当は1人だけにしてください。現在の担当: ${agentNames.join('、')}`;
+    }
+    case 'UNASSIGNED_TASK':
+      return `Task「${nodeLabel}」に主担当Agentが割り当てられていません。`;
+    case 'TASK_CYCLE_DETECTED':
+    case 'TASK_SELF_CYCLE':
+      return `Task「${nodeLabel}」を含む依存関係が循環しています。`;
+    case 'DANGLING_EDGE':
+      return '存在しないノードにつながる接続があります。不要な接続を削除してください。';
+    case 'DUPLICATE_NODE_ID':
+      return `ノードID「${error.nodeId}」が重複しています。`;
+    case 'DUPLICATE_EDGE_ID':
+      return `接続ID「${error.edgeId}」が重複しています。`;
+    default:
+      return error.message;
+  }
+}
+
 interface CodeExportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onEditNode: (nodeId?: string) => void;
   nodes: CustomNode[];
   edges: Edge[];
   crewConfig?: CrewConfig;
@@ -57,6 +109,7 @@ interface CodeExportModalProps {
 export const CodeExportModal: React.FC<CodeExportModalProps> = ({
   isOpen,
   onClose,
+  onEditNode,
   nodes,
   edges,
   crewConfig = { name: 'My Crew', process: 'sequential', verbose: true, memory: false },
@@ -148,31 +201,48 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
       {/* Main Modal Container */}
       <div
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="code-export-modal-title"
         className="relative w-full max-w-5xl max-h-[92dvh] flex flex-col rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl overflow-hidden"
       >
         {/* Modal Header */}
         <div className="px-5 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-sm shrink-0">
-              <Code2 className="w-4 h-4" />
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-sm shrink-0 border ${
+              hasErrors
+                ? 'bg-red-600/20 border-red-500/40 text-red-400'
+                : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-400'
+            }`}>
+              {hasErrors ? <AlertCircle className="w-4 h-4" /> : <Code2 className="w-4 h-4" />}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-slate-100">
-                  {t('codeModalTitle')}
+                <h3 id="code-export-modal-title" className="text-base font-bold text-slate-100">
+                  {hasErrors
+                    ? (lang === 'ja' ? 'コードを生成できません' : 'Code generation blocked')
+                    : t('codeModalTitle')}
                 </h3>
-                <span className="text-xs font-mono text-emerald-300 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-                  {activeFile.path}
-                </span>
+                {!hasErrors && (
+                  <span className="text-xs font-mono text-emerald-300 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                    {activeFile.path}
+                  </span>
+                )}
               </div>
-              <p className="text-xs text-slate-400">{t('codeModalSub')}</p>
+              <p className="text-xs text-slate-400">
+                {hasErrors
+                  ? (lang === 'ja'
+                    ? '実行できないファイルは出力していません。下の項目を修正してから再度生成してください。'
+                    : 'No runnable files were created. Fix the items below, then generate again.')
+                  : t('codeModalSub')}
+              </p>
             </div>
           </div>
 
           {/* Export Mode Toggle & Close */}
           <div className="flex items-center gap-2">
             {/* Mode Switcher */}
-            <div className="hidden sm:flex items-center p-0.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+            {!hasErrors && <div className="hidden sm:flex items-center p-0.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
               <button
                 onClick={() => setExportMode('scaffold')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition ${
@@ -198,7 +268,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Production Mode</span>
               </button>
-            </div>
+            </div>}
 
             <button
               onClick={onClose}
@@ -212,35 +282,63 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
 
         {/* Validation Errors Panel (Blocking) */}
         {hasErrors && (
-          <div className="px-5 py-3.5 bg-red-950/80 border-b border-red-800/80 text-red-200 space-y-2 animate-in slide-in-from-top-2">
-            <div className="flex items-center gap-2 font-bold text-sm text-red-300">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-              <span>
-                {lang === 'ja'
-                  ? 'グラフ検証エラー: エクスポートが停止しました'
-                  : 'Graph Validation Errors: Export Blocked'}
-              </span>
-            </div>
-            <ul className="space-y-2 text-xs text-red-200">
-              {project.validation.errors.map((err, idx) => (
-                <li key={`${err.code}-${err.nodeId || err.edgeId || idx}`} className="rounded-xl border border-red-800/70 bg-red-950/60 p-3 leading-relaxed list-none">
-                  <div className="flex flex-wrap items-start gap-2">
-                    <span className="font-mono font-bold bg-red-900/60 px-1.5 py-0.5 rounded text-[10px] border border-red-700/60 shrink-0">
-                      {err.code}
-                    </span>
-                    <span className="min-w-0 flex-1">{err.message}</span>
+          <div className="flex-1 overflow-y-auto bg-slate-950 px-4 py-5 sm:px-6 sm:py-6">
+            <div className="mx-auto max-w-3xl space-y-4">
+              <div className="rounded-2xl border border-red-800/80 bg-red-950/55 p-4 text-red-100 shadow-lg shadow-red-950/20 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 rounded-xl border border-red-700/60 bg-red-900/50 p-2 text-red-300">
+                    <AlertCircle className="h-5 w-5" />
                   </div>
-                  {getLocalizedSuggestion(err, lang) && (
-                    <div className="mt-2 rounded-lg border border-amber-700/50 bg-amber-950/50 px-3 py-2 text-amber-100">
-                      <strong className="text-amber-300">
-                        {lang === 'ja' ? '修正方法: ' : 'How to fix: '}
-                      </strong>
-                      {getLocalizedSuggestion(err, lang)}
+                  <div>
+                    <p className="font-bold text-red-200">
+                      {lang === 'ja'
+                        ? `${project.validation.errors.length}件の修正が必要です`
+                        : `${project.validation.errors.length} ${project.validation.errors.length === 1 ? 'issue' : 'issues'} must be fixed`}
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-red-200/80">
+                      {lang === 'ja'
+                        ? 'グラフは保存されたままです。自動修正で構成を変えず、担当や依存関係を確認して修正できます。'
+                        : 'Your graph remains saved. Automatic repair is avoided because choosing agents or dependencies could change the workflow meaning.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <ul className="space-y-3 text-xs text-red-100">
+                {project.validation.errors.map((err, idx) => (
+                  <li key={`${err.code}-${err.nodeId || err.edgeId || idx}`} className="rounded-2xl border border-red-900/70 bg-slate-900 p-4 leading-relaxed list-none sm:p-5">
+                    <div className="flex flex-wrap items-start gap-2">
+                      <span className="font-mono font-bold bg-red-950 px-2 py-1 rounded-md text-[10px] text-red-300 border border-red-800/70 shrink-0">
+                        {err.code}
+                      </span>
+                      <span className="min-w-0 flex-1 text-sm text-slate-200">
+                        {getLocalizedErrorMessage(err, lang, nodes, edges)}
+                      </span>
                     </div>
-                  )}
-                </li>
-              ))}
-            </ul>
+                    {getLocalizedSuggestion(err, lang) && (
+                      <div className="mt-3 rounded-xl border border-amber-700/40 bg-amber-950/35 px-3 py-2.5 text-amber-100">
+                        <strong className="text-amber-300">
+                          {lang === 'ja' ? '修正方法: ' : 'How to fix: '}
+                        </strong>
+                        {getLocalizedSuggestion(err, lang)}
+                      </div>
+                    )}
+                    {err.nodeId && (
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => onEditNode(err.nodeId)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-500/50 bg-indigo-950/60 px-3 py-2 font-semibold text-indigo-200 transition hover:border-indigo-400 hover:bg-indigo-900/60"
+                        >
+                          <MapPin className="h-3.5 w-3.5" />
+                          {lang === 'ja' ? '該当ノードを表示' : 'Show affected node'}
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
@@ -284,7 +382,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
         )}
 
         {/* Multi-file Project Tabs Bar */}
-        <div className="px-4 py-2 bg-slate-950/80 border-b border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {!hasErrors && <div className="px-4 py-2 bg-slate-950/80 border-b border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {project.files.map((file) => {
             const isActive = file.path === activeTabPath;
             return (
@@ -311,10 +409,10 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
               </button>
             );
           })}
-        </div>
+        </div>}
 
         {/* Modal Body - Code Viewer */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 bg-slate-950 font-mono text-xs leading-relaxed text-slate-300 min-h-[220px]">
+        {!hasErrors && <div className="p-4 sm:p-6 overflow-y-auto flex-1 bg-slate-950 font-mono text-xs leading-relaxed text-slate-300 min-h-[220px]">
           <div className="relative">
             {activeFile.description && (
               <div className="mb-2 text-[11px] text-slate-400 font-sans italic">
@@ -325,10 +423,10 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
               <code>{activeFile.content}</code>
             </pre>
           </div>
-        </div>
+        </div>}
 
         {/* Local Execution Instructions */}
-        <div className="px-5 py-2.5 bg-slate-900/60 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between flex-wrap gap-2">
+        {!hasErrors && <div className="px-5 py-2.5 bg-slate-900/60 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <Terminal className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>
@@ -346,10 +444,10 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
           >
             CrewAI Docs <ExternalLink className="w-3 h-3" />
           </a>
-        </div>
+        </div>}
 
         {/* Affiliate Deployment Banner */}
-        {isBannerVisible && (
+        {isBannerVisible && !hasErrors && (
           <div className="relative px-5 py-4 bg-gradient-to-r from-indigo-950/70 via-slate-900 to-emerald-950/70 border-t border-indigo-800/50 space-y-3 text-xs transition-all">
             <div className="flex items-center justify-between font-semibold text-slate-200">
               <div className="flex items-center gap-1.5">
@@ -441,56 +539,58 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
 
         {/* Modal Footer Actions */}
         <div className="px-5 py-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-mono hidden sm:inline">
-              File: <strong className="text-emerald-300">{activeFile.filename}</strong>
-            </span>
-            {hasErrors && (
-              <span className="text-xs text-red-400 font-semibold flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" />
-                {lang === 'ja' ? 'エラーを修正してください' : 'Fix graph errors before export'}
+          {hasErrors ? (
+            <button
+              type="button"
+              onClick={() => onEditNode()}
+              className="ml-auto inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-500"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {lang === 'ja' ? '編集画面に戻る' : 'Back to editor'}
+            </button>
+          ) : (
+            <>
+              <span className="text-xs text-slate-400 font-mono hidden sm:inline">
+                File: <strong className="text-emerald-300">{activeFile.filename}</strong>
               </span>
-            )}
-          </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopy}
-              disabled={hasErrors}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-semibold transition"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-400">{t('copied')}</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 text-slate-400" />
-                  <span>{t('copyCode')} ({activeFile.filename})</span>
-                </>
-              )}
-            </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-400" />
+                      <span className="text-emerald-400">{t('copied')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-slate-400" />
+                      <span>{t('copyCode')} ({activeFile.filename})</span>
+                    </>
+                  )}
+                </button>
 
-            <button
-              onClick={handleDownload}
-              disabled={hasErrors}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-semibold border border-slate-700 transition"
-            >
-              <Download className="w-4 h-4 text-emerald-400" />
-              <span>Download {activeFile.filename}</span>
-            </button>
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
+                >
+                  <Download className="w-4 h-4 text-emerald-400" />
+                  <span>Download {activeFile.filename}</span>
+                </button>
 
-            <button
-              onClick={handleDownloadAll}
-              disabled={hasErrors}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition"
-              title="Download all project files"
-            >
-              <FolderGit2 className="w-4 h-4" />
-              <span>Download Full Project</span>
-            </button>
-          </div>
+                <button
+                  onClick={handleDownloadAll}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition"
+                  title="Download all project files"
+                >
+                  <FolderGit2 className="w-4 h-4" />
+                  <span>Download Full Project</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

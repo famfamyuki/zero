@@ -290,7 +290,7 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assertValidPythonSyntax(customToolFile.content);
   });
 
-  test('14. Validation errors are exported with actionable fix comments', () => {
+  test('14. Validation errors never produce misleading or downloadable project files', () => {
     const { nodes, edges, crewConfig } = createSampleGraph();
     const invalidEdges: Edge[] = [
       ...edges,
@@ -299,8 +299,9 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
 
     const project = generateProjectFiles(nodes, invalidEdges, crewConfig, 'scaffold');
     assert.equal(project.validation.isValid, false);
-    assert.ok(project.mainCode.includes('#   Fix: Keep one primary agent'));
-    assertValidPythonSyntax(project.mainCode);
+    assert.equal(project.mainCode, '');
+    assert.deepEqual(project.files, []);
+    assert.ok(project.validation.errors[0]?.suggestion?.includes('Keep one primary agent'));
   });
 
   test('15. Repository Red-Team preset uses one owner per task and exports successfully', () => {
