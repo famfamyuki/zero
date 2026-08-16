@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --import tsx --test tests/**/*.test.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.12.1",
     "@supabase/supabase-js": "^2.111.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@vercel/analytics": "^2.0.1",
     "@xyflow/react": "^12.11.2",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
@@ -28,6 +30,7 @@
     "@types/react-dom": "^19",
     "isomorphic-git": "^1.40.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }

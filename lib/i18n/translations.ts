@@ -15,10 +15,17 @@ export const translations = {
     clearCanvas: 'Clear Canvas',
     generatePython: 'Export Code (Python)',
     deployConoHaHeader: '🚀 Deploy (ConoHa)',
+    deployCloudwaysHeader: '🚀 Deploy (Cloudways)',
 
     // Catchphrase Banner
     mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
     subCopy: 'Design AI agents in your browser and export executable Python code (main.py) in 1 second. No API keys required • 100% Local Execution.',
+
+    // Mobile Toolbar
+    mobilePalette: 'Palette',
+    mobileTemplates: 'Templates',
+    mobileExport: 'Export Code',
+    mobileInspector: 'Inspector',
 
     // Sidebar
     nodePalette: 'Node Palette',
@@ -39,6 +46,7 @@ export const translations = {
     executionProcess: 'Execution Process',
     processSequential: 'Sequential (Step-by-step)',
     processHierarchical: 'Hierarchical (Manager-delegated)',
+    managerLlm: 'Manager LLM (Hierarchical)',
     verboseLogs: 'Verbose Execution Logs',
     crewMemory: 'Crew Memory (RAG)',
     nodeInspector: 'Node Inspector',
@@ -71,9 +79,17 @@ export const translations = {
     copyCode: 'Copy Code',
     downloadPy: 'Download main.py',
     readyToDeployTitle: '🚀 24/7 Production Agent Server (Recommended Infrastructure)',
+    cloudwaysTitle: 'Cloudways Summer Offer: 40% Off for 4 Months',
+    cloudwaysSub: 'New customers get 40% off every plan for the first 4 months, plus free migration support.',
+    cloudwaysCtaBtn: 'Claim 40% Off on Cloudways',
+    cloudwaysRecommendedBadge: 'Recommended',
+    cloudwaysDeadline: 'Offer ends September 15, 2026',
+    cloudwaysPromoCode: 'Promo code: SUMMER404',
     conohaTitle: 'ConoHa VPS (High-Speed Cloud VPS)',
-    conohaSub: 'Fixed monthly pricing with ultra-fast SSD. Perfect for running CrewAI agents 24/7.',
-    conohaCtaBtn: '🚀 Deploy 24/7 Server Now',
+    conohaSub: 'A Japan-focused VPS for users who want direct control of Docker and Python while keeping monthly costs predictable.',
+    conohaCtaBtn: 'Build on ConoHa VPS',
+    conohaJapanBadge: '🇯🇵 Japan',
+    affiliateDisclosure: 'These cards contain affiliate links. The price you pay is not increased by using them.',
 
     // Templates Page
     backToCanvas: 'Back to Canvas',
@@ -100,10 +116,17 @@ export const translations = {
     clearCanvas: 'キャンバス消去',
     generatePython: 'コード出力 (Python)',
     deployConoHaHeader: '🚀 稼働 (ConoHa)',
+    deployCloudwaysHeader: '🚀 稼働 (Cloudways)',
 
     // Catchphrase Banner
     mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
     subCopy: 'ブラウザ上でAIエージェントを設計し、実行可能な生のPythonコード（main.py）を1秒で出力します。APIキーの入力不要・100%ローカル実行対応。',
+
+    // Mobile Toolbar
+    mobilePalette: 'パレット',
+    mobileTemplates: 'テンプレート',
+    mobileExport: 'コード出力',
+    mobileInspector: '詳細設定',
 
     // Sidebar
     nodePalette: 'ノードパレット',
@@ -124,6 +147,7 @@ export const translations = {
     executionProcess: '実行プロセス',
     processSequential: 'Sequential（順次実行）',
     processHierarchical: 'Hierarchical（階層マネージャー委任）',
+    managerLlm: 'マネージャーLLM (Hierarchical用)',
     verboseLogs: '詳細ログ出力（Verbose）',
     crewMemory: 'Crew メモリ（RAG記憶）',
     nodeInspector: 'ノード設定パネル',
@@ -155,10 +179,18 @@ export const translations = {
     copied: 'クリップボードにコピーしました！',
     copyCode: 'コードをコピー',
     downloadPy: 'main.py をダウンロード',
-    readyToDeployTitle: '🚀 24時間自動実行用 本番サーバー (ConoHa VPS 定額・即時構築)',
-    conohaTitle: 'ConoHa VPS (高コスパ・国内定番クラウドVPS)',
-    conohaSub: '月額料金定額・高速SSDで24時間AIエージェントボットを自動稼働',
-    conohaCtaBtn: '🚀 24時間稼働サーバーを構築する',
+    readyToDeployTitle: '🚀 24時間自動実行用 本番サーバー (推奨インフラ)',
+    cloudwaysTitle: 'Cloudways サマーオファー：最初の4か月間40%オフ',
+    cloudwaysSub: '新規登録なら全プランが最初の4か月間40%オフ。無料の移行サポートも利用できます。',
+    cloudwaysCtaBtn: '40%オフでCloudwaysを始める',
+    cloudwaysRecommendedBadge: '推奨',
+    cloudwaysDeadline: '2026年9月15日までの期間限定',
+    cloudwaysPromoCode: 'プロモコード：SUMMER404',
+    conohaTitle: 'ConoHa VPS（国内向けVPS）',
+    conohaSub: 'DockerやPythonを自分で管理しながら、月額を抑えて運用したい人向けです。',
+    conohaCtaBtn: 'ConoHaで構築する',
+    conohaJapanBadge: '🇯🇵 日本向け',
+    affiliateDisclosure: 'この表示にはアフィリエイトリンクが含まれます。リンク利用による購入価格の上乗せはありません。',
 
     // Templates Page
     backToCanvas: 'キャンバスに戻る',

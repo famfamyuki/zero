@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Bot, CheckSquare, Wrench, Sparkles, Layers, Info, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bot, CheckSquare, Wrench, Sparkles, Layers, Info, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { NodeType, WorkflowTemplate } from '@/types/editor';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -15,6 +15,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, onAddNode, isMobileOpen = false, onCloseMobile }) => {
   const { lang, t } = useLanguage();
+  const [openCategory, setOpenCategory] = useState<string>('1. Basic (順次処理)');
 
   const onDragStart = (event: React.DragEvent, nodeType: NodeType) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
@@ -128,25 +129,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLoadPreset, onAddNode, isMob
           </div>
 
           <div className="space-y-2">
-            {PRESET_TEMPLATES.map((tmpl) => (
-              <button
-                key={tmpl.id}
-                onClick={() => {
-                  onLoadPreset(tmpl);
-                  if (onCloseMobile) onCloseMobile();
-                }}
-                className="w-full text-left p-2.5 rounded-xl bg-slate-900/50 border border-slate-800/80 hover:border-slate-700 hover:bg-slate-900 transition text-xs flex flex-col gap-1 group"
-              >
-                <span className="font-semibold text-slate-300 group-hover:text-indigo-300 transition truncate">
-                  {lang === 'ja' && tmpl.titleJa ? tmpl.titleJa : (tmpl.titleEn || tmpl.title)}
-                </span>
-                <div className="flex items-center gap-2 text-[10px] text-slate-500">
-                  <span>{tmpl.previewNodesCount.agents} Agents</span>
-                  <span>•</span>
-                  <span>{tmpl.previewNodesCount.tasks} Tasks</span>
+            {['1. Basic (順次処理)', '2. Advanced (階層型/非同期)', '3. Use Cases (実務フロー)'].map((categoryName) => {
+              const categoryTemplates = PRESET_TEMPLATES.filter((t) => t.category === categoryName);
+              if (categoryTemplates.length === 0) return null;
+              
+              const isOpen = openCategory === categoryName;
+
+              return (
+                <div key={categoryName} className="border border-slate-800/80 rounded-xl overflow-hidden bg-slate-900/30">
+                  <button
+                    onClick={() => setOpenCategory(isOpen ? '' : categoryName)}
+                    className="w-full flex items-center justify-between p-2.5 bg-slate-900/80 hover:bg-slate-800 transition text-xs font-semibold text-slate-300"
+                  >
+                    <span>{categoryName}</span>
+                    {isOpen ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                  </button>
+                  
+                  {isOpen && (
+                    <div className="p-2 space-y-1.5 bg-slate-900/20">
+                      {categoryTemplates.map((tmpl) => (
+                        <button
+                          key={tmpl.id}
+                          onClick={() => {
+                            onLoadPreset(tmpl);
+                            if (onCloseMobile) onCloseMobile();
+                          }}
+                          className="w-full text-left p-2 rounded-lg bg-slate-900/50 border border-slate-800/80 hover:border-indigo-500/50 hover:bg-slate-800 transition text-xs flex flex-col gap-1 group"
+                        >
+                          <span className="font-semibold text-slate-300 group-hover:text-indigo-300 transition truncate">
+                            {lang === 'ja' && tmpl.titleJa ? tmpl.titleJa : (tmpl.titleEn || tmpl.title)}
+                          </span>
+                          <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                            <span>{tmpl.previewNodesCount.agents} Agents</span>
+                            <span>•</span>
+                            <span>{tmpl.previewNodesCount.tasks} Tasks</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
         </div>
 

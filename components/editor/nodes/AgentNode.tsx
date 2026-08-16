@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { Bot, Cpu, Sparkles, Settings, Trash2 } from 'lucide-react';
 import { AgentNodeData } from '@/types/editor';
+import { DEFAULT_LLM_MODEL } from '@/lib/models';
 
 export const AgentNode = memo(({ id, data, selected }: NodeProps<any>) => {
   const agentData = data as AgentNodeData;
@@ -59,7 +60,7 @@ export const AgentNode = memo(({ id, data, selected }: NodeProps<any>) => {
         <div className="flex items-center gap-1.5">
           <div className="flex items-center gap-1 text-[10px] text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-800/40">
             <Cpu className="w-3 h-3 text-indigo-400" />
-            <span>{agentData.model || 'gpt-4o'}</span>
+            <span>{agentData.model || DEFAULT_LLM_MODEL}</span>
           </div>
           <button
             onClick={handleEditClick}

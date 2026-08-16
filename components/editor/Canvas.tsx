@@ -25,6 +25,7 @@ import { AgentNode } from './nodes/AgentNode';
 import { TaskNode } from './nodes/TaskNode';
 import { ToolNode } from './nodes/ToolNode';
 import { CustomNode, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
+import { DEFAULT_LLM_MODEL } from '@/lib/models';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -47,6 +48,10 @@ interface CanvasProps {
   setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   onNodeSelect: (node: CustomNode | null) => void;
+  onPaneClick: () => void;
+  onNodeDragStop?: any;
+  toggleFullscreen: () => void;
+  isFullscreen: boolean;
 }
 
 export const Canvas: React.FC<CanvasProps> = ({
@@ -57,43 +62,14 @@ export const Canvas: React.FC<CanvasProps> = ({
   setNodes,
   setEdges,
   onNodeSelect,
+  onPaneClick,
+  onNodeDragStop,
+  toggleFullscreen,
+  isFullscreen,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const { lang } = useLanguage();
-
-  // Fullscreen API toggle
-  const toggleFullscreen = useCallback(() => {
-    if (!reactFlowWrapper.current) return;
-
-    if (!document.fullscreenElement) {
-      if (reactFlowWrapper.current.requestFullscreen) {
-        reactFlowWrapper.current.requestFullscreen();
-      } else if ((reactFlowWrapper.current as any).webkitRequestFullscreen) {
-        (reactFlowWrapper.current as any).webkitRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      }
-    }
-  }, []);
-
-  // Listen to fullscreen changes (including Esc key exit)
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-    };
-  }, []);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge({ ...params, ...defaultEdgeOptions }, eds)),
@@ -128,7 +104,7 @@ export const Canvas: React.FC<CanvasProps> = ({
           role: 'AI Assistant',
           goal: 'Perform requested tasks efficiently.',
           backstory: 'An expert AI agent persona.',
-          model: 'gpt-4o-mini',
+          model: DEFAULT_LLM_MODEL,
           verbose: true,
           allowDelegation: false,
         };
@@ -197,7 +173,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     : 'Fullscreen';
 
   return (
-    <div className="w-full h-full flex-1 relative bg-slate-950" ref={reactFlowWrapper}>
+    <div className="w-full h-full flex-1 relative bg-slate-950 touch-none" ref={reactFlowWrapper}>
       {/* Mobile Touch Guidance Tip */}
       <div className="md:hidden absolute top-3 left-3 z-20 pointer-events-none bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] text-slate-300 shadow-lg flex items-center gap-1.5">
         <span className="text-amber-400 font-bold">💡</span>
@@ -214,19 +190,26 @@ export const Canvas: React.FC<CanvasProps> = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
+        onNodeDragStop={onNodeDragStop}
+        onPaneClick={onPaneClick}
         onEdgeClick={onEdgeClick}
         onSelectionChange={onSelectionChange as any}
         nodeTypes={nodeTypes as any}
         panOnScroll={false}
         zoomOnScroll={true}
         zoomOnPinch={true}
+        preventScrolling={true}
+        minZoom={0.05}
         panOnDrag={true}
         zoomOnDoubleClick={false}
         selectNodesOnDrag={false}
         elevateNodesOnSelect={true}
+        snapToGrid={true}
+        snapGrid={[15, 15]}
         fitView
         colorMode="dark"
         className="bg-slate-950"
+        defaultEdgeOptions={defaultEdgeOptions}
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Controls
@@ -238,7 +221,7 @@ export const Canvas: React.FC<CanvasProps> = ({
             onClick={toggleFullscreen}
             title={fullscreenTooltipText}
             aria-label={fullscreenTooltipText}
-            className="!bg-slate-900 hover:!bg-slate-800 !text-slate-300 transition"
+            className="hidden md:flex !bg-slate-900 hover:!bg-slate-800 !text-slate-300 transition"
           >
             {isFullscreen ? (
               <Minimize2 className="w-4 h-4 text-emerald-400" />
@@ -250,11 +233,12 @@ export const Canvas: React.FC<CanvasProps> = ({
 
         <MiniMap
           nodeColor={(n) => {
-            if (n.type === 'agent') return '#6366f1';
-            if (n.type === 'task') return '#10b981';
+            if (n?.type === 'agent') return '#6366f1';
+            if (n?.type === 'task') return '#10b981';
             return '#f59e0b';
           }}
-          className="hidden sm:block !bg-slate-900/90 !border-slate-800 !rounded-xl overflow-hidden shadow-2xl"
+          position="bottom-right"
+          className="hidden sm:block !bg-slate-900/90 !border !border-slate-800 !rounded-xl overflow-hidden shadow-2xl"
           maskColor="rgba(15, 23, 42, 0.7)"
         />
       </ReactFlow>

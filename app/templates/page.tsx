@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid, Globe, Rocket, ExternalLink } from 'lucide-react';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
-import { supabase } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function TemplatesPage() {
@@ -18,7 +18,7 @@ export default function TemplatesPage() {
   useEffect(() => {
     async function loadSupabaseTemplates() {
       try {
-        const { data, error } = await supabase.from('templates').select('*');
+        const { data, error } = await getSupabase().from('templates').select('*');
         if (data && data.length > 0 && !error) {
           const formattedSupabase: WorkflowTemplate[] = data.map((item: any) => ({
             id: item.id,

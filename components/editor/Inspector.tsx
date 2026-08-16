@@ -4,6 +4,7 @@ import React from 'react';
 import { Sliders, Bot, CheckSquare, Wrench, Settings, Trash2, Sparkles, ExternalLink, X } from 'lucide-react';
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig } from '@/types/editor';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { LLM_MODEL_GROUPS, DEFAULT_LLM_MODEL } from '@/lib/models';
 
 interface InspectorProps {
   selectedNode: CustomNode | null;
@@ -11,8 +12,8 @@ interface InspectorProps {
   onDeleteNode: (nodeId: string) => void;
   crewConfig: CrewConfig;
   onUpdateCrewConfig: (newConfig: Partial<CrewConfig>) => void;
-  isMobileOpen?: boolean;
-  onCloseMobile?: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const Inspector: React.FC<InspectorProps> = ({
@@ -21,21 +22,21 @@ export const Inspector: React.FC<InspectorProps> = ({
   onDeleteNode,
   crewConfig,
   onUpdateCrewConfig,
-  isMobileOpen = false,
-  onCloseMobile,
+  isOpen = false,
+  onClose,
 }) => {
   const { t } = useLanguage();
 
-  const containerClasses = `w-full max-w-sm md:w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/80 backdrop-blur-md p-4 pb-32 md:pb-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 md:z-20 fixed md:relative inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none ${
-    isMobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
+  const containerClasses = `w-full max-w-sm md:w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/90 backdrop-blur-md p-4 pb-32 md:pb-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 absolute inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl ${
+    isOpen ? 'translate-x-0' : 'translate-x-full'
   }`;
 
   return (
     <>
       {/* Mobile Backdrop */}
-      {isMobileOpen && (
+      {isOpen && onClose && (
         <div
-          onClick={onCloseMobile}
+          onClick={onClose}
           className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-30 md:hidden animate-in fade-in"
         />
       )}
@@ -47,10 +48,10 @@ export const Inspector: React.FC<InspectorProps> = ({
               <Settings className="w-4 h-4 text-indigo-400" />
               <h3 className="text-xs font-bold uppercase tracking-wider">{t('crewGlobalConfig')}</h3>
             </div>
-            {onCloseMobile && (
+            {onClose && (
               <button
-                onClick={onCloseMobile}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 md:hidden"
+                onClick={onClose}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -83,6 +84,28 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <option value="hierarchical">{t('processHierarchical')}</option>
               </select>
             </div>
+
+            {/* Manager LLM (Only for Hierarchical) */}
+            {crewConfig.process === 'hierarchical' && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                <label className="block text-xs font-medium text-slate-300 mb-1">{t('managerLlm')}</label>
+                <select
+                  value={crewConfig.managerLlm || DEFAULT_LLM_MODEL}
+                  onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value })}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                >
+                  {LLM_MODEL_GROUPS.map((group) => (
+                    <optgroup key={group.group} label={group.group} className="bg-slate-900 text-slate-300 font-semibold">
+                      {group.models.map((model) => (
+                        <option key={model.value} value={model.value} className="bg-slate-950 text-slate-100 font-normal">
+                          {model.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Verbose & Memory Toggles */}
             <div className="space-y-2.5 pt-2 border-t border-slate-800/80">
@@ -126,10 +149,10 @@ export const Inspector: React.FC<InspectorProps> = ({
               >
                 <Trash2 className="w-4 h-4" />
               </button>
-              {onCloseMobile && (
+              {onClose && (
                 <button
-                  onClick={onCloseMobile}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 md:hidden"
+                  onClick={onClose}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -169,14 +192,19 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('llmModel')}</label>
                 <div className="relative">
                   <select
-                    value={(selectedNode.data as AgentNodeData).model || 'gpt-4o'}
+                    value={(selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL}
                     onChange={(e) => onUpdateNodeData(selectedNode.id, { model: e.target.value })}
                     className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-indigo-500"
                   >
-                    <option value="gpt-4o">OpenAI: gpt-4o</option>
-                    <option value="gpt-4o-mini">OpenAI: gpt-4o-mini</option>
-                    <option value="gemini/gemini-1.5-pro">Google: Gemini 1.5 Pro</option>
-                    <option value="claude-3-5-sonnet-20240620">Anthropic: Claude 3.5 Sonnet</option>
+                    {LLM_MODEL_GROUPS.map((group) => (
+                      <optgroup key={group.group} label={group.group} className="bg-slate-900 text-slate-300 font-semibold">
+                        {group.models.map((model) => (
+                          <option key={model.value} value={model.value} className="bg-slate-950 text-slate-100 font-normal">
+                            {model.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -307,6 +335,11 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <option value="DirectoryReadTool">DirectoryReadTool (Local Folders)</option>
                   <option value="FileReadTool">FileReadTool (Local Files)</option>
                   <option value="TXTSearchTool">TXTSearchTool (RAG Search)</option>
+                  <option value="PDFSearchTool">PDFSearchTool (PDF Search)</option>
+                  <option value="CSVSearchTool">CSVSearchTool (CSV Search)</option>
+                  <option value="YoutubeVideoSearchTool">YoutubeVideoSearchTool (YouTube Search)</option>
+                  <option value="GithubSearchTool">GithubSearchTool (GitHub Search)</option>
+                  <option value="MDXSearchTool">MDXSearchTool (Markdown Search)</option>
                   <option value="CustomTool">Custom Function Tool</option>
                 </select>
               </div>

@@ -22,7 +22,7 @@ export interface TaskNodeData extends Record<string, unknown> {
 
 export interface ToolNodeData extends Record<string, unknown> {
   label: string;
-  toolType: 'SerperDevTool' | 'ScrapeWebsiteTool' | 'DirectoryReadTool' | 'FileReadTool' | 'TXTSearchTool' | 'CustomTool';
+  toolType: 'SerperDevTool' | 'ScrapeWebsiteTool' | 'DirectoryReadTool' | 'FileReadTool' | 'TXTSearchTool' | 'CustomTool' | 'PDFSearchTool' | 'CSVSearchTool' | 'YoutubeVideoSearchTool' | 'GithubSearchTool' | 'MDXSearchTool';
   description: string;
   parameters?: string;
 }
@@ -32,6 +32,7 @@ export type CustomNode = Node<AgentNodeData | TaskNodeData | ToolNodeData>;
 export interface CrewConfig {
   name: string;
   process: 'sequential' | 'hierarchical';
+  managerLlm?: string;
   verbose: boolean;
   memory: boolean;
 }
@@ -61,3 +62,54 @@ export interface WorkflowTemplate {
   graphData: GraphData;
   created_at?: string;
 }
+
+export interface ValidationError {
+  code: string;
+  message: string;
+  nodeId?: string;
+  edgeId?: string;
+  details?: string;
+  suggestion?: string;
+}
+
+export interface ValidationWarning {
+  code: string;
+  message: string;
+  nodeId?: string;
+  details?: string;
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationWarning[];
+  inputVariables: string[];
+  customTools: {
+    id: string;
+    varName: string;
+    className: string;
+    label: string;
+    description: string;
+  }[];
+  sortedTaskIds: string[];
+  taskAgentMap: Record<string, string>;
+  taskContextMap: Record<string, string[]>;
+}
+
+export type ExportMode = 'production' | 'scaffold';
+
+export interface ProjectFile {
+  path: string;
+  filename: string;
+  content: string;
+  language: string;
+  description?: string;
+}
+
+export interface ProjectExportResult {
+  mode: ExportMode;
+  validation: ValidationResult;
+  files: ProjectFile[];
+  mainCode: string;
+}
+
