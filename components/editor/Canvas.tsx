@@ -17,6 +17,8 @@ import {
   ReactFlowInstance,
   ConnectionMode,
   Viewport,
+  MarkerType,
+  Panel,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Focus, Maximize2, Minimize2 } from 'lucide-react';
@@ -36,10 +38,18 @@ const nodeTypes = {
 
 const defaultEdgeOptions = {
   type: 'smoothstep',
-  animated: true,
+  animated: false,
   interactionWidth: 30, // Expanded touch hit target for edges (30px)
-  style: { stroke: '#818cf8', strokeWidth: 2.5 },
+  style: { stroke: '#a5b4fc', strokeWidth: 2.75, opacity: 1 },
+  markerEnd: { type: MarkerType.ArrowClosed, color: '#a5b4fc' },
 };
+
+const edgePalette = {
+  'tool-agent': { color: '#fbbf24', labelJa: 'Tool → Agent', labelEn: 'Tool → Agent' },
+  'agent-task': { color: '#a5b4fc', labelJa: 'Agent → Task', labelEn: 'Agent → Task' },
+  'task-task': { color: '#5eead4', labelJa: 'Task → Task', labelEn: 'Task → Task' },
+  other: { color: '#cbd5e1', labelJa: 'その他', labelEn: 'Other' },
+} as const;
 
 interface CanvasProps {
   nodes: CustomNode[];
@@ -103,24 +113,47 @@ export const Canvas: React.FC<CanvasProps> = ({
   }, [connectedNodeIds, nodes]);
 
   const visibleEdges = useMemo(() => {
+    const nodeTypeById = new Map(nodes.map((node) => [node.id, node.type]));
+
     return edges.map((edge) => {
       const isConnected = selectedNodeId
         ? edge.source === selectedNodeId || edge.target === selectedNodeId
         : false;
       const isDimmed = Boolean(selectedNodeId) && !isConnected;
+      const sourceType = nodeTypeById.get(edge.source);
+      const targetType = nodeTypeById.get(edge.target);
+      const paletteKey =
+        sourceType === 'tool' && targetType === 'agent'
+          ? 'tool-agent'
+          : sourceType === 'agent' && targetType === 'task'
+            ? 'agent-task'
+            : sourceType === 'task' && targetType === 'task'
+              ? 'task-task'
+              : 'other';
+      const color = edgePalette[paletteKey].color;
 
       return {
         ...edge,
+        type: edge.type || 'smoothstep',
         animated: isConnected ? true : isOverview ? false : edge.animated,
+        interactionWidth: Math.max(edge.interactionWidth || 0, 30),
+        className: `agentgraph-edge agentgraph-edge--${paletteKey}`,
         style: {
           ...edge.style,
-          strokeWidth: isConnected ? 3.5 : isOverview ? 1.5 : edge.style?.strokeWidth,
-          opacity: isConnected ? 1 : isDimmed ? 0.08 : isOverview ? 0.42 : 1,
+          stroke: color,
+          strokeWidth: isConnected || edge.selected ? 4 : 2.75,
+          opacity: isConnected ? 1 : isDimmed ? 0.32 : isOverview ? 0.9 : 1,
           transition: 'opacity 160ms ease, stroke-width 160ms ease',
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color,
+          width: 18,
+          height: 18,
         },
       };
     });
-  }, [edges, isOverview, selectedNodeId]);
+  }, [edges, isOverview, nodes, selectedNodeId]);
 
   const handleMove = useCallback((_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
     const nextIsOverview = viewport.zoom < 0.62;
@@ -292,8 +325,23 @@ export const Canvas: React.FC<CanvasProps> = ({
         colorMode="dark"
         className="bg-slate-950"
         defaultEdgeOptions={defaultEdgeOptions}
+        connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
+        <Panel position="bottom-center" className="!m-3">
+          <div className="agentgraph-edge-legend" aria-label={lang === 'ja' ? '接続線の凡例' : 'Connection legend'}>
+            {(['tool-agent', 'agent-task', 'task-task'] as const).map((key) => (
+              <span key={key} className="agentgraph-edge-legend__item">
+                <span
+                  className="agentgraph-edge-legend__line"
+                  style={{ backgroundColor: edgePalette[key].color }}
+                  aria-hidden="true"
+                />
+                {lang === 'ja' ? edgePalette[key].labelJa : edgePalette[key].labelEn}
+              </span>
+            ))}
+          </div>
+        </Panel>
         <Controls
           showFitView={false}
           showInteractive={false}
