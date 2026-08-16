@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -16,9 +16,10 @@ import {
   BackgroundVariant,
   ReactFlowInstance,
   ConnectionMode,
+  Viewport,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { Focus, Maximize2, Minimize2 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 import { AgentNode } from './nodes/AgentNode';
@@ -69,7 +70,66 @@ export const Canvas: React.FC<CanvasProps> = ({
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+  const [isOverview, setIsOverview] = useState(false);
   const { lang } = useLanguage();
+
+  const selectedNodeId = useMemo(
+    () => nodes.find((node) => node.selected)?.id ?? null,
+    [nodes]
+  );
+
+  const connectedNodeIds = useMemo(() => {
+    if (!selectedNodeId) return null;
+
+    const ids = new Set<string>([selectedNodeId]);
+    for (const edge of edges) {
+      if (edge.source === selectedNodeId) ids.add(edge.target);
+      if (edge.target === selectedNodeId) ids.add(edge.source);
+    }
+    return ids;
+  }, [edges, selectedNodeId]);
+
+  const visibleNodes = useMemo(() => {
+    if (!connectedNodeIds) return nodes;
+
+    return nodes.map((node) => ({
+      ...node,
+      style: {
+        ...node.style,
+        opacity: connectedNodeIds.has(node.id) ? 1 : 0.28,
+        transition: 'opacity 160ms ease',
+      },
+    }));
+  }, [connectedNodeIds, nodes]);
+
+  const visibleEdges = useMemo(() => {
+    return edges.map((edge) => {
+      const isConnected = selectedNodeId
+        ? edge.source === selectedNodeId || edge.target === selectedNodeId
+        : false;
+      const isDimmed = Boolean(selectedNodeId) && !isConnected;
+
+      return {
+        ...edge,
+        animated: isConnected ? true : isOverview ? false : edge.animated,
+        style: {
+          ...edge.style,
+          strokeWidth: isConnected ? 3.5 : isOverview ? 1.5 : edge.style?.strokeWidth,
+          opacity: isConnected ? 1 : isDimmed ? 0.08 : isOverview ? 0.42 : 1,
+          transition: 'opacity 160ms ease, stroke-width 160ms ease',
+        },
+      };
+    });
+  }, [edges, isOverview, selectedNodeId]);
+
+  const handleMove = useCallback((_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
+    const nextIsOverview = viewport.zoom < 0.62;
+    setIsOverview((current) => (current === nextIsOverview ? current : nextIsOverview));
+  }, []);
+
+  const handleFitView = useCallback(() => {
+    void reactFlowInstance?.fitView({ padding: 0.18, duration: 450 });
+  }, [reactFlowInstance]);
 
   useEffect(() => {
     const handleFocusNode = (event: Event) => {
@@ -202,8 +262,8 @@ export const Canvas: React.FC<CanvasProps> = ({
       </div>
 
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={visibleNodes}
+        edges={visibleEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -215,6 +275,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         onPaneClick={onPaneClick}
         onEdgeClick={onEdgeClick}
         onSelectionChange={onSelectionChange as any}
+        onMove={handleMove}
         nodeTypes={nodeTypes as any}
         panOnScroll={false}
         zoomOnScroll={true}
@@ -238,6 +299,14 @@ export const Canvas: React.FC<CanvasProps> = ({
           showInteractive={false}
           className="!bg-slate-900 !border-slate-800 !text-slate-300 !rounded-xl !shadow-2xl !left-3 !bottom-24 md:!bottom-4 md:!left-4"
         >
+          <ControlButton
+            onClick={handleFitView}
+            title={lang === 'ja' ? '全ノードを画面内に表示' : 'Fit all nodes'}
+            aria-label={lang === 'ja' ? '全ノードを画面内に表示' : 'Fit all nodes'}
+            className="!bg-slate-900 hover:!bg-slate-800 !text-slate-300 transition"
+          >
+            <Focus className="w-4 h-4 text-cyan-400" />
+          </ControlButton>
           <ControlButton
             onClick={toggleFullscreen}
             title={fullscreenTooltipText}
