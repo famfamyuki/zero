@@ -108,6 +108,22 @@ export function validateGraph(
   const taskNodes = (nodes || []).filter((n) => n?.type === 'task');
   const toolNodes = (nodes || []).filter((n) => n?.type === 'tool');
 
+  if (agentNodes.length === 0) {
+    errors.push({
+      code: 'NO_AGENTS',
+      message: 'The workflow must contain at least one Agent.',
+      suggestion: 'Add an Agent and connect it to a Task before exporting.',
+    });
+  }
+
+  if (taskNodes.length === 0) {
+    errors.push({
+      code: 'NO_TASKS',
+      message: 'The workflow must contain at least one Task.',
+      suggestion: 'Add a Task and assign exactly one Agent before exporting.',
+    });
+  }
+
   // Check Dangling Edges
   (edges || []).forEach((edge) => {
     const sourceNode = nodeMap.get(edge.source);
@@ -119,6 +135,23 @@ export function validateGraph(
         message: `Edge "${edge.id}" connects non-existent node (source: "${edge.source}", target: "${edge.target}").`,
         edgeId: edge.id,
         details: `Source exists: ${!!sourceNode}, Target exists: ${!!targetNode}`,
+      });
+      return;
+    }
+
+    const supported =
+      (sourceNode.type === 'agent' && targetNode.type === 'task') ||
+      (sourceNode.type === 'task' && targetNode.type === 'agent') ||
+      (sourceNode.type === 'tool' && targetNode.type === 'agent') ||
+      (sourceNode.type === 'tool' && targetNode.type === 'task') ||
+      (sourceNode.type === 'task' && targetNode.type === 'task');
+
+    if (!supported) {
+      errors.push({
+        code: 'UNSUPPORTED_EDGE',
+        message: `Edge "${edge.id}" uses unsupported direction ${sourceNode.type} → ${targetNode.type}.`,
+        edgeId: edge.id,
+        suggestion: 'Use Agent → Task for ownership, Tool → Agent/Task for tools, or Task → Task for dependencies.',
       });
     }
   });
@@ -313,11 +346,16 @@ export function validateGraph(
     description: string;
   }[] = [];
 
+  const usedCustomClassNames = new Set<string>();
   toolNodes.forEach((tNode, idx) => {
     const data = (tNode.data || {}) as ToolNodeData;
     if (data.toolType === 'CustomTool') {
       const baseName = data.label ? toPythonIdentifier(data.label, 'custom_tool') : `custom_tool_${idx + 1}`;
-      const className = toPythonClassName(data.label, `CustomTool${idx + 1}`);
+      const classBase = toPythonClassName(data.label, `CustomTool${idx + 1}`);
+      let className = classBase;
+      let classSuffix = 2;
+      while (usedCustomClassNames.has(className)) className = `${classBase}${classSuffix++}`;
+      usedCustomClassNames.add(className);
       const varName = `${baseName}_${idx + 1}`;
       customTools.push({
         id: tNode.id,
@@ -345,13 +383,13 @@ export function validateGraph(
     const expOut = (data.expectedOutput || '').toLowerCase();
     const desc = (data.description || '').toLowerCase();
 
-    const structuredKeywords = ['json', 'schema', 'pydantic', 'machine-readable', 'structured data', 'format: json'];
+    const structuredKeywords = ['json', 'schema', 'pydantic', 'machine-readable', 'format: json'];
     const hasStructuredReq = structuredKeywords.some((kw) => expOut.includes(kw));
 
-    if (hasStructuredReq) {
+    if (hasStructuredReq && data.outputFormat !== 'json') {
       warnings.push({
-        code: 'UNVERIFIED_STRUCTURED_OUTPUT',
-        message: `Task "${taskLabel}" expects structured/JSON output, but no explicit Pydantic schema is bound. Prompt instructions alone do not guarantee schema compliance.`,
+        code: 'STRUCTURED_OUTPUT_NOT_ENABLED',
+        message: `Task "${taskLabel}" asks for JSON/schema output but its output format is not set to JSON.`,
         nodeId: tNode.id,
       });
     }

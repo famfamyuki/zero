@@ -46,12 +46,23 @@ export function normalizeModel(rawModel?: string): string {
 }
 
 export function escapePythonString(str?: string): string {
-  if (!str) return '""';
-  if (str.includes('\n') || str.includes('"')) {
-    const escaped = str.replace(/"""/g, '\\"\\"\\"');
-    return `"""${escaped}"""`;
-  }
-  return `"${str}"`;
+  return JSON.stringify(str || '')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
+function allocatePythonName(base: string, used: Set<string>): string {
+  let candidate = base;
+  let suffix = 2;
+  while (used.has(candidate)) candidate = `${base}_${suffix++}`;
+  used.add(candidate);
+  return candidate;
+}
+
+function taskSchemaClassName(node: CustomNode, index: number): string {
+  const data = node.data as TaskNodeData;
+  const toolStyleName = toPythonClassName(data.label || '', `Task${index + 1}`);
+  return `${toolStyleName.replace(/Tool$/, '')}Output${index + 1}`;
 }
 
 export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig): string[] {
@@ -91,7 +102,8 @@ export function transpileToCrewAI(
   nodes: CustomNode[] = [],
   edges: Edge[] = [],
   crewConfig: CrewConfig = { name: 'My Crew', process: 'sequential', verbose: true, memory: false },
-  mode: ExportMode = 'scaffold'
+  mode: ExportMode = 'scaffold',
+  projectLayout = false
 ): string {
   const validation = validateGraph(nodes, edges, crewConfig, mode);
   if (!validation.isValid) {
@@ -115,15 +127,16 @@ export function transpileToCrewAI(
   });
 
   // Tool node variable names
+  const usedPythonNames = new Set<string>();
   const toolVarNames: Record<string, string> = {};
   toolNodes.forEach((tNode, idx) => {
     const data = (tNode?.data || {}) as ToolNodeData;
     if (data.toolType === 'CustomTool') {
       const ct = customToolList.find((c) => c.id === tNode.id);
-      toolVarNames[tNode.id] = ct?.varName || `custom_tool_${idx + 1}`;
+      toolVarNames[tNode.id] = allocatePythonName(ct?.varName || `custom_tool_${idx + 1}`, usedPythonNames);
     } else {
       const baseName = data?.label ? toPythonIdentifier(data.label, 'tool') : 'tool';
-      toolVarNames[tNode.id] = `${baseName}_${idx + 1}`;
+      toolVarNames[tNode.id] = allocatePythonName(`${baseName}_${idx + 1}`, usedPythonNames);
     }
   });
 
@@ -132,7 +145,7 @@ export function transpileToCrewAI(
   agentNodes.forEach((aNode, idx) => {
     const data = (aNode?.data || {}) as AgentNodeData;
     const baseName = data?.role ? toPythonIdentifier(data.role, 'agent') : `agent_${idx + 1}`;
-    agentVarNames[aNode.id] = `${baseName}_agent`;
+    agentVarNames[aNode.id] = allocatePythonName(`${baseName}_agent`, usedPythonNames);
   });
 
   // Task node variable names
@@ -140,7 +153,14 @@ export function transpileToCrewAI(
   taskNodes.forEach((tNode, idx) => {
     const data = (tNode?.data || {}) as TaskNodeData;
     const baseName = data?.label ? toPythonIdentifier(data.label, 'task') : `task_${idx + 1}`;
-    taskVarNames[tNode.id] = `${baseName}_task`;
+    taskVarNames[tNode.id] = allocatePythonName(`${baseName}_task`, usedPythonNames);
+  });
+
+  const structuredTaskSchemas: Record<string, string> = {};
+  taskNodes.forEach((tNode, idx) => {
+    if ((tNode.data as TaskNodeData).outputFormat === 'json') {
+      structuredTaskSchemas[tNode.id] = taskSchemaClassName(tNode, idx);
+    }
   });
 
   // Map tools to agents and tasks based on edges
@@ -215,7 +235,16 @@ from crewai import Agent, Task, Crew, Process, LLM
 `;
 
   if (customToolList.length > 0) {
-    code += `from crewai.tools import BaseTool\n`;
+    code += projectLayout
+      ? `from tools.custom_tools import ${customToolList.map((tool) => tool.className).join(', ')}\n`
+      : `from crewai.tools import BaseTool\n`;
+  }
+
+  const schemaNames = Object.values(structuredTaskSchemas);
+  if (schemaNames.length > 0) {
+    code += projectLayout
+      ? `from schemas import ${schemaNames.join(', ')}\n`
+      : `from pydantic import BaseModel, Field\nfrom typing import Any\n`;
   }
 
   if (requiredPrebuiltTools.size > 0) {
@@ -247,7 +276,7 @@ if missing_vars:
 # ------------------------------------------------------------------------------
 `;
 
-  if (customToolList.length > 0) {
+  if (customToolList.length > 0 && !projectLayout) {
     code += `# --- Custom Tool Stubs (Inherits from BaseTool) ---\n`;
     customToolList.forEach((ct) => {
       code += `class ${ct.className}(BaseTool):
@@ -260,6 +289,20 @@ if missing_vars:
         raise NotImplementedError(
             "${ct.className} is a scaffold tool. Implement execution logic before production execution."
         )
+
+
+`;
+    });
+  }
+
+  if (schemaNames.length > 0 && !projectLayout) {
+    code += `# --- Structured output schemas ---\n`;
+    Object.entries(structuredTaskSchemas).forEach(([taskId, className]) => {
+      const task = taskNodes.find((node) => node.id === taskId);
+      const taskLabel = String((task?.data as TaskNodeData)?.label || taskId).replace(/"""/g, '');
+      code += `class ${className}(BaseModel):
+    """Validated output for ${taskLabel}."""
+    result: Any = Field(description="Structured task result matching the requested output")
 
 
 `;
@@ -358,6 +401,9 @@ if missing_vars:
       const contextList = predecessorIds.length > 0
         ? `context=[${predecessorIds.map((pId) => taskVarNames[pId]).filter(Boolean).join(', ')}],\n    `
         : '';
+      const outputSchema = structuredTaskSchemas[tNode.id]
+        ? `output_pydantic=${structuredTaskSchemas[tNode.id]},\n    `
+        : '';
 
       let agentAssignment = '';
       if (crewConfig?.process !== 'hierarchical' && assignedAgentVar) {
@@ -367,7 +413,7 @@ if missing_vars:
       code += `${varName} = Task(
     description=${escapePythonString(data?.description || 'Perform task')},
     expected_output=${escapePythonString(data?.expectedOutput || 'Task result summary')},
-    ${agentAssignment}${toolsList}${contextList}async_execution=${data?.asyncExecution ? 'True' : 'False'}
+    ${agentAssignment}${toolsList}${contextList}${outputSchema}async_execution=${data?.asyncExecution ? 'True' : 'False'}
 )
 
 `;
@@ -432,7 +478,7 @@ export function generateProjectFiles(
     };
   }
 
-  const mainCode = transpileToCrewAI(nodes, edges, crewConfig, mode);
+  const mainCode = transpileToCrewAI(nodes, edges, crewConfig, mode, true);
 
   const files: ProjectFile[] = [];
 
@@ -475,32 +521,30 @@ from pydantic import Field
       language: 'python',
       description: 'Custom BaseTool stub implementations',
     });
+    files.push({
+      path: 'tools/__init__.py',
+      filename: '__init__.py',
+      content: '# AgentGraph Studio custom tools package\n',
+      language: 'python',
+      description: 'Marks the custom tools directory as a Python package',
+    });
   }
 
   // 3. schemas.py
   const taskNodes = (nodes || []).filter((n) => n?.type === 'task');
   let schemasContent = `# Pydantic Output Schemas for ${crewConfig.name}
 from pydantic import BaseModel, Field
-from typing import List, Optional
-
-class TaskResultSchema(BaseModel):
-    """Generic structured result container for CrewAI tasks."""
-    summary: str = Field(description="Executive summary of task execution")
-    details: List[str] = Field(default_factory=list, description="Key actionable findings or output points")
-    is_success: bool = Field(default=True, description="Whether the task completed successfully")
+from typing import Any
 
 `;
 
   taskNodes.forEach((t, idx) => {
     const data = t.data as TaskNodeData;
-    const expOut = (data.expectedOutput || '').toLowerCase();
-    if (expOut.includes('json') || expOut.includes('structured') || expOut.includes('schema')) {
-      const baseName = data.label ? toPythonClassName(data.label, `Task${idx + 1}`) : `Task${idx + 1}Output`;
-      schemasContent += `class ${baseName}Schema(BaseModel):
+    if (data.outputFormat === 'json') {
+      const className = taskSchemaClassName(t, idx);
+      schemasContent += `class ${className}(BaseModel):
     """Structured output schema for task: ${data.label || t.id}."""
-    title: str = Field(description="Result title")
-    findings: List[str] = Field(default_factory=list, description="Specific findings or output rows")
-    metadata: Optional[dict] = Field(default=None, description="Additional structured metadata")
+    result: Any = Field(description="Structured task result matching the requested output")
 
 
 `;
@@ -532,8 +576,8 @@ ${requiredEnvVars.map((k) => `${k}=your_${k.toLowerCase()}_here`).join('\n')}
 
   // 5. requirements.txt
   const requirementsContent = `# Python Dependencies for CrewAI Workflow: ${crewConfig.name}
-crewai>=0.100.0
-crewai-tools>=0.30.0
+crewai>=1.15,<2
+crewai-tools>=1.15,<2
 pydantic>=2.7.0
 python-dotenv>=1.0.1
 `;
@@ -553,15 +597,18 @@ version = "0.1.0"
 description = "Autonomous Agent Workflow generated by AgentGraph Studio"
 authors = [{ name = "AgentGraph Studio User" }]
 dependencies = [
-    "crewai>=0.100.0",
-    "crewai-tools>=0.30.0",
+    "crewai>=1.15,<2",
+    "crewai-tools>=1.15,<2",
     "pydantic>=2.7.0",
     "python-dotenv>=1.0.1",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
+
+[tool.crewai]
+type = "crew"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 `;
 

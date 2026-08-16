@@ -254,6 +254,7 @@ export default function EditorPage() {
           label: 'New Task',
           description: 'Define specific task details here',
           expectedOutput: 'Clear summary output format',
+          outputFormat: 'text',
           asyncExecution: false,
         };
       } else {

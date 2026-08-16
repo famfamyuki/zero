@@ -18,6 +18,7 @@ export interface TaskNodeData extends Record<string, unknown> {
   expectedOutput: string;
   assignedAgentId?: string;
   asyncExecution: boolean;
+  outputFormat?: 'text' | 'json';
 }
 
 export interface ToolNodeData extends Record<string, unknown> {

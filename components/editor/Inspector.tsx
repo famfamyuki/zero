@@ -293,6 +293,19 @@ export const Inspector: React.FC<InspectorProps> = ({
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">{t('outputFormat')}</label>
+                <select
+                  value={(selectedNode.data as TaskNodeData).outputFormat || 'text'}
+                  onChange={(e) => onUpdateNodeData(selectedNode.id, { outputFormat: e.target.value as 'text' | 'json' })}
+                  className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-slate-100 focus:border-emerald-500"
+                >
+                  <option value="text">{t('outputFormatText')}</option>
+                  <option value="json">{t('outputFormatJson')}</option>
+                </select>
+                <p className="mt-1 text-[10px] leading-relaxed text-slate-500">{t('outputFormatHelp')}</p>
+              </div>
+
               <div className="pt-2 border-t border-slate-800">
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-xs text-slate-300">{t('asyncExecution')}</span>

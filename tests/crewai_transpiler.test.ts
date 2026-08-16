@@ -346,4 +346,64 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assert.match(translations.ja.cloudwaysPromoCode, /SUMMER404/);
     assert.match(translations.ja.cloudwaysDeadline, /2026年9月15日/);
   });
+
+  test('17. Empty workflows and unsupported edge directions are blocked', () => {
+    const empty = validateGraph([], [], { name: 'Empty', process: 'sequential', verbose: true, memory: false });
+    assert.equal(empty.isValid, false);
+    assert.ok(empty.errors.some((error) => error.code === 'NO_AGENTS'));
+    assert.ok(empty.errors.some((error) => error.code === 'NO_TASKS'));
+
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const invalid = validateGraph(nodes, [...edges, { id: 'bad', source: 'agent-1', target: 'agent-2' }], crewConfig);
+    assert.ok(invalid.errors.some((error) => error.code === 'UNSUPPORTED_EDGE'));
+  });
+
+  test('18. Multi-file export imports custom tools once from their generated module', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const project = generateProjectFiles(nodes, edges, crewConfig, 'scaffold');
+    assert.match(project.mainCode, /from tools\.custom_tools import RepositoryReaderTool/);
+    assert.doesNotMatch(project.mainCode, /class RepositoryReaderTool\(BaseTool\):/);
+    assert.ok(project.files.some((file) => file.path === 'tools/__init__.py'));
+  });
+
+  test('19. JSON template output is bound to a generated Pydantic model', () => {
+    const preset = PRESET_TEMPLATES.find((item) => item.id === 'repository-red-team-audit');
+    assert.ok(preset);
+    const project = generateProjectFiles(preset.graphData.nodes, preset.graphData.edges, preset.graphData.crewConfig);
+    assert.match(project.mainCode, /from schemas import ReleaseReportOutput7/);
+    assert.match(project.mainCode, /output_pydantic=ReleaseReportOutput7/);
+    assert.match(project.files.find((file) => file.path === 'schemas.py')?.content || '', /class ReleaseReportOutput7\(BaseModel\):/);
+    assert.ok(!project.validation.warnings.some((warning) => warning.code === 'STRUCTURED_OUTPUT_NOT_ENABLED'));
+  });
+
+  test('20. Generated identifiers remain unique and hostile strings remain valid Python', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const duplicateAgent = structuredClone(nodes.find((node) => node.id === 'agent-1')!);
+    duplicateAgent.id = 'agent-3';
+    duplicateAgent.position = { x: 100, y: 500 };
+    (duplicateAgent.data as any).backstory = 'Quotes " and backslash \\ and newline\nremain safe';
+    const extraTask = structuredClone(nodes.find((node) => node.id === 'task-1')!);
+    extraTask.id = 'task-3';
+    extraTask.position = { x: 400, y: 500 };
+    const code = transpileToCrewAI(
+      [...nodes, duplicateAgent, extraTask],
+      [...edges, { id: 'e-a3-t3', source: 'agent-3', target: 'task-3' }],
+      crewConfig
+    );
+    assert.match(code, /lead_security_auditor_agent_2 = Agent\(/);
+    assert.match(code, /static_audit_task_task_2 = Task\(/);
+    assertValidPythonSyntax(code);
+  });
+
+  test('21. Every preset has accurate counts and exports as a syntax-valid project', () => {
+    PRESET_TEMPLATES.forEach((preset) => {
+      const { nodes, edges, crewConfig } = preset.graphData;
+      assert.equal(preset.previewNodesCount.agents, nodes.filter((node) => node.type === 'agent').length, `${preset.id}: agent count`);
+      assert.equal(preset.previewNodesCount.tasks, nodes.filter((node) => node.type === 'task').length, `${preset.id}: task count`);
+      assert.equal(preset.previewNodesCount.tools, nodes.filter((node) => node.type === 'tool').length, `${preset.id}: tool count`);
+      const project = generateProjectFiles(nodes, edges, crewConfig);
+      assert.equal(project.validation.isValid, true, `${preset.id}: ${project.validation.errors.map((error) => error.message).join('; ')}`);
+      project.files.filter((file) => file.path.endsWith('.py')).forEach((file) => assertValidPythonSyntax(file.content));
+    });
+  });
 });
