@@ -18,7 +18,8 @@ const toolIcons: Record<string, React.ReactNode> = {
 export const ToolNode = memo(({ id, data, selected }: NodeProps<any>) => {
   const toolData = data as ToolNodeData;
   const zoomMode = useNodeZoomMode();
-  const isCompact = zoomMode === 'compact';
+  const isOverview = zoomMode === 'overview';
+  const isCompact = zoomMode === 'compact' || isOverview;
   const icon = toolIcons[toolData.toolType] || <Wrench className="w-4 h-4 text-amber-400" />;
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -35,7 +36,7 @@ export const ToolNode = memo(({ id, data, selected }: NodeProps<any>) => {
 
   return (
     <div
-      className={`relative ${isCompact ? 'min-w-[200px]' : 'min-w-[240px]'} rounded-xl bg-slate-900/90 border transition-[border-color,box-shadow] duration-200 shadow-xl backdrop-blur-md ${
+      className={`relative ${isOverview ? 'w-[420px]' : isCompact ? 'w-[300px]' : 'min-w-[240px]'} rounded-xl bg-slate-900/90 border transition-[border-color,box-shadow] duration-200 shadow-xl backdrop-blur-md ${
         selected
           ? 'border-amber-500 ring-2 ring-amber-500/40 shadow-amber-500/20'
           : 'border-amber-950/80 hover:border-amber-700/60'
@@ -62,12 +63,12 @@ export const ToolNode = memo(({ id, data, selected }: NodeProps<any>) => {
       )}
 
       {/* Header Bar */}
-      <div className={`bg-gradient-to-r from-amber-950 via-slate-900 to-amber-900/80 ${isCompact ? 'px-3 py-2 rounded-xl border-b-0' : 'px-4 py-2 rounded-t-xl border-b'} border-amber-900/40 flex items-center justify-between`}>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-amber-600/20 border border-amber-500/30 flex items-center justify-center">
+      <div className={`bg-gradient-to-r from-amber-950 via-slate-900 to-amber-900/80 ${isCompact ? 'px-4 py-3 rounded-xl border-b-0' : 'px-4 py-2 rounded-t-xl border-b'} border-amber-900/40 flex items-center justify-between gap-3`}>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className={`${isOverview ? 'w-12 h-12 [&_svg]:!w-7 [&_svg]:!h-7' : isCompact ? 'w-9 h-9 [&_svg]:!w-5 [&_svg]:!h-5' : 'w-6 h-6'} shrink-0 rounded-lg bg-amber-600/20 border border-amber-500/30 flex items-center justify-center`}>
             {icon}
           </div>
-          <span className={`font-semibold text-amber-200 tracking-wide ${isCompact ? 'max-w-[135px] truncate text-sm normal-case' : 'text-xs uppercase'}`}>
+          <span title={toolData.label || 'Unnamed Tool'} className={`min-w-0 flex-1 truncate text-amber-100 tracking-wide ${isOverview ? 'text-3xl font-black' : isCompact ? 'text-xl font-extrabold' : 'text-xs font-semibold uppercase'}`}>
             {isCompact ? (toolData.label || 'Unnamed Tool') : 'Tool Node'}
           </span>
         </div>
@@ -77,10 +78,10 @@ export const ToolNode = memo(({ id, data, selected }: NodeProps<any>) => {
           </span>}
           <button
             onClick={handleEditClick}
-            className="p-1 rounded-lg bg-amber-950/80 hover:bg-amber-900 border border-amber-800/60 text-amber-300 transition"
+            className={`${isOverview ? 'p-2.5' : isCompact ? 'p-2' : 'p-1'} shrink-0 rounded-lg bg-amber-950/80 hover:bg-amber-900 border border-amber-800/60 text-amber-300 transition`}
             title="Edit Node Details"
           >
-            <Settings className="w-3.5 h-3.5" />
+            <Settings className={isOverview ? 'w-6 h-6' : isCompact ? 'w-5 h-5' : 'w-3.5 h-3.5'} />
           </button>
         </div>
       </div>

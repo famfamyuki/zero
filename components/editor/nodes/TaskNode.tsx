@@ -9,7 +9,8 @@ import { useNodeZoomMode } from './useNodeZoomMode';
 export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
   const taskData = data as TaskNodeData;
   const zoomMode = useNodeZoomMode();
-  const isCompact = zoomMode === 'compact';
+  const isOverview = zoomMode === 'overview';
+  const isCompact = zoomMode === 'compact' || isOverview;
   const isFull = zoomMode === 'full';
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -26,7 +27,7 @@ export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
 
   return (
     <div
-      className={`relative ${isCompact ? 'min-w-[210px]' : 'min-w-[260px]'} rounded-xl bg-slate-900/90 border transition-[border-color,box-shadow] duration-200 shadow-xl backdrop-blur-md ${
+      className={`relative ${isOverview ? 'w-[440px]' : isCompact ? 'w-[320px]' : 'min-w-[260px]'} rounded-xl bg-slate-900/90 border transition-[border-color,box-shadow] duration-200 shadow-xl backdrop-blur-md ${
         selected
           ? 'border-emerald-500 ring-2 ring-emerald-500/40 shadow-emerald-500/20'
           : 'border-emerald-950/80 hover:border-emerald-700/60'
@@ -53,12 +54,12 @@ export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
       )}
 
       {/* Header Bar */}
-      <div className={`bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900/80 ${isCompact ? 'px-3 py-2 rounded-xl border-b-0' : 'px-4 py-2.5 rounded-t-xl border-b'} border-emerald-900/40 flex items-center justify-between`}>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <CheckSquare className="w-4 h-4" />
+      <div className={`bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900/80 ${isCompact ? 'px-4 py-3 rounded-xl border-b-0' : 'px-4 py-2.5 rounded-t-xl border-b'} border-emerald-900/40 flex items-center justify-between gap-3`}>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className={`${isOverview ? 'w-12 h-12' : isCompact ? 'w-9 h-9' : 'w-7 h-7'} shrink-0 rounded-lg bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400`}>
+            <CheckSquare className={isOverview ? 'w-7 h-7' : isCompact ? 'w-5 h-5' : 'w-4 h-4'} />
           </div>
-          <span className={`font-semibold text-emerald-200 tracking-wide ${isCompact ? 'max-w-[145px] truncate text-sm normal-case' : 'text-xs uppercase'}`}>
+          <span title={taskData.label || 'Unnamed Task'} className={`min-w-0 flex-1 truncate text-emerald-100 tracking-wide ${isOverview ? 'text-3xl font-black' : isCompact ? 'text-xl font-extrabold' : 'text-xs font-semibold uppercase'}`}>
             {isCompact ? (taskData.label || 'Unnamed Task') : 'Task Node'}
           </span>
         </div>
@@ -70,10 +71,10 @@ export const TaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
           )}
           <button
             onClick={handleEditClick}
-            className="p-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 transition"
+            className={`${isOverview ? 'p-2.5' : isCompact ? 'p-2' : 'p-1'} shrink-0 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800/60 text-emerald-300 transition`}
             title="Edit Node Details"
           >
-            <Settings className="w-3.5 h-3.5" />
+            <Settings className={isOverview ? 'w-6 h-6' : isCompact ? 'w-5 h-5' : 'w-3.5 h-3.5'} />
           </button>
         </div>
       </div>
