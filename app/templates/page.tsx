@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Zap, Check, LayoutGrid, Globe, Rocket, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Sparkles, Bot, CheckSquare, Wrench, Check, LayoutGrid, Globe, Rocket, ExternalLink, FileCode2, Target, PackageCheck, ChevronDown } from 'lucide-react';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { getSupabase } from '@/lib/supabase';
@@ -13,7 +13,8 @@ export default function TemplatesPage() {
   const router = useRouter();
   const { lang, setLanguage, t } = useLanguage();
   const [templates, setTemplates] = useState<WorkflowTemplate[]>(PRESET_TEMPLATES);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedUseCase, setSelectedUseCase] = useState<string>('ALL');
+  const [selectedPattern, setSelectedPattern] = useState<string>('ALL');
 
   useEffect(() => {
     async function loadSupabaseTemplates() {
@@ -46,28 +47,60 @@ export default function TemplatesPage() {
     loadSupabaseTemplates();
   }, []);
 
-  const categories = ['All', 'MARKETING', 'CONTENT', 'BUSINESS'];
+  const useCases = Array.from(new Set(templates.map((template) => template.useCase).filter(Boolean))) as string[];
+  const codePatterns = Array.from(new Set(templates.map((template) => template.codePattern).filter(Boolean))) as string[];
 
-  const filteredTemplates = selectedCategory === 'All'
-    ? templates
-    : templates.filter((t) => t.category === selectedCategory);
+  const filteredTemplates = templates.filter((template) => {
+    const useCaseMatches = selectedUseCase === 'ALL' || template.useCase === selectedUseCase;
+    const patternMatches = selectedPattern === 'ALL' || template.codePattern === selectedPattern;
+    return useCaseMatches && patternMatches;
+  });
 
   const handleUseTemplate = (template: WorkflowTemplate) => {
     localStorage.setItem('agentgraph_active_flow', JSON.stringify(template.graphData));
     router.push('/');
   };
 
-  const getCategoryBadgeClass = (category: string) => {
+  const getCategoryBadgeClass = (category?: string) => {
     switch (category) {
-      case 'MARKETING':
+      case 'MARKETING': case 'SOCIAL':
         return 'text-purple-300 bg-purple-950/80 border-purple-800/40';
-      case 'CONTENT':
+      case 'CONTENT': case 'RESEARCH':
         return 'text-sky-300 bg-sky-950/80 border-sky-800/40';
-      case 'BUSINESS':
+      case 'DATA': case 'ENGINEERING':
         return 'text-emerald-300 bg-emerald-950/80 border-emerald-800/40';
+      case 'SECURITY':
+        return 'text-red-300 bg-red-950/80 border-red-800/40';
       default:
         return 'text-indigo-400 bg-indigo-950/80 border-indigo-800/40';
     }
+  };
+
+  const useCaseLabel = (template: WorkflowTemplate) => lang === 'ja'
+    ? (template.useCaseJa || template.useCase || template.category)
+    : (template.useCaseEn || template.useCase || template.category);
+
+  const patternLabel = (template: WorkflowTemplate) => lang === 'ja'
+    ? (template.codePatternJa || template.codePattern || template.graphData.crewConfig.process)
+    : (template.codePatternEn || template.codePattern || template.graphData.crewConfig.process);
+
+  const filterUseCaseLabel = (value: string) => {
+    if (value === 'ALL') return lang === 'ja' ? 'すべての用途' : 'All use cases';
+    const template = templates.find((item) => item.useCase === value);
+    return template ? useCaseLabel(template) : value;
+  };
+
+  const filterPatternLabel = (value: string) => {
+    if (value === 'ALL') return lang === 'ja' ? 'すべてのコード構成' : 'All code patterns';
+    const template = templates.find((item) => item.codePattern === value);
+    return template ? patternLabel(template) : value;
+  };
+
+  const difficultyLabel = (difficulty?: WorkflowTemplate['difficulty']) => {
+    const labels = lang === 'ja'
+      ? { STARTER: '入門', INTERMEDIATE: '中級', ADVANCED: '上級' }
+      : { STARTER: 'Starter', INTERMEDIATE: 'Intermediate', ADVANCED: 'Advanced' };
+    return labels[difficulty || 'STARTER'];
   };
 
   return (
@@ -128,31 +161,49 @@ export default function TemplatesPage() {
             {t('templatesSub')}
           </p>
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center justify-center gap-2 pt-2 sm:pt-4 flex-wrap">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700 hover:text-slate-200'
-                }`}
+          <div className="mx-auto grid max-w-2xl gap-3 pt-3 text-left sm:grid-cols-2 sm:pt-5">
+            <label className="text-[11px] font-semibold text-slate-400">
+              <span className="mb-1.5 block">{lang === 'ja' ? '用途で絞り込む' : 'Filter by use case'}</span>
+              <select
+                value={selectedUseCase}
+                onChange={(event) => setSelectedUseCase(event.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-slate-100 focus:border-indigo-500"
               >
-                {cat}
-              </button>
-            ))}
+                {['ALL', ...useCases].map((value) => <option key={value} value={value}>{filterUseCaseLabel(value)}</option>)}
+              </select>
+            </label>
+            <label className="text-[11px] font-semibold text-slate-400">
+              <span className="mb-1.5 block">{lang === 'ja' ? 'コード構成で絞り込む' : 'Filter by code pattern'}</span>
+              <select
+                value={selectedPattern}
+                onChange={(event) => setSelectedPattern(event.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-slate-100 focus:border-indigo-500"
+              >
+                {['ALL', ...codePatterns].map((value) => <option key={value} value={value}>{filterPatternLabel(value)}</option>)}
+              </select>
+            </label>
           </div>
         </div>
       </section>
 
       {/* Template Grid */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mb-5 flex items-center justify-between gap-3 text-xs text-slate-400">
+          <span>{lang === 'ja' ? `${filteredTemplates.length}件のテンプレート` : `${filteredTemplates.length} templates`}</span>
+          {(selectedUseCase !== 'ALL' || selectedPattern !== 'ALL') && (
+            <button type="button" onClick={() => { setSelectedUseCase('ALL'); setSelectedPattern('ALL'); }} className="text-indigo-300 hover:text-indigo-200">
+              {lang === 'ja' ? '絞り込みを解除' : 'Clear filters'}
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {filteredTemplates.map((template) => {
             const title = lang === 'ja' && template.titleJa ? template.titleJa : (template.titleEn || template.title);
             const description = lang === 'ja' && template.descriptionJa ? template.descriptionJa : (template.descriptionEn || template.description);
+            const bestFor = lang === 'ja' ? template.bestForJa : template.bestForEn;
+            const codeGuide = lang === 'ja' ? template.codeGuideJa : template.codeGuideEn;
+            const prerequisites = (lang === 'ja' ? template.prerequisitesJa : template.prerequisitesEn) || [];
+            const deliverables = (lang === 'ja' ? template.deliverablesJa : template.deliverablesEn) || [];
 
             return (
               <div
@@ -160,22 +211,41 @@ export default function TemplatesPage() {
                 className="rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-indigo-600/60 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden group"
               >
                 {/* Card Header */}
-                <div className="p-6 space-y-3 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${getCategoryBadgeClass(template.category)}`}>
-                      {template.category}
+                <div className="p-5 sm:p-6 space-y-3 flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className={`text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full border ${getCategoryBadgeClass(template.useCase)}`}>
+                      {useCaseLabel(template)}
                     </span>
-                    <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-emerald-950/80 text-emerald-400 border-emerald-800/40">
-                      FREE
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="rounded-full border border-indigo-800/60 bg-indigo-950/70 px-2.5 py-1 text-[10px] font-bold text-indigo-300">{patternLabel(template)}</span>
+                      <span className="rounded-full border border-slate-700 bg-slate-950 px-2 py-1 text-[9px] font-bold text-slate-400">{difficultyLabel(template.difficulty)}</span>
+                    </div>
                   </div>
 
                   <h3 className="text-base font-bold text-slate-100 group-hover:text-indigo-300 transition leading-snug">
                     {title}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
+                  <p className="text-xs text-slate-400 leading-relaxed">
                     {description}
                   </p>
+
+                  {bestFor && (
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2.5">
+                      <div className="mb-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-emerald-400">
+                        <Target className="h-3.5 w-3.5" /> {lang === 'ja' ? 'こんな人・業務に' : 'Best for'}
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-slate-300">{bestFor}</p>
+                    </div>
+                  )}
+
+                  {codeGuide && (
+                    <div className="rounded-xl border border-indigo-900/60 bg-indigo-950/25 px-3 py-2.5">
+                      <div className="mb-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-indigo-300">
+                        <FileCode2 className="h-3.5 w-3.5" /> {lang === 'ja' ? '生成されるコード構成' : 'Generated code shape'}
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-slate-300">{codeGuide}</p>
+                    </div>
+                  )}
 
                   {/* Node Composition Summary */}
                   <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
@@ -192,6 +262,23 @@ export default function TemplatesPage() {
                       <span>{template.previewNodesCount.tools} Tools</span>
                     </div>
                   </div>
+
+                  <details className="group/details rounded-xl border border-slate-800 bg-slate-950/40">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-[11px] font-semibold text-slate-300">
+                      <span className="flex items-center gap-1.5"><PackageCheck className="h-3.5 w-3.5 text-amber-400" />{lang === 'ja' ? '必要なもの・得られる成果物' : 'Requirements & deliverables'}</span>
+                      <ChevronDown className="h-3.5 w-3.5 text-slate-500 transition group-open/details:rotate-180" />
+                    </summary>
+                    <div className="grid gap-3 border-t border-slate-800 px-3 py-3 sm:grid-cols-2">
+                      <div>
+                        <p className="mb-1.5 text-[10px] font-bold text-amber-300">{lang === 'ja' ? '事前に必要' : 'Prerequisites'}</p>
+                        <ul className="space-y-1 text-[10px] text-slate-400">{prerequisites.map((item) => <li key={item}>• {item}</li>)}</ul>
+                      </div>
+                      <div>
+                        <p className="mb-1.5 text-[10px] font-bold text-emerald-300">{lang === 'ja' ? '主な成果物' : 'Deliverables'}</p>
+                        <ul className="space-y-1 text-[10px] text-slate-400">{deliverables.map((item) => <li key={item}>• {item}</li>)}</ul>
+                      </div>
+                    </div>
+                  </details>
                 </div>
 
                 {/* Card Footer / Action */}

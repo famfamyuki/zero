@@ -55,6 +55,21 @@ export interface WorkflowTemplate {
   price: number; // 0 for free
   category: 'MARKETING' | 'CONTENT' | 'BUSINESS' | string;
   badge?: string;
+  useCase?: 'SOCIAL' | 'CONTENT' | 'RESEARCH' | 'DATA' | 'ENGINEERING' | 'MARKETING' | 'SECURITY';
+  useCaseEn?: string;
+  useCaseJa?: string;
+  codePattern?: 'SEQUENTIAL' | 'PARALLEL' | 'HIERARCHICAL' | 'DAG';
+  codePatternEn?: string;
+  codePatternJa?: string;
+  difficulty?: 'STARTER' | 'INTERMEDIATE' | 'ADVANCED';
+  bestForEn?: string;
+  bestForJa?: string;
+  codeGuideEn?: string;
+  codeGuideJa?: string;
+  prerequisitesEn?: string[];
+  prerequisitesJa?: string[];
+  deliverablesEn?: string[];
+  deliverablesJa?: string[];
   previewNodesCount: {
     agents: number;
     tasks: number;

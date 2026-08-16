@@ -406,4 +406,50 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
       project.files.filter((file) => file.path.endsWith('.py')).forEach((file) => assertValidPythonSyntax(file.content));
     });
   });
+
+  test('22. Every preset includes complete bilingual selection guidance', () => {
+    PRESET_TEMPLATES.forEach((preset) => {
+      assert.ok(preset.useCase, `${preset.id}: use case`);
+      assert.ok(preset.useCaseEn && preset.useCaseJa, `${preset.id}: localized use case`);
+      assert.ok(preset.codePattern, `${preset.id}: code pattern`);
+      assert.ok(preset.codePatternEn && preset.codePatternJa, `${preset.id}: localized code pattern`);
+      assert.ok(preset.difficulty, `${preset.id}: difficulty`);
+      assert.ok(preset.bestForEn && preset.bestForJa, `${preset.id}: best-for guide`);
+      assert.ok(preset.codeGuideEn && preset.codeGuideJa, `${preset.id}: code guide`);
+      assert.ok((preset.prerequisitesEn?.length || 0) > 0 && (preset.prerequisitesJa?.length || 0) > 0, `${preset.id}: prerequisites`);
+      assert.ok((preset.deliverablesEn?.length || 0) > 0 && (preset.deliverablesJa?.length || 0) > 0, `${preset.id}: deliverables`);
+
+      if (preset.codePattern === 'HIERARCHICAL') {
+        assert.equal(preset.graphData.crewConfig.process, 'hierarchical', `${preset.id}: hierarchical process`);
+      }
+      if (preset.codePattern === 'PARALLEL') {
+        const asyncTasks = preset.graphData.nodes.filter((node) => node.type === 'task' && Boolean((node.data as any).asyncExecution));
+        assert.ok(asyncTasks.length >= 2, `${preset.id}: parallel async tasks`);
+      }
+    });
+  });
+
+  test('23. Refined templates are parameterized and do not overclaim external actions', () => {
+    PRESET_TEMPLATES.forEach((preset) => {
+      const validation = validateGraph(preset.graphData.nodes, preset.graphData.edges, preset.graphData.crewConfig);
+      assert.ok(validation.inputVariables.length > 0, `${preset.id}: reusable input variables`);
+      const taskText = preset.graphData.nodes
+        .filter((node) => node.type === 'task')
+        .map((node) => `${(node.data as any).description} ${(node.data as any).expectedOutput}`)
+        .join(' ');
+      assert.doesNotMatch(taskText, /automatically (publish|post|schedule|send)/i, `${preset.id}: unsupported automation claim`);
+    });
+
+    const redTeam = PRESET_TEMPLATES.find((preset) => preset.id === 'repository-red-team-audit');
+    assert.ok(redTeam);
+    const redTeamToolTypes = redTeam.graphData.nodes
+      .filter((node) => node.type === 'tool')
+      .map((node) => (node.data as any).toolType);
+    assert.deepEqual(new Set(redTeamToolTypes), new Set(['DirectoryReadTool', 'FileReadTool']));
+
+    const research = PRESET_TEMPLATES.find((preset) => preset.id === 'parallel-web-research');
+    assert.ok(research);
+    const researchCode = transpileToCrewAI(research.graphData.nodes, research.graphData.edges, research.graphData.crewConfig);
+    assert.match(researchCode, /"research_question": "Replace with research question"/);
+  });
 });

@@ -65,6 +65,15 @@ function taskSchemaClassName(node: CustomNode, index: number): string {
   return `${toolStyleName.replace(/Tool$/, '')}Output${index + 1}`;
 }
 
+function suggestedInputValue(variable: string): string {
+  const lower = variable.toLowerCase();
+  if (lower.endsWith('_path') || lower.endsWith('_directory') || lower.endsWith('_file')) return './';
+  if (lower.endsWith('_url') || lower.endsWith('_urls')) return 'https://example.com';
+  if (lower.includes('language')) return 'Japanese';
+  if (lower.includes('length')) return '1200';
+  return `Replace with ${variable.replace(/_/g, ' ')}`;
+}
+
 export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig): string[] {
   const keys = new Set<string>();
 
@@ -434,7 +443,7 @@ if missing_vars:
   const inputVars = validation.inputVariables;
   let executionBlock = '';
   if (inputVars.length > 0) {
-    const inputsFormatted = inputVars.map((v) => `        "${v}": "./",`).join('\n');
+    const inputsFormatted = inputVars.map((v) => `        "${v}": ${escapePythonString(suggestedInputValue(v))},`).join('\n');
     executionBlock = `    inputs = {\n${inputsFormatted}\n    }\n    result = crew.kickoff(inputs=inputs)\n`;
   } else {
     executionBlock = `    result = crew.kickoff()\n`;
@@ -652,6 +661,11 @@ python main.py
 - **Tasks**: ${nodes.filter((n) => n.type === 'task').length}
 - **Tools**: ${nodes.filter((n) => n.type === 'tool').length}
 - **Export Mode**: \`${mode.toUpperCase()}\`
+${validation.inputVariables.length > 0 ? `
+## Required Workflow Inputs
+Edit the \`inputs\` dictionary in \`main.py\` before running:
+${validation.inputVariables.map((variable) => `- \`${variable}\`: ${suggestedInputValue(variable)}`).join('\n')}
+` : ''}
 `;
 
   files.push({

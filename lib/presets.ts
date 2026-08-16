@@ -1,6 +1,7 @@
-import { WorkflowTemplate } from '@/types/editor';
+import { CustomNode, WorkflowTemplate } from '@/types/editor';
+import { Edge } from '@xyflow/react';
 
-export const PRESET_TEMPLATES: WorkflowTemplate[] = [
+const BASE_PRESET_TEMPLATES: WorkflowTemplate[] = [
   {
     id: 'x-trend-auto-poster',
     title: '📱 X (Twitter) Trend Analyst & Auto-Poster',
@@ -1059,3 +1060,300 @@ export const PRESET_TEMPLATES: WorkflowTemplate[] = [
     },
   },
 ];
+
+type TemplateGuide = Pick<
+  WorkflowTemplate,
+  | 'useCase' | 'useCaseEn' | 'useCaseJa'
+  | 'codePattern' | 'codePatternEn' | 'codePatternJa'
+  | 'difficulty' | 'bestForEn' | 'bestForJa'
+  | 'codeGuideEn' | 'codeGuideJa'
+  | 'prerequisitesEn' | 'prerequisitesJa'
+  | 'deliverablesEn' | 'deliverablesJa'
+>;
+
+const TEMPLATE_GUIDES: Record<string, TemplateGuide> = {
+  'x-trend-auto-poster': {
+    useCase: 'SOCIAL', useCaseEn: 'Social Media', useCaseJa: 'SNS運用',
+    codePattern: 'SEQUENTIAL', codePatternEn: 'Sequential pipeline', codePatternJa: '順次パイプライン', difficulty: 'STARTER',
+    bestForEn: 'Teams that want a repeatable research-to-draft workflow for X posts.',
+    bestForJa: 'X投稿のトレンド調査から下書き作成までを定型化したい運用チーム向け。',
+    codeGuideEn: 'Research task feeds one writing task through CrewAI context. Two tools are attached to separate specialist agents.',
+    codeGuideJa: '調査Taskの結果をcontext経由で執筆Taskへ渡す2段構成。各Agentへ検索・ブランド資料Toolを分担します。',
+    prerequisitesEn: ['OpenAI API key', 'Serper API key', 'Brand guideline TXT'],
+    prerequisitesJa: ['OpenAI APIキー', 'Serper APIキー', 'ブランドガイドのTXT'],
+    deliverablesEn: ['Trend brief', '3 post drafts'], deliverablesJa: ['トレンド要約', '投稿案3本'],
+  },
+  'daily-news-blog-generator': {
+    useCase: 'CONTENT', useCaseEn: 'Content Production', useCaseJa: 'コンテンツ制作',
+    codePattern: 'SEQUENTIAL', codePatternEn: 'Sequential pipeline', codePatternJa: '順次パイプライン', difficulty: 'STARTER',
+    bestForEn: 'Editors turning daily source material into localized SEO articles.',
+    bestForJa: '海外ニュースを収集し、日本語SEO記事へ定期変換したい編集者向け。',
+    codeGuideEn: 'A collection agent gathers source pages, then a writer receives the research as task context and produces the article.',
+    codeGuideJa: '収集Agentが情報源をまとめ、そのTask出力をcontextとしてライターへ渡す直列構成です。',
+    prerequisitesEn: ['OpenAI API key', 'Target news URLs', 'Output directory'],
+    prerequisitesJa: ['OpenAI APIキー', '対象ニュースURL', '出力ディレクトリ'],
+    deliverablesEn: ['Source digest', 'SEO blog draft'], deliverablesJa: ['情報源ダイジェスト', 'SEOブログ下書き'],
+  },
+  'competitor-price-monitor': {
+    useCase: 'RESEARCH', useCaseEn: 'Competitive Intelligence', useCaseJa: '競合調査',
+    codePattern: 'SEQUENTIAL', codePatternEn: 'Sequential + validated JSON', codePatternJa: '順次処理＋検証済みJSON', difficulty: 'INTERMEDIATE',
+    bestForEn: 'Commerce teams comparing competitor catalog and price changes.',
+    bestForJa: '競合商品の価格・在庫変化を比較したいEC／事業企画チーム向け。',
+    codeGuideEn: 'Scraping produces a Pydantic-validated product matrix before the analysis task creates prioritized alerts.',
+    codeGuideJa: 'スクレイピング結果をPydantic検証済みの商品マトリクスにし、後続Taskが変化と優先度を判定します。',
+    prerequisitesEn: ['OpenAI API key', 'Competitor URLs', 'Historical baseline TXT'],
+    prerequisitesJa: ['OpenAI APIキー', '競合サイトURL', '過去価格のTXT'],
+    deliverablesEn: ['Validated product matrix', 'Change alert report'], deliverablesJa: ['検証済み商品データ', '価格変動アラート'],
+  },
+  'csv-data-validator': {
+    useCase: 'DATA', useCaseEn: 'Data Operations', useCaseJa: 'データ業務',
+    codePattern: 'SEQUENTIAL', codePatternEn: 'Sequential pipeline', codePatternJa: '順次パイプライン', difficulty: 'STARTER',
+    bestForEn: 'Operations teams cleaning contact data before outreach.',
+    bestForJa: '営業リストを配信前に検査・整形したいデータ／営業業務向け。',
+    codeGuideEn: 'A CSV validation task creates a clean subset that becomes context for the outreach-generation task.',
+    codeGuideJa: 'CSV検証Taskがクリーンなデータを作り、その結果を営業文面生成Taskへcontextとして渡します。',
+    prerequisitesEn: ['OpenAI API key', 'Input CSV'], prerequisitesJa: ['OpenAI APIキー', '入力CSV'],
+    deliverablesEn: ['Validation report', 'Clean contact list', 'Outreach drafts'], deliverablesJa: ['検証レポート', '整形済み連絡先', '営業文面案'],
+  },
+  'github-repo-analyzer': {
+    useCase: 'ENGINEERING', useCaseEn: 'Engineering', useCaseJa: '開発・技術文書',
+    codePattern: 'SEQUENTIAL', codePatternEn: 'Sequential pipeline', codePatternJa: '順次パイプライン', difficulty: 'INTERMEDIATE',
+    bestForEn: 'Developers onboarding to a repository or refreshing technical documentation.',
+    bestForJa: '既存リポジトリの把握や技術ドキュメント更新を効率化したい開発者向け。',
+    codeGuideEn: 'Repository analysis runs first; its findings are injected into a dedicated documentation task.',
+    codeGuideJa: 'リポジトリ解析を先に行い、その結果を専任の文書化Taskへ注入する2段構成です。',
+    prerequisitesEn: ['OpenAI API key', 'GitHub token', 'Repository access'],
+    prerequisitesJa: ['OpenAI APIキー', 'GitHubトークン', 'リポジトリ権限'],
+    deliverablesEn: ['Architecture summary', 'README/documentation draft'], deliverablesJa: ['構成要約', 'README／技術文書案'],
+  },
+  'youtube-to-blog': {
+    useCase: 'CONTENT', useCaseEn: 'Content Repurposing', useCaseJa: 'コンテンツ再利用',
+    codePattern: 'SEQUENTIAL', codePatternEn: 'Sequential pipeline', codePatternJa: '順次パイプライン', difficulty: 'STARTER',
+    bestForEn: 'Creators converting long-form videos into searchable written content.',
+    bestForJa: '動画を検索流入向けの記事へ再利用したいクリエイター／編集者向け。',
+    codeGuideEn: 'Video retrieval and summarization complete before the writing agent receives the structured notes.',
+    codeGuideJa: '動画検索・要約を完了後、その整理結果をライターAgentへ渡して記事化します。',
+    prerequisitesEn: ['OpenAI API key', 'YouTube URL or query'], prerequisitesJa: ['OpenAI APIキー', 'YouTube URLまたは検索語'],
+    deliverablesEn: ['Video outline', 'SEO blog draft'], deliverablesJa: ['動画構成要約', 'SEOブログ下書き'],
+  },
+  'parallel-web-research': {
+    useCase: 'RESEARCH', useCaseEn: 'Web Research', useCaseJa: 'Webリサーチ',
+    codePattern: 'PARALLEL', codePatternEn: 'Parallel fan-out / synthesis', codePatternJa: '並列分岐／統合', difficulty: 'INTERMEDIATE',
+    bestForEn: 'Analysts who need independent research streams merged into one report.',
+    bestForJa: '複数観点の調査を同時に進め、最後に統合したいリサーチ業務向け。',
+    codeGuideEn: 'Independent async tasks fan out from specialist agents; a final synthesis task waits for both contexts.',
+    codeGuideJa: '専門Agentの非同期Taskを並列実行し、最終統合Taskが両方のcontextを待つfan-out構成です。',
+    prerequisitesEn: ['OpenAI API key', 'Serper API key', 'Research topic'],
+    prerequisitesJa: ['OpenAI APIキー', 'Serper APIキー', '調査テーマ'],
+    deliverablesEn: ['Independent findings', 'Synthesized research report'], deliverablesJa: ['観点別調査結果', '統合リサーチレポート'],
+  },
+  'hierarchical-software-team': {
+    useCase: 'ENGINEERING', useCaseEn: 'Software Delivery', useCaseJa: 'ソフトウェア開発',
+    codePattern: 'HIERARCHICAL', codePatternEn: 'Hierarchical manager', codePatternJa: '階層型マネージャー', difficulty: 'ADVANCED',
+    bestForEn: 'Teams experimenting with manager-led delegation across engineering roles.',
+    bestForJa: 'マネージャーLLMによる開発ロールへの動的委任を試したいチーム向け。',
+    codeGuideEn: 'CrewAI Process.hierarchical uses a manager LLM to allocate unassigned work across engineering agents.',
+    codeGuideJa: 'CrewAIのProcess.hierarchicalで、manager_llmが未割当Taskを各開発Agentへ動的に委任します。',
+    prerequisitesEn: ['OpenAI API key', 'Clear product requirements'], prerequisitesJa: ['OpenAI APIキー', '明確な要件定義'],
+    deliverablesEn: ['Implementation plan', 'Reviewed code proposal'], deliverablesJa: ['実装計画', 'レビュー済みコード案'],
+  },
+  'hierarchical-marketing-campaign': {
+    useCase: 'MARKETING', useCaseEn: 'Campaign Planning', useCaseJa: 'マーケ施策',
+    codePattern: 'HIERARCHICAL', codePatternEn: 'Hierarchical manager', codePatternJa: '階層型マネージャー', difficulty: 'ADVANCED',
+    bestForEn: 'Marketing teams coordinating research and creative work under one campaign manager.',
+    bestForJa: '調査とクリエイティブを統括マネージャーの下で連携させたいマーケチーム向け。',
+    codeGuideEn: 'A manager LLM delegates research and campaign creation while shared search tooling grounds decisions.',
+    codeGuideJa: 'manager_llmが市場調査と施策作成を委任し、共有検索Toolで意思決定を最新情報へ接地します。',
+    prerequisitesEn: ['OpenAI API key', 'Serper API key', 'Campaign brief'], prerequisitesJa: ['OpenAI APIキー', 'Serper APIキー', 'キャンペーン概要'],
+    deliverablesEn: ['Market insight brief', 'Integrated campaign plan'], deliverablesJa: ['市場インサイト', '統合キャンペーン計画'],
+  },
+  'repository-red-team-audit': {
+    useCase: 'SECURITY', useCaseEn: 'Security & Release', useCaseJa: 'セキュリティ・リリース',
+    codePattern: 'DAG', codePatternEn: 'Multi-stage audit DAG', codePatternJa: '多段監査DAG', difficulty: 'ADVANCED',
+    bestForEn: 'Engineering leaders preparing an evidence-based release readiness review.',
+    bestForJa: 'リリース前に設計・安全性・信頼性・コストを横断評価したい責任者向け。',
+    codeGuideEn: 'Six specialists feed a dependency DAG. The release judge waits for five audit branches and emits validated JSON.',
+    codeGuideJa: '6専門Agentの監査結果を依存DAGで集約し、最終判定Taskが5系統を待って検証済みJSONを出力します。',
+    prerequisitesEn: ['OpenAI API key', 'Local repository path', 'Sandboxed read-only runtime'],
+    prerequisitesJa: ['OpenAI APIキー', 'ローカルのリポジトリパス', '読み取り専用サンドボックス'],
+    deliverablesEn: ['Risk registers', 'Adversarial test plan', 'Validated release decision JSON'],
+    deliverablesJa: ['各種リスク台帳', '攻撃的テスト計画', '検証済みリリース判定JSON'],
+  },
+};
+
+interface GraphRefinement {
+  template?: Partial<Pick<WorkflowTemplate, 'title' | 'titleEn' | 'titleJa' | 'description' | 'descriptionEn' | 'descriptionJa'>>;
+  crewName?: string;
+  nodeData: Record<string, Record<string, unknown>>;
+  additionalNodes?: CustomNode[];
+  additionalEdges?: Edge[];
+}
+
+const TEMPLATE_GRAPH_REFINEMENTS: Record<string, GraphRefinement> = {
+  'x-trend-auto-poster': {
+    template: {
+      title: '📱 X Trend-to-Draft Content Planner', titleEn: '📱 X Trend-to-Draft Content Planner', titleJa: '📱 Xトレンド調査＆投稿作成プランナー',
+      description: 'Researches current topics for a defined audience and creates evidence-aware X post drafts for human review.',
+      descriptionEn: 'Researches current topics for a defined audience and creates evidence-aware X post drafts for human review.',
+      descriptionJa: '指定業界の最新話題を調査し、ブランドルールに沿ったX投稿案を人間の確認用に作成します。',
+    },
+    crewName: 'X Content Planning Crew',
+    nodeData: {
+      'agent-1': { role: 'Evidence-First Social Trend Researcher', goal: 'Find timely, verifiable topics in {industry} that matter to {target_audience}, recording source URLs and publication dates.', backstory: 'A cautious social researcher who distinguishes confirmed facts from speculation and rejects stale or unsourced claims.' },
+      'agent-2': { role: 'Brand-Safe X Content Editor', goal: 'Turn verified findings into distinct X drafts that follow {brand_voice} and remain within the requested character limit.', backstory: 'A senior social editor who optimizes clarity and relevance without fabricating urgency, metrics, or endorsements.' },
+      'task-1': { label: 'Build Evidence-Backed Trend Brief', description: 'Research {industry} developments relevant to {target_audience}. Select up to 3 topics. For each, record the source URL, publication date, verified facts, why it matters, and reputational risk. Do not treat search snippets as evidence.', expectedOutput: 'A Markdown trend brief with up to 3 topics, dated source links, verified facts, audience relevance, and risk notes.' },
+      'task-2': { label: 'Draft Posts for Human Review', description: 'Using the trend brief and brand reference, create 3 materially different X post drafts in {brand_voice}. Keep each within 280 characters, distinguish facts from opinion, and include a source link where appropriate. Do not publish or claim that scheduling occurred.', expectedOutput: 'Three review-ready X drafts with character counts, recommended posting rationale, source links, and a short factual-risk checklist.' },
+      'tool-1': { description: 'Search recent web sources for the configured industry and audience; results still require source verification.' },
+      'tool-2': { description: 'Search local brand voice, prohibited-claims, and approval guidelines.' },
+    },
+  },
+  'daily-news-blog-generator': {
+    template: {
+      title: '📰 Source-Grounded News Brief & Blog Draft', titleEn: '📰 Source-Grounded News Brief & Blog Draft', titleJa: '📰 出典付きニュース要約＆ブログ下書き',
+      description: 'Builds a dated source dossier and converts it into a localized article draft with explicit citations and uncertainty notes.',
+      descriptionEn: 'Builds a dated source dossier and converts it into a localized article draft with explicit citations and uncertainty notes.',
+      descriptionJa: '指定したニュースソースから日付付き調査メモを作成し、引用と不確実性を明記した記事下書きへ変換します。',
+    },
+    crewName: 'Grounded News Editorial Crew',
+    nodeData: {
+      'agent-3': { role: 'Source Verification Researcher', goal: 'Extract and cross-check dated facts from {source_urls} without inventing quotes or relying on headlines alone.', backstory: 'A newsroom researcher trained to preserve links, dates, attribution, and unresolved contradictions.' },
+      'agent-4': { role: 'Localized SEO Editor', goal: 'Create an accurate {target_language} article for {target_reader} while preserving attribution and editorial nuance.', backstory: 'A bilingual editor who prioritizes reader value and factual fidelity over keyword stuffing.' },
+      'task-3': { label: 'Create Verified Source Dossier', description: 'Read {source_urls}. Capture title, publisher, publication date, canonical URL, primary facts, attributed quotes, and disagreements between sources. Compare the local archive for duplicate coverage.', expectedOutput: 'A dated source dossier in Markdown with canonical links, attributed facts, contradictions, and duplicate-topic notes.', outputFormat: 'text' },
+      'task-4': { label: 'Write Localized Article Draft', description: 'Write a {target_language} article for {target_reader} using only the dossier. Include a concise title, meta description, H2/H3 structure, inline source links, key takeaways, and an editorial note for claims needing manual verification.', expectedOutput: 'A publication-review-ready Markdown article with citations, meta description, suggested slug, and manual verification checklist.' },
+    },
+  },
+  'competitor-price-monitor': {
+    template: {
+      title: '🔍 Competitor Catalog Snapshot & Price Delta Review', titleEn: '🔍 Competitor Catalog Snapshot & Price Delta Review', titleJa: '🔍 競合カタログ取得＆価格差分レビュー',
+      description: 'Captures a point-in-time catalog snapshot and compares normalized products against a supplied baseline.',
+      descriptionEn: 'Captures a point-in-time catalog snapshot and compares normalized products against a supplied baseline.',
+      descriptionJa: '競合カタログのスナップショットを取得し、支給済みの基準データと正規化比較します。',
+    },
+    crewName: 'Competitor Catalog Review Crew',
+    nodeData: {
+      'agent-5': { role: 'Catalog Evidence Collector', goal: 'Capture reproducible product facts from {competitor_urls}, including timestamp, currency, unit, availability, and source URL.', backstory: 'A methodical commerce researcher who avoids guessing variants, taxes, shipping, or unavailable prices.' },
+      'agent-6': { role: 'Pricing Delta Analyst', goal: 'Compare normalized catalog evidence with {baseline_file} and separate confirmed changes from uncertain product matches.', backstory: 'A pricing analyst who reports data-quality limitations before recommending action.' },
+      'task-5': { label: 'Capture Normalized Catalog Snapshot', description: 'Scrape {competitor_urls}. For each product capture source URL, timestamp, title, SKU if present, variant, currency, current price, reference price, unit basis, availability, and evidence status. Never infer missing prices.', expectedOutput: 'Validated JSON containing snapshot metadata and normalized product records with evidence URLs and nullable missing fields.', outputFormat: 'json' },
+      'task-6': { label: 'Compare Baseline and Triage Changes', description: 'Compare the catalog snapshot against {baseline_file}. Match conservatively, calculate deltas only when currency and unit basis agree, flag uncertain matches, and rank confirmed changes by business impact.', expectedOutput: 'A Markdown delta report with confirmed price changes, new/removed products, uncertain matches, calculation assumptions, and recommended manual checks.' },
+      'tool-6': { description: 'Search the supplied baseline file containing prior normalized catalog records.' },
+    },
+  },
+  'csv-data-validator': {
+    crewName: 'Consent-Aware Contact Data Quality Crew',
+    nodeData: {
+      'agent-data-inspector': { role: 'Contact Data Quality Analyst', goal: 'Validate {csv_path} against the required columns, normalize safe fields, and quarantine records that cannot be verified.', backstory: 'A privacy-aware data steward who never invents missing contact details and preserves a clear audit trail.' },
+      'agent-outreach': { role: 'Consent-Aware Outreach Drafting Specialist', goal: 'Create optional outreach drafts only for records that contain the required identity, lawful-contact, and personalization fields.', backstory: 'A B2B communications editor who avoids sensitive inference, deceptive personalization, and unsupported claims.' },
+      'task-verify': { label: 'Validate and Quarantine Contact Records', description: 'Read {csv_path}. Check required columns, encoding, duplicates, email syntax, missing consent/status fields, and unsafe formula-prefixed cells. Do not claim mailbox deliverability. Separate valid, review-required, and rejected rows with reason codes.', expectedOutput: 'Validated JSON with row counts, schema findings, reason-coded rejected rows, and a clean subset containing only supplied values.', outputFormat: 'json' },
+      'task-generate-list': { label: 'Prepare Reviewable Outreach Drafts', description: 'Using only valid rows, create concise {outreach_language} drafts based on supplied non-sensitive fields. Include an opt-out line and mark any record lacking personalization evidence for manual review. Do not send messages.', expectedOutput: 'A Markdown review table with contact identifier, supplied personalization evidence, draft subject/body, opt-out text, and approval status.' },
+      'tool-csv': { description: 'Read the configured local CSV for validation; this does not verify whether an email inbox exists.' },
+    },
+  },
+  'github-repo-analyzer': {
+    crewName: 'Repository Onboarding Documentation Crew',
+    nodeData: {
+      'agent-code-reviewer': { role: 'Repository Architecture Analyst', goal: 'Map {repository_url} from evidence in code and configuration while distinguishing observations from recommendations.', backstory: 'A principal engineer who cites file paths and avoids claiming runtime behavior that static inspection cannot prove.' },
+      'agent-tech-writer': { role: 'Developer Onboarding Writer', goal: 'Turn verified repository findings into accurate onboarding documentation for {target_reader}.', backstory: 'A technical writer who never fabricates installation steps, environment variables, or commands.' },
+      'task-analyze-repo': { label: 'Build Evidence-Based Repository Map', description: 'Inspect {repository_url}. Identify entrypoints, major modules, package scripts, dependencies, data stores, external services, tests, and deployment files. Cite file paths for every major claim and list unanswered questions.', expectedOutput: 'A Markdown repository map with evidence paths, verified commands, architecture boundaries, risks, and unanswered questions.' },
+      'task-draft-docs': { label: 'Draft Onboarding Documentation', description: 'Using the repository map, draft a README improvement and architecture overview for {target_reader}. Include only verified setup commands and environment-variable names; mark unknown values as TODO rather than inventing them.', expectedOutput: 'Two Markdown documents: a README proposal and architecture overview, each with evidence references and a TODO/verification section.' },
+      'tool-github': { description: 'Search code and repository metadata for the configured repository URL using authorized GitHub access.' },
+    },
+  },
+  'youtube-to-blog': {
+    crewName: 'Transcript-Grounded Content Repurposing Crew',
+    nodeData: {
+      'agent-video-extractor': { role: 'Transcript Evidence Editor', goal: 'Extract accurate themes and timestamped evidence from {youtube_url} without inventing quotations.', backstory: 'A media researcher who separates transcript evidence, paraphrase, and interpretation.' },
+      'agent-seo-writer': { role: 'Attribution-Safe SEO Editor', goal: 'Adapt the verified transcript brief into a useful article for {target_reader} while preserving attribution.', backstory: 'An SEO editor who values original structure and reader utility over transcript copying or keyword stuffing.' },
+      'task-summarize-video': { label: 'Create Timestamped Transcript Brief', description: 'Analyze {youtube_url}. Record the thesis, main arguments, speaker-attributed claims, exact short quotes only when present, timestamps, and unclear transcript passages. Do not guess missing words.', expectedOutput: 'A Markdown transcript brief with timestamps, attributed evidence, paraphrases, notable short quotes, and uncertainty notes.' },
+      'task-write-blog': { label: 'Write an Original Attributed Article', description: 'Write a {target_length}-word Markdown article for {target_reader} using the transcript brief. Add an original framing, headings, takeaways, video attribution/link, meta title, and meta description. Do not present speaker opinions as verified facts.', expectedOutput: 'A review-ready original Markdown article with video attribution, timestamp references, SEO metadata, and a factual review checklist.' },
+      'tool-youtube': { description: 'Retrieve transcript and metadata for the configured YouTube video; transcript quality may require manual review.' },
+    },
+  },
+  'parallel-web-research': {
+    template: { title: '🌐 Parallel Evidence Research & Synthesis', titleEn: '🌐 Parallel Evidence Research & Synthesis', titleJa: '🌐 並列エビデンス調査＆統合' },
+    crewName: 'Parallel Evidence Research Crew',
+    nodeData: {
+      'agent-researcher': { role: 'Multi-Lane Evidence Researcher', goal: 'Investigate {research_question} across evidence, stakeholder, and risk lanes using dated primary sources where possible.', backstory: 'A rigorous web researcher who records provenance, publication dates, and uncertainty for every lane.' },
+      'agent-writer': { role: 'Research Synthesis Editor', goal: 'Reconcile independent research lanes into a decision-ready answer to {research_question}.', backstory: 'An analytical editor who highlights conflicts and evidence gaps instead of forcing false consensus.' },
+      'task-research-1': { label: 'Evidence and Facts Lane (Async)', description: 'Research {research_question} focusing on primary evidence, definitions, measurable facts, and recent developments. Record dated source links and confidence.', expectedOutput: 'A source table and evidence brief with dates, primary/secondary classification, and confidence notes.', asyncExecution: true },
+      'task-research-2': { label: 'Stakeholders and Alternatives Lane (Async)', description: 'Research {research_question} focusing on stakeholder positions, competing approaches, adoption constraints, and credible counterarguments. Record dated sources.', expectedOutput: 'A stakeholder and alternatives brief with cited claims, tradeoffs, and unresolved disagreements.', asyncExecution: true },
+      'task-research-3': { label: 'Risk and Validation Lane (Async)', description: 'Research {research_question} focusing on risks, failure cases, missing evidence, regulatory or operational constraints, and ways to validate claims.', expectedOutput: 'A risk register with evidence links, likelihood/impact rationale, and proposed validation steps.', asyncExecution: true },
+      'task-synthesis': { label: 'Synthesize Decision-Ready Report', description: 'Answer {research_question} by reconciling all three lanes. Deduplicate claims, expose conflicts, grade evidence strength, and separate findings from recommendations.', expectedOutput: 'A Markdown report with executive answer, evidence table, stakeholder tradeoffs, risk register, disagreements, gaps, and next actions.' },
+      'tool-search': { description: 'Search current web sources for the configured research question; every important claim must retain its source URL.' },
+    },
+  },
+  'hierarchical-software-team': {
+    template: { title: '💻 Manager-Led Feature Design & Review', titleEn: '💻 Manager-Led Feature Design & Review', titleJa: '💻 階層型機能設計＆レビュー' },
+    crewName: 'Manager-Led Feature Design Crew',
+    nodeData: {
+      'agent-dev': { role: 'Senior Implementation Designer', goal: 'Produce an implementation proposal for {feature_brief} within {technical_constraints}.', backstory: 'A pragmatic full-stack engineer who makes assumptions explicit and produces testable, accessible designs.' },
+      'agent-qa': { role: 'Quality and Security Reviewer', goal: 'Challenge the proposed implementation against acceptance criteria, edge cases, accessibility, and security.', backstory: 'A skeptical reviewer who distinguishes review findings from executed test results.' },
+      'task-dev': { label: 'Design Feature Implementation', description: 'Given {feature_brief} and {technical_constraints}, propose component boundaries, data flow, typed interfaces, error states, accessibility behavior, and representative code. State assumptions and do not claim files were modified.', expectedOutput: 'A Markdown implementation plan with TypeScript code proposal, interfaces, state/error handling, accessibility notes, and acceptance-criteria mapping.' },
+      'task-qa': { label: 'Review Design and Produce Test Plan', description: 'Review the implementation proposal. Identify correctness, security, privacy, accessibility, and maintainability risks. Provide unit/integration test code where possible, but distinguish proposed tests from executed results.', expectedOutput: 'A review report with severity-ranked findings, revised code snippets, test plan/test cases, and explicit unverified items.' },
+    },
+  },
+  'hierarchical-marketing-campaign': {
+    template: { title: '📣 Manager-Led Campaign Strategy & Copy Review', titleEn: '📣 Manager-Led Campaign Strategy & Copy Review', titleJa: '📣 階層型キャンペーン設計＆コピーレビュー' },
+    crewName: 'Manager-Led Campaign Planning Crew',
+    nodeData: {
+      'agent-analyst': { role: 'Evidence-Based Market Strategist', goal: 'Research the market, audience, alternatives, and claim constraints for {campaign_brief}.', backstory: 'A market analyst who cites sources and avoids inventing audience statistics.' },
+      'agent-copywriter': { role: 'Responsible Performance Copywriter', goal: 'Create channel-appropriate copy grounded in the approved evidence and {brand_constraints}.', backstory: 'A conversion copywriter who avoids deceptive urgency, unsupported superiority claims, and sensitive targeting.' },
+      'task-analyze': { label: 'Build Campaign Evidence Brief', description: 'Analyze {campaign_brief}. Research audience needs, alternatives, category language, objections, and claim/compliance risks. Cite sources, flag assumptions, and do not fabricate market size or persona data.', expectedOutput: 'A cited campaign brief with audience hypotheses, evidence, alternatives, messaging angles, prohibited claims, and validation questions.' },
+      'task-copy': { label: 'Draft and Self-Review Campaign Variants', description: 'Using the approved brief and {brand_constraints}, create 3 distinct ad variants for {target_channel}. For each, explain the angle, evidence basis, CTA, and claim risk. Include a human approval checklist.', expectedOutput: 'Three review-ready ad variants with rationale, evidence mapping, CTA, risk notes, and approval checklist.' },
+      'tool-market': { description: 'Search current market and competitor sources for the configured campaign; retain URLs for substantiation.' },
+    },
+  },
+  'repository-red-team-audit': {
+    crewName: 'Read-Only Repository Release Audit Crew',
+    nodeData: {
+      'rt-agent-architecture': { goal: 'Reconstruct and evaluate the architecture of {repository_path} using read-only evidence.' },
+      'rt-agent-security': { goal: 'Identify plausible security weaknesses in {repository_path} without exploitation or modification.' },
+      'rt-agent-reliability': { goal: 'Find operational failure modes and recovery gaps in {repository_path} from static evidence.' },
+      'rt-agent-adversarial': { goal: 'Design safe, non-destructive validation scenarios; never execute attacks or alter systems.' },
+      'rt-agent-cost': { goal: 'Estimate cost drivers from repository evidence and clearly stated usage assumptions.' },
+      'rt-task-reconstruct': { description: 'Inspect {repository_path} using read-only tools. Map entrypoints, modules, data flows, external services, trust boundaries, deployment assumptions, and evidence file paths. Record unknowns instead of guessing.' },
+      'rt-task-security': { description: 'Perform a non-destructive static security review of {repository_path}. Cover authentication, authorization, input handling, secrets patterns, dependencies, data exposure, and abuse cases. Do not expose secret values or claim exploitability without evidence.' },
+      'rt-task-reliability': { description: 'Review static evidence for failure handling, retries, timeouts, idempotency, concurrency, observability, deployment safety, and recovery. Distinguish confirmed implementation from missing or unverified behavior.' },
+      'rt-task-cost': { description: 'Analyze likely compute, storage, network, model, and managed-service cost drivers from repository evidence plus {usage_assumptions}. State formulas, assumptions, and uncertainty; do not invent billing data.' },
+      'rt-task-release': { description: 'Combine all audit and simulation outputs. Deduplicate findings, grade evidence strength, assign proposed owners and release gates, and produce a go, conditional-go, or no-go recommendation. Treat {output_directory} as the requested destination but do not claim a file was written unless a write-capable tool is configured.' },
+    },
+    additionalNodes: [
+      { id: 'rt-tool-directory', type: 'tool', position: { x: 20, y: 120 }, data: { label: 'Repository Directory Reader', toolType: 'DirectoryReadTool', description: 'List repository files and directories in the configured local path without writing changes.' } },
+      { id: 'rt-tool-file', type: 'tool', position: { x: 20, y: 300 }, data: { label: 'Repository File Reader', toolType: 'FileReadTool', description: 'Read selected repository files for evidence without modifying them.' } },
+    ],
+    additionalEdges: [
+      { id: 'rt-e-dir-architecture', source: 'rt-tool-directory', target: 'rt-agent-architecture' },
+      { id: 'rt-e-file-architecture', source: 'rt-tool-file', target: 'rt-agent-architecture' },
+      { id: 'rt-e-file-security', source: 'rt-tool-file', target: 'rt-agent-security' },
+      { id: 'rt-e-file-reliability', source: 'rt-tool-file', target: 'rt-agent-reliability' },
+      { id: 'rt-e-file-cost', source: 'rt-tool-file', target: 'rt-agent-cost' },
+    ],
+  },
+};
+
+export const PRESET_TEMPLATES: WorkflowTemplate[] = BASE_PRESET_TEMPLATES.map((template) => ({
+  ...template,
+  ...TEMPLATE_GUIDES[template.id],
+  ...(TEMPLATE_GRAPH_REFINEMENTS[template.id]?.template || {}),
+  previewNodesCount: (() => {
+    const nodes = [...template.graphData.nodes, ...(TEMPLATE_GRAPH_REFINEMENTS[template.id]?.additionalNodes || [])];
+    return {
+      agents: nodes.filter((node) => node.type === 'agent').length,
+      tasks: nodes.filter((node) => node.type === 'task').length,
+      tools: nodes.filter((node) => node.type === 'tool').length,
+    };
+  })(),
+  graphData: {
+    crewConfig: {
+      ...template.graphData.crewConfig,
+      name: TEMPLATE_GRAPH_REFINEMENTS[template.id]?.crewName || template.graphData.crewConfig.name,
+    },
+    nodes: [...template.graphData.nodes, ...(TEMPLATE_GRAPH_REFINEMENTS[template.id]?.additionalNodes || [])].map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        ...(TEMPLATE_GRAPH_REFINEMENTS[template.id]?.nodeData[node.id] || {}),
+      },
+    })) as CustomNode[],
+    edges: [...template.graphData.edges, ...(TEMPLATE_GRAPH_REFINEMENTS[template.id]?.additionalEdges || [])],
+  },
+}));
