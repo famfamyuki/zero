@@ -15,6 +15,7 @@ import {
   toPythonIdentifier,
   toPythonClassName,
 } from './validation';
+import { parseOutputSchema } from './output-schema';
 
 export function normalizeModel(rawModel?: string): string {
   const model = String(rawModel || DEFAULT_LLM_MODEL).trim();
@@ -73,6 +74,14 @@ function taskSchemaClassName(node: CustomNode, index: number): string {
   const data = node.data as TaskNodeData;
   const toolStyleName = toPythonClassName(data.label || '', `Task${index + 1}`);
   return `${toolStyleName.replace(/Tool$/, '')}Output${index + 1}`;
+}
+
+function renderSchemaFields(data?: TaskNodeData): string {
+  const fields = parseOutputSchema(data?.outputSchema);
+  if (!fields) return '    result: dict[str, Any] = Field(description="Structured task result matching the requested output")';
+  return Object.entries(fields)
+    .map(([name, type]) => `    ${name}: ${type}`)
+    .join('\n');
 }
 
 function suggestedInputValue(variable: string): string {
@@ -327,10 +336,11 @@ if missing_vars:
     code += `# --- Structured output schemas ---\n`;
     Object.entries(structuredTaskSchemas).forEach(([taskId, className]) => {
       const task = taskNodes.find((node) => node.id === taskId);
-      const taskLabel = String((task?.data as TaskNodeData)?.label || taskId).replace(/"""/g, '');
+      const taskData = task?.data as TaskNodeData;
+      const taskLabel = String(taskData?.label || taskId).replace(/"""/g, '');
       code += `class ${className}(BaseModel):
     """Validated output for ${taskLabel}."""
-    result: dict[str, Any] = Field(description="Structured task result matching the requested output")
+${renderSchemaFields(taskData)}
 
 
 `;
@@ -349,7 +359,11 @@ if missing_vars:
         code += `${varName} = ${className}()\n`;
       } else {
         const toolType = data?.toolType || 'SerperDevTool';
-        code += `${varName} = ${toolType}()\n`;
+        const parameters = Object.entries(data.parameters || {})
+          .filter(([key, value]) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(key) && String(value).trim())
+          .map(([key, value]) => `${key}=${escapePythonString(escapeCrewAIInterpolation(String(value), validation.inputVariables))}`)
+          .join(', ');
+        code += `${varName} = ${toolType}(${parameters})\n`;
       }
     });
   }
@@ -395,7 +409,12 @@ if missing_vars:
     verbose=${data?.verbose !== false ? 'True' : 'False'},
     allow_delegation=${data?.allowDelegation ? 'True' : 'False'},
     tools=${toolsList},
-    llm=${llmVarName}
+    llm=${llmVarName},
+    max_iter=${Number.isFinite(data?.maxIter) ? Math.max(1, Number(data.maxIter)) : 25},
+    max_rpm=${Number.isFinite(data?.maxRpm) ? Math.max(1, Number(data.maxRpm)) : 'None'},
+    max_execution_time=${Number.isFinite(data?.maxExecutionTime) ? Math.max(1, Number(data.maxExecutionTime)) : 'None'},
+    respect_context_window=${data?.respectContextWindow !== false ? 'True' : 'False'},
+    cache=${data?.cache !== false ? 'True' : 'False'}
 )
 
 `;
@@ -432,6 +451,11 @@ if missing_vars:
       const outputSchema = structuredTaskSchemas[tNode.id]
         ? `output_pydantic=${structuredTaskSchemas[tNode.id]},\n    `
         : '';
+      const outputOptions = [
+        data?.markdown ? 'markdown=True' : '',
+        data?.outputFile?.trim() ? `output_file=${escapePythonString(data.outputFile.trim())}` : '',
+        data?.humanInput ? 'human_input=True' : '',
+      ].filter(Boolean).map((option) => `${option},\n    `).join('');
 
       let agentAssignment = '';
       if (crewConfig?.process !== 'hierarchical' && assignedAgentVar) {
@@ -441,7 +465,7 @@ if missing_vars:
       code += `${varName} = Task(
     description=${escapePythonString(escapeCrewAIInterpolation(data?.description || 'Perform task', validation.inputVariables))},
     expected_output=${escapePythonString(escapeCrewAIInterpolation(data?.expectedOutput || 'Task result summary', validation.inputVariables))},
-    ${agentAssignment}${toolsList}${contextList}${outputSchema}async_execution=${data?.asyncExecution ? 'True' : 'False'}
+    ${agentAssignment}${toolsList}${contextList}${outputSchema}${outputOptions}async_execution=${data?.asyncExecution ? 'True' : 'False'}
 )
 
 `;
@@ -567,12 +591,12 @@ from typing import Any
 `;
 
   taskNodes.forEach((t, idx) => {
-    const data = t.data as TaskNodeData;
+      const data = t.data as TaskNodeData;
     if (data.outputFormat === 'json') {
       const className = taskSchemaClassName(t, idx);
       schemasContent += `class ${className}(BaseModel):
     """Structured output schema for task: ${data.label || t.id}."""
-    result: dict[str, Any] = Field(description="Structured task result matching the requested output")
+${renderSchemaFields(data)}
 
 
 `;

@@ -1,5 +1,7 @@
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig, ValidationError, ValidationWarning, ValidationResult, ExportMode } from '@/types/editor';
 import { Edge } from '@xyflow/react';
+import { parseOutputSchema } from './output-schema';
+import { getToolParameterDefinitions } from '@/lib/tool-config';
 
 export function toPythonIdentifier(str: string, fallback: string): string {
   const clean = (str || '').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
@@ -43,6 +45,9 @@ export function extractInputVariables(nodes: CustomNode[], crewConfig?: CrewConf
       checkText(data.role);
       checkText(data.goal);
       checkText(data.backstory);
+    } else if (node.type === 'tool') {
+      const data = node.data as ToolNodeData;
+      Object.values(data.parameters || {}).forEach((value) => checkText(value));
     }
   });
 
@@ -118,6 +123,17 @@ export function validateGraph(
         suggestion: 'Choose a Tool Type in the inspector before exporting.',
       });
     }
+    const allowedParameters = new Set(getToolParameterDefinitions(data.toolType).map((parameter) => parameter.key));
+    Object.keys(data.parameters || {}).forEach((key) => {
+      if (!allowedParameters.has(key)) {
+        errors.push({
+          code: 'UNSUPPORTED_TOOL_PARAMETER',
+          message: `Tool "${data.label || toolNode.id}" contains unsupported parameter "${key}".`,
+          nodeId: toolNode.id,
+          suggestion: 'Remove the unsupported parameter or reselect the Tool Type to reset its configuration.',
+        });
+      }
+    });
   });
 
   if (agentNodes.length === 0) {
@@ -206,6 +222,19 @@ export function validateGraph(
     const assigned = Array.from(taskAssignedAgents[tNode.id] || []);
     const tData = (tNode.data || {}) as TaskNodeData;
     const taskLabel = tData.label || tNode.id;
+
+    if (tData.outputFormat === 'json' && tData.outputSchema?.trim()) {
+      try {
+        parseOutputSchema(tData.outputSchema);
+      } catch (error) {
+        errors.push({
+          code: 'INVALID_OUTPUT_SCHEMA',
+          message: `Task "${taskLabel}" has an invalid JSON output schema: ${error instanceof Error ? error.message : 'Unknown schema error'}`,
+          nodeId: tNode.id,
+          suggestion: 'Use a JSON object such as {"summary":"string","score":"number"}.',
+        });
+      }
+    }
 
     if (assigned.length > 1) {
       const agentNames = assigned

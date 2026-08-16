@@ -10,6 +10,11 @@ export interface AgentNodeData extends Record<string, unknown> {
   model: string;
   verbose: boolean;
   allowDelegation: boolean;
+  maxIter?: number;
+  maxRpm?: number;
+  maxExecutionTime?: number;
+  respectContextWindow?: boolean;
+  cache?: boolean;
 }
 
 export interface TaskNodeData extends Record<string, unknown> {
@@ -19,13 +24,17 @@ export interface TaskNodeData extends Record<string, unknown> {
   assignedAgentId?: string;
   asyncExecution: boolean;
   outputFormat?: 'text' | 'json';
+  outputSchema?: string;
+  markdown?: boolean;
+  outputFile?: string;
+  humanInput?: boolean;
 }
 
 export interface ToolNodeData extends Record<string, unknown> {
   label: string;
   toolType: 'SerperDevTool' | 'ScrapeWebsiteTool' | 'DirectoryReadTool' | 'FileReadTool' | 'TXTSearchTool' | 'CustomTool' | 'PDFSearchTool' | 'CSVSearchTool' | 'YoutubeVideoSearchTool' | 'GithubSearchTool' | 'MDXSearchTool';
   description: string;
-  parameters?: string;
+  parameters?: Record<string, string>;
 }
 
 export type CustomNode = Node<AgentNodeData | TaskNodeData | ToolNodeData>;

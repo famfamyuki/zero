@@ -5,6 +5,7 @@ import { Sliders, Bot, CheckSquare, Wrench, Settings, Trash2, Sparkles, External
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig } from '@/types/editor';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { LLM_MODEL_GROUPS, DEFAULT_LLM_MODEL, CUSTOM_MODEL_VALUE, isKnownModel } from '@/lib/models';
+import { getToolParameterDefinitions } from '@/lib/tool-config';
 
 interface InspectorProps {
   selectedNode: CustomNode | null;
@@ -25,7 +26,7 @@ export const Inspector: React.FC<InspectorProps> = ({
   isOpen = false,
   onClose,
 }) => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const containerClasses = `w-full max-w-sm md:w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/90 backdrop-blur-md p-4 pb-32 md:pb-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 absolute inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl ${
     isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -83,6 +84,9 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <option value="sequential">{t('processSequential')}</option>
                 <option value="hierarchical">{t('processHierarchical')}</option>
               </select>
+              <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
+                {crewConfig.process === 'hierarchical' ? t('processHierarchicalHelp') : t('processSequentialHelp')}
+              </p>
             </div>
 
             {/* Manager LLM (Only for Hierarchical) */}
@@ -171,6 +175,57 @@ export const Inspector: React.FC<InspectorProps> = ({
           </div>
 
           {/* Form Fields according to Node Type */}
+          <details className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
+            <summary className="cursor-pointer text-xs font-semibold text-indigo-300">{t('crewGlobalConfig')}</summary>
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="mb-1 block text-xs text-slate-300">{t('crewName')}</label>
+                <input value={crewConfig.name} onChange={(e) => onUpdateCrewConfig({ name: e.target.value })} className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100" />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-slate-300">{t('executionProcess')}</label>
+                <select
+                  value={crewConfig.process}
+                  onChange={(e) => onUpdateCrewConfig({ process: e.target.value as 'sequential' | 'hierarchical' })}
+                  className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+                >
+                  <option value="sequential">{t('processSequential')}</option>
+                  <option value="hierarchical">{t('processHierarchical')}</option>
+                </select>
+                <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
+                  {crewConfig.process === 'hierarchical' ? t('processHierarchicalHelp') : t('processSequentialHelp')}
+                </p>
+              </div>
+              {crewConfig.process === 'hierarchical' && (
+                <div>
+                  <label className="mb-1 block text-xs text-slate-300">{t('managerLlm')}</label>
+                  <select
+                    value={isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) ? (crewConfig.managerLlm || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
+                    onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
+                    className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
+                  >
+                    {LLM_MODEL_GROUPS.map((group) => (
+                      <optgroup key={group.group} label={group.group}>
+                        {group.models.map((model) => <option key={model.value} value={model.value}>{model.label}</option>)}
+                      </optgroup>
+                    ))}
+                    <option value={CUSTOM_MODEL_VALUE}>{t('customModel')}</option>
+                  </select>
+                  {!isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) && (
+                    <input
+                      value={crewConfig.managerLlm || ''}
+                      onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value })}
+                      placeholder={t('customModelPlaceholder')}
+                      className="mt-2 w-full rounded-lg border border-indigo-800 bg-slate-950 px-3 py-2 font-mono text-xs"
+                    />
+                  )}
+                </div>
+              )}
+              <label className="flex items-center justify-between text-xs text-slate-300">{t('verboseLogs')}<input type="checkbox" checked={crewConfig.verbose} onChange={(e) => onUpdateCrewConfig({ verbose: e.target.checked })} /></label>
+              <label className="flex items-center justify-between text-xs text-slate-300">{t('crewMemory')}<input type="checkbox" checked={crewConfig.memory} onChange={(e) => onUpdateCrewConfig({ memory: e.target.checked })} /></label>
+            </div>
+          </details>
+
           {selectedNode.type === 'agent' && (
             <div className="space-y-3.5">
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-950/40 border border-indigo-900/40 text-indigo-300 text-xs font-semibold">
@@ -272,6 +327,23 @@ export const Inspector: React.FC<InspectorProps> = ({
                   />
                 </label>
               </div>
+
+              <details className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
+                <summary className="cursor-pointer text-xs font-semibold text-slate-300">{t('advancedSettings')}</summary>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <label className="text-[11px] text-slate-400">{t('maxIterations')}
+                    <input type="number" min={1} value={(selectedNode.data as AgentNodeData).maxIter ?? 25} onChange={(e) => onUpdateNodeData(selectedNode.id, { maxIter: Number(e.target.value) })} className="mt-1 w-full rounded border border-slate-800 bg-slate-950 px-2 py-1.5 text-xs" />
+                  </label>
+                  <label className="text-[11px] text-slate-400">{t('maxRpm')}
+                    <input type="number" min={1} value={(selectedNode.data as AgentNodeData).maxRpm ?? ''} placeholder="Unlimited" onChange={(e) => onUpdateNodeData(selectedNode.id, { maxRpm: e.target.value ? Number(e.target.value) : undefined })} className="mt-1 w-full rounded border border-slate-800 bg-slate-950 px-2 py-1.5 text-xs" />
+                  </label>
+                  <label className="col-span-2 text-[11px] text-slate-400">{t('maxExecutionTime')}
+                    <input type="number" min={1} value={(selectedNode.data as AgentNodeData).maxExecutionTime ?? ''} placeholder={t('unlimited')} onChange={(e) => onUpdateNodeData(selectedNode.id, { maxExecutionTime: e.target.value ? Number(e.target.value) : undefined })} className="mt-1 w-full rounded border border-slate-800 bg-slate-950 px-2 py-1.5 text-xs" />
+                  </label>
+                  <label className="col-span-2 flex items-center justify-between text-xs text-slate-300">{t('respectContextWindow')}<input type="checkbox" checked={(selectedNode.data as AgentNodeData).respectContextWindow ?? true} onChange={(e) => onUpdateNodeData(selectedNode.id, { respectContextWindow: e.target.checked })} /></label>
+                  <label className="col-span-2 flex items-center justify-between text-xs text-slate-300">{t('cacheResponses')}<input type="checkbox" checked={(selectedNode.data as AgentNodeData).cache ?? true} onChange={(e) => onUpdateNodeData(selectedNode.id, { cache: e.target.checked })} /></label>
+                </div>
+              </details>
             </div>
           )}
 
@@ -326,6 +398,31 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <p className="mt-1 text-[10px] leading-relaxed text-slate-500">{t('outputFormatHelp')}</p>
               </div>
 
+              {(selectedNode.data as TaskNodeData).outputFormat === 'json' && (
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-300">{t('outputSchema')}</label>
+                  <textarea
+                    rows={4}
+                    value={(selectedNode.data as TaskNodeData).outputSchema || ''}
+                    onChange={(e) => onUpdateNodeData(selectedNode.id, { outputSchema: e.target.value })}
+                    placeholder={'{"summary":"string","score":"number"}'}
+                    className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 font-mono text-xs text-slate-100"
+                  />
+                  <p className="mt-1 text-[10px] text-slate-500">{t('outputSchemaHelp')}</p>
+                </div>
+              )}
+
+              <details className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
+                <summary className="cursor-pointer text-xs font-semibold text-slate-300">{t('advancedSettings')}</summary>
+                <div className="mt-3 space-y-3">
+                  <label className="flex items-center justify-between text-xs text-slate-300">{t('markdownOutput')}<input type="checkbox" checked={(selectedNode.data as TaskNodeData).markdown ?? false} onChange={(e) => onUpdateNodeData(selectedNode.id, { markdown: e.target.checked })} /></label>
+                  <label className="flex items-center justify-between text-xs text-slate-300">{t('humanApproval')}<input type="checkbox" checked={(selectedNode.data as TaskNodeData).humanInput ?? false} onChange={(e) => onUpdateNodeData(selectedNode.id, { humanInput: e.target.checked })} /></label>
+                  <label className="block text-xs text-slate-300">{t('outputFile')}
+                    <input value={(selectedNode.data as TaskNodeData).outputFile || ''} onChange={(e) => onUpdateNodeData(selectedNode.id, { outputFile: e.target.value })} placeholder="report.md" className="mt-1 w-full rounded border border-slate-800 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+                  </label>
+                </div>
+              </details>
+
               <div className="pt-2 border-t border-slate-800">
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-xs text-slate-300">{t('asyncExecution')}</span>
@@ -360,7 +457,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('toolType')}</label>
                 <select
                   value={(selectedNode.data as ToolNodeData).toolType || 'SerperDevTool'}
-                  onChange={(e) => onUpdateNodeData(selectedNode.id, { toolType: e.target.value })}
+                  onChange={(e) => onUpdateNodeData(selectedNode.id, { toolType: e.target.value, parameters: {} })}
                   className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-amber-500 font-mono"
                 >
                   <option value="SerperDevTool">SerperDevTool (Google Search)</option>
@@ -376,6 +473,21 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <option value="CustomTool">Custom Function Tool</option>
                 </select>
               </div>
+
+              {getToolParameterDefinitions((selectedNode.data as ToolNodeData).toolType).map((parameter) => (
+                <div key={parameter.key}>
+                  <label className="mb-1 block text-xs font-medium text-slate-300">{lang === 'ja' ? parameter.labelJa : parameter.label}</label>
+                  <input
+                    value={(selectedNode.data as ToolNodeData).parameters?.[parameter.key] || ''}
+                    onChange={(e) => onUpdateNodeData(selectedNode.id, {
+                      parameters: { ...((selectedNode.data as ToolNodeData).parameters || {}), [parameter.key]: e.target.value },
+                    })}
+                    placeholder={parameter.placeholder}
+                    className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 font-mono text-xs text-slate-100"
+                  />
+                  <p className="mt-1 text-[10px] leading-relaxed text-slate-500">{lang === 'ja' ? parameter.helpJa : parameter.help}</p>
+                </div>
+              ))}
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('description')}</label>

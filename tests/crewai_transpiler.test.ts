@@ -519,4 +519,54 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assert.equal(isKnownModel('anthropic/claude-3-5-sonnet-latest'), false);
     assert.equal(isKnownModel('anthropic/claude-3-opus-latest'), false);
   });
+
+  test('30. Tool-specific parameters are validated, generated, and exposed as kickoff inputs', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const configuredNodes = nodes.map((node) => node.id === 'tool-1'
+      ? { ...node, data: { ...node.data, toolType: 'FileReadTool', parameters: { file_path: '{source_file}' } } }
+      : node) as CustomNode[];
+    const validation = validateGraph(configuredNodes, edges, crewConfig);
+    assert.equal(validation.isValid, true);
+    assert.ok(validation.inputVariables.includes('source_file'));
+    const code = transpileToCrewAI(configuredNodes, edges, crewConfig);
+    assert.match(code, /FileReadTool\(file_path="\{source_file\}"\)/);
+    assert.match(code, /"source_file": "\.\/"/);
+
+    const invalidNodes = configuredNodes.map((node) => node.id === 'tool-1'
+      ? { ...node, data: { ...node.data, parameters: { arbitrary_python_kwarg: 'bad' } } }
+      : node) as CustomNode[];
+    assert.ok(validateGraph(invalidNodes, edges, crewConfig).errors.some((error) => error.code === 'UNSUPPORTED_TOOL_PARAMETER'));
+  });
+
+  test('31. Agent controls, task delivery options, and strict Pydantic fields reach generated code', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const configuredNodes = nodes.map((node) => {
+      if (node.id === 'agent-1') return { ...node, data: { ...node.data, maxIter: 12, maxRpm: 30, maxExecutionTime: 90, respectContextWindow: false, cache: false } };
+      if (node.id === 'task-1') return { ...node, data: { ...node.data, outputFormat: 'json', outputSchema: '{"summary":"string","score":"number","approved":"boolean"}', markdown: true, outputFile: 'report.md', humanInput: true } };
+      return node;
+    }) as CustomNode[];
+    const code = transpileToCrewAI(configuredNodes, edges, crewConfig);
+    assert.match(code, /max_iter=12/);
+    assert.match(code, /max_rpm=30/);
+    assert.match(code, /max_execution_time=90/);
+    assert.match(code, /respect_context_window=False/);
+    assert.match(code, /cache=False/);
+    assert.match(code, /summary: str/);
+    assert.match(code, /score: float/);
+    assert.match(code, /approved: bool/);
+    assert.match(code, /markdown=True/);
+    assert.match(code, /output_file="report\.md"/);
+    assert.match(code, /human_input=True/);
+    assertValidPythonSyntax(code);
+  });
+
+  test('32. Invalid strict JSON schemas are blocked with an actionable validation error', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const invalidNodes = nodes.map((node) => node.id === 'task-1'
+      ? { ...node, data: { ...node.data, outputFormat: 'json', outputSchema: '{"score":"unsupported"}' } }
+      : node) as CustomNode[];
+    const validation = validateGraph(invalidNodes, edges, crewConfig);
+    assert.equal(validation.isValid, false);
+    assert.ok(validation.errors.some((error) => error.code === 'INVALID_OUTPUT_SCHEMA'));
+  });
 });
