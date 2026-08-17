@@ -15,7 +15,6 @@ export const translations = {
     clearCanvas: 'Clear Canvas',
     generatePython: 'Export Code (Python)',
     deployConoHaHeader: '🚀 Deploy (ConoHa)',
-    deployCloudwaysHeader: '🚀 Deploy (Cloudways)',
 
     // Catchphrase Banner
     mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
@@ -99,12 +98,6 @@ export const translations = {
     copyCode: 'Copy Code',
     downloadPy: 'Download main.py',
     readyToDeployTitle: '🚀 24/7 Production Agent Server (Recommended Infrastructure)',
-    cloudwaysTitle: 'Cloudways Summer Offer: 40% Off for 4 Months',
-    cloudwaysSub: 'New customers get 40% off every plan for the first 4 months, plus free migration support.',
-    cloudwaysCtaBtn: 'Claim 40% Off on Cloudways',
-    cloudwaysRecommendedBadge: 'Recommended',
-    cloudwaysDeadline: 'Offer ends September 15, 2026',
-    cloudwaysPromoCode: 'Promo code: SUMMER404',
     conohaTitle: 'ConoHa VPS (High-Speed Cloud VPS)',
     conohaSub: 'A Japan-focused VPS for users who want direct control of Docker and Python while keeping monthly costs predictable.',
     conohaCtaBtn: 'Build on ConoHa VPS',
@@ -136,7 +129,6 @@ export const translations = {
     clearCanvas: 'キャンバス消去',
     generatePython: 'コード出力 (Python)',
     deployConoHaHeader: '🚀 稼働 (ConoHa)',
-    deployCloudwaysHeader: '🚀 稼働 (Cloudways)',
 
     // Catchphrase Banner
     mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
@@ -220,12 +212,6 @@ export const translations = {
     copyCode: 'コードをコピー',
     downloadPy: 'main.py をダウンロード',
     readyToDeployTitle: '🚀 24時間自動実行用 本番サーバー (推奨インフラ)',
-    cloudwaysTitle: 'Cloudways サマーオファー：最初の4か月間40%オフ',
-    cloudwaysSub: '新規登録なら全プランが最初の4か月間40%オフ。無料の移行サポートも利用できます。',
-    cloudwaysCtaBtn: '40%オフでCloudwaysを始める',
-    cloudwaysRecommendedBadge: '推奨',
-    cloudwaysDeadline: '2026年9月15日までの期間限定',
-    cloudwaysPromoCode: 'プロモコード：SUMMER404',
     conohaTitle: 'ConoHa VPS（国内向けVPS）',
     conohaSub: 'DockerやPythonを自分で管理しながら、月額を抑えて運用したい人向けです。',
     conohaCtaBtn: 'ConoHaで構築する',

@@ -13,7 +13,7 @@ type AnalyticsProperties = {
   };
   buymeacoffee_clicked: { placement: 'header' | 'mobile_sticky' };
   affiliate_clicked: {
-    provider: 'cloudways' | 'conoha';
+    provider: 'conoha';
     placement: 'editor_mobile' | 'templates_header' | 'templates_mobile' | 'code_export';
   };
 };

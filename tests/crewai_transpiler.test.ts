@@ -339,13 +339,8 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assertValidPythonSyntax(code);
   });
 
-  test('16. Cloudways summer offer copy includes the code, discount period, and deadline', () => {
-    assert.match(translations.en.cloudwaysTitle, /40% Off for 4 Months/);
-    assert.match(translations.en.cloudwaysPromoCode, /SUMMER404/);
-    assert.match(translations.en.cloudwaysDeadline, /September 15, 2026/);
-    assert.match(translations.ja.cloudwaysTitle, /4か月間40%オフ/);
-    assert.match(translations.ja.cloudwaysPromoCode, /SUMMER404/);
-    assert.match(translations.ja.cloudwaysDeadline, /2026年9月15日/);
+  test('16. Retired Cloudways promotion is absent from localized product copy', () => {
+    assert.doesNotMatch(JSON.stringify(translations), /cloudways|SUMMER404/i);
   });
 
   test('17. Empty workflows and unsupported edge directions are blocked', () => {
@@ -538,14 +533,17 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assert.ok(validateGraph(invalidNodes, edges, crewConfig).errors.some((error) => error.code === 'UNSUPPORTED_TOOL_PARAMETER'));
   });
 
-  test('31. Agent controls, task delivery options, and strict Pydantic fields reach generated code', () => {
+  test('31. Agent, task, and crew settings reach generated code', () => {
     const { nodes, edges, crewConfig } = createSampleGraph();
     const configuredNodes = nodes.map((node) => {
-      if (node.id === 'agent-1') return { ...node, data: { ...node.data, maxIter: 12, maxRpm: 30, maxExecutionTime: 90, respectContextWindow: false, cache: false } };
-      if (node.id === 'task-1') return { ...node, data: { ...node.data, outputFormat: 'json', outputSchema: '{"summary":"string","score":"number","approved":"boolean"}', markdown: true, outputFile: 'report.md', humanInput: true } };
+      if (node.id === 'agent-1') return { ...node, data: { ...node.data, verbose: false, allowDelegation: true, maxIter: 12, maxRpm: 30, maxExecutionTime: 90, respectContextWindow: false, cache: false } };
+      if (node.id === 'task-1') return { ...node, data: { ...node.data, asyncExecution: true, outputFormat: 'json', outputSchema: '{"summary":"string","score":"number","approved":"boolean"}', markdown: true, outputFile: 'report.md', humanInput: true } };
       return node;
     }) as CustomNode[];
-    const code = transpileToCrewAI(configuredNodes, edges, crewConfig);
+    const code = transpileToCrewAI(configuredNodes, edges, { ...crewConfig, verbose: false, memory: true });
+    assert.match(code, /role="Lead Security Auditor"/);
+    assert.match(code, /model="openai\/gpt-5\.6-terra"/);
+    assert.match(code, /verbose=False,\n    allow_delegation=True/);
     assert.match(code, /max_iter=12/);
     assert.match(code, /max_rpm=30/);
     assert.match(code, /max_execution_time=90/);
@@ -557,10 +555,26 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assert.match(code, /markdown=True/);
     assert.match(code, /output_file="report\.md"/);
     assert.match(code, /human_input=True/);
+    assert.match(code, /async_execution=True/);
+    assert.match(code, /process=Process\.sequential/);
+    assert.match(code, /verbose=False,\n    memory=True/);
     assertValidPythonSyntax(code);
   });
 
-  test('32. Invalid strict JSON schemas are blocked with an actionable validation error', () => {
+  test('32. Hierarchical manager model is reflected in crew configuration', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const code = transpileToCrewAI(nodes, edges, {
+      ...crewConfig,
+      process: 'hierarchical',
+      managerLlm: 'anthropic/claude-sonnet-4-6',
+    });
+    assert.match(code, /model="anthropic\/claude-sonnet-4-6"/);
+    assert.match(code, /process=Process\.hierarchical/);
+    assert.match(code, /manager_llm=llm_anthropic_claude_sonnet_4_6/);
+    assertValidPythonSyntax(code);
+  });
+
+  test('33. Invalid strict JSON schemas are blocked with an actionable validation error', () => {
     const { nodes, edges, crewConfig } = createSampleGraph();
     const invalidNodes = nodes.map((node) => node.id === 'task-1'
       ? { ...node, data: { ...node.data, outputFormat: 'json', outputSchema: '{"score":"unsupported"}' } }

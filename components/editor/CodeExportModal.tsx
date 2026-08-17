@@ -314,36 +314,13 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
               </button>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-2">
-              <a
-                href="https://unified.cloudways.com/signup?id=2194173&coupon=SUMMER404"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent('affiliate_clicked', { provider: 'cloudways', placement: 'code_export' })}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-xl border-2 border-orange-400/80 bg-gradient-to-r from-orange-900 to-amber-800 px-3 py-2.5 shadow-lg shadow-orange-950/40 transition hover:from-orange-800 hover:to-amber-700"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <strong className="text-xs font-black text-orange-50 sm:text-sm">{t('cloudwaysTitle')}</strong>
-                    <span className="rounded-full bg-amber-300 px-1.5 py-0.5 text-[9px] font-black text-orange-950">40% OFF</span>
-                  </div>
-                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[10px] text-orange-100/90">
-                    <span>{t('cloudwaysDeadline')}</span>
-                    <code className="font-mono font-bold text-amber-200">SUMMER404</code>
-                  </div>
-                </div>
-                <span className="flex shrink-0 items-center gap-1 rounded-lg bg-orange-500 px-2.5 py-2 text-[10px] font-black text-white ring-1 ring-orange-200/70 group-hover:bg-orange-400 sm:text-xs">
-                  {t('cloudwaysCtaBtn')}
-                  <ExternalLink className="h-3 w-3" />
-                </span>
-              </a>
-
+            <div>
               <a
                 href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackEvent('affiliate_clicked', { provider: 'conoha', placement: 'code_export' })}
-                className="group flex min-w-0 items-center justify-between gap-3 rounded-xl border border-emerald-500/60 bg-emerald-950/80 px-3 py-2.5 shadow-lg shadow-emerald-950/30 transition hover:border-emerald-400 hover:bg-emerald-900/80"
+                className="group flex w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-emerald-500/60 bg-emerald-950/80 px-3 py-2.5 shadow-lg shadow-emerald-950/30 transition hover:border-emerald-400 hover:bg-emerald-900/80"
               >
                 <div className="flex min-w-0 items-center gap-2.5">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/50 bg-emerald-600/25">
