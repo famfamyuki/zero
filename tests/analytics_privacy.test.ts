@@ -30,12 +30,13 @@ test('user content and automatic URL properties are removed', () => {
   });
 });
 
-test('events without custom properties discard all supplied user values', () => {
+test('JSON import keeps only its safe source and discards file contents', () => {
   assert.deepEqual(
     sanitizeAnalyticsProperties('json_imported', {
+      source: 'drag_drop',
       filename: 'private.json',
       contents: '{"apiKey":"secret"}',
     }),
-    {}
+    { source: 'drag_drop' }
   );
 });

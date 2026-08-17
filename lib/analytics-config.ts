@@ -11,7 +11,7 @@ export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
 
 const EVENT_PROPERTY_ALLOWLIST: Record<AnalyticsEvent, readonly string[]> = {
   template_selected: ['template_id', 'source'],
-  json_imported: [],
+  json_imported: ['source'],
   code_generated: [],
   code_downloaded: ['download_type', 'export_mode'],
   buymeacoffee_clicked: ['placement'],

@@ -12,7 +12,7 @@ import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNod
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
 import Link from 'next/link';
-import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink } from 'lucide-react';
+import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink, Upload } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
 
@@ -117,6 +117,7 @@ export default function EditorPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
 
   // Listen to fullscreen changes
@@ -380,16 +381,20 @@ export default function EditorPage() {
     URL.revokeObjectURL(url);
   }, [nodes, edges, crewConfig]);
 
-  // Import Graph JSON
-  const handleImportJson = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+  // Import Graph JSON from either the file picker or a desktop file drop.
+  const importGraphFile = useCallback(
+    async (file: File, source: 'button' | 'drag_drop') => {
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        alert(t('jsonFileOnly'));
+        return;
+      }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const parsed: GraphData = JSON.parse(event.target?.result as string);
+      if ((nodes.length > 0 || edges.length > 0) && !window.confirm(t('replaceWorkflowConfirm'))) {
+        return;
+      }
+
+      try {
+          const parsed: GraphData = JSON.parse(await file.text());
           if (parsed && Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
             // 1 & 2 & 3: Normalize node types and ensure data mapping
             const normalizedNodes = parsed.nodes.map((node: any) => {
@@ -442,20 +447,55 @@ export default function EditorPage() {
             }
 
             takeSnapshot();
-            trackEvent('json_imported');
+            trackEvent('json_imported', { source });
           } else {
-            alert('Invalid Workflow JSON format');
+            alert(t('invalidWorkflowJson'));
           }
-        } catch (err) {
-          alert('Failed to parse JSON file');
-        } finally {
-          e.target.value = '';
-        }
-      };
-      reader.readAsText(file);
+      } catch (err) {
+        alert(t('jsonParseFailed'));
+      }
     },
-    [crewConfig, setNodes, setEdges, takeSnapshot]
+    [crewConfig, edges.length, nodes.length, setNodes, setEdges, takeSnapshot, t]
   );
+
+  const handleImportJson = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (file) void importGraphFile(file, 'button');
+    },
+    [importGraphFile]
+  );
+
+  const handleWorkspaceDragEnter = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    if (Array.from(event.dataTransfer.types).includes('Files')) {
+      event.preventDefault();
+      setIsJsonDragActive(true);
+    }
+  }, []);
+
+  const handleJsonDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsJsonDragActive(false);
+
+    const files = Array.from(event.dataTransfer.files);
+    if (files.length !== 1) {
+      alert(t('singleJsonFileOnly'));
+      return;
+    }
+    void importGraphFile(files[0], 'drag_drop');
+  }, [importGraphFile, t]);
+
+  useEffect(() => {
+    const clearFileDragState = () => setIsJsonDragActive(false);
+    window.addEventListener('drop', clearFileDragState);
+    window.addEventListener('dragend', clearFileDragState);
+    return () => {
+      window.removeEventListener('drop', clearFileDragState);
+      window.removeEventListener('dragend', clearFileDragState);
+    };
+  }, []);
 
   return (
     <div className="min-h-[100dvh] h-[100dvh] w-full max-w-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden font-sans selection:bg-indigo-500 selection:text-white">
@@ -504,10 +544,34 @@ export default function EditorPage() {
       )}
 
       {/* Main Workspace Area */}
-      <div 
-        className="flex-1 flex overflow-hidden relative" 
+      <div
+        className="flex-1 flex overflow-hidden relative"
         ref={workspaceRef}
+        onDragEnter={handleWorkspaceDragEnter}
       >
+        {isJsonDragActive && (
+          <div
+            className="absolute inset-0 z-[70] flex items-center justify-center bg-slate-950/85 p-5 backdrop-blur-sm"
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'copy';
+            }}
+            onDragLeave={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                setIsJsonDragActive(false);
+              }
+            }}
+            onDrop={handleJsonDrop}
+          >
+            <div className="pointer-events-none flex max-w-md flex-col items-center rounded-3xl border-2 border-dashed border-emerald-400/80 bg-emerald-950/45 px-8 py-10 text-center shadow-2xl shadow-emerald-950/50">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/50 bg-emerald-500/15">
+                <Upload className="h-7 w-7 text-emerald-300" />
+              </div>
+              <strong className="text-base font-extrabold text-emerald-100">{t('dropJsonTitle')}</strong>
+              <span className="mt-2 text-xs leading-relaxed text-slate-300">{t('dropJsonHint')}</span>
+            </div>
+          </div>
+        )}
         {/* Left Palette & Presets Sidebar */}
         <Sidebar
           onLoadPreset={handleLoadPreset}
@@ -551,6 +615,12 @@ export default function EditorPage() {
             <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span className="shrink-0">{t('mobileTemplates') || 'Templates'}</span>
           </Link>
+
+          <label className="flex cursor-pointer items-center gap-1 rounded-full border border-emerald-500/30 bg-slate-800 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-300 transition hover:bg-slate-700 shrink-0">
+            <Upload className="h-3.5 w-3.5 shrink-0" />
+            <span className="shrink-0">{t('importJson')}</span>
+            <input type="file" accept=".json,application/json" onChange={handleImportJson} className="hidden" />
+          </label>
 
           <button
             onClick={handleGenerateCode}

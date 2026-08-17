@@ -5,7 +5,7 @@ import { AnalyticsEvent, sanitizeAnalyticsProperties } from '@/lib/analytics-con
 
 type AnalyticsProperties = {
   template_selected: { template_id: string; source: 'library' | 'sidebar' };
-  json_imported: never;
+  json_imported: { source: 'button' | 'drag_drop' };
   code_generated: never;
   code_downloaded: {
     download_type: 'single_file' | 'all_files';
@@ -18,8 +18,8 @@ type AnalyticsProperties = {
   };
 };
 
-export function trackEvent(event: 'json_imported' | 'code_generated'): void;
-export function trackEvent<E extends Exclude<AnalyticsEvent, 'json_imported' | 'code_generated'>>(
+export function trackEvent(event: 'code_generated'): void;
+export function trackEvent<E extends Exclude<AnalyticsEvent, 'code_generated'>>(
   event: E,
   properties: AnalyticsProperties[E]
 ): void;

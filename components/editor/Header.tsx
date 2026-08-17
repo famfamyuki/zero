@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden lg:inline shrink-0">{t('freeTemplates')}</span>
         </Link>
 
-        {/* JSON Import/Export (Save/Load) (Desktop) */}
+        {/* JSON Import/Export (Desktop) */}
         <button
           onClick={onExportJson}
           title={t('exportJson')}
@@ -92,8 +92,8 @@ export const Header: React.FC<HeaderProps> = ({
           className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition cursor-pointer shrink-0 whitespace-nowrap"
         >
           <Upload className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="text-xs font-semibold shrink-0">Load</span>
-          <input type="file" accept=".json" onChange={onImportJson} className="hidden" />
+          <span className="text-xs font-semibold shrink-0">{t('importJson')}</span>
+          <input type="file" accept=".json,application/json" onChange={onImportJson} className="hidden" />
         </label>
 
         <button
