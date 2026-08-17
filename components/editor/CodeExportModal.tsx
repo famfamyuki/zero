@@ -28,6 +28,7 @@ import { CustomNode, CrewConfig, ExportMode } from '@/types/editor';
 import { Edge } from '@xyflow/react';
 import { generateProjectFiles } from '@/lib/transpiler/crewai';
 import { ValidationError } from '@/types/editor';
+import { trackEvent } from '@/lib/analytics';
 
 function getLocalizedSuggestion(error: ValidationError, lang: 'en' | 'ja'): string | undefined {
   if (lang === 'en') return error.suggestion;
@@ -162,6 +163,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
   };
 
   const handleDownload = () => {
+    trackEvent('code_downloaded', { download_type: 'single_file', export_mode: exportMode });
     const blob = new Blob([activeFile.content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -174,6 +176,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
   };
 
   const handleDownloadAll = () => {
+    trackEvent('code_downloaded', { download_type: 'all_files', export_mode: exportMode });
     project.files.forEach((file, index) => {
       setTimeout(() => {
         const blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' });
@@ -316,6 +319,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
                 href="https://unified.cloudways.com/signup?id=2194173&coupon=SUMMER404"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent('affiliate_clicked', { provider: 'cloudways', placement: 'code_export' })}
                 className="group flex min-w-0 items-center justify-between gap-3 rounded-xl border-2 border-orange-400/80 bg-gradient-to-r from-orange-900 to-amber-800 px-3 py-2.5 shadow-lg shadow-orange-950/40 transition hover:from-orange-800 hover:to-amber-700"
               >
                 <div className="min-w-0">
@@ -338,6 +342,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
                 href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackEvent('affiliate_clicked', { provider: 'conoha', placement: 'code_export' })}
                 className="group flex min-w-0 items-center justify-between gap-3 rounded-xl border border-emerald-500/60 bg-emerald-950/80 px-3 py-2.5 shadow-lg shadow-emerald-950/30 transition hover:border-emerald-400 hover:bg-emerald-900/80"
               >
                 <div className="flex min-w-0 items-center gap-2.5">

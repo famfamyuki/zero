@@ -12,8 +12,9 @@ import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNod
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
 import Link from 'next/link';
-import { Code2, Zap, Layers, Sliders, Sparkles, Rocket, ExternalLink } from 'lucide-react';
+import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { trackEvent } from '@/lib/analytics';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -230,6 +231,7 @@ export default function EditorPage() {
         console.error('Failed to save preset to localStorage:', e);
       }
       takeSnapshot();
+      trackEvent('template_selected', { template_id: template.id, source: 'sidebar' });
       confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
     },
     [setNodes, setEdges, takeSnapshot]
@@ -344,6 +346,7 @@ export default function EditorPage() {
 
   // Transpile CrewAI Python Code & Open Modal
   const handleGenerateCode = useCallback(() => {
+    trackEvent('code_generated');
     setIsCodeModalOpen(true);
   }, []);
 
@@ -439,6 +442,7 @@ export default function EditorPage() {
             }
 
             takeSnapshot();
+            trackEvent('json_imported');
           } else {
             alert('Invalid Workflow JSON format');
           }
@@ -568,30 +572,31 @@ export default function EditorPage() {
           </button>
         </div>
 
-        {/* Dedicated Mobile Bottom Sticky Affiliate Banner (sm:hidden) */}
+        {/* Dedicated Mobile Bottom Sticky Support Banner (sm:hidden) */}
         <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className={`w-7 h-7 rounded-lg ${lang === 'en' ? 'bg-violet-600/30 border-violet-500/50 text-violet-400' : 'bg-emerald-600/30 border-emerald-500/50 text-emerald-400'} flex items-center justify-center shrink-0`}>
-              <Rocket className="w-3.5 h-3.5 animate-bounce shrink-0" />
+            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border-amber-400/50 text-amber-300 flex items-center justify-center shrink-0 border">
+              <Coffee className="w-3.5 h-3.5 shrink-0" />
             </div>
             <div className="truncate">
-              <span className={`font-extrabold text-[11px] ${lang === 'en' ? 'text-violet-300' : 'text-emerald-300'} block leading-tight truncate`}>
-                {lang === 'en' ? t('cloudwaysTitle') : t('conohaTitle')}
+              <span className="font-extrabold text-[11px] text-amber-300 block leading-tight truncate">
+                Support AgentGraph Studio
               </span>
               <span className="text-[9px] text-slate-400 block truncate">
-                {lang === 'en' ? t('cloudwaysSub') : t('conohaSub')}
+                Help fund free templates, documentation, and continued development.
               </span>
             </div>
           </div>
 
           <a
-            href={lang === 'en' ? "https://www.cloudways.com/en/?id=2194173" : "https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"}
+            href="https://www.buymeacoffee.com/agentgraph"
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-xl ${lang === 'en' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 shadow-violet-500/40 border-violet-400/40' : 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 shadow-emerald-500/40 border-emerald-300/40'} text-white font-extrabold text-[11px] shadow-lg shrink-0 border whitespace-nowrap active:scale-95 transition`}
+            onClick={() => trackEvent('buymeacoffee_clicked', { placement: 'mobile_sticky' })}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/30 border-amber-300/60 font-extrabold text-[11px] shadow-lg shrink-0 border whitespace-nowrap active:scale-95 transition"
           >
-            <span className="shrink-0">{lang === 'en' ? t('cloudwaysCtaBtn') : t('conohaCtaBtn')}</span>
-            <ExternalLink className="w-3 h-3 text-white/90 shrink-0" />
+            <span className="shrink-0">Buy me a coffee</span>
+            <ExternalLink className="w-3 h-3 shrink-0" />
           </a>
         </div>
 

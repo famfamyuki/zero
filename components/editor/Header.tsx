@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Network, Code2, Download, Upload, Trash2, Sparkles, Globe, Rocket, Settings } from 'lucide-react';
+import { Network, Code2, Download, Upload, Trash2, Sparkles, Globe, Coffee, Settings } from 'lucide-react';
 import { WorkflowTemplate } from '@/types/editor';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { trackEvent } from '@/lib/analytics';
 
 interface HeaderProps {
   onGenerateCode: () => void;
@@ -122,30 +123,18 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden sm:inline md:hidden font-bold shrink-0">Code</span>
         </button>
 
-        {/* Persistent High-Visibility Header CTA Button (Desktop & Tablet) */}
-        {lang === 'en' ? (
-          <a
-            href="https://unified.cloudways.com/signup?id=2194173&coupon=SUMMER404"
-            target="_blank"
-            rel="noopener noreferrer"
-            title={t('deployCloudwaysHeader')}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold text-xs shadow-md shadow-violet-500/20 hover:scale-105 active:scale-95 transition-all shrink-0 border border-violet-400/40 whitespace-nowrap"
-          >
-            <Rocket className="w-3.5 h-3.5 text-white animate-bounce shrink-0" />
-            <span className="hidden lg:inline shrink-0">{t('deployCloudwaysHeader')}</span>
-          </a>
-        ) : (
-          <a
-            href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
-            target="_blank"
-            rel="noopener noreferrer"
-            title={t('deployConoHaHeader')}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all shrink-0 border border-emerald-300/40 whitespace-nowrap"
-          >
-            <Rocket className="w-3.5 h-3.5 text-white animate-bounce shrink-0" />
-            <span className="hidden lg:inline shrink-0">{t('deployConoHaHeader')}</span>
-          </a>
-        )}
+        {/* Persistent Support CTA Button (Desktop & Tablet) */}
+        <a
+          href="https://www.buymeacoffee.com/agentgraph"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="☕ Support AgentGraph"
+          onClick={() => trackEvent('buymeacoffee_clicked', { placement: 'header' })}
+          className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all shrink-0 border border-amber-300/60 whitespace-nowrap"
+        >
+          <Coffee className="w-3.5 h-3.5 shrink-0" />
+          <span className="hidden lg:inline shrink-0">☕ Support AgentGraph</span>
+        </a>
       </div>
     </header>
   );

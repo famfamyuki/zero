@@ -8,6 +8,7 @@ import { PRESET_TEMPLATES } from '@/lib/presets';
 import { WorkflowTemplate } from '@/types/editor';
 import { getSupabase } from '@/lib/supabase';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { trackEvent } from '@/lib/analytics';
 
 export default function TemplatesPage() {
   const router = useRouter();
@@ -58,6 +59,7 @@ export default function TemplatesPage() {
 
   const handleUseTemplate = (template: WorkflowTemplate) => {
     localStorage.setItem('agentgraph_active_flow', JSON.stringify(template.graphData));
+    trackEvent('template_selected', { template_id: template.id, source: 'library' });
     router.push('/');
   };
 
@@ -139,6 +141,7 @@ export default function TemplatesPage() {
             href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent('affiliate_clicked', { provider: 'conoha', placement: 'templates_header' })}
             className="hidden sm:flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all shrink-0 flex-shrink-0 border border-emerald-300/40 min-w-max whitespace-nowrap"
           >
             <Rocket className="w-3.5 h-3.5 text-white animate-bounce shrink-0" />
@@ -329,6 +332,7 @@ export default function TemplatesPage() {
           href="https://px.a8.net/svt/ejp?a8mat=4B8DGU+BIDPTE+50+4YQJIQ"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackEvent('affiliate_clicked', { provider: 'conoha', placement: 'templates_mobile' })}
           className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-extrabold text-[11px] shadow-lg shadow-emerald-500/40 shrink-0 border border-emerald-300/40 whitespace-nowrap active:scale-95 transition"
         >
           <span>{lang === 'ja' ? '🚀 サーバー構築' : '🚀 Deploy VPS'}</span>
