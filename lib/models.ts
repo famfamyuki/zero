@@ -106,6 +106,7 @@ export const LLM_MODEL_GROUPS: ModelGroup[] = [
   {
     group: 'Ollama — Local Models (install separately)',
     models: [
+      { value: 'ollama/llama3', label: 'Llama 3', badge: 'LOCAL' },
       { value: 'ollama/llama3.3', label: 'Llama 3.3', badge: 'LOCAL' },
       { value: 'ollama/deepseek-r1', label: 'DeepSeek R1', badge: 'LOCAL' },
       { value: 'ollama/qwen3', label: 'Qwen 3', badge: 'LOCAL' },
