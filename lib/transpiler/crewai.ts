@@ -375,8 +375,9 @@ ${renderSchemaFields(taskData)}
 `;
 
   usedModelsMap.forEach((varName, modelStr) => {
+    const ollamaBaseUrl = modelStr.startsWith('ollama/') ? '\n    base_url="http://localhost:11434",' : '';
     code += `${varName} = LLM(
-    model="${modelStr}",
+    model="${modelStr}",${ollamaBaseUrl}
     temperature=0.1
 )
 
