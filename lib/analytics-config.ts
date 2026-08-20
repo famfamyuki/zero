@@ -1,3 +1,5 @@
+import type { CaptureResult } from 'posthog-js';
+
 export const ANALYTICS_EVENTS = [
   'template_selected',
   'json_imported',
@@ -51,4 +53,50 @@ export function sanitizeAnalyticsProperties(
   return Object.fromEntries(
     Object.entries(properties).filter(([key, value]) => allowed.has(key) && value !== undefined)
   );
+}
+
+// $pageview is allowed through before_send but with strict property filtering.
+// Only $pathname (page path without query string) and anonymous SDK metadata
+// are kept. $current_url, $referrer, UTM parameters, and all other properties
+// are intentionally stripped to maintain privacy-first design.
+const PAGEVIEW_PROPERTY_ALLOWLIST = new Set([
+  ...ANONYMOUS_SDK_PROPERTY_ALLOWLIST,
+  '$pathname',
+]);
+
+export function sanitizePageviewProperties(
+  properties: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(properties).filter(
+      ([key, value]) => PAGEVIEW_PROPERTY_ALLOWLIST.has(key) && value !== undefined
+    )
+  );
+}
+
+/**
+ * PostHog before_send filter used in instrumentation-client.ts.
+ *
+ * - `$pageview`: allowed, properties sanitized via pageview allowlist
+ * - Custom analytics events (ANALYTICS_EVENTS): allowed, properties sanitized
+ * - Everything else: rejected (returns null)
+ */
+export function filterPostHogCapture(
+  capture: CaptureResult | null
+): CaptureResult | null {
+  if (!capture) return null;
+
+  if (capture.event === '$pageview') {
+    return {
+      ...capture,
+      properties: sanitizePageviewProperties(capture.properties),
+    };
+  }
+
+  if (!isAnalyticsEvent(capture.event)) return null;
+
+  return {
+    ...capture,
+    properties: sanitizeAnalyticsProperties(capture.event, capture.properties),
+  };
 }

@@ -1,5 +1,5 @@
 import posthog from 'posthog-js';
-import { isAnalyticsEvent, sanitizeAnalyticsProperties } from '@/lib/analytics-config';
+import { filterPostHogCapture } from '@/lib/analytics-config';
 
 const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
 
@@ -9,7 +9,7 @@ if (projectToken) {
     defaults: '2026-05-30',
     autocapture: false,
     rageclick: false,
-    capture_pageview: false,
+    capture_pageview: 'history_change',
     capture_pageleave: false,
     capture_heatmaps: false,
     capture_performance: false,
@@ -19,12 +19,6 @@ if (projectToken) {
     save_campaign_params: false,
     save_referrer: false,
     ip: false,
-    before_send: (capture) => {
-      if (!capture || !isAnalyticsEvent(capture.event)) return null;
-      return {
-        ...capture,
-        properties: sanitizeAnalyticsProperties(capture.event, capture.properties),
-      };
-    },
+    before_send: filterPostHogCapture,
   });
 }
