@@ -21,20 +21,23 @@ const EVENT_PROPERTY_ALLOWLIST: Record<AnalyticsEvent, readonly string[]> = {
 };
 
 // PostHog adds these anonymous SDK properties. URL, referrer, UTM, element text,
-// and all other properties are intentionally removed before transmission.
+// user input, and all other properties are intentionally removed before transmission.
+// 'token' is the public PostHog project API key required for event ingestion by PostHog endpoints.
 const ANONYMOUS_SDK_PROPERTY_ALLOWLIST = new Set([
-  '$browser',
-  '$browser_version',
+  'token',
+  'distinct_id',
   '$device_id',
-  '$device_type',
+  '$session_id',
+  '$window_id',
   '$insert_id',
   '$lib',
   '$lib_version',
+  '$time',
+  '$browser',
+  '$browser_version',
   '$os',
   '$os_version',
-  '$session_id',
-  '$time',
-  'distinct_id',
+  '$device_type',
 ]);
 
 export function isAnalyticsEvent(event: string): event is AnalyticsEvent {

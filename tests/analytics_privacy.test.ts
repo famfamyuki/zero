@@ -160,6 +160,68 @@ test('filterPostHogCapture passes all six custom analytics events', () => {
   }
 });
 
+test('filterPostHogCapture preserves token on custom events while stripping unallowed data', () => {
+  const result = filterPostHogCapture({
+    uuid: 'custom-token-test',
+    event: 'code_generated',
+    properties: {
+      token: 'phc_test_token',
+      distinct_id: 'anon-test',
+      $session_id: 'session-123',
+      $window_id: 'window-456',
+      secret_data: 'remove-me',
+      prompt: 'private prompt',
+      generated_code: 'def foo(): pass',
+      $current_url: 'https://example.com/editor?secret=1',
+      $referrer: 'https://secret.example.com/',
+      utm_source: 'twitter',
+    },
+  });
+  assert.notEqual(result, null);
+  assert.equal(result!.event, 'code_generated');
+  assert.equal(result!.properties.token, 'phc_test_token');
+  assert.equal(result!.properties.distinct_id, 'anon-test');
+  assert.equal(result!.properties.$session_id, 'session-123');
+  assert.equal(result!.properties.$window_id, 'window-456');
+  // Privacy verification: all unallowed user/URL properties MUST be stripped
+  assert.equal(result!.properties.secret_data, undefined);
+  assert.equal(result!.properties.prompt, undefined);
+  assert.equal(result!.properties.generated_code, undefined);
+  assert.equal(result!.properties.$current_url, undefined);
+  assert.equal(result!.properties.$referrer, undefined);
+  assert.equal(result!.properties.utm_source, undefined);
+});
+
+test('filterPostHogCapture preserves token on $pageview events while stripping unallowed data', () => {
+  const result = filterPostHogCapture({
+    uuid: 'pageview-token-test',
+    event: '$pageview',
+    properties: {
+      token: 'phc_test_token',
+      distinct_id: 'anon-test',
+      $pathname: '/templates',
+      $session_id: 'session-123',
+      $window_id: 'window-456',
+      $current_url: 'https://example.com/templates?secret=abc',
+      $referrer: 'https://private.example.com/',
+      $referring_domain: 'private.example.com',
+      utm_source: 'campaign',
+    },
+  });
+  assert.notEqual(result, null);
+  assert.equal(result!.event, '$pageview');
+  assert.equal(result!.properties.token, 'phc_test_token');
+  assert.equal(result!.properties.distinct_id, 'anon-test');
+  assert.equal(result!.properties.$pathname, '/templates');
+  assert.equal(result!.properties.$session_id, 'session-123');
+  assert.equal(result!.properties.$window_id, 'window-456');
+  // Privacy verification
+  assert.equal(result!.properties.$current_url, undefined);
+  assert.equal(result!.properties.$referrer, undefined);
+  assert.equal(result!.properties.$referring_domain, undefined);
+  assert.equal(result!.properties.utm_source, undefined);
+});
+
 test('ANALYTICS_EVENTS contains exactly the six expected events', () => {
   const expected = [
     'template_selected',
@@ -171,5 +233,3 @@ test('ANALYTICS_EVENTS contains exactly the six expected events', () => {
   ];
   assert.deepEqual([...ANALYTICS_EVENTS], expected);
 });
-
-
