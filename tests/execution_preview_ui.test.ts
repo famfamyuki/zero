@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { ExecutionPreviewEntryButton } from '../components/editor/execution-preview/ExecutionPreviewEntryButton';
 import { ExecutionPreviewPanel } from '../components/editor/execution-preview/ExecutionPreviewPanel';
-import { isNewNodeSelection, isPreviewOpenSelectionSync, resolveExecutionPreviewNavigationTarget } from '../lib/execution-preview-navigation';
+import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget, shouldIgnoreSelectionChangeForOpenPreview } from '../lib/execution-preview-navigation';
 import type { ExecutionPreviewReadModel } from '../types/execution-preview';
 import type { ExecutionPreviewState } from '../hooks/useExecutionPreview';
 import type { CustomNode } from '../types/editor';
@@ -63,11 +63,9 @@ test('duplicate React Flow selection notifications do not close a reopened Previ
   for (const type of ['task', 'agent', 'tool'] as const) {
     const selectedId = `${type}-selected`;
     assert.equal(isNewNodeSelection(selectedId, selectedId), false, `${type} Locate must tolerate the duplicate selection emitted while reopening`);
-    assert.equal(isPreviewOpenSelectionSync(selectedId, undefined), true, `${type} Locate must tolerate React Flow's transient empty selection while reopening`);
-    assert.equal(isPreviewOpenSelectionSync(selectedId, selectedId), true, `${type} Locate must tolerate React Flow restoring the selected node while reopening`);
-    assert.equal(isPreviewOpenSelectionSync(selectedId, `${type}-other`), false, `${type} Locate must not suppress a genuine new selection`);
   }
-  assert.equal(isPreviewOpenSelectionSync(null, undefined), false, 'normal empty selection is not suppressed without a reopen guard');
+  assert.equal(shouldIgnoreSelectionChangeForOpenPreview(true), true, 'React Flow selection callbacks cannot close an open or opening Preview');
+  assert.equal(shouldIgnoreSelectionChangeForOpenPreview(false), false, 'normal selection navigation remains active while Preview is closed');
   assert.equal(isNewNodeSelection(undefined, 'task-initial'), true, 'initial selection still opens Inspector');
   assert.equal(isNewNodeSelection('task-a', 'agent-b'), true, 'a genuinely different selection still navigates');
   assert.equal(isNewNodeSelection('tool-a', undefined), true, 'clearing selection still updates editor state');

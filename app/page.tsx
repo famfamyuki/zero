@@ -23,7 +23,7 @@ import type { ReadinessFinding } from '@/types/readiness';
 import { useExecutionPreview } from '@/hooks/useExecutionPreview';
 import { ExecutionPreviewPanel } from '@/components/editor/execution-preview/ExecutionPreviewPanel';
 import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
-import { isNewNodeSelection, isPreviewOpenSelectionSync, resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
+import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget, shouldIgnoreSelectionChangeForOpenPreview } from '@/lib/execution-preview-navigation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -131,7 +131,7 @@ export default function EditorPage() {
   const [readinessNotice, setReadinessNotice] = useState<string | null>(null);
   const [isExecutionPreviewOpen, setIsExecutionPreviewOpen] = useState(false);
   const [executionPreviewNotice, setExecutionPreviewNotice] = useState<string | null>(null);
-  const previewOpenSelectionGuard = useRef<string | null>(null);
+  const executionPreviewOpenRef = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -140,7 +140,7 @@ export default function EditorPage() {
   const executionPreview = useExecutionPreview(readinessGraph);
 
   useEffect(() => {
-    if (!isExecutionPreviewOpen) previewOpenSelectionGuard.current = null;
+    executionPreviewOpenRef.current = isExecutionPreviewOpen;
   }, [isExecutionPreviewOpen]);
 
   // Listen to fullscreen changes
@@ -320,8 +320,7 @@ export default function EditorPage() {
 
   // Node Selection Handler
   const handleNodeSelect = useCallback((node: CustomNode | null) => {
-    if (isPreviewOpenSelectionSync(previewOpenSelectionGuard.current, node?.id)) return;
-    previewOpenSelectionGuard.current = null;
+    if (shouldIgnoreSelectionChangeForOpenPreview(executionPreviewOpenRef.current)) return;
     if (!isNewNodeSelection(selectedNode?.id, node?.id)) return;
     setSelectedNode(node);
     if (node) {
@@ -404,7 +403,7 @@ export default function EditorPage() {
 
   const handleOpenExecutionPreview = useCallback(() => {
     const current = executionPreview.evaluateNow();
-    previewOpenSelectionGuard.current = selectedNode?.id ?? null;
+    executionPreviewOpenRef.current = true;
     setIsInspectorOpen(false);
     setIsReadinessOpen(false);
     setIsMobileSidebarOpen(false);
@@ -417,7 +416,7 @@ export default function EditorPage() {
         preview_version: '0.1.0',
       });
     }
-  }, [executionPreview, selectedNode?.id]);
+  }, [executionPreview]);
 
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
     const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);

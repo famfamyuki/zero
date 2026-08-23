@@ -10,8 +10,8 @@ export function isNewNodeSelection(currentNodeId: string | undefined, nextNodeId
   return currentNodeId !== nextNodeId;
 }
 
-export function isPreviewOpenSelectionSync(guardedNodeId: string | null, nextNodeId: string | undefined): boolean {
-  return guardedNodeId !== null && (nextNodeId === undefined || nextNodeId === guardedNodeId);
+export function shouldIgnoreSelectionChangeForOpenPreview(isPreviewOpen: boolean): boolean {
+  return isPreviewOpen;
 }
 
 export function resolveExecutionPreviewNavigationTarget(type: ExecutionPreviewTargetType, id: string | undefined, nodes: readonly CustomNode[]): ExecutionPreviewNavigationTarget {
