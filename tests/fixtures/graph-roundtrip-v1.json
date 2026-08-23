@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "nodes": [
+    {
+      "id": "agent-primary",
+      "type": "agent",
+      "position": { "x": 120.5, "y": -40 },
+      "data": {
+        "label": "Primary Agent",
+        "role": "Research Lead",
+        "goal": "Research {topic}",
+        "backstory": "A careful researcher",
+        "model": "gpt-5.6-terra",
+        "verbose": false,
+        "allowDelegation": false,
+        "maxIter": 0,
+        "maxRpm": 20,
+        "maxExecutionTime": 300,
+        "respectContextWindow": false,
+        "cache": false,
+        "futureNodeData": { "enabled": true }
+      }
+    },
+    {
+      "id": "agent-reviewer",
+      "type": "agent",
+      "position": { "x": 350, "y": 220 },
+      "data": {
+        "label": "Reviewer",
+        "role": "Quality Reviewer",
+        "goal": "Review output",
+        "backstory": "An exacting reviewer",
+        "model": "gpt-5.6-terra",
+        "verbose": true,
+        "allowDelegation": true
+      }
+    },
+    {
+      "id": "task-research",
+      "type": "task",
+      "position": { "x": 620, "y": 80 },
+      "data": {
+        "label": "Research",
+        "description": "Research {topic}",
+        "expectedOutput": "Structured findings",
+        "assignedAgentId": "agent-primary",
+        "asyncExecution": false,
+        "outputFormat": "json",
+        "outputSchema": "{\"summary\":\"string\",\"score\":\"number\"}",
+        "markdown": false,
+        "outputFile": "",
+        "humanInput": false
+      }
+    },
+    {
+      "id": "task-review",
+      "type": "task",
+      "position": { "x": 900, "y": 260 },
+      "data": {
+        "label": "Review",
+        "description": "Review findings",
+        "expectedOutput": "Approved report",
+        "assignedAgentId": "agent-reviewer",
+        "asyncExecution": false,
+        "outputFormat": "text"
+      }
+    },
+    {
+      "id": "tool-search",
+      "type": "tool",
+      "position": { "x": -180, "y": 100 },
+      "data": {
+        "label": "Search",
+        "toolType": "ScrapeWebsiteTool",
+        "description": "Search the web",
+        "parameters": { "website_url": "https://example.com/{topic}" }
+      }
+    }
+  ],
+  "edges": [
+    { "id": "edge-tool-agent", "source": "tool-search", "target": "agent-primary", "sourceHandle": "out", "targetHandle": "tools" },
+    { "id": "edge-tool-task", "source": "tool-search", "target": "task-review" },
+    { "id": "edge-agent-task", "source": "agent-primary", "target": "task-research" },
+    { "id": "edge-task-agent", "source": "task-review", "target": "agent-reviewer" },
+    { "id": "edge-task-task", "source": "task-research", "target": "task-review" }
+  ],
+  "crewConfig": {
+    "name": "Round Trip Crew",
+    "process": "hierarchical",
+    "managerLlm": "gpt-5.6-terra",
+    "verbose": false,
+    "memory": true,
+    "futureCrewSetting": "preserved"
+  }
+}

@@ -39,7 +39,7 @@ export interface ToolNodeData extends Record<string, unknown> {
 
 export type CustomNode = Node<AgentNodeData | TaskNodeData | ToolNodeData>;
 
-export interface CrewConfig {
+export interface CrewConfig extends Record<string, unknown> {
   name: string;
   process: 'sequential' | 'hierarchical';
   managerLlm?: string;
@@ -51,6 +51,35 @@ export interface GraphData {
   nodes: CustomNode[];
   edges: Edge[];
   crewConfig: CrewConfig;
+}
+
+export const GRAPH_SCHEMA_VERSION = 1 as const;
+
+export interface PersistedNode {
+  id: string;
+  type: NodeType;
+  position: { x: number; y: number };
+  data: AgentNodeData | TaskNodeData | ToolNodeData;
+}
+
+export interface PersistedEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceHandle?: string | null;
+  targetHandle?: string | null;
+}
+
+export interface GraphDocumentV1 {
+  schemaVersion: typeof GRAPH_SCHEMA_VERSION;
+  nodes: PersistedNode[];
+  edges: PersistedEdge[];
+  crewConfig: CrewConfig;
+}
+
+export interface GraphImportResult {
+  graph: GraphData;
+  migratedFromLegacy: boolean;
 }
 
 export interface WorkflowTemplate {

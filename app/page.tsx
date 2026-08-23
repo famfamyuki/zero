@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink, Upload } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
+import { deserializeGraph, serializeGraph } from '@/lib/graph-json';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -155,14 +156,12 @@ export default function EditorPage() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed: GraphData = JSON.parse(saved);
-        if (parsed.nodes && parsed.edges && Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
-          setNodes(parsed.nodes);
-          setEdges(parsed.edges);
-          if (parsed.crewConfig) setCrewConfig(parsed.crewConfig);
-          historyRef.current = [{ nodes: parsed.nodes, edges: parsed.edges }];
-          historyIndexRef.current = 0;
-        }
+        const { graph } = deserializeGraph(saved);
+        setNodes(graph.nodes);
+        setEdges(graph.edges);
+        setCrewConfig(graph.crewConfig);
+        historyRef.current = [{ nodes: graph.nodes, edges: graph.edges }];
+        historyIndexRef.current = 0;
       }
     } catch (e) {
       console.error('Failed to load active flow:', e);
@@ -180,7 +179,7 @@ export default function EditorPage() {
         edges,
         crewConfig,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+      localStorage.setItem(STORAGE_KEY, serializeGraph(dataToSave));
     } catch (e) {
       console.error('Failed to auto-save flow to localStorage:', e);
     }
@@ -227,7 +226,7 @@ export default function EditorPage() {
       setCrewConfig(template.graphData.crewConfig);
       setSelectedNode(null);
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(template.graphData));
+        localStorage.setItem(STORAGE_KEY, serializeGraph(template.graphData));
       } catch (e) {
         console.error('Failed to save preset to localStorage:', e);
       }
@@ -372,7 +371,7 @@ export default function EditorPage() {
   // Export Graph JSON
   const handleExportJson = useCallback(() => {
     const data: GraphData = { nodes, edges, crewConfig };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([serializeGraph(data)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -389,73 +388,30 @@ export default function EditorPage() {
         return;
       }
 
-      if ((nodes.length > 0 || edges.length > 0) && !window.confirm(t('replaceWorkflowConfirm'))) {
-        return;
-      }
-
       try {
-          const parsed: GraphData = JSON.parse(await file.text());
-          if (parsed && Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
-            // 1 & 2 & 3: Normalize node types and ensure data mapping
-            const normalizedNodes = parsed.nodes.map((node: any) => {
-              let type = node.type?.toLowerCase() || '';
-              if (type.includes('agent')) type = 'agent';
-              else if (type.includes('task')) type = 'task';
-              else if (type.includes('tool')) type = 'tool';
-              else type = 'agent'; // default fallback
-              
-              const data = { ...node.data };
-              
-              // Handle specific data migrations / fallbacks
-              if (type === 'agent') {
-                if (data.llm && !data.model) data.model = data.llm;
-                if (!data.model) data.model = DEFAULT_LLM_MODEL;
-                if (!data.label) data.label = data.name || 'New Agent';
-                if (data.verbose === undefined) data.verbose = true;
-                if (data.allowDelegation === undefined) data.allowDelegation = false;
-              } else if (type === 'task') {
-                if (!data.label) data.label = data.name || 'New Task';
-                if (data.asyncExecution === undefined) data.asyncExecution = false;
-              } else if (type === 'tool') {
-                if (!data.label) data.label = data.name || 'New Tool';
-              }
+        const { graph } = deserializeGraph(await file.text());
+        if ((nodes.length > 0 || edges.length > 0) && !window.confirm(t('replaceWorkflowConfirm'))) {
+          return;
+        }
+        setNodes(graph.nodes);
+        setEdges(graph.edges);
+        setCrewConfig(graph.crewConfig);
+        setSelectedNode(null);
+        historyRef.current = [{ nodes: graph.nodes, edges: graph.edges }];
+        historyIndexRef.current = 0;
 
-              return {
-                ...node,
-                type: type as NodeType,
-                data
-              };
-            });
+        try {
+          localStorage.setItem(STORAGE_KEY, serializeGraph(graph));
+        } catch (err) {
+          console.error('Failed to save imported JSON to localStorage:', err);
+        }
 
-            const newCrewConfig = parsed.crewConfig || crewConfig;
-
-            setNodes(normalizedNodes);
-            setEdges(parsed.edges);
-            if (parsed.crewConfig) setCrewConfig(parsed.crewConfig);
-            setSelectedNode(null);
-
-            // Directly sync to localStorage to guarantee immediate persistence
-            try {
-              const graphDataToSave: GraphData = {
-                nodes: normalizedNodes,
-                edges: parsed.edges,
-                crewConfig: newCrewConfig,
-              };
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(graphDataToSave));
-            } catch (err) {
-              console.error('Failed to save imported JSON to localStorage:', err);
-            }
-
-            takeSnapshot();
-            trackEvent('json_imported', { source });
-          } else {
-            alert(t('invalidWorkflowJson'));
-          }
+        trackEvent('json_imported', { source });
       } catch (err) {
         alert(t('jsonParseFailed'));
       }
     },
-    [crewConfig, edges.length, nodes.length, setNodes, setEdges, takeSnapshot, t]
+    [edges.length, nodes.length, setNodes, setEdges, t]
   );
 
   const handleImportJson = useCallback(
