@@ -35,7 +35,7 @@ export function ResourceAnalysisPanel({ isOpen, state, isRefreshing, lang, notic
 
   useEffect(() => {
     if (!isOpen) return;
-    requestAnimationFrame(() => heading.current?.focus());
+    requestAnimationFrame(() => requestAnimationFrame(() => heading.current?.focus()));
   }, [isOpen]);
 
   useEffect(() => {

@@ -12,7 +12,7 @@ export function ExecutionPreviewPanel({ isOpen, state, isRefreshing, lang, notic
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (!isOpen) return;
-    requestAnimationFrame(() => heading.current?.focus());
+    requestAnimationFrame(() => requestAnimationFrame(() => heading.current?.focus()));
   }, [isOpen]);
   useEffect(() => {
     if (!isOpen) return;

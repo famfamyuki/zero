@@ -50,7 +50,7 @@ test('panel exposes responsive identity, busy state, disclaimer, and accessible 
 test('focus, Escape, and successful Locate suppression follow the established panel contract', () => {
   const source = readFileSync('components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'utf8');
   assert.doesNotMatch(source, /document\.activeElement|previousFocus/);
-  assert.match(source, /requestAnimationFrame\(\(\) => heading\.current\?\.focus\(\)\)/);
+  assert.match(source, /requestAnimationFrame\(\(\) => requestAnimationFrame\(\(\) => heading\.current\?\.focus\(\)\)\)/);
   assert.match(source, /event\.key === 'Escape'/);
   assert.doesNotMatch(source, /locating/);
   assert.match(source, /onLocate\(target, 'hotspot'\)/);
