@@ -23,7 +23,11 @@ import type { ReadinessFinding } from '@/types/readiness';
 import { useExecutionPreview } from '@/hooks/useExecutionPreview';
 import { ExecutionPreviewPanel } from '@/components/editor/execution-preview/ExecutionPreviewPanel';
 import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
-import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget, shouldIgnoreSelectionChangeForOpenPreview } from '@/lib/execution-preview-navigation';
+import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
+import { useResourceAnalysis } from '@/hooks/useResourceAnalysis';
+import { ResourceAnalysisPanel } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
+import type { ResourceAnalysisTarget } from '@/types/resource-analysis';
+import { resolvePreflightNavigationTarget, shouldIgnoreSelectionChangeForOpenPreflight } from '@/lib/preflight-navigation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -132,16 +136,24 @@ export default function EditorPage() {
   const [isExecutionPreviewOpen, setIsExecutionPreviewOpen] = useState(false);
   const [executionPreviewNotice, setExecutionPreviewNotice] = useState<string | null>(null);
   const executionPreviewOpenRef = useRef(false);
+  const [isResourceAnalysisOpen, setIsResourceAnalysisOpen] = useState(false);
+  const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
+  const resourceAnalysisOpenRef = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const readinessGraph = useMemo<GraphData>(() => ({ nodes, edges, crewConfig }), [nodes, edges, crewConfig]);
   const readiness = useReadinessEvaluation(readinessGraph);
   const executionPreview = useExecutionPreview(readinessGraph);
+  const resourceAnalysis = useResourceAnalysis(readinessGraph);
 
   useEffect(() => {
     executionPreviewOpenRef.current = isExecutionPreviewOpen;
   }, [isExecutionPreviewOpen]);
+
+  useEffect(() => {
+    resourceAnalysisOpenRef.current = isResourceAnalysisOpen;
+  }, [isResourceAnalysisOpen]);
 
   // Listen to fullscreen changes
   useEffect(() => {
@@ -225,6 +237,8 @@ export default function EditorPage() {
           setIsInspectorOpen(true);
           setIsReadinessOpen(false);
           setIsExecutionPreviewOpen(false);
+          resourceAnalysisOpenRef.current = false;
+          setIsResourceAnalysisOpen(false);
         }
       }
     };
@@ -320,13 +334,15 @@ export default function EditorPage() {
 
   // Node Selection Handler
   const handleNodeSelect = useCallback((node: CustomNode | null) => {
-    if (shouldIgnoreSelectionChangeForOpenPreview(executionPreviewOpenRef.current)) return;
+    if (shouldIgnoreSelectionChangeForOpenPreflight(executionPreviewOpenRef.current || resourceAnalysisOpenRef.current)) return;
     if (!isNewNodeSelection(selectedNode?.id, node?.id)) return;
     setSelectedNode(node);
     if (node) {
       setIsInspectorOpen(true);
       setIsReadinessOpen(false);
       setIsExecutionPreviewOpen(false);
+      resourceAnalysisOpenRef.current = false;
+      setIsResourceAnalysisOpen(false);
     }
   }, [selectedNode?.id]);
 
@@ -388,6 +404,8 @@ export default function EditorPage() {
   const handleGenerateCode = useCallback(() => {
     trackEvent('code_generated');
     setIsExecutionPreviewOpen(false);
+    resourceAnalysisOpenRef.current = false;
+    setIsResourceAnalysisOpen(false);
     setIsCodeModalOpen(true);
   }, []);
 
@@ -397,6 +415,8 @@ export default function EditorPage() {
     setIsMobileSidebarOpen(false);
     setReadinessNotice(null);
     setIsExecutionPreviewOpen(false);
+    resourceAnalysisOpenRef.current = false;
+    setIsResourceAnalysisOpen(false);
     setIsReadinessOpen(true);
     if (current) trackEvent('readiness_opened', { status: current.status, evaluable: current.evaluable, ruleset_version: current.rulesetVersion });
   }, [readiness]);
@@ -406,6 +426,8 @@ export default function EditorPage() {
     executionPreviewOpenRef.current = true;
     setIsInspectorOpen(false);
     setIsReadinessOpen(false);
+    resourceAnalysisOpenRef.current = false;
+    setIsResourceAnalysisOpen(false);
     setIsMobileSidebarOpen(false);
     setExecutionPreviewNotice(null);
     setIsExecutionPreviewOpen(true);
@@ -418,12 +440,26 @@ export default function EditorPage() {
     }
   }, [executionPreview]);
 
+  const handleOpenResourceAnalysis = useCallback(() => {
+    resourceAnalysis.evaluateNow();
+    resourceAnalysisOpenRef.current = true;
+    executionPreviewOpenRef.current = false;
+    setIsInspectorOpen(false);
+    setIsReadinessOpen(false);
+    setIsExecutionPreviewOpen(false);
+    setIsMobileSidebarOpen(false);
+    setResourceAnalysisNotice(null);
+    setIsResourceAnalysisOpen(true);
+  }, [resourceAnalysis]);
+
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
     const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);
     if (target.kind === 'crew') {
       trackEvent('execution_preview_located', { target_type: 'crew', source });
       setSelectedNode(null);
       setIsExecutionPreviewOpen(false);
+      resourceAnalysisOpenRef.current = false;
+      setIsResourceAnalysisOpen(false);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => window.dispatchEvent(new Event('focus-manager-llm')));
@@ -440,6 +476,8 @@ export default function EditorPage() {
     setEdges((items) => items.map((item) => ({ ...item, selected: false })));
     setSelectedNode(node);
     setIsExecutionPreviewOpen(false);
+    resourceAnalysisOpenRef.current = false;
+    setIsResourceAnalysisOpen(false);
     setIsMobileSidebarOpen(false);
     setIsInspectorOpen(true);
     requestAnimationFrame(() => {
@@ -448,6 +486,38 @@ export default function EditorPage() {
     });
     return true;
   }, [executionPreview, setEdges, setNodes, t]);
+
+  const handleLocateResourceAnalysis = useCallback((resourceTarget: ResourceAnalysisTarget) => {
+    const target = resolvePreflightNavigationTarget(resourceTarget, latestNodes.current);
+    if (target.kind === 'missing') {
+      resourceAnalysis.evaluateNow();
+      setResourceAnalysisNotice(t('resourceAnalysisStaleNotice'));
+      return false;
+    }
+    resourceAnalysisOpenRef.current = false;
+    executionPreviewOpenRef.current = false;
+    setIsResourceAnalysisOpen(false);
+    setIsReadinessOpen(false);
+    setIsExecutionPreviewOpen(false);
+    setIsMobileSidebarOpen(false);
+    setIsInspectorOpen(true);
+    if (target.kind === 'crew') {
+      setNodes((items) => items.map((item) => ({ ...item, selected: false })));
+      setEdges((items) => items.map((item) => ({ ...item, selected: false })));
+      setSelectedNode(null);
+      requestAnimationFrame(() => window.dispatchEvent(new Event('focus-manager-llm')));
+      return true;
+    }
+    const node = target.node;
+    setNodes((items) => items.map((item) => ({ ...item, selected: item.id === node.id })));
+    setEdges((items) => items.map((item) => ({ ...item, selected: false })));
+    setSelectedNode(node);
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId: node.id } }));
+      window.dispatchEvent(new Event('focus-inspector-heading'));
+    });
+    return true;
+  }, [resourceAnalysis, setEdges, setNodes, t]);
 
   const handleLocateFinding = useCallback((finding: ReadinessFinding) => {
     const target = finding.target;
@@ -463,6 +533,8 @@ export default function EditorPage() {
       setEdges((items) => items.map((item) => ({ ...item, selected: false })));
       setSelectedNode(node);
       setIsReadinessOpen(false);
+      resourceAnalysisOpenRef.current = false;
+      setIsResourceAnalysisOpen(false);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => {
@@ -481,10 +553,12 @@ export default function EditorPage() {
       setNodes((items) => items.map((item) => ({ ...item, selected: false })));
       setEdges((items) => items.map((item) => ({ ...item, selected: item.id === target.edgeId })));
       setSelectedNode(null); setIsInspectorOpen(false); setIsReadinessOpen(false);
+      resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false);
       requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-flow-edge', { detail: { edgeId: target.edgeId } })));
       return;
     }
     setSelectedNode(null); setIsReadinessOpen(false); setIsMobileSidebarOpen(false); setIsInspectorOpen(true);
+    resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false);
     requestAnimationFrame(() => window.dispatchEvent(new Event('focus-inspector-heading')));
   }, [lang, readiness, setEdges, setNodes]);
 
@@ -508,6 +582,8 @@ export default function EditorPage() {
     );
     setSelectedNode(targetNode);
     setIsInspectorOpen(true);
+    resourceAnalysisOpenRef.current = false;
+    setIsResourceAnalysisOpen(false);
     setIsMobileSidebarOpen(false);
     requestAnimationFrame(() => {
       window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId } }));
@@ -621,6 +697,8 @@ export default function EditorPage() {
           setSelectedNode(null);
           setIsReadinessOpen(false);
           setIsExecutionPreviewOpen(false);
+          resourceAnalysisOpenRef.current = false;
+          setIsResourceAnalysisOpen(false);
           setIsInspectorOpen(!isInspectorOpen);
         }}
         nodeCount={nodes.length}
@@ -720,17 +798,21 @@ export default function EditorPage() {
           onOpenReadiness={handleOpenReadiness}
           isExecutionPreviewOpen={isExecutionPreviewOpen}
           onOpenExecutionPreview={handleOpenExecutionPreview}
+          isResourceAnalysisOpen={isResourceAnalysisOpen}
+          onOpenResourceAnalysis={handleOpenResourceAnalysis}
           isInspectorOpen={isInspectorOpen}
         />
 
         {/* Mobile Floating Drawer & Navigation Toolbar */}
-        {!isReadinessOpen && !isExecutionPreviewOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
+        {!isReadinessOpen && !isExecutionPreviewOpen && !isResourceAnalysisOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
               setIsInspectorOpen(false);
               setIsReadinessOpen(false);
               setIsExecutionPreviewOpen(false);
+              resourceAnalysisOpenRef.current = false;
+              setIsResourceAnalysisOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
           >
@@ -766,6 +848,8 @@ export default function EditorPage() {
               setIsMobileSidebarOpen(false);
               setIsReadinessOpen(false);
               setIsExecutionPreviewOpen(false);
+              resourceAnalysisOpenRef.current = false;
+              setIsResourceAnalysisOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
           >
@@ -775,7 +859,7 @@ export default function EditorPage() {
         </div>}
 
         {/* Dedicated Mobile Bottom Sticky Support Banner (sm:hidden) */}
-        {!isReadinessOpen && !isExecutionPreviewOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
+        {!isReadinessOpen && !isExecutionPreviewOpen && !isResourceAnalysisOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="w-7 h-7 rounded-lg bg-amber-500/20 border-amber-400/50 text-amber-300 flex items-center justify-center shrink-0 border">
               <Coffee className="w-3.5 h-3.5 shrink-0" />
@@ -815,6 +899,7 @@ export default function EditorPage() {
         <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={() => setIsReadinessOpen(false)} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
         {isReadinessOpen && readinessNotice && <div role="status" className="absolute bottom-[72dvh] right-3 z-[60] rounded-lg bg-cyan-950 px-3 py-2 text-xs text-cyan-200 md:bottom-3 md:right-[420px]">{readinessNotice}</div>}
         <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={() => setIsExecutionPreviewOpen(false)} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
+        <ResourceAnalysisPanel isOpen={isResourceAnalysisOpen} state={resourceAnalysis.state} isRefreshing={resourceAnalysis.isRefreshing} lang={lang} notice={resourceAnalysisNotice} onClose={() => { resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false); }} onRetry={resourceAnalysis.evaluateNow} onLocate={handleLocateResourceAnalysis} onOpenValidation={() => { resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}

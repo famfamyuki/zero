@@ -81,6 +81,9 @@ export const translations = {
     executionPreviewAgentTools: 'Agent tools',
     executionPreviewStaleNotice: 'Target changed. Execution Preview was refreshed.',
     resourceAnalysisTitle: 'Resource & Complexity',
+    resourceAnalysisEntry: 'Resource Analysis',
+    resourceAnalysisMobile: 'Analysis',
+    resourceAnalysisOpenLabel: 'Open Resource Analysis',
     resourceAnalysisCloseLabel: 'Close Resource Analysis',
     resourceAnalysisDisclaimer: 'Static preflight analysis. No workflow is executed or simulated, and runtime cost or timing is not predicted.',
     resourceAnalysisUpdating: 'Updating analysis…',
@@ -155,6 +158,7 @@ export const translations = {
     resourceAnalysisNone: 'None',
     resourceAnalysisYes: 'Yes',
     resourceAnalysisNo: 'No',
+    resourceAnalysisStaleNotice: 'Target changed. Resource Analysis was refreshed.',
 
     // Sidebar
     nodePalette: 'Node Palette',
@@ -325,6 +329,9 @@ export const translations = {
     executionPreviewAgentTools: 'Agent Tool',
     executionPreviewStaleNotice: '対象が変更されたため、実行プレビューを更新しました。',
     resourceAnalysisTitle: 'リソース・複雑性分析',
+    resourceAnalysisEntry: 'リソース分析',
+    resourceAnalysisMobile: '分析',
+    resourceAnalysisOpenLabel: 'リソース分析を開く',
     resourceAnalysisCloseLabel: 'リソース分析を閉じる',
     resourceAnalysisDisclaimer: '実行前の静的解析です。ワークフローの実行・シミュレーションは行わず、実行コストや所要時間も予測しません。',
     resourceAnalysisUpdating: '分析を更新中…',
@@ -399,6 +406,7 @@ export const translations = {
     resourceAnalysisNone: 'なし',
     resourceAnalysisYes: 'はい',
     resourceAnalysisNo: 'いいえ',
+    resourceAnalysisStaleNotice: '対象が変更されたため、リソース分析を更新しました。',
 
     // Sidebar
     nodePalette: 'ノードパレット',

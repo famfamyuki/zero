@@ -32,6 +32,7 @@ import { DEFAULT_LLM_MODEL } from '@/lib/models';
 import type { ReadinessStatus } from '@/types/readiness';
 import { ReadinessEntryButton } from './readiness/ReadinessEntryButton';
 import { ExecutionPreviewEntryButton } from './execution-preview/ExecutionPreviewEntryButton';
+import { ResourceAnalysisEntryButton } from './resource-analysis/ResourceAnalysisEntryButton';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -71,6 +72,8 @@ interface CanvasProps {
   onOpenReadiness: () => void;
   isExecutionPreviewOpen: boolean;
   onOpenExecutionPreview: () => void;
+  isResourceAnalysisOpen: boolean;
+  onOpenResourceAnalysis: () => void;
   isInspectorOpen: boolean;
 }
 
@@ -91,6 +94,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   onOpenReadiness,
   isExecutionPreviewOpen,
   onOpenExecutionPreview,
+  isResourceAnalysisOpen,
+  onOpenResourceAnalysis,
   isInspectorOpen,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -359,6 +364,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         <Panel position="top-right" className={`!z-[45] !m-3 flex flex-col items-end gap-2 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}>
           <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} onClick={onOpenReadiness} />
           <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} onClick={onOpenExecutionPreview} />
+          <ResourceAnalysisEntryButton lang={lang} isOpen={isResourceAnalysisOpen} onClick={onOpenResourceAnalysis} />
         </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">
