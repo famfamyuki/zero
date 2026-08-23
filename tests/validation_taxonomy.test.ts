@@ -72,6 +72,19 @@ describe('Packet C validation and error taxonomy', () => {
     let stored = '{'; let active = structuredClone(current); try { active = deserializeGraph(stored).graph; } catch {} assert.deepEqual(active, current); assert.equal(stored, '{');
     const invalidPreset = { nodes: [agent(), task('t', { description: '' })], edges: [edge('e', 'a', 't')], crewConfig: crew }; if (validateGraph(invalidPreset.nodes, invalidPreset.edges, crew).isValid) active = invalidPreset; assert.deepEqual(active, current);
   });
+  test('deserialize entry, handle, and crew object failures retain precise machine codes', () => {
+    const document = JSON.parse(serializeGraph(graph()));
+    const cases: Array<[ValidationCode, (value: any) => void]> = [
+      ['NODE_ENTRY_INVALID', (value) => { value.nodes[0] = null; }],
+      ['EDGE_ENTRY_INVALID', (value) => { value.edges[0] = null; }],
+      ['CREW_CONFIG_INVALID', (value) => { value.crewConfig = null; }],
+      ['EDGE_HANDLE_INVALID', (value) => { value.edges[0].sourceHandle = 42; }],
+    ];
+    for (const [code, mutate] of cases) {
+      const candidate = structuredClone(document); mutate(candidate);
+      assert.throws(() => deserializeGraph(JSON.stringify(candidate)), (error) => error instanceof GraphDeserializationError && error.issue.code === code, code);
+    }
+  });
   test('60-64 mixed errors/warnings/infos are separated and canonically ordered', () => {
     const g = graph(); Object.assign(g.nodes[0].data, { role: '', model: 'vendor/custom-v1' }); g.edges = [];
     const result = validateGraph(g.nodes, g.edges, crew); assert.ok(result.errors.length > 1); assert.ok(result.warnings.length > 0); assert.ok(result.infos.length > 0); assert.deepEqual(result.issues, [...result.errors, ...result.warnings, ...result.infos]);

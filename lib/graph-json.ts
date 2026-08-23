@@ -28,14 +28,17 @@ function classifyDeserializationError(error: unknown): GraphDeserializationError
   const message = error instanceof Error ? error.message : 'Invalid graph document.';
   let code: ValidationCode = 'GRAPH_DOCUMENT_ROOT_INVALID';
   let scope: ValidationIssue['scope'] = 'graph';
-  if (/nodes\[\d+\]\.id/.test(message)) { code = 'NODE_ID_INVALID'; scope = 'node'; }
+  if (/nodes\[\d+\] must be an object/.test(message)) { code = 'NODE_ENTRY_INVALID'; scope = 'node'; }
+  else if (/edges\[\d+\] must be an object/.test(message)) { code = 'EDGE_ENTRY_INVALID'; scope = 'edge'; }
+  else if (/crewConfig must be an object/.test(message)) { code = 'CREW_CONFIG_INVALID'; scope = 'crew'; }
+  else if (/nodes\[\d+\]\.id/.test(message)) { code = 'NODE_ID_INVALID'; scope = 'node'; }
   else if (/node type|nodes\[\d+\]\.type/i.test(message)) { code = 'NODE_TYPE_INVALID'; scope = 'node'; }
   else if (/nodes\[\d+\]\.position/.test(message)) { code = 'NODE_POSITION_INVALID'; scope = 'node'; }
   else if (/nodes\[\d+\]\.data/.test(message)) { code = 'NODE_DATA_INVALID'; scope = 'node'; }
   else if (/edges\[\d+\]\.id/.test(message)) { code = 'EDGE_ID_INVALID'; scope = 'edge'; }
+  else if (/Handle/.test(message)) { code = 'EDGE_HANDLE_INVALID'; scope = 'edge'; }
   else if (/edges\[\d+\]\.source/.test(message)) { code = 'EDGE_SOURCE_INVALID'; scope = 'edge'; }
   else if (/edges\[\d+\]\.target/.test(message)) { code = 'EDGE_TARGET_INVALID'; scope = 'edge'; }
-  else if (/Handle/.test(message)) { code = 'EDGE_HANDLE_INVALID'; scope = 'edge'; }
   else if (/Duplicate node ID/.test(message)) { code = 'DUPLICATE_NODE_ID'; scope = 'node'; }
   else if (/Duplicate edge ID/.test(message)) { code = 'DUPLICATE_EDGE_ID'; scope = 'edge'; }
   else if (/crewConfig\.name/.test(message)) { code = 'CREW_NAME_INVALID'; scope = 'crew'; }
