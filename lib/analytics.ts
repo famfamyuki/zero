@@ -18,6 +18,8 @@ type AnalyticsProperties = {
   };
   readiness_opened: { status: string; evaluable: boolean; ruleset_version: string };
   readiness_finding_selected: { rule_id: string; impact: string; category: string; target_scope: string };
+  execution_preview_opened: { state: 'available' | 'empty' | 'invalid'; process: 'sequential' | 'hierarchical' | 'none'; preview_version: '0.1.0' };
+  execution_preview_located: { target_type: 'task' | 'agent' | 'tool' | 'crew'; source: 'task' | 'context' | 'assigned_agent' | 'direct_tool' | 'agent_section' | 'agent_tool' | 'manager' };
 };
 
 export function trackEvent(event: 'code_generated'): void;

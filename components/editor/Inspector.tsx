@@ -28,10 +28,16 @@ export const Inspector: React.FC<InspectorProps> = ({
 }) => {
   const { t, lang } = useLanguage();
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const managerLlmRef = useRef<HTMLSelectElement>(null);
   useEffect(() => {
     const focusHeading = () => headingRef.current?.focus();
     window.addEventListener('focus-inspector-heading', focusHeading);
     return () => window.removeEventListener('focus-inspector-heading', focusHeading);
+  }, []);
+  useEffect(() => {
+    const focusManager = () => managerLlmRef.current?.focus();
+    window.addEventListener('focus-manager-llm', focusManager);
+    return () => window.removeEventListener('focus-manager-llm', focusManager);
   }, []);
 
   const containerClasses = `w-full max-w-sm md:w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/90 backdrop-blur-md p-4 pb-32 md:pb-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 absolute inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl ${
@@ -100,6 +106,7 @@ export const Inspector: React.FC<InspectorProps> = ({
               <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                 <label className="block text-xs font-medium text-slate-300 mb-1">{t('managerLlm')}</label>
                 <select
+                  ref={managerLlmRef}
                   value={isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) ? (crewConfig.managerLlm || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
                   onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
                   className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"

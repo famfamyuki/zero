@@ -31,6 +31,7 @@ import { CustomNode, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from 
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
 import type { ReadinessStatus } from '@/types/readiness';
 import { ReadinessEntryButton } from './readiness/ReadinessEntryButton';
+import { ExecutionPreviewEntryButton } from './execution-preview/ExecutionPreviewEntryButton';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -68,6 +69,8 @@ interface CanvasProps {
   readinessStatus: ReadinessStatus;
   isReadinessOpen: boolean;
   onOpenReadiness: () => void;
+  isExecutionPreviewOpen: boolean;
+  onOpenExecutionPreview: () => void;
 }
 
 export const Canvas: React.FC<CanvasProps> = ({
@@ -85,6 +88,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   readinessStatus,
   isReadinessOpen,
   onOpenReadiness,
+  isExecutionPreviewOpen,
+  onOpenExecutionPreview,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
@@ -349,8 +354,9 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
-        <Panel position="top-right" className="!m-3">
+        <Panel position="top-right" className="!m-3 flex flex-col items-end gap-2">
           <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} onClick={onOpenReadiness} />
+          <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} onClick={onOpenExecutionPreview} />
         </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">

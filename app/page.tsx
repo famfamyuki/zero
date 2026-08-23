@@ -20,6 +20,10 @@ import { validateGraph } from '@/lib/transpiler/validation';
 import { useReadinessEvaluation } from '@/hooks/useReadinessEvaluation';
 import { ReadinessPanel } from '@/components/editor/readiness/ReadinessPanel';
 import type { ReadinessFinding } from '@/types/readiness';
+import { useExecutionPreview } from '@/hooks/useExecutionPreview';
+import { ExecutionPreviewPanel } from '@/components/editor/execution-preview/ExecutionPreviewPanel';
+import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
+import { resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -125,11 +129,14 @@ export default function EditorPage() {
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
   const [isReadinessOpen, setIsReadinessOpen] = useState(false);
   const [readinessNotice, setReadinessNotice] = useState<string | null>(null);
+  const [isExecutionPreviewOpen, setIsExecutionPreviewOpen] = useState(false);
+  const [executionPreviewNotice, setExecutionPreviewNotice] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const readinessGraph = useMemo<GraphData>(() => ({ nodes, edges, crewConfig }), [nodes, edges, crewConfig]);
   const readiness = useReadinessEvaluation(readinessGraph);
+  const executionPreview = useExecutionPreview(readinessGraph);
 
   // Listen to fullscreen changes
   useEffect(() => {
@@ -212,6 +219,7 @@ export default function EditorPage() {
           setSelectedNode(target);
           setIsInspectorOpen(true);
           setIsReadinessOpen(false);
+          setIsExecutionPreviewOpen(false);
         }
       }
     };
@@ -311,6 +319,7 @@ export default function EditorPage() {
     if (node) {
       setIsInspectorOpen(true);
       setIsReadinessOpen(false);
+      setIsExecutionPreviewOpen(false);
     }
   }, []);
 
@@ -371,6 +380,7 @@ export default function EditorPage() {
   // Transpile CrewAI Python Code & Open Modal
   const handleGenerateCode = useCallback(() => {
     trackEvent('code_generated');
+    setIsExecutionPreviewOpen(false);
     setIsCodeModalOpen(true);
   }, []);
 
@@ -379,9 +389,57 @@ export default function EditorPage() {
     setIsInspectorOpen(false);
     setIsMobileSidebarOpen(false);
     setReadinessNotice(null);
+    setIsExecutionPreviewOpen(false);
     setIsReadinessOpen(true);
     if (current) trackEvent('readiness_opened', { status: current.status, evaluable: current.evaluable, ruleset_version: current.rulesetVersion });
   }, [readiness]);
+
+  const handleOpenExecutionPreview = useCallback(() => {
+    const current = executionPreview.evaluateNow();
+    setIsInspectorOpen(false);
+    setIsReadinessOpen(false);
+    setIsMobileSidebarOpen(false);
+    setExecutionPreviewNotice(null);
+    setIsExecutionPreviewOpen(true);
+    if (current.status !== 'error') {
+      trackEvent('execution_preview_opened', {
+        state: current.status,
+        process: current.status === 'available' ? current.result.process : 'none',
+        preview_version: '0.1.0',
+      });
+    }
+  }, [executionPreview]);
+
+  const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
+    const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);
+    if (target.kind === 'crew') {
+      trackEvent('execution_preview_located', { target_type: 'crew', source });
+      setSelectedNode(null);
+      setIsExecutionPreviewOpen(false);
+      setIsMobileSidebarOpen(false);
+      setIsInspectorOpen(true);
+      requestAnimationFrame(() => window.dispatchEvent(new Event('focus-manager-llm')));
+      return true;
+    }
+    if (target.kind === 'missing') {
+      executionPreview.evaluateNow();
+      setExecutionPreviewNotice(t('executionPreviewStaleNotice'));
+      return false;
+    }
+    const node = target.node;
+    trackEvent('execution_preview_located', { target_type: targetType, source });
+    setNodes((items) => items.map((item) => ({ ...item, selected: item.id === node.id })));
+    setEdges((items) => items.map((item) => ({ ...item, selected: false })));
+    setSelectedNode(node);
+    setIsExecutionPreviewOpen(false);
+    setIsMobileSidebarOpen(false);
+    setIsInspectorOpen(true);
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId: node.id } }));
+      window.dispatchEvent(new Event('focus-inspector-heading'));
+    });
+    return true;
+  }, [executionPreview, setEdges, setNodes, t]);
 
   const handleLocateFinding = useCallback((finding: ReadinessFinding) => {
     const target = finding.target;
@@ -554,6 +612,7 @@ export default function EditorPage() {
         onToggleSettings={() => {
           setSelectedNode(null);
           setIsReadinessOpen(false);
+          setIsExecutionPreviewOpen(false);
           setIsInspectorOpen(!isInspectorOpen);
         }}
         nodeCount={nodes.length}
@@ -651,15 +710,18 @@ export default function EditorPage() {
           readinessStatus={readiness.result?.status ?? 'not_evaluable'}
           isReadinessOpen={isReadinessOpen}
           onOpenReadiness={handleOpenReadiness}
+          isExecutionPreviewOpen={isExecutionPreviewOpen}
+          onOpenExecutionPreview={handleOpenExecutionPreview}
         />
 
         {/* Mobile Floating Drawer & Navigation Toolbar */}
-        {!isReadinessOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
+        {!isReadinessOpen && !isExecutionPreviewOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
               setIsInspectorOpen(false);
               setIsReadinessOpen(false);
+              setIsExecutionPreviewOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
           >
@@ -694,6 +756,7 @@ export default function EditorPage() {
               setIsInspectorOpen(!isInspectorOpen);
               setIsMobileSidebarOpen(false);
               setIsReadinessOpen(false);
+              setIsExecutionPreviewOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
           >
@@ -703,7 +766,7 @@ export default function EditorPage() {
         </div>}
 
         {/* Dedicated Mobile Bottom Sticky Support Banner (sm:hidden) */}
-        {!isReadinessOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
+        {!isReadinessOpen && !isExecutionPreviewOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="w-7 h-7 rounded-lg bg-amber-500/20 border-amber-400/50 text-amber-300 flex items-center justify-center shrink-0 border">
               <Coffee className="w-3.5 h-3.5 shrink-0" />
@@ -742,6 +805,7 @@ export default function EditorPage() {
         />
         <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={() => setIsReadinessOpen(false)} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
         {isReadinessOpen && readinessNotice && <div role="status" className="absolute bottom-[72dvh] right-3 z-[60] rounded-lg bg-cyan-950 px-3 py-2 text-xs text-cyan-200 md:bottom-3 md:right-[420px]">{readinessNotice}</div>}
+        <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={() => setIsExecutionPreviewOpen(false)} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}

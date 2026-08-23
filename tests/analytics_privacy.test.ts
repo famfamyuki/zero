@@ -8,11 +8,13 @@ import {
   filterPostHogCapture,
 } from '../lib/analytics-config';
 
-test('only the eight approved analytics events are accepted', () => {
+test('only the ten approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('template_selected'), true);
   assert.equal(isAnalyticsEvent('affiliate_clicked'), true);
   assert.equal(isAnalyticsEvent('readiness_opened'), true);
   assert.equal(isAnalyticsEvent('readiness_finding_selected'), true);
+  assert.equal(isAnalyticsEvent('execution_preview_opened'), true);
+  assert.equal(isAnalyticsEvent('execution_preview_located'), true);
   assert.equal(isAnalyticsEvent('$pageview'), false);
   assert.equal(isAnalyticsEvent('$autocapture'), false);
   assert.equal(isAnalyticsEvent('api_key_entered'), false);
@@ -150,7 +152,7 @@ test('filterPostHogCapture returns null for null input', () => {
   assert.equal(filterPostHogCapture(null), null);
 });
 
-test('filterPostHogCapture passes all eight custom analytics events', () => {
+test('filterPostHogCapture passes all ten custom analytics events', () => {
   for (const event of ANALYTICS_EVENTS) {
     const result = filterPostHogCapture({
       uuid: 'test',
@@ -233,7 +235,16 @@ test('Readiness analytics retains only domain-safe properties', () => {
   }), { rule_id: 'RDY_AGENT_UNUSED', impact: 'medium', category: 'workflow_structure', target_scope: 'node' });
 });
 
-test('ANALYTICS_EVENTS contains exactly the eight expected events', () => {
+test('Execution Preview analytics retains only approved non-content properties', () => {
+  assert.deepEqual(sanitizeAnalyticsProperties('execution_preview_opened', {
+    state: 'available', process: 'hierarchical', preview_version: '0.1.0', graph: 'private', model: 'private', url: 'private',
+  }), { state: 'available', process: 'hierarchical', preview_version: '0.1.0' });
+  assert.deepEqual(sanitizeAnalyticsProperties('execution_preview_located', {
+    target_type: 'task', source: 'context', id: 'private', label: 'private', description: 'private', output_path: 'private',
+  }), { target_type: 'task', source: 'context' });
+});
+
+test('ANALYTICS_EVENTS contains exactly the ten expected events', () => {
   const expected = [
     'template_selected',
     'json_imported',
@@ -243,6 +254,8 @@ test('ANALYTICS_EVENTS contains exactly the eight expected events', () => {
     'affiliate_clicked',
     'readiness_opened',
     'readiness_finding_selected',
+    'execution_preview_opened',
+    'execution_preview_located',
   ];
   assert.deepEqual([...ANALYTICS_EVENTS], expected);
 });
