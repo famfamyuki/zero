@@ -142,6 +142,9 @@ export default function EditorPage() {
   const [isResourceAnalysisOpen, setIsResourceAnalysisOpen] = useState(false);
   const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
   const preflightSelectionOwnerRef = useRef<PreflightSelectionOwner>(null);
+  const readinessEntryRef = useRef<HTMLButtonElement | null>(null);
+  const executionPreviewEntryRef = useRef<HTMLButtonElement | null>(null);
+  const resourceAnalysisEntryRef = useRef<HTMLButtonElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -404,7 +407,8 @@ export default function EditorPage() {
     setIsCodeModalOpen(true);
   }, []);
 
-  const handleOpenReadiness = useCallback(() => {
+  const handleOpenReadiness = useCallback((trigger: HTMLButtonElement) => {
+    readinessEntryRef.current = trigger;
     preflightSelectionOwnerRef.current = 'readiness';
     const current = readiness.evaluateNow();
     setIsInspectorOpen(false);
@@ -416,7 +420,8 @@ export default function EditorPage() {
     if (current) trackEvent('readiness_opened', { status: current.status, evaluable: current.evaluable, ruleset_version: current.rulesetVersion });
   }, [readiness]);
 
-  const handleOpenExecutionPreview = useCallback(() => {
+  const handleOpenExecutionPreview = useCallback((trigger: HTMLButtonElement) => {
+    executionPreviewEntryRef.current = trigger;
     preflightSelectionOwnerRef.current = 'execution_preview';
     const current = executionPreview.evaluateNow();
     setIsInspectorOpen(false);
@@ -434,7 +439,8 @@ export default function EditorPage() {
     }
   }, [executionPreview]);
 
-  const handleOpenResourceAnalysis = useCallback(() => {
+  const handleOpenResourceAnalysis = useCallback((trigger: HTMLButtonElement) => {
+    resourceAnalysisEntryRef.current = trigger;
     preflightSelectionOwnerRef.current = 'resource_analysis';
     resourceAnalysis.evaluateNow();
     setIsInspectorOpen(false);
@@ -444,6 +450,30 @@ export default function EditorPage() {
     setResourceAnalysisNotice(null);
     setIsResourceAnalysisOpen(true);
   }, [resourceAnalysis]);
+
+  const restoreEntryFocus = useCallback((entry: HTMLButtonElement | null) => {
+    requestAnimationFrame(() => {
+      if (entry?.isConnected) entry.focus({ preventScroll: true });
+    });
+  }, []);
+
+  const closeReadiness = useCallback(() => {
+    preflightSelectionOwnerRef.current = null;
+    setIsReadinessOpen(false);
+    restoreEntryFocus(readinessEntryRef.current);
+  }, [restoreEntryFocus]);
+
+  const closeExecutionPreview = useCallback(() => {
+    preflightSelectionOwnerRef.current = null;
+    setIsExecutionPreviewOpen(false);
+    restoreEntryFocus(executionPreviewEntryRef.current);
+  }, [restoreEntryFocus]);
+
+  const closeResourceAnalysis = useCallback(() => {
+    preflightSelectionOwnerRef.current = null;
+    setIsResourceAnalysisOpen(false);
+    restoreEntryFocus(resourceAnalysisEntryRef.current);
+  }, [restoreEntryFocus]);
 
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
     const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);
@@ -893,10 +923,10 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
-        <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={() => { preflightSelectionOwnerRef.current = null; setIsReadinessOpen(false); }} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
+        <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={closeReadiness} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
         {isReadinessOpen && readinessNotice && <div role="status" className="absolute bottom-[72dvh] right-3 z-[60] rounded-lg bg-cyan-950 px-3 py-2 text-xs text-cyan-200 md:bottom-3 md:right-[420px]">{readinessNotice}</div>}
-        <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={() => { preflightSelectionOwnerRef.current = null; setIsExecutionPreviewOpen(false); }} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
-        <ResourceAnalysisPanel isOpen={isResourceAnalysisOpen} state={resourceAnalysis.state} isRefreshing={resourceAnalysis.isRefreshing} lang={lang} notice={resourceAnalysisNotice} onClose={() => { preflightSelectionOwnerRef.current = null; setIsResourceAnalysisOpen(false); }} onRetry={resourceAnalysis.evaluateNow} onLocate={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsResourceAnalysisOpen(false); setIsCodeModalOpen(true); }} />
+        <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={closeExecutionPreview} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
+        <ResourceAnalysisPanel isOpen={isResourceAnalysisOpen} state={resourceAnalysis.state} isRefreshing={resourceAnalysis.isRefreshing} lang={lang} notice={resourceAnalysisNotice} onClose={closeResourceAnalysis} onRetry={resourceAnalysis.evaluateNow} onLocate={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsResourceAnalysisOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}

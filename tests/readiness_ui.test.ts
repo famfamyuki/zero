@@ -37,7 +37,7 @@ test('translation fallback is localized and never exposes a raw key', () => {
 
 test('entry renders all statuses with labels and accessibility state', () => {
   for (const status of ['ready', 'needs_attention', 'needs_improvement', 'not_evaluable'] as const) {
-    const html = renderToStaticMarkup(React.createElement(ReadinessEntryButton, { status, lang: 'en', isOpen: true, onClick() {} }));
+    const html = renderToStaticMarkup(React.createElement(ReadinessEntryButton, { status, lang: 'en', isOpen: true, onActivate() {} }));
     assert.match(html, /aria-expanded="true"/); assert.match(html, /aria-controls="readiness-panel"/); assert.match(html, new RegExp(readinessStatusLabel(status, 'en')));
   }
   assert.equal(readinessStatusLabel('ready', 'ja'), '準備良好');

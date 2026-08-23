@@ -32,17 +32,10 @@ const actionClass = 'min-h-11 min-w-11 rounded-lg border border-violet-700 px-3 
 export function ResourceAnalysisPanel({ isOpen, state, isRefreshing, lang, notice, onClose, onRetry, onOpenValidation, onLocate }: ResourceAnalysisPanelProps) {
   const copy = translations[lang];
   const heading = useRef<HTMLHeadingElement>(null);
-  const previousFocus = useRef<HTMLElement | null>(null);
-  const locating = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    previousFocus.current = document.activeElement as HTMLElement;
     requestAnimationFrame(() => heading.current?.focus());
-    return () => {
-      if (!locating.current) previousFocus.current?.focus();
-      locating.current = false;
-    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -55,7 +48,7 @@ export function ResourceAnalysisPanel({ isOpen, state, isRefreshing, lang, notic
   if (!isOpen) return null;
 
   const result = state?.status === 'available' ? state.result : null;
-  const locate = (target: ResourceAnalysisTarget) => { locating.current = onLocate(target, 'hotspot'); };
+  const locate = (target: ResourceAnalysisTarget) => { onLocate(target, 'hotspot'); };
   const guard = (item: ResourceAnalysisGuardValue) => item.value === null
     ? copy.resourceAnalysisNotConfigured
     : `${item.value} · ${item.source === 'configured' ? copy.resourceAnalysisConfigured : copy.resourceAnalysisCodegenDefault}`;

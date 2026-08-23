@@ -23,8 +23,8 @@ const available = (result: ExecutionPreviewReadModel): ExecutionPreviewState => 
 const panel = (state: ExecutionPreviewState, lang: 'en' | 'ja' = 'en', refreshing = false) => renderToStaticMarkup(React.createElement(ExecutionPreviewPanel, { isOpen: true, state, isRefreshing: refreshing, lang, notice: null, onClose() {}, onRetry() {}, onLocate() { return true; }, onOpenValidation() {} }));
 
 test('entry is localized and exposes expanded/control accessibility state', () => {
-  const en = renderToStaticMarkup(React.createElement(ExecutionPreviewEntryButton, { lang: 'en', isOpen: true, onClick() {} }));
-  const ja = renderToStaticMarkup(React.createElement(ExecutionPreviewEntryButton, { lang: 'ja', isOpen: false, onClick() {} }));
+  const en = renderToStaticMarkup(React.createElement(ExecutionPreviewEntryButton, { lang: 'en', isOpen: true, onActivate() {} }));
+  const ja = renderToStaticMarkup(React.createElement(ExecutionPreviewEntryButton, { lang: 'ja', isOpen: false, onActivate() {} }));
   assert.match(en, /Execution Preview/); assert.match(en, /aria-expanded="true"/); assert.match(en, /aria-controls="execution-preview-panel"/);
   assert.match(ja, /実行プレビュー/); assert.match(ja, /プラン/); assert.match(ja, /aria-label="実行プレビューを開く"/);
   const source = readFileSync('components/editor/execution-preview/ExecutionPreviewEntryButton.tsx', 'utf8');

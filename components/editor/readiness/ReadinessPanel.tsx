@@ -16,8 +16,7 @@ export function filterReadinessFindings(findings: readonly ReadinessFinding[], c
 export function ReadinessPanel({ isOpen, result, error, isRefreshing, lang, targetSummary, onClose, onRetry, onLocate, onOpenValidation }: { isOpen: boolean; result: ReadinessResult | null; error: Error | null; isRefreshing: boolean; lang: Language; targetSummary: (finding: ReadinessFinding) => string; onClose: () => void; onRetry: () => void; onLocate: (finding: ReadinessFinding) => void; onOpenValidation: () => void }) {
   const [filter, setFilter] = useState<ReadinessCategory | 'all'>('all');
   const heading = useRef<HTMLHeadingElement>(null);
-  const previousFocus = useRef<HTMLElement | null>(null);
-  useEffect(() => { if (!isOpen) return; previousFocus.current = document.activeElement as HTMLElement; requestAnimationFrame(() => heading.current?.focus()); return () => previousFocus.current?.focus(); }, [isOpen]);
+  useEffect(() => { if (!isOpen) return; requestAnimationFrame(() => heading.current?.focus()); }, [isOpen]);
   useEffect(() => { if (!isOpen) return; const close = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', close); return () => window.removeEventListener('keydown', close); }, [isOpen, onClose]);
   const findings = useMemo(() => filterReadinessFindings(result?.findings ?? [], filter), [filter, result]);
   if (!isOpen) return null;
