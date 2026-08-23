@@ -366,9 +366,9 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     const preset = PRESET_TEMPLATES.find((item) => item.id === 'repository-red-team-audit');
     assert.ok(preset);
     const project = generateProjectFiles(preset.graphData.nodes, preset.graphData.edges, preset.graphData.crewConfig);
-    assert.match(project.mainCode, /from schemas import ReleaseReportOutput7/);
-    assert.match(project.mainCode, /output_pydantic=ReleaseReportOutput7/);
-    assert.match(project.files.find((file) => file.path === 'schemas.py')?.content || '', /class ReleaseReportOutput7\(BaseModel\):/);
+    assert.match(project.mainCode, /from schemas import ReleaseReportOutput5/);
+    assert.match(project.mainCode, /output_pydantic=ReleaseReportOutput5/);
+    assert.match(project.files.find((file) => file.path === 'schemas.py')?.content || '', /class ReleaseReportOutput5\(BaseModel\):/);
     assert.ok(!project.validation.warnings.some((warning) => warning.code === 'STRUCTURED_OUTPUT_NOT_ENABLED'));
   });
 

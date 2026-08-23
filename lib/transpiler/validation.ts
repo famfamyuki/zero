@@ -1,7 +1,9 @@
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig, ValidationError, ValidationWarning, ValidationResult, ExportMode } from '@/types/editor';
 import { Edge } from '@xyflow/react';
 import { parseOutputSchema } from './output-schema';
-import { getToolParameterDefinitions } from '@/lib/tool-config';
+import { getToolParameterDefinitions, isSupportedToolType } from '@/lib/tool-config';
+
+const stableCompare = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
 
 export function toPythonIdentifier(str: string, fallback: string): string {
   const clean = (str || '').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
@@ -122,6 +124,13 @@ export function validateGraph(
         nodeId: toolNode.id,
         suggestion: 'Choose a Tool Type in the inspector before exporting.',
       });
+    } else if (!isSupportedToolType(String(data.toolType))) {
+      errors.push({
+        code: 'UNSUPPORTED_TOOL_TYPE',
+        message: `Tool "${data.label || toolNode.id}" (${toolNode.id}) uses unsupported tool type "${data.toolType}".`,
+        nodeId: toolNode.id,
+        suggestion: 'Choose a supported Tool Type before exporting.',
+      });
     }
     const allowedParameters = new Set(getToolParameterDefinitions(data.toolType).map((parameter) => parameter.key));
     Object.keys(data.parameters || {}).forEach((key) => {
@@ -186,16 +195,26 @@ export function validateGraph(
 
   // Agent Assignment Mapping & Detection of Multiple Agents per Task
   const taskAssignedAgents: Record<string, Set<string>> = {};
+  const agentConnectedTools = new Set<string>();
+  const agentAssignedTasks = new Set<string>();
   taskNodes.forEach((t) => {
     taskAssignedAgents[t.id] = new Set<string>();
     const tData = (t.data || {}) as TaskNodeData;
-    if (tData.assignedAgentId && nodeMap.has(tData.assignedAgentId)) {
-      taskAssignedAgents[t.id].add(tData.assignedAgentId);
+    if (tData.assignedAgentId) {
+      const assignedNode = nodeMap.get(tData.assignedAgentId);
+      if (!assignedNode || assignedNode.type !== 'agent') {
+        errors.push({
+          code: 'INVALID_ASSIGNED_AGENT_REFERENCE',
+          message: `Task "${tData.label || t.id}" (${t.id}) references invalid assigned Agent "${tData.assignedAgentId}".`,
+          nodeId: t.id,
+          suggestion: 'Select an existing Agent or clear the assigned Agent reference.',
+        });
+      } else {
+        taskAssignedAgents[t.id].add(tData.assignedAgentId);
+        agentAssignedTasks.add(tData.assignedAgentId);
+      }
     }
   });
-
-  const agentConnectedTools = new Set<string>();
-  const agentAssignedTasks = new Set<string>();
 
   (edges || []).forEach((edge) => {
     const sourceNode = nodeMap.get(edge.source);
@@ -219,7 +238,7 @@ export function validateGraph(
   const taskAgentMap: Record<string, string> = {};
 
   taskNodes.forEach((tNode) => {
-    const assigned = Array.from(taskAssignedAgents[tNode.id] || []);
+    const assigned = Array.from(taskAssignedAgents[tNode.id] || []).sort(stableCompare);
     const tData = (tNode.data || {}) as TaskNodeData;
     const taskLabel = tData.label || tNode.id;
 
@@ -333,11 +352,15 @@ export function validateGraph(
 
   // Topological Sort (Kahn's algorithm)
   // Queue tasks with inDegree === 0, sorted by original Y position or order
-  const getTaskY = (id: string) => nodeMap.get(id)?.position?.y || 0;
+  const getTaskY = (id: string) => {
+    const value = nodeMap.get(id)?.position?.y;
+    return Number.isFinite(value) ? Number(value) : 0;
+  };
+  const compareTasks = (a: string, b: string) => (getTaskY(a) - getTaskY(b)) || stableCompare(a, b);
   const queue: string[] = taskNodes
     .filter((t) => inDegree[t.id] === 0)
     .map((t) => t.id)
-    .sort((a, b) => getTaskY(a) - getTaskY(b));
+    .sort(compareTasks);
 
   const sortedTaskIds: string[] = [];
 
@@ -345,15 +368,13 @@ export function validateGraph(
     const currId = queue.shift()!;
     sortedTaskIds.push(currId);
 
-    const successors = Array.from(taskSuccessors[currId] || []).sort(
-      (a, b) => getTaskY(a) - getTaskY(b)
-    );
+    const successors = Array.from(taskSuccessors[currId] || []).sort(compareTasks);
 
     successors.forEach((nextId) => {
       inDegree[nextId]--;
       if (inDegree[nextId] === 0) {
         queue.push(nextId);
-        queue.sort((a, b) => getTaskY(a) - getTaskY(b));
+        queue.sort(compareTasks);
       }
     });
   }
@@ -375,7 +396,7 @@ export function validateGraph(
 
   const taskContextMap: Record<string, string[]> = {};
   taskNodes.forEach((t) => {
-    taskContextMap[t.id] = Array.from(taskPredecessors[t.id] || []);
+    taskContextMap[t.id] = Array.from(taskPredecessors[t.id] || []).sort(stableCompare);
   });
 
   // Custom Tools Check
@@ -388,10 +409,10 @@ export function validateGraph(
   }[] = [];
 
   const usedCustomClassNames = new Set<string>();
-  toolNodes.forEach((tNode, idx) => {
+  [...toolNodes].sort((a, b) => stableCompare(a.id, b.id)).forEach((tNode, idx) => {
     const data = (tNode.data || {}) as ToolNodeData;
     if (data.toolType === 'CustomTool') {
-      const baseName = data.label ? toPythonIdentifier(data.label, 'custom_tool') : `custom_tool_${idx + 1}`;
+      const baseName = toPythonIdentifier(data.label || '', 'tool');
       const classBase = toPythonClassName(data.label, `CustomTool${idx + 1}`);
       let className = classBase;
       let classSuffix = 2;

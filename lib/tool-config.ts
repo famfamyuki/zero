@@ -42,3 +42,7 @@ export const TOOL_PARAMETER_DEFINITIONS: Record<string, ToolParameterDefinition[
 export function getToolParameterDefinitions(toolType?: string): ToolParameterDefinition[] {
   return TOOL_PARAMETER_DEFINITIONS[toolType || ''] || [];
 }
+
+export function isSupportedToolType(value?: string): boolean {
+  return Boolean(value && Object.prototype.hasOwnProperty.call(TOOL_PARAMETER_DEFINITIONS, value));
+}

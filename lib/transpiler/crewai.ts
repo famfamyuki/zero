@@ -9,44 +9,15 @@ import {
   ProjectExportResult,
 } from '@/types/editor';
 import { Edge } from '@xyflow/react';
-import { DEFAULT_LLM_MODEL } from '@/lib/models';
 import {
   validateGraph,
   toPythonIdentifier,
-  toPythonClassName,
 } from './validation';
 import { parseOutputSchema } from './output-schema';
+import { createCodegenPlan, normalizeModel } from './codegen-plan';
+import { getToolParameterDefinitions } from '@/lib/tool-config';
 
-export function normalizeModel(rawModel?: string): string {
-  const model = String(rawModel || DEFAULT_LLM_MODEL).trim();
-  if (!model) return `openai/${DEFAULT_LLM_MODEL}`;
-  if (
-    model.startsWith('openai/') ||
-    model.startsWith('anthropic/') ||
-    model.startsWith('gemini/') ||
-    model.startsWith('groq/') ||
-    model.startsWith('deepseek/') ||
-    model.startsWith('ollama/')
-  ) {
-    return model;
-  }
-  const lower = model.toLowerCase();
-  if (
-    lower.startsWith('gpt-') ||
-    lower.startsWith('o1') ||
-    lower.startsWith('o3') ||
-    lower.startsWith('o4') ||
-    lower.startsWith('text-davinci') ||
-    lower.startsWith('dall-e')
-  ) {
-    return `openai/${model}`;
-  }
-  if (lower.includes('claude')) return `anthropic/${model}`;
-  if (lower.includes('gemini')) return `gemini/${model}`;
-  if (lower.includes('deepseek')) return `deepseek/${model}`;
-  if (lower.includes('llama')) return `groq/${model}`;
-  return model;
-}
+export { normalizeModel } from './codegen-plan';
 
 export function escapePythonString(str?: string): string {
   return JSON.stringify(str || '')
@@ -60,20 +31,6 @@ function escapeCrewAIInterpolation(str: string | undefined, inputVariables: stri
     escaped = escaped.replaceAll(`{{${variable}}}`, `{${variable}}`);
   });
   return escaped;
-}
-
-function allocatePythonName(base: string, used: Set<string>): string {
-  let candidate = base;
-  let suffix = 2;
-  while (used.has(candidate)) candidate = `${base}_${suffix++}`;
-  used.add(candidate);
-  return candidate;
-}
-
-function taskSchemaClassName(node: CustomNode, index: number): string {
-  const data = node.data as TaskNodeData;
-  const toolStyleName = toPythonClassName(data.label || '', `Task${index + 1}`);
-  return `${toolStyleName.replace(/Tool$/, '')}Output${index + 1}`;
 }
 
 function renderSchemaFields(data?: TaskNodeData): string {
@@ -107,7 +64,7 @@ export function getRequiredEnvVars(nodes: CustomNode[], crewConfig?: CrewConfig)
     else if (m.startsWith('deepseek/')) keys.add('DEEPSEEK_API_KEY');
   };
 
-  if (crewConfig?.process === 'hierarchical' && crewConfig.managerLlm) {
+  if (crewConfig?.process === 'hierarchical') {
     checkModel(crewConfig.managerLlm);
   }
 
@@ -148,113 +105,16 @@ export function transpileToCrewAI(
     throw new Error(`Graph validation failed:\n${errorDetails}`);
   }
 
-  const agentNodes = (nodes || []).filter((n) => n?.type === 'agent');
-  const taskNodes = (nodes || []).filter((n) => n?.type === 'task');
-  const toolNodes = (nodes || []).filter((n) => n?.type === 'tool');
-
-  // Map Predefined Tool Imports needed
-  const requiredPrebuiltTools = new Set<string>();
-  const customToolList = validation.customTools;
-
-  toolNodes.forEach((tNode) => {
-    const data = (tNode?.data || {}) as ToolNodeData;
-    if (data?.toolType && data.toolType !== 'CustomTool') {
-      requiredPrebuiltTools.add(data.toolType);
-    }
-  });
-
-  // Tool node variable names
-  const usedPythonNames = new Set<string>();
-  const toolVarNames: Record<string, string> = {};
-  toolNodes.forEach((tNode, idx) => {
-    const data = (tNode?.data || {}) as ToolNodeData;
-    if (data.toolType === 'CustomTool') {
-      const ct = customToolList.find((c) => c.id === tNode.id);
-      toolVarNames[tNode.id] = allocatePythonName(ct?.varName || `custom_tool_${idx + 1}`, usedPythonNames);
-    } else {
-      const baseName = data?.label ? toPythonIdentifier(data.label, 'tool') : 'tool';
-      toolVarNames[tNode.id] = allocatePythonName(`${baseName}_${idx + 1}`, usedPythonNames);
-    }
-  });
-
-  // Agent node variable names
-  const agentVarNames: Record<string, string> = {};
-  agentNodes.forEach((aNode, idx) => {
-    const data = (aNode?.data || {}) as AgentNodeData;
-    const baseName = data?.role ? toPythonIdentifier(data.role, 'agent') : `agent_${idx + 1}`;
-    agentVarNames[aNode.id] = allocatePythonName(`${baseName}_agent`, usedPythonNames);
-  });
-
-  // Task node variable names
-  const taskVarNames: Record<string, string> = {};
-  taskNodes.forEach((tNode, idx) => {
-    const data = (tNode?.data || {}) as TaskNodeData;
-    const baseName = data?.label ? toPythonIdentifier(data.label, 'task') : `task_${idx + 1}`;
-    taskVarNames[tNode.id] = allocatePythonName(`${baseName}_task`, usedPythonNames);
-  });
-
-  const structuredTaskSchemas: Record<string, string> = {};
-  taskNodes.forEach((tNode, idx) => {
-    if ((tNode.data as TaskNodeData).outputFormat === 'json') {
-      structuredTaskSchemas[tNode.id] = taskSchemaClassName(tNode, idx);
-    }
-  });
-
-  // Map tools to agents and tasks based on edges
-  const agentToolMap: Record<string, string[]> = {};
-  const taskToolMap: Record<string, string[]> = {};
-
-  (edges || []).forEach((edge) => {
-    const sourceNode = nodes.find((n) => n.id === edge.source);
-    const targetNode = nodes.find((n) => n.id === edge.target);
-    if (!sourceNode || !targetNode) return;
-
-    if (sourceNode.type === 'tool' && targetNode.type === 'agent') {
-      if (!agentToolMap[targetNode.id]) agentToolMap[targetNode.id] = [];
-      const varName = toolVarNames[sourceNode.id];
-      if (varName && !agentToolMap[targetNode.id].includes(varName)) {
-        agentToolMap[targetNode.id].push(varName);
-      }
-    } else if (sourceNode.type === 'tool' && targetNode.type === 'task') {
-      if (!taskToolMap[targetNode.id]) taskToolMap[targetNode.id] = [];
-      const varName = toolVarNames[sourceNode.id];
-      if (varName && !taskToolMap[targetNode.id].includes(varName)) {
-        taskToolMap[targetNode.id].push(varName);
-      }
-    }
-  });
-
-  // LLM Instance Resolution & Deduplication
-  const usedModelsMap = new Map<string, string>(); // normalizedModel -> varName
-  const agentModelNormalized: Record<string, string> = {};
-
-  agentNodes.forEach((aNode) => {
-    const data = (aNode?.data || {}) as AgentNodeData;
-    const norm = normalizeModel(data?.model);
-    agentModelNormalized[aNode.id] = norm;
-    if (!usedModelsMap.has(norm)) {
-      usedModelsMap.set(norm, '');
-    }
-  });
-
-  let managerModelNormalized = '';
-  if (crewConfig?.process === 'hierarchical') {
-    managerModelNormalized = normalizeModel(crewConfig?.managerLlm);
-    if (!usedModelsMap.has(managerModelNormalized)) {
-      usedModelsMap.set(managerModelNormalized, '');
-    }
-  }
-
-  // Name LLM variables
-  if (usedModelsMap.size === 1) {
-    const [singleModel] = Array.from(usedModelsMap.keys());
-    usedModelsMap.set(singleModel, 'llm');
-  } else {
-    usedModelsMap.forEach((_, modelStr) => {
-      const safeSuffix = modelStr.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-      usedModelsMap.set(modelStr, `llm_${safeSuffix}`);
-    });
-  }
+  const plan = createCodegenPlan(nodes, edges, crewConfig, validation);
+  const agentNodes = plan.agents;
+  const taskNodes = plan.tasksById;
+  const toolNodes = plan.tools;
+  const requiredPrebuiltTools = plan.prebuiltToolTypes;
+  const customToolList = plan.customTools;
+  const { toolVarNames, agentVarNames, taskVarNames, structuredTaskSchemas, agentToolMap, taskToolMap } = plan;
+  const usedModelsMap = new Map(plan.models.map(({ model, varName }) => [model, varName]));
+  const agentModelNormalized = plan.agentModels;
+  const managerModelNormalized = plan.managerModel;
 
   // Environment checks
   const requiredEnvVars = getRequiredEnvVars(nodes, crewConfig);
@@ -284,8 +144,8 @@ from crewai import Agent, Task, Crew, Process, LLM
       : `from pydantic import BaseModel, Field\nfrom typing import Any\n`;
   }
 
-  if (requiredPrebuiltTools.size > 0) {
-    code += `from crewai_tools import (\n    ${Array.from(requiredPrebuiltTools).sort().join(',\n    ')}\n)\n`;
+  if (requiredPrebuiltTools.length > 0) {
+    code += `from crewai_tools import (\n    ${requiredPrebuiltTools.join(',\n    ')}\n)\n`;
   }
 
   // 1. Environment & API Keys
@@ -359,8 +219,9 @@ ${renderSchemaFields(taskData)}
         code += `${varName} = ${className}()\n`;
       } else {
         const toolType = data?.toolType || 'SerperDevTool';
-        const parameters = Object.entries(data.parameters || {})
-          .filter(([key, value]) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(key) && String(value).trim())
+        const parameters = getToolParameterDefinitions(data.toolType)
+          .map(({ key }) => [key, data.parameters?.[key]] as const)
+          .filter(([, value]) => String(value || '').trim())
           .map(([key, value]) => `${key}=${escapePythonString(escapeCrewAIInterpolation(String(value), validation.inputVariables))}`)
           .join(', ');
         code += `${varName} = ${toolType}(${parameters})\n`;
@@ -428,9 +289,7 @@ ${renderSchemaFields(taskData)}
 # ------------------------------------------------------------------------------
 `;
 
-  const sortedTaskNodes = validation.sortedTaskIds
-    .map((id) => taskNodes.find((t) => t.id === id)!)
-    .filter(Boolean);
+  const sortedTaskNodes = plan.executionTasks;
 
   if (sortedTaskNodes.length === 0) {
     code += `# Warning: No Task nodes defined in graph\n`;
@@ -445,7 +304,7 @@ ${renderSchemaFields(taskData)}
         ? `tools=[${taskToolMap[tNode.id].join(', ')}],\n    `
         : '';
 
-      const predecessorIds = validation.taskContextMap[tNode.id] || [];
+      const predecessorIds = plan.taskContextMap[tNode.id] || [];
       const contextList = predecessorIds.length > 0
         ? `context=[${predecessorIds.map((pId) => taskVarNames[pId]).filter(Boolean).join(', ')}],\n    `
         : '';
@@ -480,7 +339,7 @@ ${renderSchemaFields(taskData)}
 
   let managerLlmStr = '';
   if (crewConfig?.process === 'hierarchical' && managerModelNormalized) {
-    const managerVar = usedModelsMap.get(managerModelNormalized) || 'llm';
+    const managerVar = plan.managerLlmVar;
     managerLlmStr = `\n    manager_llm=${managerVar},`;
   }
 
@@ -532,6 +391,7 @@ export function generateProjectFiles(
   }
 
   const mainCode = transpileToCrewAI(nodes, edges, crewConfig, mode, true);
+  const plan = createCodegenPlan(nodes, edges, crewConfig, validation);
 
   const files: ProjectFile[] = [];
 
@@ -584,17 +444,16 @@ from pydantic import Field
   }
 
   // 3. schemas.py
-  const taskNodes = (nodes || []).filter((n) => n?.type === 'task');
   let schemasContent = `# Pydantic Output Schemas for ${crewConfig.name}
 from pydantic import BaseModel, Field
 from typing import Any
 
 `;
 
-  taskNodes.forEach((t, idx) => {
+  plan.tasksById.forEach((t) => {
       const data = t.data as TaskNodeData;
     if (data.outputFormat === 'json') {
-      const className = taskSchemaClassName(t, idx);
+      const className = plan.structuredTaskSchemas[t.id];
       schemasContent += `class ${className}(BaseModel):
     """Structured output schema for task: ${data.label || t.id}."""
 ${renderSchemaFields(data)}
