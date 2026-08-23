@@ -452,6 +452,7 @@ export default function EditorPage() {
   }, [resourceAnalysis]);
 
   const restoreEntryFocus = useCallback((entry: HTMLButtonElement | null) => {
+    if (entry?.isConnected) entry.focus({ preventScroll: true });
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         if (entry?.isConnected) entry.focus({ preventScroll: true });

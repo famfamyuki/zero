@@ -87,7 +87,7 @@ test('parent owns normal dismiss focus restoration without panel cleanup races',
     assert.match(page, new RegExp(`const ${name}EntryRef = useRef<HTMLButtonElement \\| null>\\(null\\)`));
   }
   assert.match(page, /requestAnimationFrame\(\(\) => \{\s*requestAnimationFrame\(\(\) => \{/);
-  assert.match(page, /if \(entry\?\.isConnected\) entry\.focus\(\{ preventScroll: true \}\)/);
+  assert.equal((page.match(/if \(entry\?\.isConnected\) entry\.focus\(\{ preventScroll: true \}\)/g) ?? []).length, 2);
   assert.match(page, /onClose=\{closeReadiness\}/);
   assert.match(page, /onClose=\{closeExecutionPreview\}/);
   assert.match(page, /onClose=\{closeResourceAnalysis\}/);
