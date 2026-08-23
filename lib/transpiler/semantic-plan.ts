@@ -21,6 +21,25 @@ export type SemanticTaskAssignment =
   | { kind: 'fixed'; agentId: string }
   | { kind: 'manager_delegated'; configuredAgentId?: string };
 
+export type SemanticExecutionGuardSource = 'configured' | 'codegen_default';
+
+export interface SemanticExecutionGuard {
+  readonly value: number | null;
+  readonly source: SemanticExecutionGuardSource;
+}
+
+export interface SemanticAgentExecutionGuards {
+  readonly maxIter: SemanticExecutionGuard;
+  readonly maxRpm: SemanticExecutionGuard;
+  readonly maxExecutionTime: SemanticExecutionGuard;
+}
+
+export function normalizeExecutionGuard(rawValue: number | undefined, codegenDefault: number | null): SemanticExecutionGuard {
+  return Number.isFinite(rawValue)
+    ? { value: Math.max(1, Number(rawValue)), source: 'configured' }
+    : { value: codegenDefault, source: 'codegen_default' };
+}
+
 export interface SemanticPlan {
   process: CrewConfig['process'];
   tools: CustomNode[];
@@ -32,6 +51,7 @@ export interface SemanticPlan {
   taskToolIds: Record<string, string[]>;
   taskContextIds: Record<string, string[]>;
   agentModels: Record<string, string>;
+  agentExecutionGuards: Record<string, SemanticAgentExecutionGuards>;
   managerModel?: string;
 }
 
@@ -78,6 +98,15 @@ export function createSemanticPlan(
 
   const agentModels: Record<string, string> = {};
   agents.forEach((node) => { agentModels[node.id] = normalizeModel((node.data as AgentNodeData).model); });
+  const agentExecutionGuards: Record<string, SemanticAgentExecutionGuards> = {};
+  agents.forEach((node) => {
+    const data = node.data as AgentNodeData;
+    agentExecutionGuards[node.id] = {
+      maxIter: normalizeExecutionGuard(data.maxIter, 25),
+      maxRpm: normalizeExecutionGuard(data.maxRpm, null),
+      maxExecutionTime: normalizeExecutionGuard(data.maxExecutionTime, null),
+    };
+  });
 
   return {
     process: crewConfig.process,
@@ -90,6 +119,7 @@ export function createSemanticPlan(
     taskToolIds,
     taskContextIds,
     agentModels,
+    agentExecutionGuards,
     ...(crewConfig.process === 'hierarchical' ? { managerModel: normalizeModel(crewConfig.managerLlm) } : {}),
   };
 }

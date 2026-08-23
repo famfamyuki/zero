@@ -2,7 +2,7 @@ import { Edge } from '@xyflow/react';
 import { TOOL_PARAMETER_DEFINITIONS } from '@/lib/tool-config';
 import { AgentNodeData, CrewConfig, CustomNode, TaskNodeData, ToolNodeData, ValidationResult } from '@/types/editor';
 import { toPythonClassName, toPythonIdentifier } from './validation';
-import { createSemanticPlan, normalizeModel, SemanticPlan, SemanticTaskAssignment, stableCompare } from './semantic-plan';
+import { createSemanticPlan, normalizeModel, SemanticAgentExecutionGuards, SemanticPlan, SemanticTaskAssignment, stableCompare } from './semantic-plan';
 
 export { normalizeModel, stableCompare } from './semantic-plan';
 
@@ -41,6 +41,7 @@ export interface CodegenPlan {
   taskContextMap: Record<string, string[]>;
   taskAssignments: Record<string, SemanticTaskAssignment>;
   agentModels: Record<string, string>;
+  agentExecutionGuards: Record<string, SemanticAgentExecutionGuards>;
   models: { model: string; varName: string }[];
   managerModel: string;
   managerLlmVar: string;
@@ -100,7 +101,8 @@ export function createCodegenPlan(nodes: CustomNode[], edges: Edge[], crewConfig
   const customById = new Map(validation.customTools.map((tool) => [tool.id, tool]));
   return {
     semanticPlan, tools, agents, tasksById, executionTasks, toolVarNames, agentVarNames, taskVarNames,
-    structuredTaskSchemas, agentToolMap, taskToolMap, taskContextMap, taskAssignments: semanticPlan.taskAssignments, agentModels, models,
+    structuredTaskSchemas, agentToolMap, taskToolMap, taskContextMap, taskAssignments: semanticPlan.taskAssignments, agentModels,
+    agentExecutionGuards: semanticPlan.agentExecutionGuards, models,
     managerModel, managerLlmVar: modelVar.get(managerModel) || 'llm',
     prebuiltToolTypes: Array.from(new Set(tools.map((node) => (node.data as ToolNodeData).toolType).filter((type) => type !== 'CustomTool' && TOOL_PARAMETER_DEFINITIONS[type]))).sort(stableCompare),
     customTools: tools.flatMap((node) => customById.get(node.id) ? [customById.get(node.id)!] : []),

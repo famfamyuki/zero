@@ -263,6 +263,7 @@ ${renderSchemaFields(taskData)}
 
       const normModel = agentModelNormalized[aNode.id];
       const llmVarName = usedModelsMap.get(normModel) || 'llm';
+      const executionGuards = plan.agentExecutionGuards[aNode.id];
 
       code += `${varName} = Agent(
     role=${escapePythonString(escapeCrewAIInterpolation(data?.role || 'AI Agent', validation.inputVariables))},
@@ -272,9 +273,9 @@ ${renderSchemaFields(taskData)}
     allow_delegation=${data?.allowDelegation ? 'True' : 'False'},
     tools=${toolsList},
     llm=${llmVarName},
-    max_iter=${Number.isFinite(data?.maxIter) ? Math.max(1, Number(data.maxIter)) : 25},
-    max_rpm=${Number.isFinite(data?.maxRpm) ? Math.max(1, Number(data.maxRpm)) : 'None'},
-    max_execution_time=${Number.isFinite(data?.maxExecutionTime) ? Math.max(1, Number(data.maxExecutionTime)) : 'None'},
+    max_iter=${executionGuards.maxIter.value},
+    max_rpm=${executionGuards.maxRpm.value ?? 'None'},
+    max_execution_time=${executionGuards.maxExecutionTime.value ?? 'None'},
     respect_context_window=${data?.respectContextWindow !== false ? 'True' : 'False'},
     cache=${data?.cache !== false ? 'True' : 'False'}
 )

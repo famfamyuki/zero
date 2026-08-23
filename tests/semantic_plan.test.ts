@@ -1,12 +1,12 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Edge } from '@xyflow/react';
-import { CrewConfig, CustomNode } from '../types/editor';
+import { AgentNodeData, CrewConfig, CustomNode } from '../types/editor';
 import { createSemanticPlan, normalizeModel } from '../lib/transpiler/semantic-plan';
 import { validateGraph } from '../lib/transpiler/validation';
 
 const sequential: CrewConfig = { name: 'Plan', process: 'sequential', verbose: true, memory: false };
-const agent = (id: string, model = 'gpt-5.6-terra'): CustomNode => ({ id, type: 'agent', position: { x: 0, y: 0 }, data: { label: id, role: id, goal: 'Work', backstory: 'Expert', model, verbose: true, allowDelegation: false } });
+const agent = (id: string, model = 'gpt-5.6-terra', guards: Partial<Pick<AgentNodeData, 'maxIter' | 'maxRpm' | 'maxExecutionTime'>> = {}): CustomNode => ({ id, type: 'agent', position: { x: 0, y: 0 }, data: { label: id, role: id, goal: 'Work', backstory: 'Expert', model, verbose: true, allowDelegation: false, ...guards } });
 const task = (id: string, assignedAgentId?: string): CustomNode => ({ id, type: 'task', position: { x: 0, y: 0 }, data: { label: id, description: 'Work', expectedOutput: 'Result', assignedAgentId, asyncExecution: false } });
 const tool = (id: string): CustomNode => ({ id, type: 'tool', position: { x: 0, y: 0 }, data: { label: id, toolType: 'FileReadTool', description: 'Read' } });
 const edge = (id: string, source: string, target: string): Edge => ({ id, source, target });
@@ -54,6 +54,51 @@ describe('EPV-A SemanticPlan boundary', () => {
     assert.equal(plan.managerModel, undefined);
     const hierarchical = create(nodes, [edge('1', 'agent-a', 'task-a')], { ...sequential, process: 'hierarchical' });
     assert.equal(hierarchical.managerModel, normalizeModel(undefined));
+  });
+
+  test('provides effective execution guard defaults and configured sources for every agent', () => {
+    const nodes = [
+      agent('defaults'),
+      agent('configured', 'gpt-5.6-terra', { maxIter: 10, maxRpm: 20, maxExecutionTime: 60 }),
+      task('task-a'),
+    ];
+    const plan = create(nodes, [], { ...sequential, process: 'hierarchical' });
+    assert.deepEqual(plan.agentExecutionGuards.defaults, {
+      maxIter: { value: 25, source: 'codegen_default' },
+      maxRpm: { value: null, source: 'codegen_default' },
+      maxExecutionTime: { value: null, source: 'codegen_default' },
+    });
+    assert.deepEqual(plan.agentExecutionGuards.configured, {
+      maxIter: { value: 10, source: 'configured' },
+      maxRpm: { value: 20, source: 'configured' },
+      maxExecutionTime: { value: 60, source: 'configured' },
+    });
+  });
+
+  test('preserves renderer normalization for zero, negative, decimal, and non-finite guard values', () => {
+    const nodes = [
+      agent('bounded', 'gpt-5.6-terra', { maxIter: 0, maxRpm: -4, maxExecutionTime: 0.5 }),
+      agent('non-finite', 'gpt-5.6-terra', { maxIter: Number.NaN, maxRpm: Number.POSITIVE_INFINITY, maxExecutionTime: Number.NEGATIVE_INFINITY }),
+      task('task-a'),
+    ];
+    const plan = create(nodes, [], { ...sequential, process: 'hierarchical' });
+    assert.deepEqual(plan.agentExecutionGuards.bounded, {
+      maxIter: { value: 1, source: 'configured' },
+      maxRpm: { value: 1, source: 'configured' },
+      maxExecutionTime: { value: 1, source: 'configured' },
+    });
+    assert.deepEqual(plan.agentExecutionGuards['non-finite'], {
+      maxIter: { value: 25, source: 'codegen_default' },
+      maxRpm: { value: null, source: 'codegen_default' },
+      maxExecutionTime: { value: null, source: 'codegen_default' },
+    });
+
+    const decimal = create([agent('decimal', 'gpt-5.6-terra', { maxIter: 2.5, maxRpm: 3.25, maxExecutionTime: 4.75 }), task('task-b')], [], { ...sequential, process: 'hierarchical' });
+    assert.deepEqual(decimal.agentExecutionGuards.decimal, {
+      maxIter: { value: 2.5, source: 'configured' },
+      maxRpm: { value: 3.25, source: 'configured' },
+      maxExecutionTime: { value: 4.75, source: 'configured' },
+    });
   });
 
   test('is insertion-order independent, repeated-call deterministic, and does not mutate inputs', () => {

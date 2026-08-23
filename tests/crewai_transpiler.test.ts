@@ -291,6 +291,19 @@ describe('CrewAI Exporter & Graph Validation Test Suite', () => {
     assertValidPythonSyntax(customToolFile.content);
   });
 
+  test('11a. Execution guards preserve default, configured, bounded, and decimal codegen semantics', () => {
+    const { nodes, edges, crewConfig } = createSampleGraph();
+    const configuredNodes = nodes.map((node) => node.id === 'agent-1'
+      ? { ...node, data: { ...node.data, maxIter: 0, maxRpm: -2, maxExecutionTime: 4.5 } }
+      : node) as CustomNode[];
+
+    for (const config of [crewConfig, { ...crewConfig, process: 'hierarchical' as const }]) {
+      const code = transpileToCrewAI(configuredNodes, edges, config, 'scaffold');
+      assert.match(code, /max_iter=1,\n    max_rpm=1,\n    max_execution_time=4\.5/);
+      assert.match(code, /max_iter=25,\n    max_rpm=None,\n    max_execution_time=None/);
+    }
+  });
+
   test('14. Validation errors never produce misleading or downloadable project files', () => {
     const { nodes, edges, crewConfig } = createSampleGraph();
     const invalidEdges: Edge[] = [
