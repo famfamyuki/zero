@@ -27,6 +27,8 @@ test('entry is localized and exposes expanded/control accessibility state', () =
   const ja = renderToStaticMarkup(React.createElement(ExecutionPreviewEntryButton, { lang: 'ja', isOpen: false, onClick() {} }));
   assert.match(en, /Execution Preview/); assert.match(en, /aria-expanded="true"/); assert.match(en, /aria-controls="execution-preview-panel"/);
   assert.match(ja, /実行プレビュー/); assert.match(ja, /プラン/); assert.match(ja, /aria-label="実行プレビューを開く"/);
+  const source = readFileSync('components/editor/execution-preview/ExecutionPreviewEntryButton.tsx', 'utf8');
+  assert.match(source, /onPointerDown=.*stopPropagation/); assert.match(source, /onClick=.*stopPropagation/);
 });
 
 test('sequential panel preserves order, context, direct vs Agent tools, async facts and task metadata', () => {
