@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNodesState, useEdgesState, Edge } from '@xyflow/react';
 import confetti from 'canvas-confetti';
 import { Header } from '@/components/editor/Header';
@@ -17,6 +17,9 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
 import { deserializeGraph, GraphDeserializationError, serializeGraph } from '@/lib/graph-json';
 import { validateGraph } from '@/lib/transpiler/validation';
+import { useReadinessEvaluation } from '@/hooks/useReadinessEvaluation';
+import { ReadinessPanel } from '@/components/editor/readiness/ReadinessPanel';
+import type { ReadinessFinding } from '@/types/readiness';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -120,9 +123,13 @@ export default function EditorPage() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
+  const [isReadinessOpen, setIsReadinessOpen] = useState(false);
+  const [readinessNotice, setReadinessNotice] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
+  const readinessGraph = useMemo<GraphData>(() => ({ nodes, edges, crewConfig }), [nodes, edges, crewConfig]);
+  const readiness = useReadinessEvaluation(readinessGraph);
 
   // Listen to fullscreen changes
   useEffect(() => {
@@ -204,6 +211,7 @@ export default function EditorPage() {
         if (target) {
           setSelectedNode(target);
           setIsInspectorOpen(true);
+          setIsReadinessOpen(false);
         }
       }
     };
@@ -302,6 +310,7 @@ export default function EditorPage() {
     setSelectedNode(node);
     if (node) {
       setIsInspectorOpen(true);
+      setIsReadinessOpen(false);
     }
   }, []);
 
@@ -364,6 +373,62 @@ export default function EditorPage() {
     trackEvent('code_generated');
     setIsCodeModalOpen(true);
   }, []);
+
+  const handleOpenReadiness = useCallback(() => {
+    const current = readiness.evaluateNow();
+    setIsInspectorOpen(false);
+    setIsMobileSidebarOpen(false);
+    setReadinessNotice(null);
+    setIsReadinessOpen(true);
+    if (current) trackEvent('readiness_opened', { status: current.status, evaluable: current.evaluable, ruleset_version: current.rulesetVersion });
+  }, [readiness]);
+
+  const handleLocateFinding = useCallback((finding: ReadinessFinding) => {
+    const target = finding.target;
+    trackEvent('readiness_finding_selected', { rule_id: finding.ruleId, impact: finding.impact, category: finding.category, target_scope: target.scope });
+    if (target.nodeId) {
+      const node = latestNodes.current.find((item) => item.id === target.nodeId);
+      if (!node) {
+        readiness.evaluateNow();
+        setReadinessNotice(lang === 'ja' ? '対象が変更されたため、Readinessを更新しました。' : 'Target changed. Readiness was refreshed.');
+        return;
+      }
+      setNodes((items) => items.map((item) => ({ ...item, selected: item.id === target.nodeId })));
+      setEdges((items) => items.map((item) => ({ ...item, selected: false })));
+      setSelectedNode(node);
+      setIsReadinessOpen(false);
+      setIsMobileSidebarOpen(false);
+      setIsInspectorOpen(true);
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId: target.nodeId } }));
+        window.dispatchEvent(new Event('focus-inspector-heading'));
+      });
+      return;
+    }
+    if (target.edgeId) {
+      const edge = latestEdges.current.find((item) => item.id === target.edgeId);
+      if (!edge) {
+        readiness.evaluateNow();
+        setReadinessNotice(lang === 'ja' ? '対象が変更されたため、Readinessを更新しました。' : 'Target changed. Readiness was refreshed.');
+        return;
+      }
+      setNodes((items) => items.map((item) => ({ ...item, selected: false })));
+      setEdges((items) => items.map((item) => ({ ...item, selected: item.id === target.edgeId })));
+      setSelectedNode(null); setIsInspectorOpen(false); setIsReadinessOpen(false);
+      requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-flow-edge', { detail: { edgeId: target.edgeId } })));
+      return;
+    }
+    setSelectedNode(null); setIsReadinessOpen(false); setIsMobileSidebarOpen(false); setIsInspectorOpen(true);
+    requestAnimationFrame(() => window.dispatchEvent(new Event('focus-inspector-heading')));
+  }, [lang, readiness, setEdges, setNodes]);
+
+  const readinessTargetSummary = useCallback((finding: ReadinessFinding) => {
+    const target = finding.target;
+    if (target.nodeId) return `${latestNodes.current.find((node) => node.id === target.nodeId)?.data.label || target.nodeId}${target.field ? ` · ${target.field}` : ''}`;
+    if (target.edgeId) { const edge = latestEdges.current.find((item) => item.id === target.edgeId); return edge ? `${edge.source} → ${edge.target}` : target.edgeId; }
+    if (target.field) return `Crew Config · ${target.field}`;
+    return lang === 'ja' ? 'ワークフロー全体' : 'Whole workflow';
+  }, [lang]);
 
   const handleEditExportError = useCallback((nodeId?: string) => {
     setIsCodeModalOpen(false);
@@ -488,6 +553,7 @@ export default function EditorPage() {
         onLoadPreset={handleLoadPreset}
         onToggleSettings={() => {
           setSelectedNode(null);
+          setIsReadinessOpen(false);
           setIsInspectorOpen(!isInspectorOpen);
         }}
         nodeCount={nodes.length}
@@ -582,14 +648,18 @@ export default function EditorPage() {
           onNodeDragStop={takeSnapshot}
           toggleFullscreen={toggleFullscreen}
           isFullscreen={isFullscreen}
+          readinessStatus={readiness.result?.status ?? 'not_evaluable'}
+          isReadinessOpen={isReadinessOpen}
+          onOpenReadiness={handleOpenReadiness}
         />
 
         {/* Mobile Floating Drawer & Navigation Toolbar */}
-        <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
+        {!isReadinessOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
               setIsInspectorOpen(false);
+              setIsReadinessOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
           >
@@ -623,16 +693,17 @@ export default function EditorPage() {
             onClick={() => {
               setIsInspectorOpen(!isInspectorOpen);
               setIsMobileSidebarOpen(false);
+              setIsReadinessOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
           >
             <Sliders className="w-3.5 h-3.5 text-slate-300 shrink-0" />
             <span className="shrink-0">{t('mobileInspector') || 'Inspector'}</span>
           </button>
-        </div>
+        </div>}
 
         {/* Dedicated Mobile Bottom Sticky Support Banner (sm:hidden) */}
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
+        {!isReadinessOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="w-7 h-7 rounded-lg bg-amber-500/20 border-amber-400/50 text-amber-300 flex items-center justify-center shrink-0 border">
               <Coffee className="w-3.5 h-3.5 shrink-0" />
@@ -657,7 +728,7 @@ export default function EditorPage() {
             <span className="shrink-0">Buy me a coffee</span>
             <ExternalLink className="w-3 h-3 shrink-0" />
           </a>
-        </div>
+        </div>}
 
         {/* Right Parameter Inspector Panel */}
         <Inspector
@@ -669,6 +740,8 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
+        <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={() => setIsReadinessOpen(false)} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
+        {isReadinessOpen && readinessNotice && <div role="status" className="absolute bottom-[72dvh] right-3 z-[60] rounded-lg bg-cyan-950 px-3 py-2 text-xs text-cyan-200 md:bottom-3 md:right-[420px]">{readinessNotice}</div>}
       </div>
 
       {/* Transpiled Python Code Export Modal */}

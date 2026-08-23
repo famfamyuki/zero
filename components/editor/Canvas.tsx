@@ -29,6 +29,8 @@ import { TaskNode } from './nodes/TaskNode';
 import { ToolNode } from './nodes/ToolNode';
 import { CustomNode, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
+import type { ReadinessStatus } from '@/types/readiness';
+import { ReadinessEntryButton } from './readiness/ReadinessEntryButton';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -63,6 +65,9 @@ interface CanvasProps {
   onNodeDragStop?: any;
   toggleFullscreen: () => void;
   isFullscreen: boolean;
+  readinessStatus: ReadinessStatus;
+  isReadinessOpen: boolean;
+  onOpenReadiness: () => void;
 }
 
 export const Canvas: React.FC<CanvasProps> = ({
@@ -77,6 +82,9 @@ export const Canvas: React.FC<CanvasProps> = ({
   onNodeDragStop,
   toggleFullscreen,
   isFullscreen,
+  readinessStatus,
+  isReadinessOpen,
+  onOpenReadiness,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
@@ -185,6 +193,20 @@ export const Canvas: React.FC<CanvasProps> = ({
     return () => window.removeEventListener('focus-flow-node', handleFocusNode);
   }, [nodes, reactFlowInstance]);
 
+  useEffect(() => {
+    const handleFocusEdge = (event: Event) => {
+      const edgeId = (event as CustomEvent<{ edgeId?: string }>).detail?.edgeId;
+      if (!edgeId || !reactFlowInstance) return;
+      const edge = edges.find((item) => item.id === edgeId);
+      if (!edge) return;
+      const endpoints = nodes.filter((node) => node.id === edge.source || node.id === edge.target);
+      if (endpoints.length) void reactFlowInstance.fitView({ nodes: endpoints, padding: 0.35, duration: 450 });
+      requestAnimationFrame(() => reactFlowWrapper.current?.focus());
+    };
+    window.addEventListener('focus-flow-edge', handleFocusEdge);
+    return () => window.removeEventListener('focus-flow-edge', handleFocusEdge);
+  }, [edges, nodes, reactFlowInstance]);
+
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge({ ...params, ...defaultEdgeOptions }, eds)),
     [setEdges]
@@ -287,7 +309,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     : 'Fullscreen';
 
   return (
-    <div className="w-full h-full flex-1 relative bg-slate-950 touch-none" ref={reactFlowWrapper}>
+    <div className="w-full h-full flex-1 relative bg-slate-950 touch-none outline-none" ref={reactFlowWrapper} tabIndex={-1} aria-label={lang === 'ja' ? 'ワークフローキャンバス' : 'Workflow canvas'}>
       {/* Mobile Touch Guidance Tip */}
       <div className="md:hidden absolute top-3 left-3 z-20 pointer-events-none bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] text-slate-300 shadow-lg flex items-center gap-1.5">
         <span className="text-amber-400 font-bold">💡</span>
@@ -327,6 +349,9 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
+        <Panel position="top-right" className="!m-3">
+          <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} onClick={onOpenReadiness} />
+        </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">
           <div className="agentgraph-edge-legend" aria-label={lang === 'ja' ? '接続線の凡例' : 'Connection legend'}>

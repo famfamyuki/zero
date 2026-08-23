@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Sliders, Bot, CheckSquare, Wrench, Settings, Trash2, Sparkles, ExternalLink, X } from 'lucide-react';
 import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig } from '@/types/editor';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -27,6 +27,12 @@ export const Inspector: React.FC<InspectorProps> = ({
   onClose,
 }) => {
   const { t, lang } = useLanguage();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    const focusHeading = () => headingRef.current?.focus();
+    window.addEventListener('focus-inspector-heading', focusHeading);
+    return () => window.removeEventListener('focus-inspector-heading', focusHeading);
+  }, []);
 
   const containerClasses = `w-full max-w-sm md:w-80 border-l border-slate-800 bg-slate-950/95 md:bg-slate-950/90 backdrop-blur-md p-4 pb-32 md:pb-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-40 absolute inset-y-0 right-0 transition-transform duration-300 ease-in-out shadow-2xl ${
     isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -47,7 +53,7 @@ export const Inspector: React.FC<InspectorProps> = ({
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2 text-slate-400">
               <Settings className="w-4 h-4 text-indigo-400" />
-              <h3 className="text-xs font-bold uppercase tracking-wider">{t('crewGlobalConfig')}</h3>
+              <h3 ref={headingRef} tabIndex={-1} className="text-xs font-bold uppercase tracking-wider outline-none">{t('crewGlobalConfig')}</h3>
             </div>
             {onClose && (
               <button
@@ -151,7 +157,7 @@ export const Inspector: React.FC<InspectorProps> = ({
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-indigo-400" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <h3 ref={headingRef} tabIndex={-1} className="text-xs font-bold uppercase tracking-wider text-slate-200 outline-none">
                 {t('nodeInspector')} ({selectedNode.type})
               </h3>
             </div>

@@ -16,6 +16,8 @@ type AnalyticsProperties = {
     provider: 'conoha';
     placement: 'editor_mobile' | 'templates_header' | 'templates_mobile' | 'code_export';
   };
+  readiness_opened: { status: string; evaluable: boolean; ruleset_version: string };
+  readiness_finding_selected: { rule_id: string; impact: string; category: string; target_scope: string };
 };
 
 export function trackEvent(event: 'code_generated'): void;
