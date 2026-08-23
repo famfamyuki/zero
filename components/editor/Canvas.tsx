@@ -102,6 +102,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [isOverview, setIsOverview] = useState(false);
   const { lang } = useLanguage();
+  const isPreflightOpen = isReadinessOpen || isExecutionPreviewOpen || isResourceAnalysisOpen;
 
   const selectedNodeId = useMemo(
     () => nodes.find((node) => node.selected)?.id ?? null,
@@ -361,10 +362,10 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
-        <Panel position="top-right" className={`!z-[45] !m-3 flex flex-col items-end gap-2 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}>
-          <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} onClick={onOpenReadiness} />
-          <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} onClick={onOpenExecutionPreview} />
-          <ResourceAnalysisEntryButton lang={lang} isOpen={isResourceAnalysisOpen} onClick={onOpenResourceAnalysis} />
+        <Panel position="top-right" className={`!z-[60] flex items-end gap-2 ${isPreflightOpen ? '!top-auto !right-2 !bottom-[calc(78dvh+0.5rem)] !m-0 max-w-[calc(100vw-1rem)] flex-row overflow-x-auto md:!top-3 md:!right-[412px] md:!bottom-auto md:max-w-none md:flex-col md:overflow-visible lg:!right-[432px]' : `!m-3 flex-col ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}`}>
+          <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} compact={isPreflightOpen} onClick={onOpenReadiness} />
+          <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} compact={isPreflightOpen} onClick={onOpenExecutionPreview} />
+          <ResourceAnalysisEntryButton lang={lang} isOpen={isResourceAnalysisOpen} compact={isPreflightOpen} onClick={onOpenResourceAnalysis} />
         </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">

@@ -27,7 +27,11 @@ import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '@/l
 import { useResourceAnalysis } from '@/hooks/useResourceAnalysis';
 import { ResourceAnalysisPanel } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
 import type { ResourceAnalysisTarget } from '@/types/resource-analysis';
-import { resolvePreflightNavigationTarget, shouldIgnoreSelectionChangeForOpenPreflight } from '@/lib/preflight-navigation';
+import {
+  resolvePreflightNavigationTarget,
+  shouldIgnoreSelectionChangeForOpenPreflight,
+  type PreflightSelectionOwner,
+} from '@/lib/preflight-navigation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -135,10 +139,9 @@ export default function EditorPage() {
   const [readinessNotice, setReadinessNotice] = useState<string | null>(null);
   const [isExecutionPreviewOpen, setIsExecutionPreviewOpen] = useState(false);
   const [executionPreviewNotice, setExecutionPreviewNotice] = useState<string | null>(null);
-  const executionPreviewOpenRef = useRef(false);
   const [isResourceAnalysisOpen, setIsResourceAnalysisOpen] = useState(false);
   const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
-  const resourceAnalysisOpenRef = useRef(false);
+  const preflightSelectionOwnerRef = useRef<PreflightSelectionOwner>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -146,14 +149,6 @@ export default function EditorPage() {
   const readiness = useReadinessEvaluation(readinessGraph);
   const executionPreview = useExecutionPreview(readinessGraph);
   const resourceAnalysis = useResourceAnalysis(readinessGraph);
-
-  useEffect(() => {
-    executionPreviewOpenRef.current = isExecutionPreviewOpen;
-  }, [isExecutionPreviewOpen]);
-
-  useEffect(() => {
-    resourceAnalysisOpenRef.current = isResourceAnalysisOpen;
-  }, [isResourceAnalysisOpen]);
 
   // Listen to fullscreen changes
   useEffect(() => {
@@ -233,11 +228,11 @@ export default function EditorPage() {
       if (nodeId) {
         const target = nodes.find((n) => n.id === nodeId);
         if (target) {
+          preflightSelectionOwnerRef.current = null;
           setSelectedNode(target);
           setIsInspectorOpen(true);
           setIsReadinessOpen(false);
           setIsExecutionPreviewOpen(false);
-          resourceAnalysisOpenRef.current = false;
           setIsResourceAnalysisOpen(false);
         }
       }
@@ -334,14 +329,13 @@ export default function EditorPage() {
 
   // Node Selection Handler
   const handleNodeSelect = useCallback((node: CustomNode | null) => {
-    if (shouldIgnoreSelectionChangeForOpenPreflight(executionPreviewOpenRef.current || resourceAnalysisOpenRef.current)) return;
+    if (shouldIgnoreSelectionChangeForOpenPreflight(preflightSelectionOwnerRef.current)) return;
     if (!isNewNodeSelection(selectedNode?.id, node?.id)) return;
     setSelectedNode(node);
     if (node) {
       setIsInspectorOpen(true);
       setIsReadinessOpen(false);
       setIsExecutionPreviewOpen(false);
-      resourceAnalysisOpenRef.current = false;
       setIsResourceAnalysisOpen(false);
     }
   }, [selectedNode?.id]);
@@ -402,31 +396,31 @@ export default function EditorPage() {
 
   // Transpile CrewAI Python Code & Open Modal
   const handleGenerateCode = useCallback(() => {
+    preflightSelectionOwnerRef.current = null;
     trackEvent('code_generated');
+    setIsReadinessOpen(false);
     setIsExecutionPreviewOpen(false);
-    resourceAnalysisOpenRef.current = false;
     setIsResourceAnalysisOpen(false);
     setIsCodeModalOpen(true);
   }, []);
 
   const handleOpenReadiness = useCallback(() => {
+    preflightSelectionOwnerRef.current = 'readiness';
     const current = readiness.evaluateNow();
     setIsInspectorOpen(false);
     setIsMobileSidebarOpen(false);
     setReadinessNotice(null);
     setIsExecutionPreviewOpen(false);
-    resourceAnalysisOpenRef.current = false;
     setIsResourceAnalysisOpen(false);
     setIsReadinessOpen(true);
     if (current) trackEvent('readiness_opened', { status: current.status, evaluable: current.evaluable, ruleset_version: current.rulesetVersion });
   }, [readiness]);
 
   const handleOpenExecutionPreview = useCallback(() => {
+    preflightSelectionOwnerRef.current = 'execution_preview';
     const current = executionPreview.evaluateNow();
-    executionPreviewOpenRef.current = true;
     setIsInspectorOpen(false);
     setIsReadinessOpen(false);
-    resourceAnalysisOpenRef.current = false;
     setIsResourceAnalysisOpen(false);
     setIsMobileSidebarOpen(false);
     setExecutionPreviewNotice(null);
@@ -441,9 +435,8 @@ export default function EditorPage() {
   }, [executionPreview]);
 
   const handleOpenResourceAnalysis = useCallback(() => {
+    preflightSelectionOwnerRef.current = 'resource_analysis';
     resourceAnalysis.evaluateNow();
-    resourceAnalysisOpenRef.current = true;
-    executionPreviewOpenRef.current = false;
     setIsInspectorOpen(false);
     setIsReadinessOpen(false);
     setIsExecutionPreviewOpen(false);
@@ -455,10 +448,10 @@ export default function EditorPage() {
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
     const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);
     if (target.kind === 'crew') {
+      preflightSelectionOwnerRef.current = null;
       trackEvent('execution_preview_located', { target_type: 'crew', source });
       setSelectedNode(null);
       setIsExecutionPreviewOpen(false);
-      resourceAnalysisOpenRef.current = false;
       setIsResourceAnalysisOpen(false);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
@@ -471,12 +464,12 @@ export default function EditorPage() {
       return false;
     }
     const node = target.node;
+    preflightSelectionOwnerRef.current = null;
     trackEvent('execution_preview_located', { target_type: targetType, source });
     setNodes((items) => items.map((item) => ({ ...item, selected: item.id === node.id })));
     setEdges((items) => items.map((item) => ({ ...item, selected: false })));
     setSelectedNode(node);
     setIsExecutionPreviewOpen(false);
-    resourceAnalysisOpenRef.current = false;
     setIsResourceAnalysisOpen(false);
     setIsMobileSidebarOpen(false);
     setIsInspectorOpen(true);
@@ -494,8 +487,7 @@ export default function EditorPage() {
       setResourceAnalysisNotice(t('resourceAnalysisStaleNotice'));
       return false;
     }
-    resourceAnalysisOpenRef.current = false;
-    executionPreviewOpenRef.current = false;
+    preflightSelectionOwnerRef.current = null;
     setIsResourceAnalysisOpen(false);
     setIsReadinessOpen(false);
     setIsExecutionPreviewOpen(false);
@@ -529,12 +521,13 @@ export default function EditorPage() {
         setReadinessNotice(lang === 'ja' ? '対象が変更されたため、Readinessを更新しました。' : 'Target changed. Readiness was refreshed.');
         return;
       }
+      preflightSelectionOwnerRef.current = null;
       setNodes((items) => items.map((item) => ({ ...item, selected: item.id === target.nodeId })));
       setEdges((items) => items.map((item) => ({ ...item, selected: false })));
       setSelectedNode(node);
       setIsReadinessOpen(false);
-      resourceAnalysisOpenRef.current = false;
       setIsResourceAnalysisOpen(false);
+      setIsExecutionPreviewOpen(false);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => {
@@ -550,15 +543,17 @@ export default function EditorPage() {
         setReadinessNotice(lang === 'ja' ? '対象が変更されたため、Readinessを更新しました。' : 'Target changed. Readiness was refreshed.');
         return;
       }
+      preflightSelectionOwnerRef.current = null;
       setNodes((items) => items.map((item) => ({ ...item, selected: false })));
       setEdges((items) => items.map((item) => ({ ...item, selected: item.id === target.edgeId })));
       setSelectedNode(null); setIsInspectorOpen(false); setIsReadinessOpen(false);
-      resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false);
+      setIsExecutionPreviewOpen(false); setIsResourceAnalysisOpen(false);
       requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-flow-edge', { detail: { edgeId: target.edgeId } })));
       return;
     }
+    preflightSelectionOwnerRef.current = null;
     setSelectedNode(null); setIsReadinessOpen(false); setIsMobileSidebarOpen(false); setIsInspectorOpen(true);
-    resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false);
+    setIsExecutionPreviewOpen(false); setIsResourceAnalysisOpen(false);
     requestAnimationFrame(() => window.dispatchEvent(new Event('focus-inspector-heading')));
   }, [lang, readiness, setEdges, setNodes]);
 
@@ -577,12 +572,14 @@ export default function EditorPage() {
     const targetNode = nodes.find((node) => node.id === nodeId);
     if (!targetNode) return;
 
+    preflightSelectionOwnerRef.current = null;
     setNodes((currentNodes) =>
       currentNodes.map((node) => ({ ...node, selected: node.id === nodeId }))
     );
     setSelectedNode(targetNode);
     setIsInspectorOpen(true);
-    resourceAnalysisOpenRef.current = false;
+    setIsReadinessOpen(false);
+    setIsExecutionPreviewOpen(false);
     setIsResourceAnalysisOpen(false);
     setIsMobileSidebarOpen(false);
     requestAnimationFrame(() => {
@@ -694,10 +691,10 @@ export default function EditorPage() {
         onClearCanvas={handleClearCanvas}
         onLoadPreset={handleLoadPreset}
         onToggleSettings={() => {
+          preflightSelectionOwnerRef.current = null;
           setSelectedNode(null);
           setIsReadinessOpen(false);
           setIsExecutionPreviewOpen(false);
-          resourceAnalysisOpenRef.current = false;
           setIsResourceAnalysisOpen(false);
           setIsInspectorOpen(!isInspectorOpen);
         }}
@@ -807,11 +804,11 @@ export default function EditorPage() {
         {!isReadinessOpen && !isExecutionPreviewOpen && !isResourceAnalysisOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
+              preflightSelectionOwnerRef.current = null;
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
               setIsInspectorOpen(false);
               setIsReadinessOpen(false);
               setIsExecutionPreviewOpen(false);
-              resourceAnalysisOpenRef.current = false;
               setIsResourceAnalysisOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
@@ -844,11 +841,11 @@ export default function EditorPage() {
 
           <button
             onClick={() => {
+              preflightSelectionOwnerRef.current = null;
               setIsInspectorOpen(!isInspectorOpen);
               setIsMobileSidebarOpen(false);
               setIsReadinessOpen(false);
               setIsExecutionPreviewOpen(false);
-              resourceAnalysisOpenRef.current = false;
               setIsResourceAnalysisOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
@@ -896,10 +893,10 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
-        <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={() => setIsReadinessOpen(false)} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
+        <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={() => { preflightSelectionOwnerRef.current = null; setIsReadinessOpen(false); }} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
         {isReadinessOpen && readinessNotice && <div role="status" className="absolute bottom-[72dvh] right-3 z-[60] rounded-lg bg-cyan-950 px-3 py-2 text-xs text-cyan-200 md:bottom-3 md:right-[420px]">{readinessNotice}</div>}
-        <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={() => setIsExecutionPreviewOpen(false)} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
-        <ResourceAnalysisPanel isOpen={isResourceAnalysisOpen} state={resourceAnalysis.state} isRefreshing={resourceAnalysis.isRefreshing} lang={lang} notice={resourceAnalysisNotice} onClose={() => { resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false); }} onRetry={resourceAnalysis.evaluateNow} onLocate={handleLocateResourceAnalysis} onOpenValidation={() => { resourceAnalysisOpenRef.current = false; setIsResourceAnalysisOpen(false); setIsCodeModalOpen(true); }} />
+        <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={() => { preflightSelectionOwnerRef.current = null; setIsExecutionPreviewOpen(false); }} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
+        <ResourceAnalysisPanel isOpen={isResourceAnalysisOpen} state={resourceAnalysis.state} isRefreshing={resourceAnalysis.isRefreshing} lang={lang} notice={resourceAnalysisNotice} onClose={() => { preflightSelectionOwnerRef.current = null; setIsResourceAnalysisOpen(false); }} onRetry={resourceAnalysis.evaluateNow} onLocate={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsResourceAnalysisOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}

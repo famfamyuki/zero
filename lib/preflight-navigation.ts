@@ -11,12 +11,14 @@ export type PreflightNavigationResult =
   | { kind: 'crew' }
   | { kind: 'missing' };
 
+export type PreflightSelectionOwner = 'readiness' | 'execution_preview' | 'resource_analysis' | null;
+
 export function resolvePreflightNavigationTarget(target: PreflightTarget, nodes: readonly CustomNode[]): PreflightNavigationResult {
   if (target.type === 'crew') return { kind: 'crew' };
   const node = nodes.find((item) => item.id === target.id && item.type === target.type);
   return node ? { kind: 'node', node } : { kind: 'missing' };
 }
 
-export function shouldIgnoreSelectionChangeForOpenPreflight(isPreflightOpen: boolean): boolean {
-  return isPreflightOpen;
+export function shouldIgnoreSelectionChangeForOpenPreflight(owner: PreflightSelectionOwner): boolean {
+  return owner !== null;
 }

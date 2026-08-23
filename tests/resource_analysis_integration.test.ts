@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { ExecutionPreviewEntryButton } from '../components/editor/execution-preview/ExecutionPreviewEntryButton';
+import { ReadinessEntryButton } from '../components/editor/readiness/ReadinessEntryButton';
 import { ResourceAnalysisEntryButton } from '../components/editor/resource-analysis/ResourceAnalysisEntryButton';
 import { resolvePreflightNavigationTarget, shouldIgnoreSelectionChangeForOpenPreflight } from '../lib/preflight-navigation';
 import { resolveExecutionPreviewNavigationTarget } from '../lib/execution-preview-navigation';
@@ -26,8 +28,10 @@ test('generic preflight navigation resolves matching nodes and crew while reject
   assert.equal(resolvePreflightNavigationTarget({ type: 'agent', id: 'shared-id' }, [task, tool]).kind, 'missing');
   assert.equal(resolvePreflightNavigationTarget({ type: 'task', id: 'deleted' }, [task, tool]).kind, 'missing');
   assert.equal(resolvePreflightNavigationTarget({ type: 'crew' }, [task, tool]).kind, 'crew');
-  assert.equal(shouldIgnoreSelectionChangeForOpenPreflight(true), true);
-  assert.equal(shouldIgnoreSelectionChangeForOpenPreflight(false), false);
+  assert.equal(shouldIgnoreSelectionChangeForOpenPreflight('readiness'), true);
+  assert.equal(shouldIgnoreSelectionChangeForOpenPreflight('execution_preview'), true);
+  assert.equal(shouldIgnoreSelectionChangeForOpenPreflight('resource_analysis'), true);
+  assert.equal(shouldIgnoreSelectionChangeForOpenPreflight(null), false);
 });
 
 test('Execution Preview remains a compatible thin wrapper over shared navigation', () => {
@@ -45,6 +49,18 @@ test('Canvas control order is Readiness, Execution Preview, then Resource Analys
   const analysis = source.indexOf('<ResourceAnalysisEntryButton');
   assert.ok(readiness >= 0 && readiness < preview && preview < analysis);
   assert.match(source, /isResourceAnalysisOpen: boolean/); assert.match(source, /onOpenResourceAnalysis: \(\) => void/);
+  assert.match(source, /md:!right-\[412px\]/); assert.match(source, /lg:!right-\[432px\]/);
+  assert.match(source, /!bottom-\[calc\(78dvh\+0\.5rem\)\]/); assert.match(source, /compact=\{isPreflightOpen\}/g);
+});
+
+test('all preflight entries retain compact labels, touch targets, and pointer safety', () => {
+  const readiness = renderToStaticMarkup(React.createElement(ReadinessEntryButton, { status: 'ready', lang: 'en', isOpen: false, compact: true, onClick() {} }));
+  const preview = renderToStaticMarkup(React.createElement(ExecutionPreviewEntryButton, { lang: 'en', isOpen: true, compact: true, onClick() {} }));
+  const analysis = renderToStaticMarkup(React.createElement(ResourceAnalysisEntryButton, { lang: 'en', isOpen: false, compact: true, onClick() {} }));
+  assert.match(readiness, />Ready</); assert.match(preview, />Plan</); assert.match(analysis, />Analysis</);
+  for (const markup of [readiness, preview, analysis]) {
+    assert.match(markup, /min-h-11/); assert.match(markup, /min-w-11/); assert.match(markup, /nodrag nopan/);
+  }
 });
 
 test('page evaluates the same graph independently and wires panel state, refresh, retry, validation, and notice', () => {
@@ -58,7 +74,9 @@ test('page evaluates the same graph independently and wires panel state, refresh
 test('opening Analysis evaluates now and closes Inspector, Readiness, Preview, and mobile sidebar', () => {
   const source = readFileSync('app/page.tsx', 'utf8');
   const handler = source.slice(source.indexOf('const handleOpenResourceAnalysis'), source.indexOf('const handleLocateExecutionPreview'));
-  for (const expected of ['resourceAnalysis.evaluateNow()', 'resourceAnalysisOpenRef.current = true', 'setIsInspectorOpen(false)', 'setIsReadinessOpen(false)', 'setIsExecutionPreviewOpen(false)', 'setIsMobileSidebarOpen(false)', 'setResourceAnalysisNotice(null)', 'setIsResourceAnalysisOpen(true)']) assert.ok(handler.includes(expected), expected);
+  for (const expected of ["preflightSelectionOwnerRef.current = 'resource_analysis'", 'resourceAnalysis.evaluateNow()', 'setIsInspectorOpen(false)', 'setIsReadinessOpen(false)', 'setIsExecutionPreviewOpen(false)', 'setIsMobileSidebarOpen(false)', 'setResourceAnalysisNotice(null)', 'setIsResourceAnalysisOpen(true)']) assert.ok(handler.includes(expected), expected);
+  assert.ok(handler.indexOf("preflightSelectionOwnerRef.current = 'resource_analysis'") < handler.indexOf('resourceAnalysis.evaluateNow()'));
+  assert.doesNotMatch(handler, /setSelectedNode\(null\)/);
   assert.doesNotMatch(handler, /trackEvent/);
 });
 
@@ -73,7 +91,7 @@ test('missing Resource target refreshes in place, announces stable EN/JA copy, a
   const source = readFileSync('app/page.tsx', 'utf8');
   const resourceHandlerStart = source.indexOf('const handleLocateResourceAnalysis');
   const missingStart = source.indexOf("if (target.kind === 'missing')", resourceHandlerStart);
-  const handler = source.slice(missingStart, source.indexOf('resourceAnalysisOpenRef.current = false', missingStart));
+  const handler = source.slice(missingStart, source.indexOf('preflightSelectionOwnerRef.current = null', missingStart));
   assert.match(handler, /resourceAnalysis\.evaluateNow\(\)/); assert.match(handler, /setResourceAnalysisNotice\(t\('resourceAnalysisStaleNotice'\)\)/); assert.match(handler, /return false/);
   assert.doesNotMatch(handler, /setSelectedNode|setIsInspectorOpen|setIsResourceAnalysisOpen/);
   const translations = readFileSync('lib/i18n/translations.ts', 'utf8');
@@ -82,12 +100,15 @@ test('missing Resource target refreshes in place, announces stable EN/JA copy, a
 
 test('selection guards and explicit Inspector entry preserve mutual exclusivity', () => {
   const source = readFileSync('app/page.tsx', 'utf8');
-  assert.match(source, /shouldIgnoreSelectionChangeForOpenPreflight\(executionPreviewOpenRef\.current \|\| resourceAnalysisOpenRef\.current\)/);
+  assert.match(source, /shouldIgnoreSelectionChangeForOpenPreflight\(preflightSelectionOwnerRef\.current\)/);
   const explicit = source.slice(source.indexOf('const handleOpenInspector'), source.indexOf("window.addEventListener('open-node-inspector'"));
-  assert.match(explicit, /setIsInspectorOpen\(true\)/); assert.match(explicit, /setIsResourceAnalysisOpen\(false\)/);
+  assert.match(explicit, /preflightSelectionOwnerRef\.current = null/); assert.match(explicit, /setIsInspectorOpen\(true\)/); assert.match(explicit, /setIsReadinessOpen\(false\)/); assert.match(explicit, /setIsExecutionPreviewOpen\(false\)/); assert.match(explicit, /setIsResourceAnalysisOpen\(false\)/);
   const readinessOpen = source.slice(source.indexOf('const handleOpenReadiness'), source.indexOf('const handleOpenExecutionPreview'));
   const previewOpen = source.slice(source.indexOf('const handleOpenExecutionPreview'), source.indexOf('const handleOpenResourceAnalysis'));
-  assert.match(readinessOpen, /setIsResourceAnalysisOpen\(false\)/); assert.match(previewOpen, /setIsResourceAnalysisOpen\(false\)/);
+  assert.match(readinessOpen, /preflightSelectionOwnerRef\.current = 'readiness'/); assert.match(readinessOpen, /setIsResourceAnalysisOpen\(false\)/); assert.match(readinessOpen, /setIsExecutionPreviewOpen\(false\)/);
+  assert.match(previewOpen, /preflightSelectionOwnerRef\.current = 'execution_preview'/); assert.match(previewOpen, /setIsResourceAnalysisOpen\(false\)/); assert.match(previewOpen, /setIsReadinessOpen\(false\)/);
+  assert.ok(readinessOpen.indexOf("preflightSelectionOwnerRef.current = 'readiness'") < readinessOpen.indexOf('readiness.evaluateNow()'));
+  assert.ok(previewOpen.indexOf("preflightSelectionOwnerRef.current = 'execution_preview'") < previewOpen.indexOf('executionPreview.evaluateNow()'));
 });
 
 test('integration adds no Resource Analysis analytics or persistence/semantic coupling', () => {

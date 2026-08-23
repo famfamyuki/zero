@@ -13,11 +13,11 @@ const config = {
 
 export function readinessStatusLabel(status: ReadinessStatus, lang: Language) { return config[status][lang]; }
 
-export function ReadinessEntryButton({ status, lang, isOpen, onClick }: { status: ReadinessStatus; lang: Language; isOpen: boolean; onClick: () => void }) {
+export function ReadinessEntryButton({ status, lang, isOpen, compact = false, onClick }: { status: ReadinessStatus; lang: Language; isOpen: boolean; compact?: boolean; onClick: () => void }) {
   const item = config[status];
   const Icon = item.icon;
-  return <button type="button" onClick={onClick} aria-expanded={isOpen} aria-controls="readiness-panel" className={`flex min-h-11 items-center gap-2 rounded-full border px-3 text-xs font-bold shadow-xl backdrop-blur transition hover:brightness-110 ${item.color}`}>
+  return <button type="button" onPointerDown={(event) => { event.stopPropagation(); onClick(); }} onClick={(event) => { event.stopPropagation(); if (event.detail === 0) onClick(); }} aria-expanded={isOpen} aria-controls="readiness-panel" className={`nodrag nopan flex min-h-11 min-w-11 items-center gap-2 rounded-full border px-3 text-xs font-bold shadow-xl backdrop-blur transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${item.color}`}>
     <Icon className="h-4 w-4" aria-hidden="true" />
-    <span className="hidden sm:inline">Readiness · {item[lang]}</span><span className="sm:hidden">{item[lang]}</span>
+    {compact ? <span>{item[lang]}</span> : <><span className="hidden sm:inline">Readiness · {item[lang]}</span><span className="sm:hidden">{item[lang]}</span></>}
   </button>;
 }

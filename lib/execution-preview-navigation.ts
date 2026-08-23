@@ -9,7 +9,7 @@ export function isNewNodeSelection(currentNodeId: string | undefined, nextNodeId
 }
 
 export function shouldIgnoreSelectionChangeForOpenPreview(isPreviewOpen: boolean): boolean {
-  return shouldIgnoreSelectionChangeForOpenPreflight(isPreviewOpen);
+  return shouldIgnoreSelectionChangeForOpenPreflight(isPreviewOpen ? 'execution_preview' : null);
 }
 
 export function resolveExecutionPreviewNavigationTarget(type: ExecutionPreviewTargetType, id: string | undefined, nodes: readonly CustomNode[]): ExecutionPreviewNavigationTarget {
