@@ -19,12 +19,12 @@ function create(nodes: CustomNode[], edges: Edge[], config = sequential) {
   return { plan, result: createResourceAnalysisReadModel(plan) };
 }
 
-describe('RA-B1 core Resource Analysis read model', () => {
+describe('RA-B Resource Analysis read model', () => {
   test('projects sequential counts, fixed assignments, async configuration, and execution order', () => {
     const nodes = [task('task-b', true), agent('agent-b', 'claude-sonnet-4-6'), task('task-a'), agent('agent-a', 'gpt-5.6-terra')];
     const edges = [edge('a', 'agent-a', 'task-a'), edge('b', 'agent-b', 'task-b'), edge('order', 'task-a', 'task-b')];
     const { result } = create(nodes, edges);
-    assert.deepEqual(result.summary, { agentCount: 2, taskCount: 2, toolCount: 0, executionStepCount: 2, uniqueModelCount: 2, asyncTaskCount: 1, fixedAssignmentCount: 2, managerDelegatedTaskCount: 0, agentToolBindingCount: 0, taskToolBindingCount: 0 });
+    assert.deepEqual(result.summary, { agentCount: 2, taskCount: 2, toolCount: 0, executionStepCount: 2, uniqueModelCount: 2, dependencyDepth: 2, maxContextFanIn: 1, asyncTaskCount: 1, fixedAssignmentCount: 2, managerDelegatedTaskCount: 0, agentToolBindingCount: 0, taskToolBindingCount: 0 });
     assert.deepEqual(result.tasks.map(({ task }) => [task.taskId, task.planOrder]), [['task-a', 0], ['task-b', 1]]);
     assert.deepEqual(result.tasks.map(({ assignment }) => assignment.kind), ['fixed', 'fixed']);
     assert.equal(result.tasks[1].asyncConfigured, true);
@@ -85,5 +85,84 @@ describe('RA-B1 core Resource Analysis read model', () => {
     const reversed = create([...nodes].reverse(), [...edges].reverse());
     assert.deepEqual(reversed.result, first.result);
     assert.deepEqual(first.plan, snapshot);
+  });
+
+  test('computes dependency depth, direct fan-in, and task direct tools from SemanticPlan', () => {
+    const nodes = [agent('agent-a', 'gpt-5.6-terra'), task('task-d'), task('task-c'), task('task-b'), task('task-a'), tool('tool-b'), tool('tool-a')];
+    const edges = [
+      edge('aa', 'agent-a', 'task-a'), edge('ab', 'agent-a', 'task-b'), edge('ac', 'agent-a', 'task-c'), edge('ad', 'agent-a', 'task-d'),
+      edge('a-b', 'task-a', 'task-b'), edge('a-c', 'task-a', 'task-c'), edge('b-d', 'task-b', 'task-d'), edge('c-d', 'task-c', 'task-d'),
+      edge('tool-b', 'tool-b', 'task-d'), edge('tool-a', 'tool-a', 'task-d'),
+    ];
+    const { result } = create(nodes, edges);
+    assert.deepEqual(result.tasks.map((item) => [item.task.taskId, item.dependencyDepth, item.contextFanIn]), [['task-a', 1, 0], ['task-b', 2, 1], ['task-c', 2, 1], ['task-d', 3, 2]]);
+    assert.deepEqual(result.tasks[3].directTools.map((item) => item.toolId), ['tool-a', 'tool-b']);
+    assert.equal(result.summary.dependencyDepth, 3);
+    assert.equal(result.summary.maxContextFanIn, 2);
+    assert.deepEqual(result.hotspots.slice(0, 2), [
+      { kind: 'dependency_depth', value: 3, target: { type: 'task', id: 'task-d' } },
+      { kind: 'context_fan_in', value: 2, target: { type: 'task', id: 'task-d' } },
+    ]);
+  });
+
+  test('omits task hotspots for independent tasks and includes every depth and fan-in tie in plan order', () => {
+    const independent = create([agent('agent-a', 'gpt-5.6-terra'), task('task-a')], [edge('owner', 'agent-a', 'task-a')]).result;
+    assert.equal(independent.summary.dependencyDepth, 1);
+    assert.equal(independent.summary.maxContextFanIn, 0);
+    assert.deepEqual(independent.hotspots, []);
+
+    const nodes = [agent('agent-a', 'gpt-5.6-terra'), task('task-a'), task('task-b'), task('task-c'), task('task-d'), task('task-e'), task('task-f')];
+    const edges = [
+      ...['a', 'b', 'c', 'd', 'e', 'f'].map((id) => edge(`owner-${id}`, 'agent-a', `task-${id}`)),
+      edge('a-c', 'task-a', 'task-c'), edge('b-c', 'task-b', 'task-c'), edge('a-d', 'task-a', 'task-d'), edge('b-d', 'task-b', 'task-d'),
+      edge('c-e', 'task-c', 'task-e'), edge('d-e', 'task-d', 'task-e'), edge('c-f', 'task-c', 'task-f'), edge('d-f', 'task-d', 'task-f'),
+    ];
+    const { result } = create(nodes, edges);
+    assert.deepEqual(result.hotspots.filter((item) => item.kind === 'dependency_depth').map((item) => item.target), [{ type: 'task', id: 'task-e' }, { type: 'task', id: 'task-f' }]);
+    assert.deepEqual(result.hotspots.filter((item) => item.kind === 'context_fan_in').map((item) => item.target), [{ type: 'task', id: 'task-c' }, { type: 'task', id: 'task-d' }, { type: 'task', id: 'task-e' }, { type: 'task', id: 'task-f' }]);
+  });
+
+  test('orders tool bindings by concentration and emits all tied tool hotspots by stable ID', () => {
+    const nodes = [agent('agent-a', 'gpt-5.6-terra'), agent('agent-b', 'gpt-5.6-terra'), task('task-a'), task('task-b'), tool('tool-c'), tool('tool-b'), tool('tool-a')];
+    const edges = [
+      edge('owner-a', 'agent-a', 'task-a'), edge('owner-b', 'agent-b', 'task-b'),
+      edge('aa', 'tool-a', 'agent-a'), edge('ab', 'tool-a', 'agent-b'), edge('at', 'tool-a', 'task-a'),
+      edge('ba', 'tool-b', 'agent-a'), edge('bb', 'tool-b', 'agent-b'), edge('bt', 'tool-b', 'task-b'),
+      edge('ct', 'tool-c', 'task-a'),
+    ];
+    const { result } = create(nodes, edges);
+    assert.deepEqual(result.toolBindings.map((item) => [item.tool.toolId, item.totalBindingCount]), [['tool-a', 3], ['tool-b', 3], ['tool-c', 1]]);
+    assert.deepEqual(result.hotspots, [
+      { kind: 'tool_binding_concentration', value: 3, target: { type: 'tool', id: 'tool-a' } },
+      { kind: 'tool_binding_concentration', value: 3, target: { type: 'tool', id: 'tool-b' } },
+    ]);
+  });
+
+  test('emits runtime unknowns in fixed order and exposes only hierarchical manager fact', () => {
+    const nodes = [agent('agent-a', 'gpt-5.6-terra'), task('task-a')];
+    const edges = [edge('owner', 'agent-a', 'task-a')];
+    const sequentialResult = create(nodes, edges).result;
+    assert.deepEqual(sequentialResult.unknowns.map((item) => item.code), ['runtime_cost', 'runtime_latency', 'token_consumption', 'tool_invocation_count', 'tool_execution_duration', 'actual_iteration_count']);
+    assert.equal(sequentialResult.manager, undefined);
+
+    const hierarchical = create(nodes, edges, { ...sequential, process: 'hierarchical', managerLlm: 'claude-sonnet-4-6' }).result;
+    assert.deepEqual(hierarchical.unknowns.map((item) => item.code), ['runtime_cost', 'runtime_latency', 'token_consumption', 'tool_invocation_count', 'tool_execution_duration', 'actual_iteration_count', 'manager_runtime_assignment']);
+    assert.deepEqual(hierarchical.manager, { model: 'anthropic/claude-sonnet-4-6' });
+  });
+
+  test('keeps hotspot categories fixed and contains no score, severity, recommendation, or runtime estimates', () => {
+    const nodes = [agent('agent-a', 'gpt-5.6-terra'), task('task-a'), task('task-b'), task('task-c'), tool('tool-a')];
+    const edges = [edge('oa', 'agent-a', 'task-a'), edge('ob', 'agent-a', 'task-b'), edge('oc', 'agent-a', 'task-c'), edge('a-c', 'task-a', 'task-c'), edge('b-c', 'task-b', 'task-c'), edge('ta', 'tool-a', 'agent-a'), edge('tt', 'tool-a', 'task-c')];
+    const { result } = create(nodes, edges);
+    assert.deepEqual(result.hotspots.map((item) => item.kind), ['dependency_depth', 'context_fan_in', 'tool_binding_concentration']);
+    assert.doesNotMatch(JSON.stringify(result), /severity|recommendation|complexityScore|costEstimate|latencyEstimate|tokenEstimate/);
+  });
+
+  test('throws instead of silently accepting unresolved dependency or unknown direct Tool references', () => {
+    const nodes = [agent('agent-a', 'gpt-5.6-terra'), task('task-a')];
+    const edges = [edge('owner', 'agent-a', 'task-a')];
+    const { plan } = create(nodes, edges);
+    assert.throws(() => createResourceAnalysisReadModel({ ...plan, taskContextIds: { 'task-a': ['missing'] } }), /Resource Analysis invariant violation/);
+    assert.throws(() => createResourceAnalysisReadModel({ ...plan, taskToolIds: { 'task-a': ['missing'] } }), /Resource Analysis invariant violation/);
   });
 });

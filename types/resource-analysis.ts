@@ -55,6 +55,9 @@ export interface ResourceAnalysisTaskProfile {
   readonly task: ResourceAnalysisTaskRef;
   readonly assignment: ResourceAnalysisAssignment;
   readonly asyncConfigured: boolean;
+  readonly dependencyDepth: number;
+  readonly contextFanIn: number;
+  readonly directTools: readonly ResourceAnalysisToolRef[];
 }
 
 export interface ResourceAnalysisSummary {
@@ -63,11 +66,36 @@ export interface ResourceAnalysisSummary {
   readonly toolCount: number;
   readonly executionStepCount: number;
   readonly uniqueModelCount: number;
+  readonly dependencyDepth: number;
+  readonly maxContextFanIn: number;
   readonly asyncTaskCount: number;
   readonly fixedAssignmentCount: number;
   readonly managerDelegatedTaskCount: number;
   readonly agentToolBindingCount: number;
   readonly taskToolBindingCount: number;
+}
+
+export type ResourceAnalysisTarget =
+  | { readonly type: 'task'; readonly id: string }
+  | { readonly type: 'agent'; readonly id: string }
+  | { readonly type: 'tool'; readonly id: string }
+  | { readonly type: 'crew' };
+
+export interface ResourceAnalysisHotspot {
+  readonly kind: 'dependency_depth' | 'context_fan_in' | 'tool_binding_concentration';
+  readonly value: number;
+  readonly target: ResourceAnalysisTarget;
+}
+
+export interface ResourceAnalysisUnknown {
+  readonly code:
+    | 'runtime_cost'
+    | 'runtime_latency'
+    | 'token_consumption'
+    | 'tool_invocation_count'
+    | 'tool_execution_duration'
+    | 'actual_iteration_count'
+    | 'manager_runtime_assignment';
 }
 
 export interface ResourceAnalysisReadModel {
@@ -78,4 +106,7 @@ export interface ResourceAnalysisReadModel {
   readonly tasks: readonly ResourceAnalysisTaskProfile[];
   readonly agentGuards: readonly ResourceAnalysisAgentGuardProfile[];
   readonly toolBindings: readonly ResourceAnalysisToolBindingProfile[];
+  readonly hotspots: readonly ResourceAnalysisHotspot[];
+  readonly unknowns: readonly ResourceAnalysisUnknown[];
+  readonly manager?: { readonly model: string };
 }
