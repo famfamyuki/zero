@@ -354,7 +354,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
-        <Panel position="top-right" className="!m-3 flex flex-col items-end gap-2">
+        <Panel position="top-right" className="!z-[45] !m-3 flex flex-col items-end gap-2">
           <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} onClick={onOpenReadiness} />
           <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} onClick={onOpenExecutionPreview} />
         </Panel>
