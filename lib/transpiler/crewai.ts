@@ -297,8 +297,8 @@ ${renderSchemaFields(taskData)}
     sortedTaskNodes.forEach((tNode) => {
       const data = (tNode?.data || {}) as TaskNodeData;
       const varName = taskVarNames[tNode.id];
-      const assignedAgentId = validation.taskAgentMap[tNode.id];
-      const assignedAgentVar = assignedAgentId ? agentVarNames[assignedAgentId] : undefined;
+      const assignment = plan.taskAssignments[tNode.id];
+      const assignedAgentVar = assignment?.kind === 'fixed' ? agentVarNames[assignment.agentId] : undefined;
 
       const toolsList = taskToolMap[tNode.id] && taskToolMap[tNode.id].length > 0
         ? `tools=[${taskToolMap[tNode.id].join(', ')}],\n    `
@@ -318,7 +318,7 @@ ${renderSchemaFields(taskData)}
       ].filter(Boolean).map((option) => `${option},\n    `).join('');
 
       let agentAssignment = '';
-      if (crewConfig?.process !== 'hierarchical' && assignedAgentVar) {
+      if (assignment?.kind === 'fixed' && assignedAgentVar) {
         agentAssignment = `agent=${assignedAgentVar},\n    `;
       }
 
