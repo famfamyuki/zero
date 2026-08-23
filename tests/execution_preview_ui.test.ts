@@ -72,7 +72,7 @@ test('duplicate React Flow selection notifications do not close a reopened Previ
   assert.equal(isNewNodeSelection('task-a', 'agent-b'), true, 'a genuinely different selection still navigates');
   assert.equal(isNewNodeSelection('tool-a', undefined), true, 'clearing selection still updates editor state');
   const canvasSource = readFileSync('components/editor/Canvas.tsx', 'utf8');
-  assert.match(canvasSource, /Panel position="top-right" className="!z-\[45\]/, 'Preview entry remains pointer-accessible above the Inspector');
+  assert.match(canvasSource, /isInspectorOpen \? 'md:!mr-\[21rem\]'/, 'Preview entry remains pointer-accessible beside the Inspector');
 });
 
 test('presentation components do not import graph semantics or recalculate ordering', () => {

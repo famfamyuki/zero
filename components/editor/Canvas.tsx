@@ -71,6 +71,7 @@ interface CanvasProps {
   onOpenReadiness: () => void;
   isExecutionPreviewOpen: boolean;
   onOpenExecutionPreview: () => void;
+  isInspectorOpen: boolean;
 }
 
 export const Canvas: React.FC<CanvasProps> = ({
@@ -90,6 +91,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   onOpenReadiness,
   isExecutionPreviewOpen,
   onOpenExecutionPreview,
+  isInspectorOpen,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
@@ -354,7 +356,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
-        <Panel position="top-right" className="!z-[45] !m-3 flex flex-col items-end gap-2">
+        <Panel position="top-right" className={`!z-[45] !m-3 flex flex-col items-end gap-2 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}>
           <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} onClick={onOpenReadiness} />
           <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} onClick={onOpenExecutionPreview} />
         </Panel>

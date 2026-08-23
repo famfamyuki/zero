@@ -720,6 +720,7 @@ export default function EditorPage() {
           onOpenReadiness={handleOpenReadiness}
           isExecutionPreviewOpen={isExecutionPreviewOpen}
           onOpenExecutionPreview={handleOpenExecutionPreview}
+          isInspectorOpen={isInspectorOpen}
         />
 
         {/* Mobile Floating Drawer & Navigation Toolbar */}
