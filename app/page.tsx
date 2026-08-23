@@ -23,7 +23,7 @@ import type { ReadinessFinding } from '@/types/readiness';
 import { useExecutionPreview } from '@/hooks/useExecutionPreview';
 import { ExecutionPreviewPanel } from '@/components/editor/execution-preview/ExecutionPreviewPanel';
 import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
-import { resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
+import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -315,13 +315,14 @@ export default function EditorPage() {
 
   // Node Selection Handler
   const handleNodeSelect = useCallback((node: CustomNode | null) => {
+    if (!isNewNodeSelection(selectedNode?.id, node?.id)) return;
     setSelectedNode(node);
     if (node) {
       setIsInspectorOpen(true);
       setIsReadinessOpen(false);
       setIsExecutionPreviewOpen(false);
     }
-  }, []);
+  }, [selectedNode?.id]);
 
   const handlePaneClick = useCallback(() => {
     setSelectedNode(null);

@@ -6,6 +6,10 @@ export type ExecutionPreviewNavigationTarget =
   | { kind: 'crew' }
   | { kind: 'missing' };
 
+export function isNewNodeSelection(currentNodeId: string | undefined, nextNodeId: string | undefined): boolean {
+  return currentNodeId !== nextNodeId;
+}
+
 export function resolveExecutionPreviewNavigationTarget(type: ExecutionPreviewTargetType, id: string | undefined, nodes: readonly CustomNode[]): ExecutionPreviewNavigationTarget {
   if (type === 'crew') return { kind: 'crew' };
   const node = id ? nodes.find((item) => item.id === id && item.type === type) : undefined;

@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { ExecutionPreviewEntryButton } from '../components/editor/execution-preview/ExecutionPreviewEntryButton';
 import { ExecutionPreviewPanel } from '../components/editor/execution-preview/ExecutionPreviewPanel';
-import { resolveExecutionPreviewNavigationTarget } from '../lib/execution-preview-navigation';
+import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '../lib/execution-preview-navigation';
 import type { ExecutionPreviewReadModel } from '../types/execution-preview';
 import type { ExecutionPreviewState } from '../hooks/useExecutionPreview';
 import type { CustomNode } from '../types/editor';
@@ -57,6 +57,16 @@ test('Locate resolution accepts stable node IDs and safely rejects stale or wron
   assert.equal(resolveExecutionPreviewNavigationTarget('agent', 'task-a', [node]).kind, 'missing');
   assert.equal(resolveExecutionPreviewNavigationTarget('tool', 'deleted', [node]).kind, 'missing');
   assert.equal(resolveExecutionPreviewNavigationTarget('crew', undefined, [node]).kind, 'crew');
+});
+
+test('duplicate React Flow selection notifications do not close a reopened Preview after Locate', () => {
+  for (const type of ['task', 'agent', 'tool'] as const) {
+    const selectedId = `${type}-selected`;
+    assert.equal(isNewNodeSelection(selectedId, selectedId), false, `${type} Locate must tolerate the duplicate selection emitted while reopening`);
+  }
+  assert.equal(isNewNodeSelection(undefined, 'task-initial'), true, 'initial selection still opens Inspector');
+  assert.equal(isNewNodeSelection('task-a', 'agent-b'), true, 'a genuinely different selection still navigates');
+  assert.equal(isNewNodeSelection('tool-a', undefined), true, 'clearing selection still updates editor state');
 });
 
 test('presentation components do not import graph semantics or recalculate ordering', () => {
