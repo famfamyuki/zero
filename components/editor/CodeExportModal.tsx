@@ -27,10 +27,10 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { CustomNode, CrewConfig, ExportMode } from '@/types/editor';
 import { Edge } from '@xyflow/react';
 import { generateProjectFiles } from '@/lib/transpiler/crewai';
-import { ValidationError } from '@/types/editor';
+import { ValidationIssue } from '@/types/editor';
 import { trackEvent } from '@/lib/analytics';
 
-function getLocalizedSuggestion(error: ValidationError, lang: 'en' | 'ja'): string | undefined {
+function getLocalizedSuggestion(error: ValidationIssue, lang: 'en' | 'ja'): string | undefined {
   if (lang === 'en') return error.suggestion;
 
   switch (error.code) {
@@ -49,7 +49,7 @@ function getLocalizedSuggestion(error: ValidationError, lang: 'en' | 'ja'): stri
 }
 
 function getLocalizedErrorMessage(
-  error: ValidationError,
+  error: ValidationIssue,
   lang: 'en' | 'ja',
   nodes: CustomNode[],
   edges: Edge[]
@@ -92,6 +92,25 @@ function getLocalizedErrorMessage(
       return `ノードID「${error.nodeId}」が重複しています。`;
     case 'DUPLICATE_EDGE_ID':
       return `接続ID「${error.edgeId}」が重複しています。`;
+    case 'AGENT_ROLE_MISSING':
+      return `Agent「${nodeLabel}」のRoleを入力してください。`;
+    case 'AGENT_GOAL_MISSING':
+      return `Agent「${nodeLabel}」のGoalを入力してください。`;
+    case 'AGENT_BACKSTORY_MISSING':
+      return `Agent「${nodeLabel}」のBackstoryを入力してください。`;
+    case 'TASK_DESCRIPTION_MISSING':
+      return `Task「${nodeLabel}」のDescriptionを入力してください。`;
+    case 'TASK_EXPECTED_OUTPUT_MISSING':
+      return `Task「${nodeLabel}」のExpected Outputを入力してください。`;
+    case 'AGENT_MODEL_INVALID':
+      return `Agent「${nodeLabel}」のModel IDが不完全です。`;
+    case 'MANAGER_LLM_INVALID':
+      return 'Manager LLMのModel IDが不完全です。';
+    case 'UNSUPPORTED_TOOL_TYPE':
+      return `Tool「${nodeLabel}」のTool Typeはサポートされていません。`;
+    case 'TOOL_PARAMETERS_INVALID':
+    case 'TOOL_PARAMETER_TYPE_INVALID':
+      return `Tool「${nodeLabel}」のパラメータ形式が不正です。`;
     default:
       return error.message;
   }
@@ -120,6 +139,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
   const [activeTabPath, setActiveTabPath] = useState<string>('main.py');
   const [copied, setCopied] = useState(false);
   const [showWarnings, setShowWarnings] = useState(false);
+  const [showInfos, setShowInfos] = useState(false);
   const [showDeploymentOptions, setShowDeploymentOptions] = useState(true);
 
   // Close on Escape key
@@ -194,6 +214,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
 
   const hasErrors = !project.validation.isValid;
   const hasWarnings = project.validation.warnings.length > 0;
+  const hasInfos = project.validation.infos.length > 0;
   const hasCustomTools = project.validation.customTools.length > 0;
 
   return (
@@ -438,6 +459,29 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
                       {w.code}
                     </span>
                     {w.message}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {hasInfos && (
+          <div className="border-b border-sky-900/60 bg-sky-950/35 px-5 py-2 text-xs text-sky-200">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-semibold">
+                {lang === 'ja' ? `診断情報 (${project.validation.infos.length}件)` : `Diagnostic info (${project.validation.infos.length})`}
+              </span>
+              <button type="button" onClick={() => setShowInfos(!showInfos)} className="text-[11px] text-sky-300 underline hover:text-sky-100">
+                {showInfos ? (lang === 'ja' ? '折りたたむ' : 'Hide') : (lang === 'ja' ? '詳細を表示' : 'Show details')}
+              </button>
+            </div>
+            {showInfos && (
+              <ul className="mt-2 max-h-40 space-y-1 overflow-y-auto pl-5 text-[11px] text-sky-100/90 list-disc">
+                {project.validation.infos.map((issue, idx) => (
+                  <li key={`${issue.code}-${issue.nodeId || issue.edgeId || idx}`}>
+                    <span className="mr-1 rounded border border-sky-800/60 bg-sky-900/50 px-1 font-mono text-[10px]">{issue.code}</span>
+                    {issue.message}
                   </li>
                 ))}
               </ul>

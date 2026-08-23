@@ -15,7 +15,8 @@ import Link from 'next/link';
 import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink, Upload } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
-import { deserializeGraph, serializeGraph } from '@/lib/graph-json';
+import { deserializeGraph, GraphDeserializationError, serializeGraph } from '@/lib/graph-json';
+import { validateGraph } from '@/lib/transpiler/validation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -39,6 +40,7 @@ export default function EditorPage() {
   const latestNodes = useRef(nodes);
   const latestEdges = useRef(edges);
   const isLoadedRef = useRef(false);
+  const skipNextAutosaveRef = useRef(false);
 
   useEffect(() => {
     latestNodes.current = nodes;
@@ -114,6 +116,7 @@ export default function EditorPage() {
   const [selectedNode, setSelectedNode] = useState<CustomNode | null>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [purchaseSuccessMessage, setPurchaseSuccessMessage] = useState<string | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState(false);
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
@@ -164,7 +167,9 @@ export default function EditorPage() {
         historyIndexRef.current = 0;
       }
     } catch (e) {
-      console.error('Failed to load active flow:', e);
+      skipNextAutosaveRef.current = true;
+      setRecoveryNotice(true);
+      console.error('Failed to load active flow:', e instanceof GraphDeserializationError ? e.issue.code : e);
     } finally {
       isLoadedRef.current = true;
     }
@@ -173,6 +178,10 @@ export default function EditorPage() {
   // Auto-sync state changes to LocalStorage
   useEffect(() => {
     if (!isLoadedRef.current) return;
+    if (skipNextAutosaveRef.current) {
+      skipNextAutosaveRef.current = false;
+      return;
+    }
     try {
       const dataToSave: GraphData = {
         nodes,
@@ -221,6 +230,12 @@ export default function EditorPage() {
   // Handle Preset Loading
   const handleLoadPreset = useCallback(
     (template: WorkflowTemplate) => {
+      const validation = validateGraph(template.graphData.nodes, template.graphData.edges, template.graphData.crewConfig, 'scaffold');
+      if (!validation.isValid) {
+        console.error('Internal preset validation failed:', validation.errors.map((issue) => issue.code));
+        alert(t('presetValidationFailed'));
+        return;
+      }
       setNodes(template.graphData.nodes);
       setEdges(template.graphData.edges);
       setCrewConfig(template.graphData.crewConfig);
@@ -234,7 +249,7 @@ export default function EditorPage() {
       trackEvent('template_selected', { template_id: template.id, source: 'sidebar' });
       confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
     },
-    [setNodes, setEdges, takeSnapshot]
+    [setNodes, setEdges, takeSnapshot, t]
   );
 
   // Add Node from Tap/Click Handler (Mobile Ergonomics)
@@ -408,7 +423,16 @@ export default function EditorPage() {
 
         trackEvent('json_imported', { source });
       } catch (err) {
-        alert(t('jsonParseFailed'));
+        if (err instanceof GraphDeserializationError) {
+          console.error('JSON import rejected:', err.issue.code);
+          alert(err.issue.code === 'JSON_SYNTAX_INVALID'
+            ? t('jsonParseFailed')
+            : err.issue.code === 'GRAPH_SCHEMA_VERSION_UNSUPPORTED'
+              ? t('jsonSchemaUnsupported')
+              : t('jsonDocumentInvalid'));
+        } else {
+          alert(t('jsonDocumentInvalid'));
+        }
       }
     },
     [edges.length, nodes.length, setNodes, setEdges, t]
@@ -495,6 +519,15 @@ export default function EditorPage() {
             className="text-emerald-400 hover:text-emerald-200 underline text-[11px]"
           >
             Dismiss
+          </button>
+        </div>
+      )}
+
+      {recoveryNotice && (
+        <div className="z-40 flex items-center justify-between border-b border-amber-700/60 bg-amber-950 px-4 py-2 text-xs text-amber-200">
+          <span>{t('storageRecoveryNotice')}</span>
+          <button type="button" onClick={() => setRecoveryNotice(false)} className="text-amber-300 underline hover:text-amber-100">
+            {lang === 'ja' ? '閉じる' : 'Dismiss'}
           </button>
         </div>
       )}

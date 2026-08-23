@@ -1,18 +1,21 @@
-import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig, ValidationError, ValidationWarning, ValidationResult, ExportMode } from '@/types/editor';
+import { CustomNode, AgentNodeData, TaskNodeData, ToolNodeData, CrewConfig, ValidationCode, ValidationIssue, ValidationResult, ExportMode } from '@/types/editor';
 import { Edge } from '@xyflow/react';
 import { parseOutputSchema } from './output-schema';
 import { getToolParameterDefinitions, isSupportedToolType } from '@/lib/tool-config';
+import { isKnownModel } from '@/lib/models';
 
 const stableCompare = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
+type DraftIssue = Pick<ValidationIssue, 'code' | 'message'> & Partial<Pick<ValidationIssue, 'nodeId' | 'edgeId' | 'field' | 'details' | 'suggestion'>>;
+const MODEL_PREFIX_ONLY = /^(openai|anthropic|gemini|groq|deepseek|ollama|custom)\/$/i;
 
 export function toPythonIdentifier(str: string, fallback: string): string {
-  const clean = (str || '').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+  const clean = String(str || '').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
   const valid = clean.replace(/^[^a-zA-Z_]+/, '');
   return valid || fallback;
 }
 
 export function toPythonClassName(str: string, fallback: string): string {
-  const words = (str || '').replace(/[^a-zA-Z0-9]/g, ' ').trim().split(/\s+/);
+  const words = String(str || '').replace(/[^a-zA-Z0-9]/g, ' ').trim().split(/\s+/);
   const pascal = words
     .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -61,13 +64,51 @@ export function extractInputVariables(nodes: CustomNode[], crewConfig?: CrewConf
 }
 
 export function validateGraph(
-  nodes: CustomNode[] = [],
-  edges: Edge[] = [],
-  crewConfig: CrewConfig = { name: 'My Crew', process: 'sequential', verbose: true, memory: false },
+  inputNodes: CustomNode[] = [],
+  inputEdges: Edge[] = [],
+  inputCrewConfig: CrewConfig = { name: 'My Crew', process: 'sequential', verbose: true, memory: false },
   mode: ExportMode = 'scaffold'
 ): ValidationResult {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationWarning[] = [];
+  const errors: DraftIssue[] = [];
+  const warnings: DraftIssue[] = [];
+  const infos: DraftIssue[] = [];
+  const rawNodes: unknown[] = Array.isArray(inputNodes) ? inputNodes : [];
+  const rawEdges: unknown[] = Array.isArray(inputEdges) ? inputEdges : [];
+  const nodes: CustomNode[] = [];
+  const edges: Edge[] = [];
+
+  rawNodes.forEach((value, index) => {
+    const node = value as Record<string, unknown> | null;
+    const target = typeof node?.id === 'string' ? node.id : `#${index}`;
+    if (!node || typeof node !== 'object') { errors.push({ code: 'NODE_DATA_INVALID', message: `Node ${target} must be an object.`, nodeId: target }); return; }
+    if (typeof node.id !== 'string' || !node.id.trim()) { errors.push({ code: 'NODE_ID_INVALID', message: `Node at index ${index} has an invalid ID.`, nodeId: target, field: 'id' }); return; }
+    if (node.type !== 'agent' && node.type !== 'task' && node.type !== 'tool') { errors.push({ code: 'NODE_TYPE_INVALID', message: `Node "${node.id}" has an invalid type.`, nodeId: node.id, field: 'type' }); return; }
+    const position = node.position as Record<string, unknown> | null;
+    if (!position || typeof position !== 'object' || !Number.isFinite(position.x) || !Number.isFinite(position.y)) { errors.push({ code: 'NODE_POSITION_INVALID', message: `Node "${node.id}" has an invalid position.`, nodeId: node.id, field: 'position' }); return; }
+    if (!node.data || typeof node.data !== 'object' || Array.isArray(node.data)) { errors.push({ code: 'NODE_DATA_INVALID', message: `Node "${node.id}" has invalid data.`, nodeId: node.id, field: 'data' }); return; }
+    nodes.push(value as CustomNode);
+  });
+  rawEdges.forEach((value, index) => {
+    const edge = value as Record<string, unknown> | null;
+    const target = typeof edge?.id === 'string' ? edge.id : `#${index}`;
+    if (!edge || typeof edge !== 'object' || typeof edge.id !== 'string' || !edge.id.trim()) { errors.push({ code: 'EDGE_ID_INVALID', message: `Edge at index ${index} has an invalid ID.`, edgeId: target, field: 'id' }); return; }
+    if (typeof edge.source !== 'string' || !edge.source.trim()) { errors.push({ code: 'EDGE_SOURCE_INVALID', message: `Edge "${edge.id}" has an invalid source.`, edgeId: edge.id, field: 'source' }); return; }
+    if (typeof edge.target !== 'string' || !edge.target.trim()) { errors.push({ code: 'EDGE_TARGET_INVALID', message: `Edge "${edge.id}" has an invalid target.`, edgeId: edge.id, field: 'target' }); return; }
+    if ((edge.sourceHandle !== undefined && edge.sourceHandle !== null && typeof edge.sourceHandle !== 'string') || (edge.targetHandle !== undefined && edge.targetHandle !== null && typeof edge.targetHandle !== 'string')) { errors.push({ code: 'EDGE_HANDLE_INVALID', message: `Edge "${edge.id}" has an invalid handle.`, edgeId: edge.id, field: typeof edge.sourceHandle !== 'string' && edge.sourceHandle != null ? 'sourceHandle' : 'targetHandle' }); return; }
+    edges.push(value as Edge);
+  });
+  const rawCrew = inputCrewConfig as unknown as Record<string, unknown>;
+  if (!rawCrew || typeof rawCrew.name !== 'string') errors.push({ code: 'CREW_NAME_INVALID', message: 'Crew name must be a string.', field: 'name' });
+  if (!rawCrew || (rawCrew.process !== 'sequential' && rawCrew.process !== 'hierarchical')) errors.push({ code: 'CREW_PROCESS_INVALID', message: 'Crew process must be sequential or hierarchical.', field: 'process' });
+  if (!rawCrew || typeof rawCrew.verbose !== 'boolean') errors.push({ code: 'CREW_VERBOSE_INVALID', message: 'Crew verbose must be a boolean.', field: 'verbose' });
+  if (!rawCrew || typeof rawCrew.memory !== 'boolean') errors.push({ code: 'CREW_MEMORY_INVALID', message: 'Crew memory must be a boolean.', field: 'memory' });
+  const crewConfig: CrewConfig = {
+    ...(rawCrew || {}),
+    name: typeof rawCrew?.name === 'string' ? rawCrew.name : '',
+    process: rawCrew?.process === 'hierarchical' ? 'hierarchical' : 'sequential',
+    verbose: typeof rawCrew?.verbose === 'boolean' ? rawCrew.verbose : true,
+    memory: typeof rawCrew?.memory === 'boolean' ? rawCrew.memory : false,
+  };
 
   const nodeMap = new Map<string, CustomNode>();
   const duplicateNodeIds = new Set<string>();
@@ -115,6 +156,29 @@ export function validateGraph(
   const taskNodes = (nodes || []).filter((n) => n?.type === 'task');
   const toolNodes = (nodes || []).filter((n) => n?.type === 'tool');
 
+  agentNodes.forEach((node) => {
+    const data = node.data as Partial<AgentNodeData>;
+    if (typeof data.role !== 'string' || !data.role.trim()) errors.push({ code: 'AGENT_ROLE_MISSING', message: `Agent "${node.id}" requires a role.`, nodeId: node.id, field: 'role' });
+    if (typeof data.goal !== 'string' || !data.goal.trim()) errors.push({ code: 'AGENT_GOAL_MISSING', message: `Agent "${node.id}" requires a goal.`, nodeId: node.id, field: 'goal' });
+    if (typeof data.backstory !== 'string' || !data.backstory.trim()) errors.push({ code: 'AGENT_BACKSTORY_MISSING', message: `Agent "${node.id}" requires a backstory.`, nodeId: node.id, field: 'backstory' });
+    if (data.model !== undefined && typeof data.model !== 'string') errors.push({ code: 'AGENT_MODEL_INVALID', message: `Agent "${node.id}" has an invalid model ID.`, nodeId: node.id, field: 'model' });
+    else if (typeof data.model === 'string' && data.model.trim() && MODEL_PREFIX_ONLY.test(data.model.trim())) errors.push({ code: 'AGENT_MODEL_INVALID', message: `Agent "${node.id}" has an incomplete model ID.`, nodeId: node.id, field: 'model' });
+    else if (typeof data.model === 'string' && data.model.trim() && !isKnownModel(data.model.trim())) infos.push({ code: 'MODEL_ID_UNVERIFIED', message: `Agent "${node.id}" uses a custom model ID that is not in the current catalog.`, nodeId: node.id, field: 'model' });
+  });
+
+  taskNodes.forEach((node) => {
+    const data = node.data as Partial<TaskNodeData>;
+    if (typeof data.description !== 'string' || !data.description.trim()) errors.push({ code: 'TASK_DESCRIPTION_MISSING', message: `Task "${node.id}" requires a description.`, nodeId: node.id, field: 'description' });
+    if (typeof data.expectedOutput !== 'string' || !data.expectedOutput.trim()) errors.push({ code: 'TASK_EXPECTED_OUTPUT_MISSING', message: `Task "${node.id}" requires an expected output.`, nodeId: node.id, field: 'expectedOutput' });
+  });
+
+  if (crewConfig.process === 'hierarchical' && crewConfig.managerLlm !== undefined && typeof crewConfig.managerLlm !== 'string') {
+    errors.push({ code: 'MANAGER_LLM_INVALID', message: 'Manager LLM must be a string.', field: 'managerLlm' });
+  } else if (crewConfig.process === 'hierarchical' && typeof crewConfig.managerLlm === 'string' && crewConfig.managerLlm.trim()) {
+    if (MODEL_PREFIX_ONLY.test(crewConfig.managerLlm.trim())) errors.push({ code: 'MANAGER_LLM_INVALID', message: 'Manager LLM model ID is incomplete.', field: 'managerLlm' });
+    else if (!isKnownModel(crewConfig.managerLlm.trim())) infos.push({ code: 'MODEL_ID_UNVERIFIED', message: 'Manager uses a custom model ID that is not in the current catalog.', field: 'managerLlm' });
+  }
+
   toolNodes.forEach((toolNode) => {
     const data = (toolNode.data || {}) as Partial<ToolNodeData>;
     if (!data.toolType) {
@@ -132,8 +196,14 @@ export function validateGraph(
         suggestion: 'Choose a supported Tool Type before exporting.',
       });
     }
+    const parametersValid = data.parameters === undefined || (typeof data.parameters === 'object' && data.parameters !== null && !Array.isArray(data.parameters));
+    if (!parametersValid) errors.push({ code: 'TOOL_PARAMETERS_INVALID', message: `Tool "${toolNode.id}" parameters must be a plain object.`, nodeId: toolNode.id, field: 'parameters' });
+    const parameters = parametersValid ? (data.parameters || {}) as Record<string, unknown> : {};
     const allowedParameters = new Set(getToolParameterDefinitions(data.toolType).map((parameter) => parameter.key));
-    Object.keys(data.parameters || {}).forEach((key) => {
+    Object.keys(parameters).forEach((key) => {
+      if (typeof parameters[key] !== 'string') {
+        errors.push({ code: 'TOOL_PARAMETER_TYPE_INVALID', message: `Tool "${toolNode.id}" parameter "${key}" must be a string.`, nodeId: toolNode.id, field: `parameters.${key}` });
+      }
       if (!allowedParameters.has(key)) {
         errors.push({
           code: 'UNSUPPORTED_TOOL_PARAMETER',
@@ -143,6 +213,7 @@ export function validateGraph(
         });
       }
     });
+    if (data.toolType === 'CustomTool' && (typeof data.description !== 'string' || !data.description.trim())) warnings.push({ code: 'CUSTOM_TOOL_DESCRIPTION_MISSING', message: `Custom Tool "${toolNode.id}" has no description.`, nodeId: toolNode.id, field: 'description' });
   });
 
   if (agentNodes.length === 0) {
@@ -171,7 +242,8 @@ export function validateGraph(
         code: 'DANGLING_EDGE',
         message: `Edge "${edge.id}" connects non-existent node (source: "${edge.source}", target: "${edge.target}").`,
         edgeId: edge.id,
-        details: `Source exists: ${!!sourceNode}, Target exists: ${!!targetNode}`,
+        field: !sourceNode ? 'source' : 'target',
+        details: { sourceExists: Boolean(sourceNode), targetExists: Boolean(targetNode) },
       });
       return;
     }
@@ -191,6 +263,32 @@ export function validateGraph(
         suggestion: 'Use Agent → Task for ownership, Tool → Agent/Task for tools, or Task → Task for dependencies.',
       });
     }
+  });
+
+  const semanticEdges = new Map<string, string[]>();
+  edges.forEach((edge) => {
+    const source = nodeMap.get(edge.source);
+    const target = nodeMap.get(edge.target);
+    if (!source || !target) return;
+    const relation = `${source.type}->${target.type}`;
+    const key = `${edge.source}\u0000${edge.target}\u0000${relation}`;
+    const ids = semanticEdges.get(key) || [];
+    ids.push(edge.id);
+    semanticEdges.set(key, ids);
+  });
+  semanticEdges.forEach((edgeIds) => {
+    if (edgeIds.length < 2) return;
+    const sortedIds = [...edgeIds].sort(stableCompare);
+    infos.push({ code: 'DUPLICATE_SEMANTIC_EDGE', message: 'Multiple edges describe the same semantic relation.', edgeId: sortedIds[0], details: { edgeIds: sortedIds } });
+  });
+
+  const connectedToolIds = new Set(edges.flatMap((edge) => {
+    const source = nodeMap.get(edge.source);
+    const target = nodeMap.get(edge.target);
+    return source?.type === 'tool' && (target?.type === 'agent' || target?.type === 'task') ? [source.id] : [];
+  }));
+  toolNodes.forEach((node) => {
+    if (!connectedToolIds.has(node.id)) warnings.push({ code: 'UNUSED_TOOL', message: `Tool "${node.id}" is not connected to an Agent or Task.`, nodeId: node.id });
   });
 
   // Agent Assignment Mapping & Detection of Multiple Agents per Task
@@ -268,7 +366,7 @@ export function validateGraph(
         code: 'MULTIPLE_AGENTS_PER_TASK',
         message: `Task "${taskLabel}" (${tNode.id}) has ${assigned.length} assigned agents: ${agentNames}. In standard CrewAI, each Task must have exactly one primary assigned agent.`,
         nodeId: tNode.id,
-        details: `Connected agents: ${agentNames}`,
+        details: { agentIds: assigned },
         suggestion: `Keep one primary agent for "${taskLabel}", or split it into ${assigned.length} agent-owned tasks. Connect their outputs to a later synthesis task with Task → Task edges.`,
       });
     } else if (assigned.length === 1) {
@@ -380,7 +478,7 @@ export function validateGraph(
   }
 
   if (sortedTaskIds.length < taskNodes.length) {
-    const cyclicTaskIds = taskNodes.filter((t) => !sortedTaskIds.includes(t.id)).map((t) => t.id);
+    const cyclicTaskIds = taskNodes.filter((t) => !sortedTaskIds.includes(t.id)).map((t) => t.id).sort(stableCompare);
     const cyclicTaskNames = cyclicTaskIds.map((id) => {
       const t = nodeMap.get(id);
       return `"${(t?.data as TaskNodeData)?.label || id}" (${id})`;
@@ -389,7 +487,7 @@ export function validateGraph(
     errors.push({
       code: 'TASK_CYCLE_DETECTED',
       message: `Cyclic dependency detected among tasks: ${cyclicTaskNames.join(', ')}. Tasks cannot have circular dependencies in CrewAI.`,
-      details: `Involved task IDs: ${cyclicTaskIds.join(', ')}`,
+      details: { taskIds: [...cyclicTaskIds].sort(stableCompare) },
       suggestion: 'Remove at least one Task → Task edge so every task dependency flows in one direction.',
     });
   }
@@ -442,8 +540,8 @@ export function validateGraph(
   taskNodes.forEach((tNode) => {
     const data = (tNode.data || {}) as TaskNodeData;
     const taskLabel = data.label || tNode.id;
-    const expOut = (data.expectedOutput || '').toLowerCase();
-    const desc = (data.description || '').toLowerCase();
+    const expOut = String(data.expectedOutput || '').toLowerCase();
+    const desc = String(data.description || '').toLowerCase();
 
     const structuredKeywords = ['json', 'schema', 'pydantic', 'machine-readable', 'format: json'];
     const hasStructuredReq = structuredKeywords.some((kw) => expOut.includes(kw));
@@ -470,10 +568,45 @@ export function validateGraph(
   // Extract template input variables ({repository_path}, {output_directory}, etc.)
   const inputVariables = extractInputVariables(nodes, crewConfig);
 
+  const structureCodes = new Set<ValidationCode>([
+    'NODE_ID_INVALID', 'NODE_TYPE_INVALID', 'NODE_POSITION_INVALID', 'NODE_DATA_INVALID', 'DUPLICATE_NODE_ID',
+    'EDGE_ID_INVALID', 'EDGE_SOURCE_INVALID', 'EDGE_TARGET_INVALID', 'EDGE_HANDLE_INVALID', 'DUPLICATE_EDGE_ID',
+    'DANGLING_EDGE', 'CREW_NAME_INVALID', 'CREW_PROCESS_INVALID', 'CREW_VERBOSE_INVALID', 'CREW_MEMORY_INVALID',
+  ]);
+  const crewCodes = new Set<ValidationCode>(['CREW_NAME_INVALID', 'CREW_PROCESS_INVALID', 'CREW_VERBOSE_INVALID', 'CREW_MEMORY_INVALID', 'MANAGER_LLM_INVALID']);
+  const graphCodes = new Set<ValidationCode>(['NO_AGENTS', 'NO_TASKS', 'TASK_CYCLE_DETECTED']);
+  const materialize = (draft: DraftIssue, severity: ValidationIssue['severity']): ValidationIssue => ({
+    ...draft,
+    severity,
+    phase: draft.code === 'UNIMPLEMENTED_CUSTOM_TOOLS_IN_PRODUCTION' ? 'codegen' : structureCodes.has(draft.code) ? 'structure' : 'semantic',
+    scope: draft.code === 'UNIMPLEMENTED_CUSTOM_TOOLS_IN_PRODUCTION' ? 'codegen' : crewCodes.has(draft.code) ? 'crew' : draft.nodeId ? 'node' : draft.edgeId ? 'edge' : graphCodes.has(draft.code) ? 'graph' : 'crew',
+  });
+  const severityRank = { error: 0, warning: 1, info: 2 } as const;
+  const phaseRank = { deserialize: 0, structure: 1, semantic: 2, codegen: 3 } as const;
+  const scopeRank = { graph: 0, crew: 1, node: 2, edge: 3, codegen: 4 } as const;
+  const issues = [
+    ...errors.map((issue) => materialize(issue, 'error')),
+    ...warnings.map((issue) => materialize(issue, 'warning')),
+    ...infos.map((issue) => materialize(issue, 'info')),
+  ].sort((a, b) =>
+    severityRank[a.severity] - severityRank[b.severity]
+    || phaseRank[a.phase] - phaseRank[b.phase]
+    || scopeRank[a.scope] - scopeRank[b.scope]
+    || stableCompare(a.nodeId || a.edgeId || '', b.nodeId || b.edgeId || '')
+    || stableCompare(a.field || '', b.field || '')
+    || stableCompare(a.code, b.code)
+    || stableCompare(JSON.stringify(a.details || {}), JSON.stringify(b.details || {}))
+  );
+  const canonicalErrors = issues.filter((issue) => issue.severity === 'error');
+  const canonicalWarnings = issues.filter((issue) => issue.severity === 'warning');
+  const canonicalInfos = issues.filter((issue) => issue.severity === 'info');
+
   return {
-    isValid: errors.length === 0,
-    errors,
-    warnings,
+    isValid: canonicalErrors.length === 0,
+    issues,
+    errors: canonicalErrors,
+    warnings: canonicalWarnings,
+    infos: canonicalInfos,
     inputVariables,
     customTools,
     sortedTaskIds: sortedTaskIds.length === taskNodes.length ? sortedTaskIds : taskNodes.map((t) => t.id),

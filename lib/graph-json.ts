@@ -3,6 +3,7 @@ import {
   AgentNodeData, CrewConfig, CustomNode, GRAPH_SCHEMA_VERSION, GraphData,
   GraphDocumentV1, GraphImportResult, NodeType, PersistedEdge, PersistedNode,
   TaskNodeData, ToolNodeData,
+  ValidationCode, ValidationIssue,
 } from '@/types/editor';
 
 const LEGACY_CREW_CONFIG: CrewConfig = {
@@ -10,6 +11,40 @@ const LEGACY_CREW_CONFIG: CrewConfig = {
 };
 
 type JsonObject = Record<string, unknown>;
+
+export class GraphDeserializationError extends Error {
+  constructor(public readonly issue: ValidationIssue) {
+    super(issue.message);
+    this.name = 'GraphDeserializationError';
+  }
+}
+
+function deserializeIssue(code: ValidationCode, message: string, scope: ValidationIssue['scope'] = 'graph', field?: string): GraphDeserializationError {
+  return new GraphDeserializationError({ code, severity: 'error', phase: 'deserialize', scope, message, field });
+}
+
+function classifyDeserializationError(error: unknown): GraphDeserializationError {
+  if (error instanceof GraphDeserializationError) return error;
+  const message = error instanceof Error ? error.message : 'Invalid graph document.';
+  let code: ValidationCode = 'GRAPH_DOCUMENT_ROOT_INVALID';
+  let scope: ValidationIssue['scope'] = 'graph';
+  if (/nodes\[\d+\]\.id/.test(message)) { code = 'NODE_ID_INVALID'; scope = 'node'; }
+  else if (/node type|nodes\[\d+\]\.type/i.test(message)) { code = 'NODE_TYPE_INVALID'; scope = 'node'; }
+  else if (/nodes\[\d+\]\.position/.test(message)) { code = 'NODE_POSITION_INVALID'; scope = 'node'; }
+  else if (/nodes\[\d+\]\.data/.test(message)) { code = 'NODE_DATA_INVALID'; scope = 'node'; }
+  else if (/edges\[\d+\]\.id/.test(message)) { code = 'EDGE_ID_INVALID'; scope = 'edge'; }
+  else if (/edges\[\d+\]\.source/.test(message)) { code = 'EDGE_SOURCE_INVALID'; scope = 'edge'; }
+  else if (/edges\[\d+\]\.target/.test(message)) { code = 'EDGE_TARGET_INVALID'; scope = 'edge'; }
+  else if (/Handle/.test(message)) { code = 'EDGE_HANDLE_INVALID'; scope = 'edge'; }
+  else if (/Duplicate node ID/.test(message)) { code = 'DUPLICATE_NODE_ID'; scope = 'node'; }
+  else if (/Duplicate edge ID/.test(message)) { code = 'DUPLICATE_EDGE_ID'; scope = 'edge'; }
+  else if (/crewConfig\.name/.test(message)) { code = 'CREW_NAME_INVALID'; scope = 'crew'; }
+  else if (/crewConfig\.process/.test(message)) { code = 'CREW_PROCESS_INVALID'; scope = 'crew'; }
+  else if (/crewConfig\.verbose/.test(message)) { code = 'CREW_VERBOSE_INVALID'; scope = 'crew'; }
+  else if (/crewConfig\.memory/.test(message)) { code = 'CREW_MEMORY_INVALID'; scope = 'crew'; }
+  else if (/crewConfig\.managerLlm/.test(message)) { code = 'MANAGER_LLM_INVALID'; scope = 'crew'; }
+  return deserializeIssue(code, message, scope);
+}
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -138,22 +173,23 @@ export function serializeGraph(graph: GraphData): string {
 
 export function deserializeGraph(json: string): GraphImportResult {
   let root: unknown;
-  try { root = JSON.parse(json); } catch { throw new Error('Invalid JSON.'); }
-  if (!isObject(root)) throw new Error('Graph document root must be an object.');
+  try { root = JSON.parse(json); } catch { throw deserializeIssue('JSON_SYNTAX_INVALID', 'Invalid JSON.'); }
+  if (!isObject(root)) throw deserializeIssue('GRAPH_DOCUMENT_ROOT_INVALID', 'Graph document root must be an object.');
 
   const legacy = !Object.prototype.hasOwnProperty.call(root, 'schemaVersion');
   if (!legacy && root.schemaVersion !== GRAPH_SCHEMA_VERSION) {
-    throw new Error(`Unsupported graph schema version: ${String(root.schemaVersion)}`);
+    throw deserializeIssue('GRAPH_SCHEMA_VERSION_UNSUPPORTED', `Unsupported graph schema version: ${String(root.schemaVersion)}`, 'graph', 'schemaVersion');
   }
-  if (!Array.isArray(root.nodes) || !Array.isArray(root.edges)) {
-    throw new Error('Graph document must contain nodes and edges arrays.');
+  if (!Array.isArray(root.nodes)) throw deserializeIssue('GRAPH_NODES_INVALID', 'Graph document must contain a nodes array.', 'graph', 'nodes');
+  if (!Array.isArray(root.edges)) throw deserializeIssue('GRAPH_EDGES_INVALID', 'Graph document must contain an edges array.', 'graph', 'edges');
+  try {
+    const nodes = root.nodes.map((node, index) => parseNode(node, index, legacy));
+    const edges = root.edges.map((edge, index) => parseEdge(edge, index));
+    assertUniqueIds(nodes, 'node');
+    assertUniqueIds(edges, 'edge');
+    const crewConfig = legacy && root.crewConfig === undefined ? { ...LEGACY_CREW_CONFIG } : parseCrewConfig(root.crewConfig);
+    return { graph: { nodes, edges, crewConfig }, migratedFromLegacy: legacy };
+  } catch (error) {
+    throw classifyDeserializationError(error);
   }
-  const nodes = root.nodes.map((node, index) => parseNode(node, index, legacy));
-  const edges = root.edges.map((edge, index) => parseEdge(edge, index));
-  assertUniqueIds(nodes, 'node');
-  assertUniqueIds(edges, 'edge');
-  const crewConfig = legacy && root.crewConfig === undefined
-    ? { ...LEGACY_CREW_CONFIG }
-    : parseCrewConfig(root.crewConfig);
-  return { graph: { nodes, edges, crewConfig }, migratedFromLegacy: legacy };
 }

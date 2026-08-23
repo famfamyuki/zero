@@ -44,7 +44,7 @@ describe('Packet B deterministic codegen boundary', () => {
   test('13-21 duplicate, cross-kind, empty, Japanese, punctuation, numeric, and keyword names are AST-valid and unique', () => {
     const names = ['', '日本語', '!!!', '123abc', 'class', 'Same'];
     const nodes: CustomNode[] = []; const edges: Edge[] = [];
-    names.forEach((name, index) => { nodes.push(agent(`a${index}`, name), task(`t${index}`, name, index)); edges.push(edge(`e${index}`, `a${index}`, `t${index}`)); });
+    names.forEach((name, index) => { nodes.push(agent(`a${index}`, name || 'Worker'), task(`t${index}`, name, index)); edges.push(edge(`e${index}`, `a${index}`, `t${index}`)); });
     nodes.push(tool('z1', 'Same'), tool('z2', 'Same'));
     const code = transpileToCrewAI(nodes, edges, config); astValid(code);
     const assigned = [...code.matchAll(/^([a-zA-Z_][a-zA-Z0-9_]*) = (?:Agent|Task|\w+Tool)\(/gm)].map((match) => match[1]);

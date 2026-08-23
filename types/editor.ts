@@ -117,26 +117,49 @@ export interface WorkflowTemplate {
   created_at?: string;
 }
 
-export interface ValidationError {
-  code: string;
+export type ValidationSeverity = 'error' | 'warning' | 'info';
+export type ValidationPhase = 'deserialize' | 'structure' | 'semantic' | 'codegen';
+export type ValidationScope = 'graph' | 'crew' | 'node' | 'edge' | 'codegen';
+export type ValidationCode =
+  | 'DUPLICATE_NODE_ID' | 'DUPLICATE_EDGE_ID' | 'MISSING_TOOL_TYPE' | 'UNSUPPORTED_TOOL_TYPE'
+  | 'UNSUPPORTED_TOOL_PARAMETER' | 'NO_AGENTS' | 'NO_TASKS' | 'DANGLING_EDGE' | 'UNSUPPORTED_EDGE'
+  | 'INVALID_ASSIGNED_AGENT_REFERENCE' | 'INVALID_OUTPUT_SCHEMA' | 'MULTIPLE_AGENTS_PER_TASK'
+  | 'UNASSIGNED_TASK' | 'TASK_SELF_CYCLE' | 'TASK_CYCLE_DETECTED' | 'UNIMPLEMENTED_CUSTOM_TOOLS_IN_PRODUCTION'
+  | 'UNASSIGNED_TASK_HIERARCHICAL' | 'UNUSED_AGENT' | 'AGENT_WITHOUT_TOOLS' | 'STRUCTURED_OUTPUT_NOT_ENABLED'
+  | 'UNENFORCED_SAFETY_CLAIM' | 'JSON_SYNTAX_INVALID' | 'GRAPH_DOCUMENT_ROOT_INVALID'
+  | 'GRAPH_SCHEMA_VERSION_UNSUPPORTED' | 'GRAPH_NODES_INVALID' | 'GRAPH_EDGES_INVALID' | 'NODE_ID_INVALID'
+  | 'NODE_TYPE_INVALID' | 'NODE_POSITION_INVALID' | 'NODE_DATA_INVALID' | 'EDGE_ID_INVALID'
+  | 'EDGE_SOURCE_INVALID' | 'EDGE_TARGET_INVALID' | 'EDGE_HANDLE_INVALID' | 'CREW_NAME_INVALID'
+  | 'CREW_PROCESS_INVALID' | 'CREW_VERBOSE_INVALID' | 'CREW_MEMORY_INVALID' | 'AGENT_ROLE_MISSING'
+  | 'AGENT_GOAL_MISSING' | 'AGENT_BACKSTORY_MISSING' | 'AGENT_MODEL_INVALID' | 'MANAGER_LLM_INVALID'
+  | 'MODEL_ID_UNVERIFIED' | 'TASK_DESCRIPTION_MISSING' | 'TASK_EXPECTED_OUTPUT_MISSING'
+  | 'TOOL_PARAMETERS_INVALID' | 'TOOL_PARAMETER_TYPE_INVALID' | 'MISSING_REQUIRED_TOOL_PARAMETER'
+  | 'CUSTOM_TOOL_DESCRIPTION_MISSING' | 'UNUSED_TOOL' | 'DUPLICATE_SEMANTIC_EDGE';
+
+export interface ValidationIssue {
+  code: ValidationCode;
+  severity: ValidationSeverity;
+  phase: ValidationPhase;
+  scope: ValidationScope;
   message: string;
   nodeId?: string;
   edgeId?: string;
-  details?: string;
+  field?: string;
+  details?: Record<string, unknown>;
   suggestion?: string;
 }
 
-export interface ValidationWarning {
-  code: string;
-  message: string;
-  nodeId?: string;
-  details?: string;
-}
+/** @deprecated Use ValidationIssue. */
+export type ValidationError = ValidationIssue;
+/** @deprecated Use ValidationIssue. */
+export type ValidationWarning = ValidationIssue;
 
 export interface ValidationResult {
   isValid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationWarning[];
+  issues: ValidationIssue[];
+  errors: ValidationIssue[];
+  warnings: ValidationIssue[];
+  infos: ValidationIssue[];
   inputVariables: string[];
   customTools: {
     id: string;
