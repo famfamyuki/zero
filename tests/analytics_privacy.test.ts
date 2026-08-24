@@ -8,13 +8,16 @@ import {
   filterPostHogCapture,
 } from '../lib/analytics-config';
 
-test('only the ten approved analytics events are accepted', () => {
+test('only the twelve approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('template_selected'), true);
   assert.equal(isAnalyticsEvent('affiliate_clicked'), true);
   assert.equal(isAnalyticsEvent('readiness_opened'), true);
   assert.equal(isAnalyticsEvent('readiness_finding_selected'), true);
   assert.equal(isAnalyticsEvent('execution_preview_opened'), true);
   assert.equal(isAnalyticsEvent('execution_preview_located'), true);
+  assert.equal(isAnalyticsEvent('resource_analysis_opened'), true);
+  assert.equal(isAnalyticsEvent('resource_analysis_hotspot_selected'), true);
+  assert.equal(isAnalyticsEvent('resource_analysis_refreshed'), false);
   assert.equal(isAnalyticsEvent('$pageview'), false);
   assert.equal(isAnalyticsEvent('$autocapture'), false);
   assert.equal(isAnalyticsEvent('api_key_entered'), false);
@@ -152,7 +155,7 @@ test('filterPostHogCapture returns null for null input', () => {
   assert.equal(filterPostHogCapture(null), null);
 });
 
-test('filterPostHogCapture passes all ten custom analytics events', () => {
+test('filterPostHogCapture passes all twelve custom analytics events', () => {
   for (const event of ANALYTICS_EVENTS) {
     const result = filterPostHogCapture({
       uuid: 'test',
@@ -244,7 +247,22 @@ test('Execution Preview analytics retains only approved non-content properties',
   }), { target_type: 'task', source: 'context' });
 });
 
-test('ANALYTICS_EVENTS contains exactly the ten expected events', () => {
+test('Resource Analysis analytics retains only bounded categorical properties', () => {
+  assert.deepEqual(sanitizeAnalyticsProperties('resource_analysis_opened', {
+    state: 'available', process: 'sequential', analysis_version: '0.1.0',
+    id: 'task-private', label: 'private', role: 'private', task_text: 'private',
+    graph: '{"private":true}', model_id: 'private-model', hotspot_value: 9,
+    blockingCodes: ['NO_TASKS'], error: 'private', $current_url: 'https://private.example',
+    $referrer: 'https://referrer.example', utm_source: 'private', lang: 'ja',
+  }), { state: 'available', process: 'sequential', analysis_version: '0.1.0' });
+  assert.deepEqual(sanitizeAnalyticsProperties('resource_analysis_hotspot_selected', {
+    hotspot_kind: 'dependency_depth', target_type: 'task',
+    node_id: 'private', tool_id: 'private', label: 'private', value: 7,
+    description: 'private', graph_json: '{"private":true}', manager_model: 'private',
+  }), { hotspot_kind: 'dependency_depth', target_type: 'task' });
+});
+
+test('ANALYTICS_EVENTS contains exactly the twelve expected events', () => {
   const expected = [
     'template_selected',
     'json_imported',
@@ -256,6 +274,8 @@ test('ANALYTICS_EVENTS contains exactly the ten expected events', () => {
     'readiness_finding_selected',
     'execution_preview_opened',
     'execution_preview_located',
+    'resource_analysis_opened',
+    'resource_analysis_hotspot_selected',
   ];
   assert.deepEqual([...ANALYTICS_EVENTS], expected);
 });

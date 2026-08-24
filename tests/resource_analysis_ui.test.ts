@@ -53,7 +53,7 @@ test('focus, Escape, and successful Locate suppression follow the established pa
   assert.match(source, /requestAnimationFrame\(\(\) => requestAnimationFrame\(\(\) => heading\.current\?\.focus\(\)\)\)/);
   assert.match(source, /event\.key === 'Escape'/);
   assert.doesNotMatch(source, /locating/);
-  assert.match(source, /onLocate\(target, 'hotspot'\)/);
+  assert.match(source, /onLocate\(hotspot\.target, \{ source: 'hotspot', hotspotKind: hotspot\.kind \}\)/);
 });
 
 test('refresh, empty, invalid, unavailable, and defensive null states are distinct and safe', () => {

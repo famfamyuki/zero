@@ -132,14 +132,14 @@ test('opening Analysis evaluates now and closes Inspector, Readiness, Preview, a
   for (const expected of ["preflightSelectionOwnerRef.current = 'resource_analysis'", 'resourceAnalysis.evaluateNow()', 'setIsInspectorOpen(false)', 'setIsReadinessOpen(false)', 'setIsExecutionPreviewOpen(false)', 'setIsMobileSidebarOpen(false)', 'setResourceAnalysisNotice(null)', 'setIsResourceAnalysisOpen(true)']) assert.ok(handler.includes(expected), expected);
   assert.ok(handler.indexOf("preflightSelectionOwnerRef.current = 'resource_analysis'") < handler.indexOf('resourceAnalysis.evaluateNow()'));
   assert.doesNotMatch(handler, /setSelectedNode\(null\)/);
-  assert.doesNotMatch(handler, /trackEvent/);
+  assert.equal((handler.match(/resource_analysis_opened/g) ?? []).length, 1);
 });
 
 test('Resource Analysis node and crew Locate transfer selection, panels, viewport, and focus', () => {
   const source = readFileSync('app/page.tsx', 'utf8');
   const handler = source.slice(source.indexOf('const handleLocateResourceAnalysis'), source.indexOf('const handleLocateFinding'));
   for (const expected of ['resolvePreflightNavigationTarget', 'selected: item.id === node.id', 'setSelectedNode(node)', 'setIsResourceAnalysisOpen(false)', 'setIsReadinessOpen(false)', 'setIsExecutionPreviewOpen(false)', 'setIsInspectorOpen(true)', "'focus-flow-node'", "'focus-inspector-heading'", 'setSelectedNode(null)', "'focus-manager-llm'", 'return true']) assert.ok(handler.includes(expected), expected);
-  assert.doesNotMatch(handler, /trackEvent/);
+  assert.equal((handler.match(/resource_analysis_hotspot_selected/g) ?? []).length, 1);
 });
 
 test('missing Resource target refreshes in place, announces stable EN/JA copy, and returns false', () => {
@@ -166,10 +166,30 @@ test('selection guards and explicit Inspector entry preserve mutual exclusivity'
   assert.ok(previewOpen.indexOf("preflightSelectionOwnerRef.current = 'execution_preview'") < previewOpen.indexOf('executionPreview.evaluateNow()'));
 });
 
-test('integration adds no Resource Analysis analytics or persistence/semantic coupling', () => {
+test('Resource Analysis analytics is parent-owned, transition-gated, and preserves Locate ordering', () => {
+  const page = readFileSync('app/page.tsx', 'utf8');
+  const open = page.slice(page.indexOf('const handleOpenResourceAnalysis'), page.indexOf('const restoreEntryFocus'));
+  assert.match(open, /const current = resourceAnalysis\.evaluateNow\(\)/);
+  assert.match(open, /if \(!isResourceAnalysisOpen\)/);
+  assert.match(open, /createResourceAnalysisOpenedAnalyticsProperties\(current\)/);
+  assert.equal((open.match(/resource_analysis_opened/g) ?? []).length, 1);
+  assert.ok(open.indexOf('setIsResourceAnalysisOpen(true)') < open.indexOf("trackEvent(\n        'resource_analysis_opened'"));
+
+  const locate = page.slice(page.indexOf('const handleLocateResourceAnalysis'), page.indexOf('const handleLocateFinding'));
+  assert.match(locate, /createResourceAnalysisHotspotAnalyticsProperties/);
+  assert.equal((locate.match(/resource_analysis_hotspot_selected/g) ?? []).length, 1);
+  assert.ok(locate.indexOf('resource_analysis_hotspot_selected') < locate.indexOf('resolvePreflightNavigationTarget'));
+  assert.ok(locate.indexOf('resource_analysis_hotspot_selected') < locate.indexOf("if (target.kind === 'missing')"));
+
+  const panel = readFileSync('components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'utf8');
+  assert.match(panel, /hotspotKind: ResourceAnalysisHotspot\['kind'\]/);
+  assert.match(panel, /onLocate\(hotspot\.target, \{ source: 'hotspot', hotspotKind: hotspot\.kind \}\)/);
+  const entry = readFileSync('components/editor/resource-analysis/ResourceAnalysisEntryButton.tsx', 'utf8');
+  assert.doesNotMatch(entry, /trackEvent|resource_analysis_/);
+});
+
+test('Resource Analysis analytics adds no persistence or semantic coupling', () => {
   const files = ['app/page.tsx', 'components/editor/Canvas.tsx', 'components/editor/resource-analysis/ResourceAnalysisEntryButton.tsx', 'lib/preflight-navigation.ts'];
-  const source = files.map((path) => readFileSync(path, 'utf8')).join('\n');
-  assert.doesNotMatch(source, /resource_analysis_opened|resource_analysis_hotspot_selected/);
   const entryAndNavigation = files.slice(1).map((path) => readFileSync(path, 'utf8')).join('\n');
   for (const forbidden of ['localStorage', 'serializeGraph', 'SemanticPlan', 'createResourceAnalysisReadModel', 'CodegenPlan']) assert.equal(entryAndNavigation.includes(forbidden), false, forbidden);
 });

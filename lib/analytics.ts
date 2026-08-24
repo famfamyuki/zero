@@ -20,6 +20,15 @@ type AnalyticsProperties = {
   readiness_finding_selected: { rule_id: string; impact: string; category: string; target_scope: string };
   execution_preview_opened: { state: 'available' | 'empty' | 'invalid'; process: 'sequential' | 'hierarchical' | 'none'; preview_version: '0.1.0' };
   execution_preview_located: { target_type: 'task' | 'agent' | 'tool' | 'crew'; source: 'task' | 'context' | 'assigned_agent' | 'direct_tool' | 'agent_section' | 'agent_tool' | 'manager' };
+  resource_analysis_opened: {
+    state: 'available' | 'empty' | 'invalid' | 'unavailable';
+    process: 'sequential' | 'hierarchical' | 'none';
+    analysis_version: '0.1.0';
+  };
+  resource_analysis_hotspot_selected: {
+    hotspot_kind: 'dependency_depth' | 'context_fan_in' | 'tool_binding_concentration';
+    target_type: 'task' | 'tool';
+  };
 };
 
 export function trackEvent(event: 'code_generated'): void;

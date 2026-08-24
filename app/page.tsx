@@ -26,7 +26,12 @@ import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@
 import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
 import { useResourceAnalysis } from '@/hooks/useResourceAnalysis';
 import { ResourceAnalysisPanel } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
+import type { ResourceAnalysisLocateContext } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
 import type { ResourceAnalysisTarget } from '@/types/resource-analysis';
+import {
+  createResourceAnalysisHotspotAnalyticsProperties,
+  createResourceAnalysisOpenedAnalyticsProperties,
+} from '@/lib/resource-analysis-analytics';
 import {
   resolvePreflightNavigationTarget,
   shouldIgnoreSelectionChangeForOpenPreflight,
@@ -442,14 +447,20 @@ export default function EditorPage() {
   const handleOpenResourceAnalysis = useCallback((trigger: HTMLButtonElement) => {
     resourceAnalysisEntryRef.current = trigger;
     preflightSelectionOwnerRef.current = 'resource_analysis';
-    resourceAnalysis.evaluateNow();
+    const current = resourceAnalysis.evaluateNow();
     setIsInspectorOpen(false);
     setIsReadinessOpen(false);
     setIsExecutionPreviewOpen(false);
     setIsMobileSidebarOpen(false);
     setResourceAnalysisNotice(null);
     setIsResourceAnalysisOpen(true);
-  }, [resourceAnalysis]);
+    if (!isResourceAnalysisOpen) {
+      trackEvent(
+        'resource_analysis_opened',
+        createResourceAnalysisOpenedAnalyticsProperties(current)
+      );
+    }
+  }, [isResourceAnalysisOpen, resourceAnalysis]);
 
   const restoreEntryFocus = useCallback((entry: HTMLButtonElement | null) => {
     if (entry?.isConnected) entry.focus({ preventScroll: true });
@@ -513,7 +524,17 @@ export default function EditorPage() {
     return true;
   }, [executionPreview, setEdges, setNodes, t]);
 
-  const handleLocateResourceAnalysis = useCallback((resourceTarget: ResourceAnalysisTarget) => {
+  const handleLocateResourceAnalysis = useCallback((
+    resourceTarget: ResourceAnalysisTarget,
+    context: ResourceAnalysisLocateContext
+  ) => {
+    const analyticsProperties = createResourceAnalysisHotspotAnalyticsProperties(
+      context.hotspotKind,
+      resourceTarget
+    );
+    if (analyticsProperties) {
+      trackEvent('resource_analysis_hotspot_selected', analyticsProperties);
+    }
     const target = resolvePreflightNavigationTarget(resourceTarget, latestNodes.current);
     if (target.kind === 'missing') {
       resourceAnalysis.evaluateNow();

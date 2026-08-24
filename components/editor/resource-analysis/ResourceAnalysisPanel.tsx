@@ -12,7 +12,10 @@ import type {
   ResourceAnalysisUnknown,
 } from '@/types/resource-analysis';
 
-export type ResourceAnalysisLocateSource = 'hotspot';
+export interface ResourceAnalysisLocateContext {
+  readonly source: 'hotspot';
+  readonly hotspotKind: ResourceAnalysisHotspot['kind'];
+}
 
 interface ResourceAnalysisPanelProps {
   isOpen: boolean;
@@ -23,7 +26,7 @@ interface ResourceAnalysisPanelProps {
   onClose: () => void;
   onRetry: () => void;
   onOpenValidation: () => void;
-  onLocate: (target: ResourceAnalysisTarget, source: ResourceAnalysisLocateSource) => boolean;
+  onLocate: (target: ResourceAnalysisTarget, context: ResourceAnalysisLocateContext) => boolean;
 }
 
 const sectionClass = 'mt-4 rounded-2xl border border-slate-700 bg-slate-900/60 p-4';
@@ -48,7 +51,9 @@ export function ResourceAnalysisPanel({ isOpen, state, isRefreshing, lang, notic
   if (!isOpen) return null;
 
   const result = state?.status === 'available' ? state.result : null;
-  const locate = (target: ResourceAnalysisTarget) => { onLocate(target, 'hotspot'); };
+  const locate = (hotspot: ResourceAnalysisHotspot) => {
+    onLocate(hotspot.target, { source: 'hotspot', hotspotKind: hotspot.kind });
+  };
   const guard = (item: ResourceAnalysisGuardValue) => item.value === null
     ? copy.resourceAnalysisNotConfigured
     : `${item.value} · ${item.source === 'configured' ? copy.resourceAnalysisConfigured : copy.resourceAnalysisCodegenDefault}`;
@@ -91,7 +96,7 @@ export function ResourceAnalysisPanel({ isOpen, state, isRefreshing, lang, notic
           {[[copy.resourceAnalysisDependencyDepth, result.summary.dependencyDepth], [copy.resourceAnalysisContextFanIn, result.summary.maxContextFanIn], [copy.resourceAnalysisAsyncTasks, result.summary.asyncTaskCount], [copy.resourceAnalysisFixedAssignments, result.summary.fixedAssignmentCount], [copy.resourceAnalysisManagerAssignments, result.summary.managerDelegatedTaskCount], [copy.resourceAnalysisAgentBindings, result.summary.agentToolBindingCount], [copy.resourceAnalysisTaskBindings, result.summary.taskToolBindingCount]].map(([label, value]) => <div key={label}><dt className="text-slate-500">{label}</dt><dd className="font-bold text-white">{value}</dd></div>)}
         </dl></section>
 
-        <section className={sectionClass}><h3 className="text-sm font-bold text-white">{copy.resourceAnalysisHotspots}</h3>{result.hotspots.length ? <ul className="mt-3 space-y-3">{result.hotspots.map((item, index) => <li key={`${item.kind}-${item.target.type}-${'id' in item.target ? item.target.id : 'crew'}-${index}`} className="rounded-xl bg-slate-950/80 p-3"><p className="text-xs font-bold text-slate-100">{hotspotLabel(item.kind)}</p><p className="mt-1 text-[11px] text-slate-400">{copy.resourceAnalysisValue}: <span className="font-bold text-violet-200">{item.value}</span></p><button type="button" onClick={() => locate(item.target)} className={`mt-2 ${actionClass}`}>{copy.resourceAnalysisLocate}</button></li>)}</ul> : <p className="mt-2 text-xs leading-relaxed text-slate-400">{copy.resourceAnalysisNoHotspots}</p>}</section>
+        <section className={sectionClass}><h3 className="text-sm font-bold text-white">{copy.resourceAnalysisHotspots}</h3>{result.hotspots.length ? <ul className="mt-3 space-y-3">{result.hotspots.map((item, index) => <li key={`${item.kind}-${item.target.type}-${'id' in item.target ? item.target.id : 'crew'}-${index}`} className="rounded-xl bg-slate-950/80 p-3"><p className="text-xs font-bold text-slate-100">{hotspotLabel(item.kind)}</p><p className="mt-1 text-[11px] text-slate-400">{copy.resourceAnalysisValue}: <span className="font-bold text-violet-200">{item.value}</span></p><button type="button" onClick={() => locate(item)} className={`mt-2 ${actionClass}`}>{copy.resourceAnalysisLocate}</button></li>)}</ul> : <p className="mt-2 text-xs leading-relaxed text-slate-400">{copy.resourceAnalysisNoHotspots}</p>}</section>
 
         <section className={sectionClass}><h3 className="text-sm font-bold text-white">{copy.resourceAnalysisModels}</h3><div className="mt-3 space-y-3">{result.models.map((model) => <article key={model.model} className="rounded-xl bg-slate-950/80 p-3 text-xs"><p className="text-[10px] uppercase text-slate-500">{copy.resourceAnalysisModelId}</p><p className="break-all font-mono text-violet-200 [overflow-wrap:anywhere]">{model.model}</p><dl className="mt-2 grid grid-cols-2 gap-2"><div><dt className="text-slate-500">{copy.resourceAnalysisAgentCount}</dt><dd className="text-white">{model.agentCount}</dd></div><div><dt className="text-slate-500">{copy.resourceAnalysisReferenceCount}</dt><dd className="text-white">{model.referenceCount}</dd></div><div><dt className="text-slate-500">{copy.resourceAnalysisUsedByManager}</dt><dd className="text-white">{model.usedByManager ? copy.resourceAnalysisYes : copy.resourceAnalysisNo}</dd></div></dl><p className="mt-2 text-slate-500">{copy.resourceAnalysisAgentReferences}</p><ul className="mt-1 text-slate-300">{model.agents.length ? model.agents.map((agent) => <li key={agent.agentId}>{agent.label} · {agent.role}</li>) : <li>{copy.resourceAnalysisNone}</li>}</ul></article>)}</div></section>
 
