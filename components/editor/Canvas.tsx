@@ -350,7 +350,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
         <Panel position="top-right" className={`!z-[60] flex items-end gap-2 ${isPreflightOpen ? '!top-auto !right-2 !bottom-[calc(80dvh+0.5rem)] !m-0 md:!top-3 md:!right-[452px] md:!bottom-auto lg:!right-[492px]' : `!m-3 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}`}>
-          <UnifiedPreflightEntryButton lang={lang} isOpen={isPreflightReviewOpen} compact={isPreflightOpen} onActivate={onOpenPreflightReview} />
+          <UnifiedPreflightEntryButton lang={lang} isOpen={isPreflightReviewOpen} onActivate={onOpenPreflightReview} />
         </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">
