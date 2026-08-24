@@ -76,6 +76,6 @@ test('duplicate React Flow selection notifications do not close a reopened Previ
 });
 
 test('presentation components do not import graph semantics or recalculate ordering', () => {
-  const sources = ['components/editor/execution-preview/ExecutionPreviewPanel.tsx', 'components/editor/execution-preview/ExecutionPreviewStepCard.tsx'].map((path) => readFileSync(path, 'utf8')).join('\n');
+  const sources = ['components/editor/execution-preview/ExecutionPreviewPanel.tsx', 'components/editor/execution-preview/ExecutionPreviewStageContent.tsx', 'components/editor/execution-preview/ExecutionPreviewStepCard.tsx'].map((path) => readFileSync(path, 'utf8')).join('\n');
   for (const forbidden of ['validateGraph', 'createSemanticPlan', 'normalizeModel', 'CodegenPlan', '@xyflow/react', '.sort(']) assert.equal(sources.includes(forbidden), false, forbidden);
 });

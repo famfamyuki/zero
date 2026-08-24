@@ -40,7 +40,7 @@ test('panel exposes responsive identity, busy state, disclaimer, and accessible 
   assert.match(html, /aria-busy="false"/);
   assert.match(html, /Static preflight analysis/);
   assert.match(html, /max-h-\[78dvh\]/);
-  const source = readFileSync('components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'utf8');
+  const source = ['components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'components/editor/resource-analysis/ResourceAnalysisStageContent.tsx'].map((path) => readFileSync(path, 'utf8')).join('\n');
   assert.match(source, /tabIndex=\{-1\}/);
   assert.match(source, /min-h-11 min-w-11/);
   assert.match(source, /aria-live="polite"/);
@@ -48,7 +48,7 @@ test('panel exposes responsive identity, busy state, disclaimer, and accessible 
 });
 
 test('focus, Escape, and successful Locate suppression follow the established panel contract', () => {
-  const source = readFileSync('components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'utf8');
+  const source = ['components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'components/editor/resource-analysis/ResourceAnalysisStageContent.tsx'].map((path) => readFileSync(path, 'utf8')).join('\n');
   assert.doesNotMatch(source, /document\.activeElement|previousFocus/);
   assert.match(source, /requestAnimationFrame\(\(\) => requestAnimationFrame\(\(\) => heading\.current\?\.focus\(\)\)\)/);
   assert.match(source, /event\.key === 'Escape'/);
@@ -87,7 +87,7 @@ test('models and manager retain complete IDs, usage counts, and references', () 
   const html = panel(available);
   assert.match(html, new RegExp(longModel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   for (const expected of ['Agent count', 'Reference count', 'Used by manager', 'Agent references', 'Researcher', 'Manager']) assert.match(html, new RegExp(expected));
-  const source = readFileSync('components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'utf8');
+  const source = readFileSync('components/editor/resource-analysis/ResourceAnalysisStageContent.tsx', 'utf8');
   assert.match(source, /break-all/); assert.match(source, /overflow-wrap:anywhere/);
 });
 

@@ -181,7 +181,7 @@ test('Resource Analysis analytics is parent-owned, transition-gated, and preserv
   assert.ok(locate.indexOf('resource_analysis_hotspot_selected') < locate.indexOf('resolvePreflightNavigationTarget'));
   assert.ok(locate.indexOf('resource_analysis_hotspot_selected') < locate.indexOf("if (target.kind === 'missing')"));
 
-  const panel = readFileSync('components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'utf8');
+  const panel = ['components/editor/resource-analysis/ResourceAnalysisPanel.tsx', 'components/editor/resource-analysis/ResourceAnalysisStageContent.tsx'].map((path) => readFileSync(path, 'utf8')).join('\n');
   assert.match(panel, /hotspotKind: ResourceAnalysisHotspot\['kind'\]/);
   assert.match(panel, /onLocate\(hotspot\.target, \{ source: 'hotspot', hotspotKind: hotspot\.kind \}\)/);
   const entry = readFileSync('components/editor/resource-analysis/ResourceAnalysisEntryButton.tsx', 'utf8');
