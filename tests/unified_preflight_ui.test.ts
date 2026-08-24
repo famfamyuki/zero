@@ -5,6 +5,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { UnifiedPreflightEntryButton } from '../components/editor/unified-preflight/UnifiedPreflightEntryButton';
 import { UnifiedPreflightOverview } from '../components/editor/unified-preflight/UnifiedPreflightOverview';
+import { getUnifiedPreflightTabDestination, unifiedPreflightStages } from '../components/editor/unified-preflight/unifiedPreflightTabs';
 import type { UnifiedPreflightReadModel } from '../types/unified-preflight';
 
 const availableReview: UnifiedPreflightReadModel = {
@@ -81,6 +82,44 @@ test('Unified shell retains identity, tabs, focus, Escape, responsive shell, and
   assert.match(source, /id="unified-preflight-panel"/); assert.match(source, /id="unified-preflight-heading"/); assert.match(source, /role="tablist"/); assert.match(source, /role="tab"/); assert.match(source, /role="tabpanel"/);
   assert.match(source, /md:w-\[440px\]/); assert.match(source, /lg:w-\[480px\]/); assert.match(source, /max-h-\[80dvh\]/); assert.equal((source.match(/overflow-y-auto/g) ?? []).length, 1);
   assert.match(source, /event\.key === 'Escape'/); assert.match(source, /onClose\(\)/);
+});
+
+test('Unified tabs keep the exact four-stage order and complete ARIA roving-tabindex contract', () => {
+  assert.deepEqual(unifiedPreflightStages, ['overview', 'readiness', 'execution', 'resources']);
+  const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
+  assert.match(source, /role="tablist"/);
+  assert.match(source, /role="tab"/);
+  assert.match(source, /id=\{`unified-preflight-tab-\$\{stage\}`\}/);
+  assert.match(source, /aria-selected=\{activeStage === stage\}/);
+  assert.match(source, /aria-controls=\{`unified-preflight-tabpanel-\$\{stage\}`\}/);
+  assert.match(source, /tabIndex=\{activeStage === stage \? 0 : -1\}/);
+  assert.match(source, /role="tabpanel"/);
+  assert.match(source, /id=\{`unified-preflight-tabpanel-\$\{activeStage\}`\}/);
+  assert.match(source, /aria-labelledby=\{`unified-preflight-tab-\$\{activeStage\}`\}/);
+  assert.doesNotMatch(source, /role="tabpanel"[^>]*tabIndex/);
+});
+
+test('Unified automatic tabs support ArrowRight, ArrowLeft, Home, End, and ignore unsupported keys', () => {
+  const stages = [...unifiedPreflightStages];
+  const right = ['readiness', 'execution', 'resources', 'overview'];
+  const left = ['resources', 'overview', 'readiness', 'execution'];
+
+  stages.forEach((stage, index) => {
+    assert.equal(getUnifiedPreflightTabDestination(stage, 'ArrowRight'), right[index]);
+    assert.equal(getUnifiedPreflightTabDestination(stage, 'ArrowLeft'), left[index]);
+    assert.equal(getUnifiedPreflightTabDestination(stage, 'Home'), 'overview');
+    assert.equal(getUnifiedPreflightTabDestination(stage, 'End'), 'resources');
+    assert.equal(getUnifiedPreflightTabDestination(stage, 'Tab'), null);
+    assert.equal(getUnifiedPreflightTabDestination(stage, 'Enter'), null);
+    assert.equal(getUnifiedPreflightTabDestination(stage, ' '), null);
+  });
+
+  const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
+  assert.match(source, /onKeyDown=\{\(event\) => handleTabKeyDown\(stage, event\)\}/);
+  assert.match(source, /if \(!destination\) return/);
+  assert.match(source, /onStageChange\(destination\)/);
+  assert.match(source, /tabRefs\.current\[destination\]\?\.focus\(\)/);
+  assert.doesNotMatch(source, /window\.addEventListener\('keydown', (?!escape)/);
 });
 
 test('Unified stage intros reuse exact existing disclaimer translations', () => {
