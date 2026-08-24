@@ -24,15 +24,17 @@ interface ReadinessStageContentProps {
   onRetry: () => void;
   onLocate: (finding: ReadinessFinding) => void;
   onOpenValidation: () => void;
+  notice?: string | null;
 }
 
-export function ReadinessStageContent({ result, error, isRefreshing, lang, filter, onFilterChange, targetSummary, onRetry, onLocate, onOpenValidation }: ReadinessStageContentProps) {
+export function ReadinessStageContent({ result, error, isRefreshing, lang, filter, onFilterChange, targetSummary, onRetry, onLocate, onOpenValidation, notice = null }: ReadinessStageContentProps) {
   const findings = filterReadinessFindings(result?.findings ?? [], filter);
   const status = result?.status ?? 'not_evaluable';
   const Icon = statusIcons[status];
   const ja = lang === 'ja';
 
   return <>
+    <div aria-live="polite">{notice ? <p role="status" className="mb-3 rounded-lg bg-indigo-950/70 p-3 text-xs text-indigo-100">{notice}</p> : null}</div>
     {error ? <section className="rounded-2xl border border-orange-700/50 bg-orange-950/20 p-4"><h3 className="font-bold text-orange-200">{ja ? 'Readinessの評価に失敗しました。' : 'Readiness check failed.'}</h3><p className="mt-2 text-xs leading-relaxed text-slate-300">{ja ? '評価を完了できなかったため、Readiness結果は表示していません。' : 'No Readiness result is being shown because the evaluation could not complete.'}</p><button type="button" onClick={onRetry} className="mt-4 min-h-11 rounded-lg bg-orange-500 px-4 text-xs font-bold text-slate-950">{ja ? '再試行' : 'Retry'}</button>{error instanceof ReadinessEvaluationError && <details className="mt-4 text-[11px] text-slate-500"><summary>Technical details</summary><code>{error.ruleId}</code></details>}</section> : result && <>
       <section><div className="flex items-center gap-2"><Icon className="h-5 w-5" /><strong className="text-sm text-white">{readinessStatusLabel(status, lang)}</strong></div><p className="mt-2 text-xs leading-relaxed text-slate-300">{ja ? 'Readinessは、Validationを通過したワークフローの設計上の改善余地を確認します。本番実行の成功を保証するものではありません。' : 'Readiness checks design signals for a valid workflow and suggests improvements for clarity and production preparedness. It does not guarantee runtime success.'}</p><p className="mt-2 text-[11px] leading-relaxed text-slate-500">{ja ? 'Validationはコード生成可能かを判定します。Readinessはコード生成を止めず、設計改善の指針を示します。' : 'Validation decides whether code can be generated. Readiness gives non-blocking improvement guidance.'}</p>
         {result.evaluable && <div className="mt-3 flex flex-wrap gap-2">{(['high','medium','low','info'] as const).filter(k => result.counts[k] > 0).map(k => <span key={k} className="rounded-full bg-slate-800 px-2 py-1 text-[10px] text-slate-300">{k} {result.counts[k]}</span>)}</div>}

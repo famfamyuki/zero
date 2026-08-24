@@ -15,7 +15,7 @@ interface CardProps {
   stage: Exclude<UnifiedPreflightStage, 'overview'>;
   title: string;
   question: string;
-  state: string;
+  state: string | null;
   summary: ReactNode;
   lang: Language;
   onSelectStage: Props['onSelectStage'];
@@ -35,7 +35,7 @@ function Summary({ rows }: { rows: readonly (readonly [string, string | number])
 function OverviewCard({ stage, title, question, state, summary, lang, onSelectStage }: CardProps) {
   const copy = translations[lang];
   return <section className={cardClass}>
-    <div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-bold text-white">{title}</h3><p className="mt-1 text-xs text-slate-400">{question}</p></div><span className="rounded-full bg-slate-800 px-2 py-1 text-[10px] text-slate-300">{stageStateLabel(state, lang)}</span></div>
+    <div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-bold text-white">{title}</h3><p className="mt-1 text-xs text-slate-400">{question}</p></div>{state ? <span className="rounded-full bg-slate-800 px-2 py-1 text-[10px] text-slate-300">{stageStateLabel(state, lang)}</span> : null}</div>
     {summary}
     <button type="button" onClick={() => onSelectStage(stage)} className="mt-3 min-h-11 rounded-lg border border-teal-700 px-3 text-xs font-bold text-teal-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300">{lang === 'ja' ? `${title}を${copy.unifiedPreflightOpenStage}` : `${copy.unifiedPreflightOpenStage} ${title}`}</button>
   </section>;
@@ -49,13 +49,14 @@ export function UnifiedPreflightOverview({ review, lang, onSelectStage }: Props)
   const message = { refreshing: copy.unifiedPreflightUpdating, empty: copy.unifiedPreflightEmpty, invalid: copy.unifiedPreflightInvalid, partial: copy.unifiedPreflightPartial, available: copy.unifiedPreflightAvailable }[review.state];
   const aggregateState = stageStateLabel(review.state, lang);
   const processLabel = (process: 'sequential' | 'hierarchical') => process === 'sequential' ? copy.processSequential : copy.processHierarchical;
+  const isGloballyRefreshing = review.state === 'refreshing';
 
   return <>
     <section aria-live="polite" className="rounded-2xl border border-teal-800/70 bg-teal-950/20 p-4"><p className="text-xs font-bold uppercase tracking-wide text-teal-300">{aggregateState}</p><p className="mt-2 text-xs leading-relaxed text-slate-200">{message}</p>{review.state === 'invalid' ? <button type="button" onClick={() => onSelectStage('readiness')} className="mt-3 min-h-11 rounded-lg bg-indigo-500 px-4 text-xs font-bold text-white">{copy.unifiedPreflightReviewReadiness}</button> : null}</section>
     <div className="mt-4 space-y-3">
-      <OverviewCard stage="readiness" title={copy.unifiedPreflightReadiness} question={copy.unifiedPreflightQuestionReadiness} state={readiness.state} lang={lang} onSelectStage={onSelectStage} summary={readiness.result ? <Summary rows={[[copy.unifiedPreflightStatus, readinessStatusLabel(readiness.result.status, lang)], [copy.unifiedPreflightFindings, readiness.result.counts.total], [copy.unifiedPreflightRuleset, readiness.result.rulesetVersion]]} /> : null} />
-      <OverviewCard stage="execution" title={copy.unifiedPreflightExecution} question={copy.unifiedPreflightQuestionExecution} state={execution.state} lang={lang} onSelectStage={onSelectStage} summary={execution.result ? <Summary rows={[[copy.unifiedPreflightProcess, processLabel(execution.result.process)], [copy.unifiedPreflightTasks, execution.result.summary.taskCount], [copy.unifiedPreflightAgents, execution.result.summary.agentCount], [copy.unifiedPreflightTools, execution.result.summary.toolCount], [copy.unifiedPreflightVersion, execution.result.version]]} /> : null} />
-      <OverviewCard stage="resources" title={copy.unifiedPreflightResources} question={copy.unifiedPreflightQuestionResources} state={resources.state} lang={lang} onSelectStage={onSelectStage} summary={resources.result ? <Summary rows={[[copy.unifiedPreflightProcess, processLabel(resources.result.process)], [copy.unifiedPreflightTasks, resources.result.summary.taskCount], [copy.unifiedPreflightHotspots, resources.result.hotspotCount], [copy.unifiedPreflightVersion, resources.result.version]]} /> : null} />
+      <OverviewCard stage="readiness" title={copy.unifiedPreflightReadiness} question={copy.unifiedPreflightQuestionReadiness} state={isGloballyRefreshing ? null : readiness.state} lang={lang} onSelectStage={onSelectStage} summary={!isGloballyRefreshing && readiness.result ? <Summary rows={[[copy.unifiedPreflightStatus, readinessStatusLabel(readiness.result.status, lang)], [copy.unifiedPreflightFindings, readiness.result.counts.total], [copy.unifiedPreflightRuleset, readiness.result.rulesetVersion]]} /> : null} />
+      <OverviewCard stage="execution" title={copy.unifiedPreflightExecution} question={copy.unifiedPreflightQuestionExecution} state={isGloballyRefreshing ? null : execution.state} lang={lang} onSelectStage={onSelectStage} summary={!isGloballyRefreshing && execution.result ? <Summary rows={[[copy.unifiedPreflightProcess, processLabel(execution.result.process)], [copy.unifiedPreflightTasks, execution.result.summary.taskCount], [copy.unifiedPreflightAgents, execution.result.summary.agentCount], [copy.unifiedPreflightTools, execution.result.summary.toolCount], [copy.unifiedPreflightVersion, execution.result.version]]} /> : null} />
+      <OverviewCard stage="resources" title={copy.unifiedPreflightResources} question={copy.unifiedPreflightQuestionResources} state={isGloballyRefreshing ? null : resources.state} lang={lang} onSelectStage={onSelectStage} summary={!isGloballyRefreshing && resources.result ? <Summary rows={[[copy.unifiedPreflightProcess, processLabel(resources.result.process)], [copy.unifiedPreflightTasks, resources.result.summary.taskCount], [copy.unifiedPreflightHotspots, resources.result.hotspotCount], [copy.unifiedPreflightVersion, resources.result.version]]} /> : null} />
     </div>
     <footer className="mt-4 text-[10px] text-slate-600">Unified Preflight {review.version}</footer>
   </>;

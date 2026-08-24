@@ -47,6 +47,35 @@ test('all aggregate state messages are localized without changing projected stat
   }
 });
 
+test('aggregate refreshing suppresses retained stage badges and summaries', () => {
+  const refreshing = { ...availableReview, state: 'refreshing' as const };
+  const html = renderToStaticMarkup(React.createElement(UnifiedPreflightOverview, { review: refreshing, lang: 'en', onSelectStage() {} }));
+  assert.match(html, /Updating the review/);
+  for (const retained of ['needs attention', 'Findings', 'Ruleset', 'sequential', 'Hotspots', '>0.1.0<']) assert.doesNotMatch(html, new RegExp(retained, 'i'));
+  for (const title of ['Readiness', 'Execution', 'Resources']) assert.match(html, new RegExp(`>${title}<`));
+  const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightOverview.tsx', 'utf8');
+  assert.doesNotMatch(source, /GraphData|validateGraph|createSemanticPlan/);
+});
+
+test('Re-evaluate and live status copies are exact in EN and JA', () => {
+  const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
+  const translations = readFileSync('lib/i18n/translations.ts', 'utf8');
+  assert.match(source, /copy\.unifiedPreflightReevaluate/);
+  assert.match(source, /aria-live="polite"/);
+  assert.match(source, /role="status"/);
+  for (const copy of ['Re-evaluate', '再評価', 'Preflight review updated.', '事前レビューを更新しました。']) assert.ok(translations.includes(copy));
+});
+
+test('Readiness stale notice is optional and announced politely', () => {
+  const source = readFileSync('components/editor/readiness/ReadinessStageContent.tsx', 'utf8');
+  const panelSource = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
+  assert.match(source, /notice\?: string \| null/);
+  assert.match(source, /notice = null/);
+  assert.match(source, /aria-live="polite"/);
+  assert.match(source, /role="status"/);
+  assert.match(panelSource, /notice=\{props\.readinessNotice\}/);
+});
+
 test('Unified shell retains identity, tabs, focus, Escape, responsive shell, and one scroll owner', () => {
   const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
   assert.match(source, /id="unified-preflight-panel"/); assert.match(source, /id="unified-preflight-heading"/); assert.match(source, /role="tablist"/); assert.match(source, /role="tab"/); assert.match(source, /role="tabpanel"/);

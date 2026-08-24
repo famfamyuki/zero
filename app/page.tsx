@@ -140,6 +140,7 @@ export default function EditorPage() {
   const [readinessNotice, setReadinessNotice] = useState<string | null>(null);
   const [executionPreviewNotice, setExecutionPreviewNotice] = useState<string | null>(null);
   const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
+  const [preflightUpdatedNotice, setPreflightUpdatedNotice] = useState<string | null>(null);
   const [isPreflightReviewOpen, setIsPreflightReviewOpen] = useState(false);
   const [activePreflightStage, setActivePreflightStage] = useState<UnifiedPreflightStage>('overview');
   const preflightSelectionOwnerRef = useRef<PreflightSelectionOwner>(null);
@@ -152,6 +153,14 @@ export default function EditorPage() {
   const readiness = preflight.readiness;
   const executionPreview = preflight.execution;
   const resourceAnalysis = preflight.resources;
+
+  useEffect(() => {
+    if (preflight.isRefreshing) setPreflightUpdatedNotice(null);
+  }, [preflight.isRefreshing]);
+
+  useEffect(() => {
+    if (!isPreflightReviewOpen) setPreflightUpdatedNotice(null);
+  }, [isPreflightReviewOpen]);
 
   // Listen to fullscreen changes
   useEffect(() => {
@@ -421,6 +430,15 @@ export default function EditorPage() {
     if (stage === 'resources' && resourceAnalysis.state) trackEvent('resource_analysis_opened', createResourceAnalysisOpenedAnalyticsProperties(resourceAnalysis.state));
   }, [activePreflightStage, executionPreview.state, readiness.result, resourceAnalysis.state]);
 
+  const handleReevaluatePreflight = useCallback(() => {
+    setReadinessNotice(null);
+    setExecutionPreviewNotice(null);
+    setResourceAnalysisNotice(null);
+    setPreflightUpdatedNotice(null);
+    preflight.evaluateAll();
+    setPreflightUpdatedNotice(t('unifiedPreflightUpdated'));
+  }, [preflight, t]);
+
   const restoreEntryFocus = useCallback((entry: HTMLButtonElement | null) => {
     if (entry?.isConnected) entry.focus({ preventScroll: true });
     requestAnimationFrame(() => {
@@ -432,6 +450,7 @@ export default function EditorPage() {
 
   const closePreflightReview = useCallback(() => {
     preflightSelectionOwnerRef.current = null;
+    setPreflightUpdatedNotice(null);
     setIsPreflightReviewOpen(false);
     restoreEntryFocus(preflightReviewEntryRef.current);
   }, [restoreEntryFocus]);
@@ -873,7 +892,7 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
-        <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} />
+        <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}

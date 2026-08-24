@@ -53,6 +53,41 @@ test('explicit stage selection retains exact legacy analytics and deduplicates a
   assert.match(stage, /trackEvent\('resource_analysis_opened', createResourceAnalysisOpenedAnalyticsProperties\(resourceAnalysis\.state\)\)/);
 });
 
+test('manual Re-evaluate clears stale notices and calls only evaluateAll exactly once', () => {
+  const reevaluate = between('const handleReevaluatePreflight', 'const restoreEntryFocus');
+  assert.equal((reevaluate.match(/preflight\.evaluateAll\(\)/g) ?? []).length, 1);
+  assert.match(reevaluate, /setReadinessNotice\(null\)/);
+  assert.match(reevaluate, /setExecutionPreviewNotice\(null\)/);
+  assert.match(reevaluate, /setResourceAnalysisNotice\(null\)/);
+  assert.doesNotMatch(reevaluate, /readiness\.evaluateNow|executionPreview\.evaluateNow|resourceAnalysis\.evaluateNow/);
+  assert.doesNotMatch(reevaluate, /setActivePreflightStage|setIsPreflightReviewOpen|preflightSelectionOwnerRef|setSelectedNode|setNodes|setEdges|setIsInspectorOpen|setIsMobileSidebarOpen|trackEvent/);
+  assert.match(panel, /onClick=\{props\.onReevaluate\}/);
+  assert.doesNotMatch(panel, /key=\{.*updatedNotice|updatedNotice.*key=/);
+  assert.match(page, /if \(!isPreflightReviewOpen\) setPreflightUpdatedNotice\(null\)/);
+  assert.match(page, /if \(preflight\.isRefreshing\) setPreflightUpdatedNotice\(null\)/);
+});
+
+test('active Unified stage remains page-session state and is not reset by workflow actions', () => {
+  assert.match(page, /useState<UnifiedPreflightStage>\('overview'\)/);
+  const actions = page.slice(page.indexOf('const handleReevaluatePreflight'), page.indexOf('const readinessTargetSummary'));
+  assert.doesNotMatch(actions, /setActivePreflightStage/);
+  assert.doesNotMatch(page, /localStorage[^\n]*activePreflightStage|serializeGraph[^\n]*activePreflightStage|searchParams[^\n]*activePreflightStage/);
+});
+
+test('missing targets preserve Unified navigation state while valid Locate retains destination focus', () => {
+  const readiness = between('const handleLocateFinding', 'const readinessTargetSummary');
+  const execution = between('const handleLocateExecutionPreview', 'const handleLocateResourceAnalysis');
+  const resource = between('const handleLocateResourceAnalysis', 'const handleLocateFinding');
+  for (const [source, marker] of [[readiness, 'if (!node)'], [readiness, 'if (!edge)'], [execution, "if (target.kind === 'missing')"], [resource, "if (target.kind === 'missing')"]] as const) {
+    const missing = source.slice(source.indexOf(marker), source.indexOf('return', source.indexOf(marker)) + 6);
+    assert.doesNotMatch(missing, /setIsPreflightReviewOpen|setActivePreflightStage|preflightSelectionOwnerRef|setSelectedNode|setIsInspectorOpen/);
+  }
+  assert.doesNotMatch(readiness + execution + resource, /closePreflightReview\(/);
+  assert.match(readiness, /focus-flow-node|focus-flow-edge/);
+  assert.match(execution, /focus-inspector-heading|focus-manager-llm/);
+  assert.match(resource, /focus-inspector-heading|focus-manager-llm/);
+});
+
 test('Readiness and Execution interaction analytics and destination focus remain unchanged', () => {
   const readiness = between('const handleLocateFinding', 'const readinessTargetSummary');
   const execution = between('const handleLocateExecutionPreview', 'const handleLocateResourceAnalysis');
