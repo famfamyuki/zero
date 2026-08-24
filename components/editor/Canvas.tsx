@@ -29,10 +29,7 @@ import { TaskNode } from './nodes/TaskNode';
 import { ToolNode } from './nodes/ToolNode';
 import { CustomNode, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
-import type { ReadinessStatus } from '@/types/readiness';
-import { ReadinessEntryButton } from './readiness/ReadinessEntryButton';
-import { ExecutionPreviewEntryButton } from './execution-preview/ExecutionPreviewEntryButton';
-import { ResourceAnalysisEntryButton } from './resource-analysis/ResourceAnalysisEntryButton';
+import { UnifiedPreflightEntryButton } from './unified-preflight/UnifiedPreflightEntryButton';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -67,13 +64,8 @@ interface CanvasProps {
   onNodeDragStop?: any;
   toggleFullscreen: () => void;
   isFullscreen: boolean;
-  readinessStatus: ReadinessStatus;
-  isReadinessOpen: boolean;
-  onOpenReadiness: (trigger: HTMLButtonElement) => void;
-  isExecutionPreviewOpen: boolean;
-  onOpenExecutionPreview: (trigger: HTMLButtonElement) => void;
-  isResourceAnalysisOpen: boolean;
-  onOpenResourceAnalysis: (trigger: HTMLButtonElement) => void;
+  isPreflightReviewOpen: boolean;
+  onOpenPreflightReview: (trigger: HTMLButtonElement) => void;
   isInspectorOpen: boolean;
 }
 
@@ -89,20 +81,15 @@ export const Canvas: React.FC<CanvasProps> = ({
   onNodeDragStop,
   toggleFullscreen,
   isFullscreen,
-  readinessStatus,
-  isReadinessOpen,
-  onOpenReadiness,
-  isExecutionPreviewOpen,
-  onOpenExecutionPreview,
-  isResourceAnalysisOpen,
-  onOpenResourceAnalysis,
+  isPreflightReviewOpen,
+  onOpenPreflightReview,
   isInspectorOpen,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [isOverview, setIsOverview] = useState(false);
   const { lang } = useLanguage();
-  const isPreflightOpen = isReadinessOpen || isExecutionPreviewOpen || isResourceAnalysisOpen;
+  const isPreflightOpen = isPreflightReviewOpen;
 
   const selectedNodeId = useMemo(
     () => nodes.find((node) => node.selected)?.id ?? null,
@@ -362,10 +349,8 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
-        <Panel position="top-right" className={`!z-[60] flex items-end gap-2 ${isPreflightOpen ? '!top-auto !right-2 !bottom-[calc(78dvh+0.5rem)] !m-0 max-w-[calc(100vw-1rem)] flex-row overflow-x-auto md:!top-3 md:!right-[412px] md:!bottom-auto md:max-w-none md:flex-col md:overflow-visible lg:!right-[432px]' : `!m-3 flex-col ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}`}>
-          <ReadinessEntryButton status={readinessStatus} lang={lang} isOpen={isReadinessOpen} compact={isPreflightOpen} onActivate={onOpenReadiness} />
-          <ExecutionPreviewEntryButton lang={lang} isOpen={isExecutionPreviewOpen} compact={isPreflightOpen} onActivate={onOpenExecutionPreview} />
-          <ResourceAnalysisEntryButton lang={lang} isOpen={isResourceAnalysisOpen} compact={isPreflightOpen} onActivate={onOpenResourceAnalysis} />
+        <Panel position="top-right" className={`!z-[60] flex items-end gap-2 ${isPreflightOpen ? '!top-auto !right-2 !bottom-[calc(80dvh+0.5rem)] !m-0 md:!top-3 md:!right-[452px] md:!bottom-auto lg:!right-[492px]' : `!m-3 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}`}>
+          <UnifiedPreflightEntryButton lang={lang} isOpen={isPreflightReviewOpen} compact={isPreflightOpen} onActivate={onOpenPreflightReview} />
         </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">

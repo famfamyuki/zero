@@ -11,7 +11,7 @@ export type PreflightNavigationResult =
   | { kind: 'crew' }
   | { kind: 'missing' };
 
-export type PreflightSelectionOwner = 'readiness' | 'execution_preview' | 'resource_analysis' | null;
+export type PreflightSelectionOwner = 'readiness' | 'execution_preview' | 'resource_analysis' | 'unified_preflight' | null;
 
 export function resolvePreflightNavigationTarget(target: PreflightTarget, nodes: readonly CustomNode[]): PreflightNavigationResult {
   if (target.type === 'crew') return { kind: 'crew' };

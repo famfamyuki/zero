@@ -17,15 +17,9 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
 import { deserializeGraph, GraphDeserializationError, serializeGraph } from '@/lib/graph-json';
 import { validateGraph } from '@/lib/transpiler/validation';
-import { useReadinessEvaluation } from '@/hooks/useReadinessEvaluation';
-import { ReadinessPanel } from '@/components/editor/readiness/ReadinessPanel';
 import type { ReadinessFinding } from '@/types/readiness';
-import { useExecutionPreview } from '@/hooks/useExecutionPreview';
-import { ExecutionPreviewPanel } from '@/components/editor/execution-preview/ExecutionPreviewPanel';
 import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
 import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
-import { useResourceAnalysis } from '@/hooks/useResourceAnalysis';
-import { ResourceAnalysisPanel } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
 import type { ResourceAnalysisLocateContext } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
 import type { ResourceAnalysisTarget } from '@/types/resource-analysis';
 import {
@@ -37,6 +31,9 @@ import {
   shouldIgnoreSelectionChangeForOpenPreflight,
   type PreflightSelectionOwner,
 } from '@/lib/preflight-navigation';
+import { useUnifiedPreflight } from '@/hooks/useUnifiedPreflight';
+import { UnifiedPreflightPanel } from '@/components/editor/unified-preflight/UnifiedPreflightPanel';
+import type { UnifiedPreflightStage } from '@/types/unified-preflight';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -140,23 +137,21 @@ export default function EditorPage() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
-  const [isReadinessOpen, setIsReadinessOpen] = useState(false);
   const [readinessNotice, setReadinessNotice] = useState<string | null>(null);
-  const [isExecutionPreviewOpen, setIsExecutionPreviewOpen] = useState(false);
   const [executionPreviewNotice, setExecutionPreviewNotice] = useState<string | null>(null);
-  const [isResourceAnalysisOpen, setIsResourceAnalysisOpen] = useState(false);
   const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
+  const [isPreflightReviewOpen, setIsPreflightReviewOpen] = useState(false);
+  const [activePreflightStage, setActivePreflightStage] = useState<UnifiedPreflightStage>('overview');
   const preflightSelectionOwnerRef = useRef<PreflightSelectionOwner>(null);
-  const readinessEntryRef = useRef<HTMLButtonElement | null>(null);
-  const executionPreviewEntryRef = useRef<HTMLButtonElement | null>(null);
-  const resourceAnalysisEntryRef = useRef<HTMLButtonElement | null>(null);
+  const preflightReviewEntryRef = useRef<HTMLButtonElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const readinessGraph = useMemo<GraphData>(() => ({ nodes, edges, crewConfig }), [nodes, edges, crewConfig]);
-  const readiness = useReadinessEvaluation(readinessGraph);
-  const executionPreview = useExecutionPreview(readinessGraph);
-  const resourceAnalysis = useResourceAnalysis(readinessGraph);
+  const preflight = useUnifiedPreflight(readinessGraph);
+  const readiness = preflight.readiness;
+  const executionPreview = preflight.execution;
+  const resourceAnalysis = preflight.resources;
 
   // Listen to fullscreen changes
   useEffect(() => {
@@ -239,9 +234,7 @@ export default function EditorPage() {
           preflightSelectionOwnerRef.current = null;
           setSelectedNode(target);
           setIsInspectorOpen(true);
-          setIsReadinessOpen(false);
-          setIsExecutionPreviewOpen(false);
-          setIsResourceAnalysisOpen(false);
+          setIsPreflightReviewOpen(false);
         }
       }
     };
@@ -342,9 +335,7 @@ export default function EditorPage() {
     setSelectedNode(node);
     if (node) {
       setIsInspectorOpen(true);
-      setIsReadinessOpen(false);
-      setIsExecutionPreviewOpen(false);
-      setIsResourceAnalysisOpen(false);
+    setIsPreflightReviewOpen(false);
     }
   }, [selectedNode?.id]);
 
@@ -406,61 +397,29 @@ export default function EditorPage() {
   const handleGenerateCode = useCallback(() => {
     preflightSelectionOwnerRef.current = null;
     trackEvent('code_generated');
-    setIsReadinessOpen(false);
-    setIsExecutionPreviewOpen(false);
-    setIsResourceAnalysisOpen(false);
+    setIsPreflightReviewOpen(false);
     setIsCodeModalOpen(true);
   }, []);
 
-  const handleOpenReadiness = useCallback((trigger: HTMLButtonElement) => {
-    readinessEntryRef.current = trigger;
-    preflightSelectionOwnerRef.current = 'readiness';
-    const current = readiness.evaluateNow();
+  const handleOpenPreflightReview = useCallback((trigger: HTMLButtonElement) => {
+    preflightReviewEntryRef.current = trigger;
+    preflightSelectionOwnerRef.current = 'unified_preflight';
+    if (!isPreflightReviewOpen) preflight.evaluateAll();
     setIsInspectorOpen(false);
     setIsMobileSidebarOpen(false);
     setReadinessNotice(null);
-    setIsExecutionPreviewOpen(false);
-    setIsResourceAnalysisOpen(false);
-    setIsReadinessOpen(true);
-    if (current) trackEvent('readiness_opened', { status: current.status, evaluable: current.evaluable, ruleset_version: current.rulesetVersion });
-  }, [readiness]);
-
-  const handleOpenExecutionPreview = useCallback((trigger: HTMLButtonElement) => {
-    executionPreviewEntryRef.current = trigger;
-    preflightSelectionOwnerRef.current = 'execution_preview';
-    const current = executionPreview.evaluateNow();
-    setIsInspectorOpen(false);
-    setIsReadinessOpen(false);
-    setIsResourceAnalysisOpen(false);
-    setIsMobileSidebarOpen(false);
     setExecutionPreviewNotice(null);
-    setIsExecutionPreviewOpen(true);
-    if (current.status !== 'error') {
-      trackEvent('execution_preview_opened', {
-        state: current.status,
-        process: current.status === 'available' ? current.result.process : 'none',
-        preview_version: '0.1.0',
-      });
-    }
-  }, [executionPreview]);
-
-  const handleOpenResourceAnalysis = useCallback((trigger: HTMLButtonElement) => {
-    resourceAnalysisEntryRef.current = trigger;
-    preflightSelectionOwnerRef.current = 'resource_analysis';
-    const current = resourceAnalysis.evaluateNow();
-    setIsInspectorOpen(false);
-    setIsReadinessOpen(false);
-    setIsExecutionPreviewOpen(false);
-    setIsMobileSidebarOpen(false);
     setResourceAnalysisNotice(null);
-    setIsResourceAnalysisOpen(true);
-    if (!isResourceAnalysisOpen) {
-      trackEvent(
-        'resource_analysis_opened',
-        createResourceAnalysisOpenedAnalyticsProperties(current)
-      );
-    }
-  }, [isResourceAnalysisOpen, resourceAnalysis]);
+    setIsPreflightReviewOpen(true);
+  }, [isPreflightReviewOpen, preflight]);
+
+  const handlePreflightStageChange = useCallback((stage: UnifiedPreflightStage) => {
+    if (stage === activePreflightStage) return;
+    setActivePreflightStage(stage);
+    if (stage === 'readiness' && readiness.result) trackEvent('readiness_opened', { status: readiness.result.status, evaluable: readiness.result.evaluable, ruleset_version: readiness.result.rulesetVersion });
+    if (stage === 'execution' && executionPreview.state.status !== 'error') trackEvent('execution_preview_opened', { state: executionPreview.state.status, process: executionPreview.state.status === 'available' ? executionPreview.state.result.process : 'none', preview_version: '0.1.0' });
+    if (stage === 'resources' && resourceAnalysis.state) trackEvent('resource_analysis_opened', createResourceAnalysisOpenedAnalyticsProperties(resourceAnalysis.state));
+  }, [activePreflightStage, executionPreview.state, readiness.result, resourceAnalysis.state]);
 
   const restoreEntryFocus = useCallback((entry: HTMLButtonElement | null) => {
     if (entry?.isConnected) entry.focus({ preventScroll: true });
@@ -471,22 +430,10 @@ export default function EditorPage() {
     });
   }, []);
 
-  const closeReadiness = useCallback(() => {
+  const closePreflightReview = useCallback(() => {
     preflightSelectionOwnerRef.current = null;
-    setIsReadinessOpen(false);
-    restoreEntryFocus(readinessEntryRef.current);
-  }, [restoreEntryFocus]);
-
-  const closeExecutionPreview = useCallback(() => {
-    preflightSelectionOwnerRef.current = null;
-    setIsExecutionPreviewOpen(false);
-    restoreEntryFocus(executionPreviewEntryRef.current);
-  }, [restoreEntryFocus]);
-
-  const closeResourceAnalysis = useCallback(() => {
-    preflightSelectionOwnerRef.current = null;
-    setIsResourceAnalysisOpen(false);
-    restoreEntryFocus(resourceAnalysisEntryRef.current);
+    setIsPreflightReviewOpen(false);
+    restoreEntryFocus(preflightReviewEntryRef.current);
   }, [restoreEntryFocus]);
 
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
@@ -495,8 +442,7 @@ export default function EditorPage() {
       preflightSelectionOwnerRef.current = null;
       trackEvent('execution_preview_located', { target_type: 'crew', source });
       setSelectedNode(null);
-      setIsExecutionPreviewOpen(false);
-      setIsResourceAnalysisOpen(false);
+    setIsPreflightReviewOpen(false);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => window.dispatchEvent(new Event('focus-manager-llm')));
@@ -513,8 +459,7 @@ export default function EditorPage() {
     setNodes((items) => items.map((item) => ({ ...item, selected: item.id === node.id })));
     setEdges((items) => items.map((item) => ({ ...item, selected: false })));
     setSelectedNode(node);
-    setIsExecutionPreviewOpen(false);
-    setIsResourceAnalysisOpen(false);
+    setIsPreflightReviewOpen(false);
     setIsMobileSidebarOpen(false);
     setIsInspectorOpen(true);
     requestAnimationFrame(() => {
@@ -542,9 +487,7 @@ export default function EditorPage() {
       return false;
     }
     preflightSelectionOwnerRef.current = null;
-    setIsResourceAnalysisOpen(false);
-    setIsReadinessOpen(false);
-    setIsExecutionPreviewOpen(false);
+    setIsPreflightReviewOpen(false);
     setIsMobileSidebarOpen(false);
     setIsInspectorOpen(true);
     if (target.kind === 'crew') {
@@ -579,9 +522,7 @@ export default function EditorPage() {
       setNodes((items) => items.map((item) => ({ ...item, selected: item.id === target.nodeId })));
       setEdges((items) => items.map((item) => ({ ...item, selected: false })));
       setSelectedNode(node);
-      setIsReadinessOpen(false);
-      setIsResourceAnalysisOpen(false);
-      setIsExecutionPreviewOpen(false);
+      setIsPreflightReviewOpen(false);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => {
@@ -600,14 +541,12 @@ export default function EditorPage() {
       preflightSelectionOwnerRef.current = null;
       setNodes((items) => items.map((item) => ({ ...item, selected: false })));
       setEdges((items) => items.map((item) => ({ ...item, selected: item.id === target.edgeId })));
-      setSelectedNode(null); setIsInspectorOpen(false); setIsReadinessOpen(false);
-      setIsExecutionPreviewOpen(false); setIsResourceAnalysisOpen(false);
+      setSelectedNode(null); setIsInspectorOpen(false); setIsPreflightReviewOpen(false);
       requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-flow-edge', { detail: { edgeId: target.edgeId } })));
       return;
     }
     preflightSelectionOwnerRef.current = null;
-    setSelectedNode(null); setIsReadinessOpen(false); setIsMobileSidebarOpen(false); setIsInspectorOpen(true);
-    setIsExecutionPreviewOpen(false); setIsResourceAnalysisOpen(false);
+    setSelectedNode(null); setIsPreflightReviewOpen(false); setIsMobileSidebarOpen(false); setIsInspectorOpen(true);
     requestAnimationFrame(() => window.dispatchEvent(new Event('focus-inspector-heading')));
   }, [lang, readiness, setEdges, setNodes]);
 
@@ -632,9 +571,7 @@ export default function EditorPage() {
     );
     setSelectedNode(targetNode);
     setIsInspectorOpen(true);
-    setIsReadinessOpen(false);
-    setIsExecutionPreviewOpen(false);
-    setIsResourceAnalysisOpen(false);
+    setIsPreflightReviewOpen(false);
     setIsMobileSidebarOpen(false);
     requestAnimationFrame(() => {
       window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId } }));
@@ -747,9 +684,7 @@ export default function EditorPage() {
         onToggleSettings={() => {
           preflightSelectionOwnerRef.current = null;
           setSelectedNode(null);
-          setIsReadinessOpen(false);
-          setIsExecutionPreviewOpen(false);
-          setIsResourceAnalysisOpen(false);
+    setIsPreflightReviewOpen(false);
           setIsInspectorOpen(!isInspectorOpen);
         }}
         nodeCount={nodes.length}
@@ -844,26 +779,19 @@ export default function EditorPage() {
           onNodeDragStop={takeSnapshot}
           toggleFullscreen={toggleFullscreen}
           isFullscreen={isFullscreen}
-          readinessStatus={readiness.result?.status ?? 'not_evaluable'}
-          isReadinessOpen={isReadinessOpen}
-          onOpenReadiness={handleOpenReadiness}
-          isExecutionPreviewOpen={isExecutionPreviewOpen}
-          onOpenExecutionPreview={handleOpenExecutionPreview}
-          isResourceAnalysisOpen={isResourceAnalysisOpen}
-          onOpenResourceAnalysis={handleOpenResourceAnalysis}
+          isPreflightReviewOpen={isPreflightReviewOpen}
+          onOpenPreflightReview={handleOpenPreflightReview}
           isInspectorOpen={isInspectorOpen}
         />
 
         {/* Mobile Floating Drawer & Navigation Toolbar */}
-        {!isReadinessOpen && !isExecutionPreviewOpen && !isResourceAnalysisOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
+        {!isPreflightReviewOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
           <button
             onClick={() => {
               preflightSelectionOwnerRef.current = null;
               setIsMobileSidebarOpen(!isMobileSidebarOpen);
               setIsInspectorOpen(false);
-              setIsReadinessOpen(false);
-              setIsExecutionPreviewOpen(false);
-              setIsResourceAnalysisOpen(false);
+              setIsPreflightReviewOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
           >
@@ -898,9 +826,7 @@ export default function EditorPage() {
               preflightSelectionOwnerRef.current = null;
               setIsInspectorOpen(!isInspectorOpen);
               setIsMobileSidebarOpen(false);
-              setIsReadinessOpen(false);
-              setIsExecutionPreviewOpen(false);
-              setIsResourceAnalysisOpen(false);
+              setIsPreflightReviewOpen(false);
             }}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
           >
@@ -910,7 +836,7 @@ export default function EditorPage() {
         </div>}
 
         {/* Dedicated Mobile Bottom Sticky Support Banner (sm:hidden) */}
-        {!isReadinessOpen && !isExecutionPreviewOpen && !isResourceAnalysisOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
+        {!isPreflightReviewOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="w-7 h-7 rounded-lg bg-amber-500/20 border-amber-400/50 text-amber-300 flex items-center justify-center shrink-0 border">
               <Coffee className="w-3.5 h-3.5 shrink-0" />
@@ -947,10 +873,7 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
-        <ReadinessPanel isOpen={isReadinessOpen} result={readiness.result} error={readiness.error} isRefreshing={readiness.isRefreshing} lang={lang} targetSummary={readinessTargetSummary} onClose={closeReadiness} onRetry={readiness.evaluateNow} onLocate={handleLocateFinding} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsReadinessOpen(false); setIsCodeModalOpen(true); }} />
-        {isReadinessOpen && readinessNotice && <div role="status" className="absolute bottom-[72dvh] right-3 z-[60] rounded-lg bg-cyan-950 px-3 py-2 text-xs text-cyan-200 md:bottom-3 md:right-[420px]">{readinessNotice}</div>}
-        <ExecutionPreviewPanel isOpen={isExecutionPreviewOpen} state={executionPreview.state} isRefreshing={executionPreview.isRefreshing} lang={lang} notice={executionPreviewNotice} onClose={closeExecutionPreview} onRetry={executionPreview.evaluateNow} onLocate={handleLocateExecutionPreview} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsExecutionPreviewOpen(false); setIsCodeModalOpen(true); }} />
-        <ResourceAnalysisPanel isOpen={isResourceAnalysisOpen} state={resourceAnalysis.state} isRefreshing={resourceAnalysis.isRefreshing} lang={lang} notice={resourceAnalysisNotice} onClose={closeResourceAnalysis} onRetry={resourceAnalysis.evaluateNow} onLocate={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsResourceAnalysisOpen(false); setIsCodeModalOpen(true); }} />
+        <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}
