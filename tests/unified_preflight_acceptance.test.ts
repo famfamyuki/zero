@@ -109,6 +109,8 @@ test('UPR acceptance: analytics taxonomy, emission boundaries, and privacy are e
   assert.equal((page.match(/trackEvent\('preflight_review_re_evaluated'/g) ?? []).length, 1);
   assert.match(page, /if \(stage === activePreflightStage\) return/);
   assert.match(page, /preflight_version: UNIFIED_PREFLIGHT_REVIEW_VERSION/);
+  assert.match(page, /source,/);
+  assert.doesNotMatch(source('lib/analytics.ts'), /source-less overload/);
   assert.doesNotMatch(panel + hook, /preflight_review_|trackEvent/);
 
   const privateProperties = {

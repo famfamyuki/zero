@@ -34,6 +34,15 @@ import {
 import { useUnifiedPreflight } from '@/hooks/useUnifiedPreflight';
 import { UnifiedPreflightPanel } from '@/components/editor/unified-preflight/UnifiedPreflightPanel';
 import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/types/unified-preflight';
+import {
+  PREFLIGHT_ACTIVATION_STORAGE_KEY,
+  PREFLIGHT_ACTIVATION_VERSION,
+  hasMeaningfulPreflightFirstValue,
+  parsePreflightActivationPersistence,
+  serializePreflightActivationPersistence,
+  type PreflightActivationPersistentStatus,
+  type PreflightActivationSource,
+} from '@/lib/preflight-activation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -142,9 +151,16 @@ export default function EditorPage() {
   const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
   const [preflightUpdatedNotice, setPreflightUpdatedNotice] = useState<string | null>(null);
   const [isPreflightReviewOpen, setIsPreflightReviewOpen] = useState(false);
+  const [workspaceHydrated, setWorkspaceHydrated] = useState(false);
+  const [activationPersistenceHydrated, setActivationPersistenceHydrated] = useState(false);
+  const [activationPersistentStatus, setActivationPersistentStatus] = useState<PreflightActivationPersistentStatus | null>(null);
+  const [activationPromptVisible, setActivationPromptVisible] = useState(false);
+  const [currentActivationAttemptSource, setCurrentActivationAttemptSource] = useState<PreflightActivationSource | null>(null);
   const [activePreflightStage, setActivePreflightStage] = useState<UnifiedPreflightStage>('overview');
   const preflightSelectionOwnerRef = useRef<PreflightSelectionOwner>(null);
   const preflightReviewEntryRef = useRef<HTMLButtonElement | null>(null);
+  const activationPromptShownEmittedRef = useRef(false);
+  const firstValueEmittedRef = useRef(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isJsonDragActive, setIsJsonDragActive] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
@@ -153,6 +169,18 @@ export default function EditorPage() {
   const readiness = preflight.readiness;
   const executionPreview = preflight.execution;
   const resourceAnalysis = preflight.resources;
+
+  const persistActivationStatus = useCallback((status: PreflightActivationPersistentStatus) => {
+    setActivationPersistentStatus(status);
+    try {
+      localStorage.setItem(
+        PREFLIGHT_ACTIVATION_STORAGE_KEY,
+        serializePreflightActivationPersistence(status),
+      );
+    } catch {
+      // In-memory state preserves one-shot behavior when storage is unavailable.
+    }
+  }, []);
 
   useEffect(() => {
     if (preflight.isRefreshing) setPreflightUpdatedNotice(null);
@@ -210,8 +238,58 @@ export default function EditorPage() {
       console.error('Failed to load active flow:', e instanceof GraphDeserializationError ? e.issue.code : e);
     } finally {
       isLoadedRef.current = true;
+      setWorkspaceHydrated(true);
     }
   }, [setNodes, setEdges]);
+
+  useEffect(() => {
+    try {
+      setActivationPersistentStatus(
+        parsePreflightActivationPersistence(
+          localStorage.getItem(PREFLIGHT_ACTIVATION_STORAGE_KEY),
+        ),
+      );
+    } catch {
+      setActivationPersistentStatus(null);
+    } finally {
+      setActivationPersistenceHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      workspaceHydrated
+      && activationPersistenceHydrated
+      && activationPersistentStatus === null
+      && !isPreflightReviewOpen
+      && !activationPromptVisible
+      && hasMeaningfulPreflightFirstValue(preflight.review)
+    ) {
+      setActivationPromptVisible(true);
+    }
+  }, [
+    activationPersistenceHydrated,
+    activationPersistentStatus,
+    activationPromptVisible,
+    isPreflightReviewOpen,
+    preflight.review,
+    workspaceHydrated,
+  ]);
+
+  const handleActivationPromptShown = useCallback(() => {
+    if (activationPromptShownEmittedRef.current) return;
+    activationPromptShownEmittedRef.current = true;
+    persistActivationStatus('prompted');
+    trackEvent('preflight_activation_prompt_shown', {
+      activation_version: PREFLIGHT_ACTIVATION_VERSION,
+      preflight_version: UNIFIED_PREFLIGHT_REVIEW_VERSION,
+    });
+  }, [persistActivationStatus]);
+
+  const handleDismissActivationPrompt = useCallback(() => {
+    setActivationPromptVisible(false);
+    if (activationPersistentStatus === 'prompted') persistActivationStatus('dismissed');
+  }, [activationPersistentStatus, persistActivationStatus]);
 
   // Auto-sync state changes to LocalStorage
   useEffect(() => {
@@ -410,22 +488,63 @@ export default function EditorPage() {
     setIsCodeModalOpen(true);
   }, []);
 
-  const handleOpenPreflightReview = useCallback((trigger: HTMLButtonElement) => {
-    preflightReviewEntryRef.current = trigger;
-    preflightSelectionOwnerRef.current = 'unified_preflight';
+  const handleOpenPreflightReview = useCallback((trigger: HTMLButtonElement, source: PreflightActivationSource) => {
     if (!isPreflightReviewOpen) {
+      preflightReviewEntryRef.current = trigger;
+      preflightSelectionOwnerRef.current = 'unified_preflight';
+      setCurrentActivationAttemptSource(source);
+      setActivationPromptVisible(false);
       trackEvent('preflight_review_opened', {
         preflight_version: UNIFIED_PREFLIGHT_REVIEW_VERSION,
+        source,
       });
       preflight.evaluateAll();
+      setIsInspectorOpen(false);
+      setIsMobileSidebarOpen(false);
+      setReadinessNotice(null);
+      setExecutionPreviewNotice(null);
+      setResourceAnalysisNotice(null);
+      setIsPreflightReviewOpen(true);
     }
-    setIsInspectorOpen(false);
-    setIsMobileSidebarOpen(false);
-    setReadinessNotice(null);
-    setExecutionPreviewNotice(null);
-    setResourceAnalysisNotice(null);
-    setIsPreflightReviewOpen(true);
   }, [isPreflightReviewOpen, preflight]);
+
+  useEffect(() => {
+    if (!isPreflightReviewOpen) setCurrentActivationAttemptSource(null);
+  }, [isPreflightReviewOpen]);
+
+  useEffect(() => {
+    if (
+      !activationPersistenceHydrated
+      || !isPreflightReviewOpen
+      || currentActivationAttemptSource === null
+      || activationPersistentStatus === 'completed'
+      || firstValueEmittedRef.current
+      || !hasMeaningfulPreflightFirstValue(preflight.review)
+      || (
+        preflight.review.state !== 'available'
+        && preflight.review.state !== 'invalid'
+        && preflight.review.state !== 'partial'
+      )
+    ) return;
+
+    firstValueEmittedRef.current = true;
+    trackEvent('preflight_first_value_reached', {
+      activation_version: PREFLIGHT_ACTIVATION_VERSION,
+      preflight_version: UNIFIED_PREFLIGHT_REVIEW_VERSION,
+      review_state: preflight.review.state,
+      source: currentActivationAttemptSource,
+    });
+    persistActivationStatus('completed');
+    setActivationPromptVisible(false);
+    setCurrentActivationAttemptSource(null);
+  }, [
+    activationPersistenceHydrated,
+    activationPersistentStatus,
+    currentActivationAttemptSource,
+    isPreflightReviewOpen,
+    persistActivationStatus,
+    preflight.review,
+  ]);
 
   const handlePreflightStageChange = useCallback((stage: UnifiedPreflightStage) => {
     if (stage === activePreflightStage) return;
@@ -807,6 +926,9 @@ export default function EditorPage() {
           isFullscreen={isFullscreen}
           isPreflightReviewOpen={isPreflightReviewOpen}
           onOpenPreflightReview={handleOpenPreflightReview}
+          activationPromptVisible={activationPromptVisible}
+          onActivationPromptShown={handleActivationPromptShown}
+          onDismissActivationPrompt={handleDismissActivationPrompt}
           isInspectorOpen={isInspectorOpen}
         />
 

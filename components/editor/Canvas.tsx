@@ -30,6 +30,8 @@ import { ToolNode } from './nodes/ToolNode';
 import { CustomNode, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
 import { UnifiedPreflightEntryButton } from './unified-preflight/UnifiedPreflightEntryButton';
+import { PreflightActivationPrompt } from './unified-preflight/PreflightActivationPrompt';
+import type { PreflightActivationSource } from '@/lib/preflight-activation';
 
 const nodeTypes = {
   agent: AgentNode,
@@ -65,7 +67,10 @@ interface CanvasProps {
   toggleFullscreen: () => void;
   isFullscreen: boolean;
   isPreflightReviewOpen: boolean;
-  onOpenPreflightReview: (trigger: HTMLButtonElement) => void;
+  onOpenPreflightReview: (trigger: HTMLButtonElement, source: PreflightActivationSource) => void;
+  activationPromptVisible: boolean;
+  onActivationPromptShown: () => void;
+  onDismissActivationPrompt: () => void;
   isInspectorOpen: boolean;
 }
 
@@ -83,13 +88,33 @@ export const Canvas: React.FC<CanvasProps> = ({
   isFullscreen,
   isPreflightReviewOpen,
   onOpenPreflightReview,
+  activationPromptVisible,
+  onActivationPromptShown,
+  onDismissActivationPrompt,
   isInspectorOpen,
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const preflightEntryRef = useRef<HTMLButtonElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   const [isOverview, setIsOverview] = useState(false);
   const { lang } = useLanguage();
   const isPreflightOpen = isPreflightReviewOpen;
+
+  const focusPreflightEntry = useCallback(() => {
+    preflightEntryRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const handleActivationReview = useCallback(() => {
+    const entry = preflightEntryRef.current;
+    if (!entry) return;
+    focusPreflightEntry();
+    onOpenPreflightReview(entry, 'activation_prompt');
+  }, [focusPreflightEntry, onOpenPreflightReview]);
+
+  const handleActivationDismiss = useCallback(() => {
+    onDismissActivationPrompt();
+    focusPreflightEntry();
+  }, [focusPreflightEntry, onDismissActivationPrompt]);
 
   const selectedNodeId = useMemo(
     () => nodes.find((node) => node.selected)?.id ?? null,
@@ -349,8 +374,9 @@ export const Canvas: React.FC<CanvasProps> = ({
         defaultEdgeOptions={defaultEdgeOptions}
         connectionLineStyle={{ stroke: '#e0e7ff', strokeWidth: 3 }}
       >
-        <Panel position="top-right" className={`!z-[60] flex items-end gap-2 ${isPreflightOpen ? '!top-auto !right-2 !bottom-[calc(80dvh+0.5rem)] !m-0 md:!top-3 md:!right-[452px] md:!bottom-auto lg:!right-[492px]' : `!m-3 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}`}>
-          <UnifiedPreflightEntryButton lang={lang} isOpen={isPreflightReviewOpen} onActivate={onOpenPreflightReview} />
+        <Panel position="top-right" className={`!z-[60] flex flex-col items-end gap-2 ${isPreflightOpen ? '!top-auto !right-2 !bottom-[calc(80dvh+0.5rem)] !m-0 md:!top-3 md:!right-[452px] md:!bottom-auto lg:!right-[492px]' : `!m-3 ${isInspectorOpen ? 'md:!mr-[21rem]' : ''}`}`}>
+          {activationPromptVisible ? <PreflightActivationPrompt lang={lang} onReview={handleActivationReview} onDismiss={handleActivationDismiss} onShown={onActivationPromptShown} /> : null}
+          <UnifiedPreflightEntryButton ref={preflightEntryRef} lang={lang} isOpen={isPreflightReviewOpen} onActivate={(trigger) => onOpenPreflightReview(trigger, 'entry')} />
         </Panel>
         <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#334155" />
         <Panel position="bottom-center" className="!m-3">
