@@ -16,6 +16,8 @@ export const ANALYTICS_EVENTS = [
   'preflight_review_opened',
   'preflight_review_stage_selected',
   'preflight_review_re_evaluated',
+  'preflight_activation_prompt_shown',
+  'preflight_first_value_reached',
 ] as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
@@ -33,9 +35,11 @@ const EVENT_PROPERTY_ALLOWLIST: Record<AnalyticsEvent, readonly string[]> = {
   execution_preview_located: ['target_type', 'source'],
   resource_analysis_opened: ['state', 'process', 'analysis_version'],
   resource_analysis_hotspot_selected: ['hotspot_kind', 'target_type'],
-  preflight_review_opened: ['preflight_version'],
+  preflight_review_opened: ['preflight_version', 'source'],
   preflight_review_stage_selected: ['stage'],
   preflight_review_re_evaluated: ['stage'],
+  preflight_activation_prompt_shown: ['activation_version', 'preflight_version'],
+  preflight_first_value_reached: ['activation_version', 'preflight_version', 'review_state', 'source'],
 };
 
 // PostHog adds these anonymous SDK properties. URL, referrer, UTM, element text,

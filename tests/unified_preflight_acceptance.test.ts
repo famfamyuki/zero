@@ -96,11 +96,13 @@ test('UPR acceptance: tabs, ARIA, and responsive shell remain hardened without J
 });
 
 test('UPR acceptance: analytics taxonomy, emission boundaries, and privacy are exact', () => {
-  assert.equal(ANALYTICS_EVENTS.length, 15);
-  assert.deepEqual(ANALYTICS_EVENTS.slice(-3), [
+  assert.equal(ANALYTICS_EVENTS.length, 17);
+  assert.deepEqual(ANALYTICS_EVENTS.slice(-5), [
     'preflight_review_opened',
     'preflight_review_stage_selected',
     'preflight_review_re_evaluated',
+    'preflight_activation_prompt_shown',
+    'preflight_first_value_reached',
   ]);
   assert.equal((page.match(/trackEvent\('preflight_review_opened'/g) ?? []).length, 1);
   assert.equal((page.match(/trackEvent\('preflight_review_stage_selected'/g) ?? []).length, 1);
@@ -112,12 +114,14 @@ test('UPR acceptance: analytics taxonomy, emission boundaries, and privacy are e
   const privateProperties = {
     label: 'private', prompt: 'private', role: 'private', goal: 'private', backstory: 'private',
     task_description: 'private', graph_json: 'private', generated_code: 'private', model_id: 'private',
-    tool_params: 'private', node_id: 'private', filename: 'private', contents: 'private',
+    tool_params: 'private', node_id: 'private', edge_id: 'private', filename: 'private', contents: 'private',
+    labels: 'private', descriptions: 'private', goals: 'private', backstories: 'private', task_content: 'private',
+    raw_errors: 'private', validation_text: 'private', language: 'private', url: 'private', query_string: 'private',
     query: 'private', $referrer: 'private', utm_source: 'private', $current_url: 'private',
   };
-  const opened = filterPostHogCapture({ uuid: 'open', event: 'preflight_review_opened', properties: { preflight_version: '0.1.0', ...privateProperties } });
+  const opened = filterPostHogCapture({ uuid: 'open', event: 'preflight_review_opened', properties: { preflight_version: '0.1.0', source: 'entry', ...privateProperties } });
   const stage = filterPostHogCapture({ uuid: 'stage', event: 'preflight_review_stage_selected', properties: { stage: 'resources', ...privateProperties } });
-  assert.deepEqual(opened?.properties, { preflight_version: '0.1.0' });
+  assert.deepEqual(opened?.properties, { preflight_version: '0.1.0', source: 'entry' });
   assert.deepEqual(stage?.properties, { stage: 'resources' });
   assert.equal(filterPostHogCapture({ uuid: 'unknown', event: '$autocapture', properties: {} }), null);
   assert.match(source('lib/analytics-config.ts'), /capture\.event === '\$pageview'/);

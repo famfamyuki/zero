@@ -2,6 +2,8 @@
 
 import posthog from 'posthog-js';
 import { AnalyticsEvent, sanitizeAnalyticsProperties } from '@/lib/analytics-config';
+import type { PreflightActivationSource } from '@/lib/preflight-activation';
+import { PREFLIGHT_ACTIVATION_VERSION } from '@/lib/preflight-activation';
 import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/types/unified-preflight';
 
 type AnalyticsProperties = {
@@ -32,6 +34,17 @@ type AnalyticsProperties = {
   };
   preflight_review_opened: {
     preflight_version: typeof UNIFIED_PREFLIGHT_REVIEW_VERSION;
+    source: PreflightActivationSource;
+  };
+  preflight_activation_prompt_shown: {
+    activation_version: typeof PREFLIGHT_ACTIVATION_VERSION;
+    preflight_version: typeof UNIFIED_PREFLIGHT_REVIEW_VERSION;
+  };
+  preflight_first_value_reached: {
+    activation_version: typeof PREFLIGHT_ACTIVATION_VERSION;
+    preflight_version: typeof UNIFIED_PREFLIGHT_REVIEW_VERSION;
+    review_state: 'available' | 'invalid' | 'partial';
+    source: PreflightActivationSource;
   };
   preflight_review_stage_selected: {
     stage: UnifiedPreflightStage;
@@ -42,6 +55,12 @@ type AnalyticsProperties = {
 };
 
 export function trackEvent(event: 'code_generated'): void;
+// Packet 1 defines the source-aware contract without changing the existing runtime caller.
+// The source-less overload is removed when the runtime connection is implemented.
+export function trackEvent(
+  event: 'preflight_review_opened',
+  properties: { preflight_version: typeof UNIFIED_PREFLIGHT_REVIEW_VERSION },
+): void;
 export function trackEvent<E extends Exclude<AnalyticsEvent, 'code_generated'>>(
   event: E,
   properties: AnalyticsProperties[E]

@@ -8,7 +8,7 @@ import {
   filterPostHogCapture,
 } from '../lib/analytics-config';
 
-test('only the fifteen approved analytics events are accepted', () => {
+test('only the seventeen approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('template_selected'), true);
   assert.equal(isAnalyticsEvent('affiliate_clicked'), true);
   assert.equal(isAnalyticsEvent('readiness_opened'), true);
@@ -20,6 +20,8 @@ test('only the fifteen approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('preflight_review_opened'), true);
   assert.equal(isAnalyticsEvent('preflight_review_stage_selected'), true);
   assert.equal(isAnalyticsEvent('preflight_review_re_evaluated'), true);
+  assert.equal(isAnalyticsEvent('preflight_activation_prompt_shown'), true);
+  assert.equal(isAnalyticsEvent('preflight_first_value_reached'), true);
   assert.equal(isAnalyticsEvent('resource_analysis_refreshed'), false);
   assert.equal(isAnalyticsEvent('$pageview'), false);
   assert.equal(isAnalyticsEvent('$autocapture'), false);
@@ -158,7 +160,7 @@ test('filterPostHogCapture returns null for null input', () => {
   assert.equal(filterPostHogCapture(null), null);
 });
 
-test('filterPostHogCapture passes all fifteen custom analytics events', () => {
+test('filterPostHogCapture passes all seventeen custom analytics events', () => {
   for (const event of ANALYTICS_EVENTS) {
     const result = filterPostHogCapture({
       uuid: 'test',
@@ -265,25 +267,47 @@ test('Resource Analysis analytics retains only bounded categorical properties', 
   }), { hotspot_kind: 'dependency_depth', target_type: 'task' });
 });
 
-test('Unified Preflight analytics retain only exact version and stage properties', () => {
+test('Unified Preflight analytics retain only exact activation properties', () => {
   const privateProperties = {
     node_id: 'node-private',
+    edge_id: 'edge-private',
     label: 'private label',
+    labels: ['private label'],
     prompt: 'private prompt',
+    descriptions: ['private description'],
+    goals: ['private goal'],
+    backstories: ['private backstory'],
+    task_content: 'private task content',
     graph_json: '{"private":true}',
     model_id: 'private-model',
+    tool_params: { private: true },
     filename: 'private.json',
+    raw_errors: ['private error'],
+    validation_text: 'private validation text',
     contents: 'private contents',
+    url: 'https://private.example/',
+    query_string: 'private=1',
     $current_url: 'https://example.com/?private=1',
     $referrer: 'https://private.example/',
     utm_source: 'private-campaign',
+    language: 'ja',
   };
 
   assert.deepEqual(sanitizeAnalyticsProperties('preflight_review_opened', {
     preflight_version: '0.1.0',
+    source: 'entry',
     stage: 'resources',
     ...privateProperties,
-  }), { preflight_version: '0.1.0' });
+  }), { preflight_version: '0.1.0', source: 'entry' });
+
+  assert.deepEqual(sanitizeAnalyticsProperties('preflight_activation_prompt_shown', {
+    activation_version: '0.1.0', preflight_version: '0.1.0', ...privateProperties,
+  }), { activation_version: '0.1.0', preflight_version: '0.1.0' });
+
+  assert.deepEqual(sanitizeAnalyticsProperties('preflight_first_value_reached', {
+    activation_version: '0.1.0', preflight_version: '0.1.0', review_state: 'partial',
+    source: 'activation_prompt', ...privateProperties,
+  }), { activation_version: '0.1.0', preflight_version: '0.1.0', review_state: 'partial', source: 'activation_prompt' });
 
   for (const event of ['preflight_review_stage_selected', 'preflight_review_re_evaluated'] as const) {
     assert.deepEqual(sanitizeAnalyticsProperties(event, {
@@ -296,9 +320,11 @@ test('Unified Preflight analytics retain only exact version and stage properties
 
 test('PostHog before_send strips private properties from every Unified Preflight event', () => {
   const cases = [
-    ['preflight_review_opened', { preflight_version: '0.1.0' }],
+    ['preflight_review_opened', { preflight_version: '0.1.0', source: 'entry' }],
     ['preflight_review_stage_selected', { stage: 'resources' }],
     ['preflight_review_re_evaluated', { stage: 'resources' }],
+    ['preflight_activation_prompt_shown', { activation_version: '0.1.0', preflight_version: '0.1.0' }],
+    ['preflight_first_value_reached', { activation_version: '0.1.0', preflight_version: '0.1.0', review_state: 'available', source: 'activation_prompt' }],
   ] as const;
 
   for (const [event, expected] of cases) {
@@ -310,15 +336,27 @@ test('PostHog before_send strips private properties from every Unified Preflight
         token: 'phc_public_token',
         distinct_id: 'anonymous-id',
         node_id: 'private-node',
+        edge_id: 'private-edge',
         label: 'private label',
+        labels: ['private label'],
         prompt: 'private prompt',
+        descriptions: ['private description'],
+        goals: ['private goal'],
+        backstories: ['private backstory'],
+        task_content: 'private task content',
         graph_json: '{"private":true}',
         model_id: 'private-model',
+        tool_params: { private: true },
         filename: 'private.json',
+        raw_errors: ['private error'],
+        validation_text: 'private validation text',
         contents: 'private contents',
+        url: 'https://private.example/',
+        query_string: 'private=1',
         $current_url: 'https://example.com/?private=1',
         $referrer: 'https://private.example/',
         utm_source: 'private-campaign',
+        language: 'ja',
       },
     });
 
@@ -331,7 +369,7 @@ test('PostHog before_send strips private properties from every Unified Preflight
   }
 });
 
-test('ANALYTICS_EVENTS contains exactly the fifteen expected events', () => {
+test('ANALYTICS_EVENTS contains exactly the seventeen expected events', () => {
   const expected = [
     'template_selected',
     'json_imported',
@@ -348,6 +386,8 @@ test('ANALYTICS_EVENTS contains exactly the fifteen expected events', () => {
     'preflight_review_opened',
     'preflight_review_stage_selected',
     'preflight_review_re_evaluated',
+    'preflight_activation_prompt_shown',
+    'preflight_first_value_reached',
   ];
   assert.deepEqual([...ANALYTICS_EVENTS], expected);
 });
