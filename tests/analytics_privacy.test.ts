@@ -8,7 +8,7 @@ import {
   filterPostHogCapture,
 } from '../lib/analytics-config';
 
-test('only the twelve approved analytics events are accepted', () => {
+test('only the fifteen approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('template_selected'), true);
   assert.equal(isAnalyticsEvent('affiliate_clicked'), true);
   assert.equal(isAnalyticsEvent('readiness_opened'), true);
@@ -17,6 +17,9 @@ test('only the twelve approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('execution_preview_located'), true);
   assert.equal(isAnalyticsEvent('resource_analysis_opened'), true);
   assert.equal(isAnalyticsEvent('resource_analysis_hotspot_selected'), true);
+  assert.equal(isAnalyticsEvent('preflight_review_opened'), true);
+  assert.equal(isAnalyticsEvent('preflight_review_stage_selected'), true);
+  assert.equal(isAnalyticsEvent('preflight_review_re_evaluated'), true);
   assert.equal(isAnalyticsEvent('resource_analysis_refreshed'), false);
   assert.equal(isAnalyticsEvent('$pageview'), false);
   assert.equal(isAnalyticsEvent('$autocapture'), false);
@@ -155,7 +158,7 @@ test('filterPostHogCapture returns null for null input', () => {
   assert.equal(filterPostHogCapture(null), null);
 });
 
-test('filterPostHogCapture passes all twelve custom analytics events', () => {
+test('filterPostHogCapture passes all fifteen custom analytics events', () => {
   for (const event of ANALYTICS_EVENTS) {
     const result = filterPostHogCapture({
       uuid: 'test',
@@ -262,7 +265,73 @@ test('Resource Analysis analytics retains only bounded categorical properties', 
   }), { hotspot_kind: 'dependency_depth', target_type: 'task' });
 });
 
-test('ANALYTICS_EVENTS contains exactly the twelve expected events', () => {
+test('Unified Preflight analytics retain only exact version and stage properties', () => {
+  const privateProperties = {
+    node_id: 'node-private',
+    label: 'private label',
+    prompt: 'private prompt',
+    graph_json: '{"private":true}',
+    model_id: 'private-model',
+    filename: 'private.json',
+    contents: 'private contents',
+    $current_url: 'https://example.com/?private=1',
+    $referrer: 'https://private.example/',
+    utm_source: 'private-campaign',
+  };
+
+  assert.deepEqual(sanitizeAnalyticsProperties('preflight_review_opened', {
+    preflight_version: '0.1.0',
+    stage: 'resources',
+    ...privateProperties,
+  }), { preflight_version: '0.1.0' });
+
+  for (const event of ['preflight_review_stage_selected', 'preflight_review_re_evaluated'] as const) {
+    assert.deepEqual(sanitizeAnalyticsProperties(event, {
+      stage: 'resources',
+      preflight_version: '0.1.0',
+      ...privateProperties,
+    }), { stage: 'resources' });
+  }
+});
+
+test('PostHog before_send strips private properties from every Unified Preflight event', () => {
+  const cases = [
+    ['preflight_review_opened', { preflight_version: '0.1.0' }],
+    ['preflight_review_stage_selected', { stage: 'resources' }],
+    ['preflight_review_re_evaluated', { stage: 'resources' }],
+  ] as const;
+
+  for (const [event, expected] of cases) {
+    const result = filterPostHogCapture({
+      uuid: `privacy-${event}`,
+      event,
+      properties: {
+        ...expected,
+        token: 'phc_public_token',
+        distinct_id: 'anonymous-id',
+        node_id: 'private-node',
+        label: 'private label',
+        prompt: 'private prompt',
+        graph_json: '{"private":true}',
+        model_id: 'private-model',
+        filename: 'private.json',
+        contents: 'private contents',
+        $current_url: 'https://example.com/?private=1',
+        $referrer: 'https://private.example/',
+        utm_source: 'private-campaign',
+      },
+    });
+
+    assert.notEqual(result, null);
+    assert.deepEqual(result!.properties, {
+      ...expected,
+      token: 'phc_public_token',
+      distinct_id: 'anonymous-id',
+    });
+  }
+});
+
+test('ANALYTICS_EVENTS contains exactly the fifteen expected events', () => {
   const expected = [
     'template_selected',
     'json_imported',
@@ -276,6 +345,9 @@ test('ANALYTICS_EVENTS contains exactly the twelve expected events', () => {
     'execution_preview_located',
     'resource_analysis_opened',
     'resource_analysis_hotspot_selected',
+    'preflight_review_opened',
+    'preflight_review_stage_selected',
+    'preflight_review_re_evaluated',
   ];
   assert.deepEqual([...ANALYTICS_EVENTS], expected);
 });

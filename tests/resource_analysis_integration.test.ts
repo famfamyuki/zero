@@ -51,10 +51,12 @@ test('Resource Locate success closes Unified while missing refreshes in place', 
   assert.match(locate, /setIsPreflightReviewOpen\(false\)/); assert.match(locate, /focus-flow-node/); assert.match(locate, /focus-inspector-heading/);
 });
 
-test('existing Resource analytics remains interaction-owned; no Unified events exist', () => {
+test('existing Resource analytics remains interaction-owned alongside D1 Unified events', () => {
   const source = page();
   assert.match(source, /resource_analysis_opened/); assert.match(source, /resource_analysis_hotspot_selected/);
-  assert.doesNotMatch(source, /preflight_review_opened|preflight_review_stage_selected|preflight_review_re_evaluated/);
+  assert.match(source, /preflight_review_opened/);
+  assert.match(source, /preflight_review_stage_selected/);
+  assert.match(source, /preflight_review_re_evaluated/);
 });
 
 test('Unified integration adds no persistence or semantic coupling', () => {

@@ -2,6 +2,7 @@
 
 import posthog from 'posthog-js';
 import { AnalyticsEvent, sanitizeAnalyticsProperties } from '@/lib/analytics-config';
+import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/types/unified-preflight';
 
 type AnalyticsProperties = {
   template_selected: { template_id: string; source: 'library' | 'sidebar' };
@@ -28,6 +29,15 @@ type AnalyticsProperties = {
   resource_analysis_hotspot_selected: {
     hotspot_kind: 'dependency_depth' | 'context_fan_in' | 'tool_binding_concentration';
     target_type: 'task' | 'tool';
+  };
+  preflight_review_opened: {
+    preflight_version: typeof UNIFIED_PREFLIGHT_REVIEW_VERSION;
+  };
+  preflight_review_stage_selected: {
+    stage: UnifiedPreflightStage;
+  };
+  preflight_review_re_evaluated: {
+    stage: UnifiedPreflightStage;
   };
 };
 

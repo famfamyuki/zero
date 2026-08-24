@@ -33,7 +33,7 @@ import {
 } from '@/lib/preflight-navigation';
 import { useUnifiedPreflight } from '@/hooks/useUnifiedPreflight';
 import { UnifiedPreflightPanel } from '@/components/editor/unified-preflight/UnifiedPreflightPanel';
-import type { UnifiedPreflightStage } from '@/types/unified-preflight';
+import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/types/unified-preflight';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
 const initialDefaultPreset = PRESET_TEMPLATES[0];
@@ -413,7 +413,12 @@ export default function EditorPage() {
   const handleOpenPreflightReview = useCallback((trigger: HTMLButtonElement) => {
     preflightReviewEntryRef.current = trigger;
     preflightSelectionOwnerRef.current = 'unified_preflight';
-    if (!isPreflightReviewOpen) preflight.evaluateAll();
+    if (!isPreflightReviewOpen) {
+      trackEvent('preflight_review_opened', {
+        preflight_version: UNIFIED_PREFLIGHT_REVIEW_VERSION,
+      });
+      preflight.evaluateAll();
+    }
     setIsInspectorOpen(false);
     setIsMobileSidebarOpen(false);
     setReadinessNotice(null);
@@ -424,6 +429,7 @@ export default function EditorPage() {
 
   const handlePreflightStageChange = useCallback((stage: UnifiedPreflightStage) => {
     if (stage === activePreflightStage) return;
+    trackEvent('preflight_review_stage_selected', { stage });
     setActivePreflightStage(stage);
     if (stage === 'readiness' && readiness.result) trackEvent('readiness_opened', { status: readiness.result.status, evaluable: readiness.result.evaluable, ruleset_version: readiness.result.rulesetVersion });
     if (stage === 'execution' && executionPreview.state.status !== 'error') trackEvent('execution_preview_opened', { state: executionPreview.state.status, process: executionPreview.state.status === 'available' ? executionPreview.state.result.process : 'none', preview_version: '0.1.0' });
@@ -435,9 +441,10 @@ export default function EditorPage() {
     setExecutionPreviewNotice(null);
     setResourceAnalysisNotice(null);
     setPreflightUpdatedNotice(null);
+    trackEvent('preflight_review_re_evaluated', { stage: activePreflightStage });
     preflight.evaluateAll();
     setPreflightUpdatedNotice(t('unifiedPreflightUpdated'));
-  }, [preflight, t]);
+  }, [activePreflightStage, preflight, t]);
 
   const restoreEntryFocus = useCallback((entry: HTMLButtonElement | null) => {
     if (entry?.isConnected) entry.focus({ preventScroll: true });

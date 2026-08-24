@@ -26,7 +26,7 @@ test('normal Close and Escape share owner release and double-rAF focus restorati
 test('Unified owner is claimed before opening and suppresses passive selection', () => {
   const open = between('const handleOpenPreflightReview', 'const handlePreflightStageChange');
   assert.ok(open.indexOf("preflightSelectionOwnerRef.current = 'unified_preflight'") < open.indexOf('setIsPreflightReviewOpen(true)'));
-  assert.match(open, /if \(!isPreflightReviewOpen\) preflight\.evaluateAll\(\)/);
+  assert.match(open, /if \(!isPreflightReviewOpen\) \{[\s\S]*preflight\.evaluateAll\(\);[\s\S]*\}/);
   assert.equal(shouldIgnoreSelectionChangeForOpenPreflight('unified_preflight'), true); assert.equal(shouldIgnoreSelectionChangeForOpenPreflight(null), false);
   assert.match(page, /shouldIgnoreSelectionChangeForOpenPreflight\(preflightSelectionOwnerRef\.current\)/);
 });
@@ -39,32 +39,48 @@ test('explicit Inspector, Crew settings, and Code Export release owner and close
   assert.match(inspector, /setIsInspectorOpen\(true\)/); assert.match(crew, /setIsInspectorOpen\(!isInspectorOpen\)/); assert.match(code, /setIsCodeModalOpen\(true\)/);
 });
 
-test('Overview open emits no legacy stage-open analytics', () => {
+test('Overview open emits only the Unified opened event and can emit again after close', () => {
   const open = between('const handleOpenPreflightReview', 'const handlePreflightStageChange');
   assert.doesNotMatch(open, /readiness_opened|execution_preview_opened|resource_analysis_opened/);
-  assert.doesNotMatch(page, /preflight_review_opened|preflight_review_stage_selected|preflight_review_re_evaluated/);
+  assert.equal((open.match(/trackEvent\('preflight_review_opened'/g) ?? []).length, 1);
+  assert.match(open, /if \(!isPreflightReviewOpen\)/);
+  assert.match(open, /preflight_version: UNIFIED_PREFLIGHT_REVIEW_VERSION/);
+  assert.doesNotMatch(open, /preflight_review_stage_selected|preflight_review_re_evaluated/);
+  assert.doesNotMatch(open, /useRef|sessionStorage|openedOnce/);
 });
 
 test('explicit stage selection retains exact legacy analytics and deduplicates active-stage selection', () => {
   const stage = between('const handlePreflightStageChange', 'const restoreEntryFocus');
   assert.ok(stage.indexOf('if (stage === activePreflightStage) return') < stage.indexOf('setActivePreflightStage(stage)'));
+  assert.ok(stage.indexOf('if (stage === activePreflightStage) return') < stage.indexOf("trackEvent('preflight_review_stage_selected', { stage })"));
+  assert.equal((stage.match(/trackEvent\('preflight_review_stage_selected', \{ stage \}\)/g) ?? []).length, 1);
   assert.match(stage, /trackEvent\('readiness_opened', \{ status: readiness\.result\.status, evaluable: readiness\.result\.evaluable, ruleset_version: readiness\.result\.rulesetVersion \}\)/);
   assert.match(stage, /trackEvent\('execution_preview_opened', \{ state: executionPreview\.state\.status, process:/); assert.match(stage, /preview_version: '0\.1\.0'/);
   assert.match(stage, /trackEvent\('resource_analysis_opened', createResourceAnalysisOpenedAnalyticsProperties\(resourceAnalysis\.state\)\)/);
 });
 
-test('manual Re-evaluate clears stale notices and calls only evaluateAll exactly once', () => {
+test('manual Re-evaluate emits once, clears stale notices, and calls only evaluateAll exactly once', () => {
   const reevaluate = between('const handleReevaluatePreflight', 'const restoreEntryFocus');
   assert.equal((reevaluate.match(/preflight\.evaluateAll\(\)/g) ?? []).length, 1);
   assert.match(reevaluate, /setReadinessNotice\(null\)/);
   assert.match(reevaluate, /setExecutionPreviewNotice\(null\)/);
   assert.match(reevaluate, /setResourceAnalysisNotice\(null\)/);
   assert.doesNotMatch(reevaluate, /readiness\.evaluateNow|executionPreview\.evaluateNow|resourceAnalysis\.evaluateNow/);
-  assert.doesNotMatch(reevaluate, /setActivePreflightStage|setIsPreflightReviewOpen|preflightSelectionOwnerRef|setSelectedNode|setNodes|setEdges|setIsInspectorOpen|setIsMobileSidebarOpen|trackEvent/);
+  assert.doesNotMatch(reevaluate, /setActivePreflightStage|setIsPreflightReviewOpen|preflightSelectionOwnerRef|setSelectedNode|setNodes|setEdges|setIsInspectorOpen|setIsMobileSidebarOpen/);
+  assert.equal((reevaluate.match(/trackEvent\('preflight_review_re_evaluated'/g) ?? []).length, 1);
+  assert.match(reevaluate, /trackEvent\('preflight_review_re_evaluated', \{ stage: activePreflightStage \}\)/);
   assert.match(panel, /onClick=\{props\.onReevaluate\}/);
   assert.doesNotMatch(panel, /key=\{.*updatedNotice|updatedNotice.*key=/);
   assert.match(page, /if \(!isPreflightReviewOpen\) setPreflightUpdatedNotice\(null\)/);
   assert.match(page, /if \(preflight\.isRefreshing\) setPreflightUpdatedNotice\(null\)/);
+});
+
+test('Unified analytics stay inside explicit user action handlers', () => {
+  assert.equal((page.match(/trackEvent\('preflight_review_opened'/g) ?? []).length, 1);
+  assert.equal((page.match(/trackEvent\('preflight_review_stage_selected'/g) ?? []).length, 1);
+  assert.equal((page.match(/trackEvent\('preflight_review_re_evaluated'/g) ?? []).length, 1);
+  assert.doesNotMatch(panel, /preflight_review_/);
+  assert.doesNotMatch(readFileSync('hooks/useUnifiedPreflight.ts', 'utf8'), /preflight_review_|trackEvent/);
 });
 
 test('active Unified stage remains page-session state and is not reset by workflow actions', () => {
