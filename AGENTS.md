@@ -7,13 +7,16 @@ Before making product, architecture, specification, code, QA, or release decisio
 1. `docs/PRODUCT_MASTER.md`
 2. `docs/ARCHITECTURE.md`
 3. `docs/DEVELOPMENT_RULES.md`
-4. `docs/CHAT_ROLE_REGISTRY.md`
-5. `docs/roadmap/MASTER_ROADMAP.md`
-6. `docs/roadmap/EXECUTION_GATES.md`
-7. `docs/SECURITY_RELIABILITY_BASELINE.md`
-8. `docs/DATA_AND_AI_GOVERNANCE.md`
-9. `docs/CURRENT_STATE.md`
-10. the current authoritative packet under `docs/specs/`
+4. `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
+5. `docs/CHAT_ROLE_REGISTRY.md`
+6. `docs/roadmap/MASTER_ROADMAP.md`
+7. `docs/roadmap/EXECUTION_GATES.md`
+8. `docs/roadmap/PROGRAM_BOARD.md`
+9. `docs/roadmap/RISK_REGISTER.md`
+10. `docs/SECURITY_RELIABILITY_BASELINE.md`
+11. `docs/DATA_AND_AI_GOVERNANCE.md`
+12. `docs/CURRENT_STATE.md`
+13. the current authoritative packet under `docs/specs/`
 
 Read additional cross-stage contracts when relevant:
 
@@ -21,6 +24,7 @@ Read additional cross-stage contracts when relevant:
 - product platform/commercial sequencing → `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
 - persisted semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
 - import / Workspace / revision foundation → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
+- designed expectations / later verification → `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`
 - durable decisions → `docs/decisions/`
 
 ## Chat role activation
@@ -68,12 +72,13 @@ When information conflicts, use this order:
 3. the current packet in `docs/specs/` for in-scope implementation details
 4. `docs/PRODUCT_MASTER.md`
 5. `docs/ARCHITECTURE.md`
-6. `docs/DEVELOPMENT_RULES.md` and applicable cross-cutting baselines
+6. `docs/DEVELOPMENT_RULES.md`, `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`, and applicable cross-cutting baselines
 7. `docs/roadmap/MASTER_ROADMAP.md`
-8. `docs/roadmap/EXECUTION_GATES.md` for promotion/authority decisions
+8. `docs/roadmap/EXECUTION_GATES.md` for promotion/authority/mutation-scope decisions
 9. relevant cross-stage plans/contracts
-10. `docs/CURRENT_STATE.md` as a snapshot only
-11. historical chats, old SHAs, old deployments, archived planning documents
+10. `docs/roadmap/PROGRAM_BOARD.md` / `docs/roadmap/RISK_REGISTER.md` for coordination
+11. `docs/CURRENT_STATE.md` as a snapshot only
+12. historical chats, old SHAs, old deployments, archived planning documents
 
 A SHA written in documentation is a snapshot or selection baseline unless the document explicitly says otherwise. Never treat an old SHA as current state without checking `main`.
 
@@ -94,11 +99,15 @@ AgentGraph Studio is not merely a visual workflow builder. It is intended to bec
 - Do not use an arbitrary overall 0–100 architecture score without a calibrated benchmark contract.
 - AI must not silently mutate workflow semantics.
 - Semantic change direction is `Proposal → Semantic Patch → Validation → Preview → User Apply`.
+- AI authority is capability-scoped; approval for review does not imply proposal/tool/security/patch authority.
+- Gate C pipeline safety does not authorize every patch operation; allowed mutation scope must be explicit.
+- Side-effect-sensitive changes require sufficient capability/human-control/security evidence before authorization.
+- Configured Intent/Constraint/Scenario expectations are not observed runtime truth.
 - Visual grouping, reusable semantic modules, and runtime orchestration are separate concepts.
 - User-owned source and user-owned runtime are default architectural goals.
 - CrewAI is the current primary target; do not unnecessarily lock the core domain to one framework.
 - Silent lossy target conversion is prohibited.
-- Workflow/imported text supplied by users is untrusted data when passed to an evaluator; it is not evaluator instruction.
+- Workflow/imported/scenario text supplied by users is untrusted data when passed to an evaluator; it is not evaluator instruction.
 - Do not execute arbitrary imported project code merely to inspect/convert it unless an explicitly specified sandboxed feature exists.
 - Never expose, store, or repeat secrets, API keys, tokens, or credentials.
 - Do not silently broaden data persistence or third-party AI-provider disclosure.
@@ -111,15 +120,48 @@ Stage order is dependency direction, not an automatic queue.
 
 After Stage 1, use `docs/roadmap/EXECUTION_GATES.md` and measured evidence. A Stage 1.5 **Adoption & Context Foundation selection band** may be selected before Stage 2. Guided Improvement and later mutation authority require explicit promotion decisions.
 
+Use `docs/roadmap/PROGRAM_BOARD.md` for near-term candidates/blockers and `docs/roadmap/RISK_REGISTER.md` for durable cross-stage risks.
+
+## Definition of Ready
+
+Before treating a Selected capability as implementation-ready, apply `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
+
+Do not start implementation while applicable product/dependency, domain/version, migration, security/data, UX/state, accessibility, analytics, test, or release questions remain undefined.
+
+Non-trivial packets should maintain lightweight traceability:
+
+```text
+Upstream Product / Architecture / Gate / Scenario / Risk
+→ Packet AC
+→ Test / Production verification
+```
+
+## Version / operational maturity
+
+Durable versioned contracts use the lifecycle defined in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`; do not remove legacy readers casually or silently reinterpret old versions.
+
+Operational targets mature from measured baselines rather than guessed permanent SLOs:
+
+```text
+UNMEASURED
+→ BASELINED
+→ PROVISIONAL_TARGET
+→ CALIBRATED_TARGET
+→ ENFORCED / ALERTED where justified
+```
+
 ## Implementation completion gate
 
 Before declaring implementation complete, run and report:
 
+- `npm run docs:check`
 - `npm test`
 - `npm run typecheck`
 - `npm run build`
 
-Repository CI should run the same gate on pull requests / main pushes. Branch protection/rulesets should require CI for normal merges where platform support permits.
+Repository CI should run the same gate on pull requests / main pushes. Branch Protection / Rulesets should require the `test-typecheck-build` status for normal merges where platform support permits.
+
+Live branch/ruleset settings must be checked; documentation is not proof that enforcement is enabled. If protection is absent despite support, keep the repository governance risk/blocker open.
 
 For release verification also confirm:
 
