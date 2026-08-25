@@ -1,6 +1,6 @@
 # AgentGraph Studio — Decision Records
 
-Use this directory for durable Product/Architecture decisions that materially change contracts, sequencing, boundaries, or migration strategy.
+Use this directory for durable Product/Architecture/operating-model decisions that materially change contracts, sequencing, boundaries, migration strategy, or development decision authority.
 
 Decision records are not current-state snapshots and do not replace live repository/Production checks.
 
@@ -18,6 +18,7 @@ Create an ADR when a decision materially changes one or more of:
 - persistence/cloud ownership model
 - semantic mutation/apply model
 - major dependency/tooling architecture
+- canonical chat/Work role ownership, lifecycle authority, or cross-role handoff model
 
 Small packet-local implementation details do not require an ADR when they do not alter durable behavior.
 

@@ -7,12 +7,13 @@ Before making product, architecture, specification, code, QA, or release decisio
 1. `docs/PRODUCT_MASTER.md`
 2. `docs/ARCHITECTURE.md`
 3. `docs/DEVELOPMENT_RULES.md`
-4. `docs/roadmap/MASTER_ROADMAP.md`
-5. `docs/roadmap/EXECUTION_GATES.md`
-6. `docs/SECURITY_RELIABILITY_BASELINE.md`
-7. `docs/DATA_AND_AI_GOVERNANCE.md`
-8. `docs/CURRENT_STATE.md`
-9. the current authoritative packet under `docs/specs/`
+4. `docs/CHAT_ROLE_REGISTRY.md`
+5. `docs/roadmap/MASTER_ROADMAP.md`
+6. `docs/roadmap/EXECUTION_GATES.md`
+7. `docs/SECURITY_RELIABILITY_BASELINE.md`
+8. `docs/DATA_AND_AI_GOVERNANCE.md`
+9. `docs/CURRENT_STATE.md`
+10. the current authoritative packet under `docs/specs/`
 
 Read additional cross-stage contracts when relevant:
 
@@ -21,6 +22,42 @@ Read additional cross-stage contracts when relevant:
 - persisted semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
 - import / Workspace / revision foundation → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
 - durable decisions → `docs/decisions/`
+
+## Chat role activation
+
+`docs/CHAT_ROLE_REGISTRY.md` is authoritative for the meaning of AgentGraph Studio conversation identifiers.
+
+If the user says only something like:
+
+```text
+ここは01として使います。
+```
+
+that is sufficient role activation. Resolve `01` from the current `main` registry, load the role's required docs, re-check live GitHub/Vercel/Production state when required by that role, and continue without asking the user to paste the previous prompt or old chat history.
+
+Canonical routing:
+
+```text
+00  Program Control & Current State
+01  Product Architecture & Roadmap
+02  UX & Implementation Specification
+03  GitHub, Vercel & Release Operations
+04  Engineering & Implementation
+05  Marketing & Developer Communication
+06  Analytics & Growth Evidence
+C01 Current Sprint Implementation
+W01 Independent QA & Release Verification
+W00 Development Master Synthesis
+```
+
+Legacy aliases:
+
+```text
+07 → 01
+08 → 02
+```
+
+Do not create competing Product/Roadmap or Specification authority in legacy aliases.
 
 ## Source-of-truth priority
 
