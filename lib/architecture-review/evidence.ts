@@ -7,6 +7,12 @@ import { canonicalize, sha256 } from './canonicalize';
 
 export interface ArchitectureEvidenceInput { graph: GraphData; readiness: ReadinessResult; execution: ExecutionPreviewReadModel; resources: ResourceAnalysisReadModel }
 const sourceOrder: Record<ArchitectureEvidenceSource, number> = { readiness: 0, execution_preview: 1, resource_analysis: 2, workflow_semantics: 3 };
+const ARCHITECTURE_TARGET_FIELDS = {
+  agent: ['label', 'role', 'goal', 'backstory'],
+  task: ['label', 'description', 'expectedOutput', 'outputSchema'],
+  tool: ['label', 'toolType', 'description'],
+} as const;
+const ARCHITECTURE_CREW_TARGET_FIELDS = ['name', 'process', 'memory', 'managerLlm'] as const;
 const nodeKey = (id: string) => `node:${id}`; const edgeKey = (id: string) => `edge:${id}`;
 const targetKey = (target: ReadinessTarget): string => target.scope === 'graph' ? 'workflow' : target.scope === 'node' && target.nodeId ? nodeKey(target.nodeId) : target.scope === 'edge' && target.edgeId ? edgeKey(target.edgeId) : target.scope === 'field' ? `field:${target.nodeId ?? 'crew'}:${target.field ?? 'unknown'}` : target.scope;
 const resourceTargetKey = (target: ResourceAnalysisTarget): string => target.type === 'crew' ? 'crew' : nodeKey(target.id);
@@ -30,8 +36,8 @@ export function createArchitectureTargetRegistry(graph: GraphData): Architecture
   const targets: ArchitectureEvidenceTargetEntryV0[] = [{ targetKey: 'workflow', kind: 'workflow', label: 'Workflow' }, { targetKey: 'crew', kind: 'crew', label: graph.crewConfig.name || 'Crew' }];
   for (const node of [...graph.nodes].sort((a,b) => a.id.localeCompare(b.id))) targets.push({ targetKey: nodeKey(node.id), kind: 'node', nodeType: node.type as 'agent'|'task'|'tool', nodeId: node.id, label: String(node.data.label || node.id) });
   for (const edge of [...graph.edges].sort((a,b) => a.id.localeCompare(b.id))) targets.push({ targetKey: edgeKey(edge.id), kind: 'edge', edgeId: edge.id, label: `${edge.source} → ${edge.target}` });
-  const fields = graph.nodes.flatMap((node) => Object.keys(node.data).map((field) => ({ targetKey: `field:${node.id}:${field}`, kind: 'field' as const, nodeType: node.type as 'agent'|'task'|'tool', nodeId: node.id, field, label: `${String(node.data.label || node.id)} · ${field}` })));
-  const crewFields=Object.keys(graph.crewConfig).map((field)=>({targetKey:`field:crew:${field}`,kind:'field' as const,field,label:`Crew · ${field}`}));
+  const fields = graph.nodes.flatMap((node) => ARCHITECTURE_TARGET_FIELDS[node.type as 'agent'|'task'|'tool'].map((field) => ({ targetKey: `field:${node.id}:${field}`, kind: 'field' as const, nodeType: node.type as 'agent'|'task'|'tool', nodeId: node.id, field, label: `${String(node.data.label || node.id)} · ${field}` })));
+  const crewFields=ARCHITECTURE_CREW_TARGET_FIELDS.map((field)=>({targetKey:`field:crew:${field}`,kind:'field' as const,field,label:`Crew · ${field}`}));
   return [...targets, ...fields, ...crewFields].sort((a,b) => a.targetKey.localeCompare(b.targetKey));
 }
 
