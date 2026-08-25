@@ -5,7 +5,7 @@ export const translations = {
     // Header
     appName: 'AgentGraph Studio',
     zeroCostBadge: '100% Free Tool',
-    subTitle: 'Visual Builder for CrewAI • No Vendor Lock-in (Raw Python Export)',
+    subTitle: 'Preflight Engineering for CrewAI • Visual Design • Deterministic Python Export',
     loadPreset: 'Load Presets',
     presetWorkflows: 'Preset Workflows',
     nodesCount: 'Nodes',
@@ -28,8 +28,8 @@ export const translations = {
     deployConoHaHeader: '🚀 Deploy (ConoHa)',
 
     // Catchphrase Banner
-    mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
-    subCopy: 'Design AI agents in your browser and export executable Python code (main.py) in 1 second. No API keys required • 100% Local Execution.',
+    mainCopy: 'Preflight Engineering for CrewAI Workflows',
+    subCopy: 'Design visually or import JSON, review readiness, execution structure, and resource implications before you run them, then export deterministic Python.',
 
     // Mobile Toolbar
     mobilePalette: 'Palette',
@@ -277,17 +277,17 @@ export const translations = {
     templatesTitle: 'CrewAI Free Template Library',
     freeAndOpenBadge: '100% Free & Open Source',
     noPaywallsBadge: 'Unlimited Access • No Paywalls',
-    templatesSub: 'Instantly deploy pre-configured multi-agent systems onto your canvas. All templates are 100% free with raw Python code export.',
+    templatesSub: 'Start from a preconfigured CrewAI workflow, inspect readiness, execution structure, and resource implications in Preflight, adapt it on the canvas, then export deterministic Python.',
     access: 'Access',
     freeAccess: '100% Free',
     loadTemplateBtn: 'Load Template',
-    templatesFooter: 'AgentGraph Studio • 100% Free Open Source AI Agent Builder • Zero Vendor Lock-in',
+    templatesFooter: 'AgentGraph Studio • Free & Open Source • Preflight Engineering for CrewAI • Deterministic Python Export',
   },
   ja: {
     // Header
     appName: 'AgentGraph Studio',
     zeroCostBadge: 'コスト完全ゼロ',
-    subTitle: 'Visual Builder for CrewAI • No Vendor Lock-in (生のPythonコード出力)',
+    subTitle: 'CrewAI向けPreflight Engineering • ビジュアル設計 • Pythonコード出力',
     loadPreset: 'プリセット読込',
     presetWorkflows: 'プリセットワークフロー',
     nodesCount: 'ノード数',
@@ -310,8 +310,8 @@ export const translations = {
     deployConoHaHeader: '🚀 稼働 (ConoHa)',
 
     // Catchphrase Banner
-    mainCopy: 'Visual Builder for CrewAI - No Vendor Lock-in',
-    subCopy: 'ブラウザ上でAIエージェントを設計し、実行可能な生のPythonコード（main.py）を1秒で出力します。APIキーの入力不要・100%ローカル実行対応。',
+    mainCopy: 'CrewAIワークフローのPreflight Engineering',
+    subCopy: 'ビジュアル設計やJSON読込から、実行前に準備状況・実行構造・リソース上の示唆をレビューし、決定的に生成されるPythonコードとして出力できます。',
 
     // Mobile Toolbar
     mobilePalette: 'パレット',
@@ -559,10 +559,10 @@ export const translations = {
     templatesTitle: 'CrewAI 無料テンプレートライブラリ',
     freeAndOpenBadge: '100% 完全無料 & オープンソース',
     noPaywallsBadge: '無制限アクセス • ペイウォールなし',
-    templatesSub: '事前構成されたマルチエージェント構成をワンクリックでキャンバスに読み込めます。生のPythonコード出力まで完全無料です。',
+    templatesSub: '設定済みのCrewAIワークフローから始め、Preflightで準備状況・実行構造・リソース上の示唆を確認し、キャンバスで調整してからPythonコードとして出力できます。',
     access: 'アクセス',
     freeAccess: '完全無料',
     loadTemplateBtn: 'テンプレートを読込',
-    templatesFooter: 'AgentGraph Studio • 完全無料オープンソースAIエージェントビルダー • ベンダーロックインなし',
+    templatesFooter: 'AgentGraph Studio • 無料・オープンソース • CrewAI向けPreflight Engineering • Pythonコード出力',
   },
 };
