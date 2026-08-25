@@ -3,6 +3,18 @@
 Status: **Authoritative long-term sequencing**  
 Roadmap stages express dependency order and product direction, not guaranteed dates.
 
+Execution/promotion governance is defined in:
+
+- `docs/roadmap/EXECUTION_GATES.md`
+
+Evaluation-quality/scale direction is defined in:
+
+- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+
+Commercial/adoption sequencing is defined in:
+
+- `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
+
 ## 0. Source-of-truth rule
 
 The current active packet under `docs/specs/` defines the implementation scope of the current Sprint. This roadmap must not be used to pull later-stage features into the current packet.
@@ -14,11 +26,7 @@ Stage status terms:
 - Long-term Vision
 - Conditional / Business Validation Required
 
-Cross-stage evaluation trust/scale direction is defined in:
-
-- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
-
-That plan is authoritative for evaluation-quality/scale decisions but does not automatically expand an active packet.
+When a stage completes, the next stage is **not automatically selected**. Use `docs/roadmap/EXECUTION_GATES.md`, current repository/Production reality, and measured evidence.
 
 ---
 
@@ -38,16 +46,42 @@ The sequencing principle is:
 
 1. establish reliable deterministic facts
 2. make architecture understandable/evaluable and establish measurable trust in the evaluator
-3. create improvement proposals only as evaluator quality justifies them
-4. make semantic changes safe and reviewable
-5. scale evaluation and navigation to larger workflows
-6. add policy/security boundaries
-7. make architecture reusable/composable
-8. compile/package for user ownership
-9. incorporate runtime evidence
-10. evaluate behavior, not only static design
-11. generalize target compilation
-12. add collaboration/distribution only where product value is validated
+3. resolve evaluation quality/scale limits before expanding authority
+4. strengthen adoption/context foundations where they materially improve first value, evaluator context, repeat use, or migration leverage
+5. create improvement proposals only as evaluator quality justifies them
+6. make semantic changes safe and reviewable
+7. scale navigation/evaluation to larger workflows as required
+8. add policy/security boundaries
+9. make architecture reusable/composable
+10. compile/package for user ownership
+11. incorporate runtime evidence
+12. evaluate behavior, not only static design
+13. generalize target compilation
+14. add collaboration/distribution only where product value is validated
+
+Operational execution model:
+
+```text
+Stage 0 — Deterministic Foundation
+↓
+Stage 1 — Evidence-Grounded Architecture Review
+↓
+Gate A — Evaluation Trust & Scale
+↓
+Stage 1.5 — Adoption & Context Foundation selection band
+↓
+Gate B — Evaluator Authority Expansion
+↓
+Stage 2 — Guided Improvement
+↓
+Gate C — Safe Transformation Readiness
+↓
+Stage 3 — Safe Transformation
+↓
+Later stages / gates as dependencies justify
+```
+
+Stage 1.5 is not one mandatory mega-Sprint. It is a planned selection band from which the smallest coherent foundation packet(s) should be selected.
 
 ---
 
@@ -114,19 +148,22 @@ Exit condition:
 
 A user can explicitly request an architecture-level review and understand the most important strengths, weaknesses, uncertainties, and justified improvement direction without AI inventing deterministic facts or modifying the workflow.
 
+Stage 1 Production release is **not** itself permission to expand AI authority. Gate A follows.
+
 ---
 
-# Cross-stage Gate — Evaluation Trust & Scale
+# Gate A — Evaluation Trust & Scale
 
 Status: **Planned decision gate; not automatically part of the current Stage 1 packet**
 
 Primary purpose:
 
-Determine whether the evaluation engine is trustworthy and scalable enough to justify expanding its authority into Guided Improvement and later Safe Transformation.
+Determine what measured evaluator hardening/scale/context work is required before stronger automation authority.
 
-Authoritative cross-stage plan:
+Authoritative plans:
 
 - `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+- `docs/roadmap/EXECUTION_GATES.md`
 
 Key concerns:
 
@@ -140,16 +177,91 @@ Key concerns:
 - introduce scoped/hierarchical evaluation when monolithic review is no longer sufficient
 - prohibit silent truncation of large workflows
 - determine when Search / Locate / Focus / Scoped Evaluation becomes an evaluator dependency
-- avoid unsupported "world's best" or equivalent evaluator claims without reproducible comparative evidence
+- avoid unsupported evaluator-superiority claims without reproducible comparative evidence
 
 Decision outcomes may include:
 
-- proceed directly to Stage 2
-- select an Evaluation Quality hardening Sprint
-- select an Evaluation Scale foundation Sprint
-- select a combined Trust & Scale Sprint when that is the simplest sufficient dependency solution
+- select Evaluation Quality hardening
+- select Evaluation Scale foundation
+- select Search/Locate/Scoped Evidence foundation
+- select Adoption & Context foundation work that does not expand mutation authority
+- select a combined minimal dependency Sprint
+- when evidence and context are sufficient, proceed toward Gate B / Stage 2
 
-This gate must be resolved from measured evidence, not mechanically from stage order.
+Gate thresholds must be tied to a versioned dataset/rubric and must not be invented as permanent values before calibration is mature.
+
+---
+
+# Stage 1.5 — Adoption & Context Foundation
+
+Status: **Planned selection band; evidence-driven, not one mandatory Sprint**
+
+Primary value:
+
+```text
+Access first value faster
++
+Understand with better context
++
+Create legitimate repeat-use/revision foundations
+```
+
+Candidate capability threads:
+
+- CrewAI existing-project static import / semantic mapping
+- Project / Local Workspace identity and persistence foundation
+- persisted Intent & Constraints
+- dedicated Review Workspace / finding navigation / Locate improvements
+- revision/evaluation-history foundation
+
+Strategic reason:
+
+The strongest adoption wedge is not requiring users to redraw existing systems before receiving value. Returning users also need stable project/workflow/revision context before later safe change and Review Delta become trustworthy.
+
+Architecture references:
+
+- `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
+- `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
+- `docs/DATA_AND_AI_GOVERNANCE.md`
+
+Selection discipline:
+
+- do not implement all candidate threads at once by default
+- select the smallest coherent packet that current evidence justifies
+- do not create speculative Graph V2
+- imported unsupported/dynamic behavior remains Unknown/inferred/lossy/unsupported rather than fabricated
+- multi-workflow value must not require proprietary cloud lock-in
+- Stage 1.5 does not silently grant direct AI mutation authority
+
+Exit condition for a selected Stage 1.5 packet depends on that packet. The selection band as a whole is complete only when Product Architecture decides no further Adoption/Context prerequisite is required before Gate B/Stage 2.
+
+---
+
+# Gate B — Evaluator Authority Expansion
+
+Status: **Planned decision gate**
+
+Primary purpose:
+
+Decide whether the evaluator is reliable and sufficiently contextualized for structured Guided Improvement proposals within a defined scope.
+
+Review at minimum:
+
+- Gate A quality evidence/current limitations
+- good-workflow false-positive control
+- flawed-workflow issue coverage
+- top-issue prioritization quality
+- repeated-run stability
+- intent/context quality for the proposal scope
+- evidence-groundability of proposed recommendations
+- revision/provenance sufficiency
+- large-workflow scope disclosure
+
+Decision question:
+
+> Is the reviewer reliable enough that users should reasonably act on its structured improvement proposals within the proposed scope?
+
+If no, select evaluator/context hardening instead of mechanically entering Stage 2.
 
 ---
 
@@ -176,11 +288,34 @@ Capabilities:
 
 No direct semantic apply unless Stage 3 safety contracts are present.
 
-Evaluation authority must not grow faster than evaluation trust. If Stage 1 findings are not sufficiently precise, well-prioritized, and false-positive controlled, harden the evaluator before expanding recommendation automation.
+Evaluation authority must not grow faster than evaluation trust. Gate B is a prerequisite for materially stronger automated recommendations.
 
 Exit condition:
 
 Users can compare meaningful improvement directions and understand why they differ before any graph mutation.
+
+---
+
+# Gate C — Safe Transformation Readiness
+
+Status: **Planned decision gate**
+
+Required before semantic AI-supported apply.
+
+Mandatory direction:
+
+- trustworthy upstream finding/proposal
+- semantic revision identity / stale detection
+- versioned Semantic Patch
+- base-revision validation
+- structural/semantic validation
+- before/after deterministic analysis
+- policy/compatibility validation where relevant
+- semantic diff preview
+- transactional user-controlled apply
+- failure leaves source unchanged
+
+Authoritative gate details: `docs/roadmap/EXECUTION_GATES.md`.
 
 ---
 
@@ -257,7 +392,7 @@ Navigation/search scope must not silently become execution meaning. A scoped Arc
 
 Roadmap flexibility:
 
-The full Stage 4 UX remains here. A lightweight Search / Locate / Scoped Evidence foundation may be selected earlier only through explicit Product Architecture review when measured evaluator scale makes it a dependency.
+The full Stage 4 UX remains here. A lightweight Search / Locate / Scoped Evidence foundation may be selected earlier through Gate A/Stage 1.5 when measured evaluator scale or Review usability makes it a dependency.
 
 Exit condition:
 
@@ -284,6 +419,10 @@ Capabilities:
 - policy packs
 - `PASS / REVIEW / BLOCK`
 - policy impact in evaluation and proposed changes
+
+Important distinction:
+
+This stage is **workflow-level Security & Policy Engineering**. AgentGraph Studio's own platform/product security and reliability baseline applies now and is defined in `docs/SECURITY_RELIABILITY_BASELINE.md`.
 
 Exit condition:
 
@@ -382,14 +521,7 @@ Principle:
 Own your runtime, bring your observability.
 ```
 
-Design-time and runtime responsibilities remain distinct:
-
-```text
-Design-time: Should this architecture be implemented/run in this form?
-Runtime: What actually happened when it ran?
-```
-
-Runtime-only facts remain Unknown until observed evidence exists.
+Runtime Evidence ingestion/persistence follows `docs/DATA_AND_AI_GOVERNANCE.md`.
 
 Exit condition:
 
@@ -414,7 +546,7 @@ Capabilities:
 - trajectory/tool-use checks
 - failure/retry/approval scenarios
 - runtime outcome vs designed expectation
-- production failures promoted into regression fixtures
+- production failures promoted into regression fixtures under appropriate privacy governance
 - runtime evidence used to confirm/falsify design-time hypotheses and improve future evaluator benchmarks without turning runtime-specific observations into universal static rules
 
 Exit condition:
@@ -440,6 +572,8 @@ Target Capability Contract
 
 Do not preselect or implement a second framework solely to claim multi-framework support.
 
+Framework expansion must satisfy the relevant gate in `docs/roadmap/EXECUTION_GATES.md`.
+
 Exit condition:
 
 CrewAI remains strong while the core can represent and validate another target without scattered framework-specific conditionals or silent semantic loss.
@@ -461,6 +595,8 @@ Possible capabilities:
 - organizational workflow libraries
 
 Do not make cloud collaboration a prerequisite for local/user-owned value.
+
+Before major collaboration scope, underlying identity/revision/data-governance contracts must be mature enough; use the collaboration/enterprise gate in `docs/roadmap/EXECUTION_GATES.md`.
 
 Exit condition:
 
@@ -499,6 +635,7 @@ Deterministic Analysis
 → Evidence
 → AI Evaluation
 → Evaluation Trust / Calibration
+→ Context / Repeat-use Foundation where required
 → Improvement Proposal
 → Semantic Patch
 → Revision / Diff / Apply
@@ -510,6 +647,22 @@ Small-workflow Evaluation
 → Search / Locate / Scoped Evidence when needed
 → Local / Cross-region Evaluation
 → Global Synthesis
+```
+
+```text
+External Source
+→ Static Import / Mapping Diagnostics
+→ Canonical Semantics
+→ Evidence / Review
+→ Project / Revision History
+```
+
+```text
+Current Graph V1
+→ Canonical Semantic Projection
+→ Stable identity/revision
+→ Additive contracts
+→ explicit persisted V2 only when required
 ```
 
 ```text
@@ -559,8 +712,13 @@ When choosing the next Sprint, evaluate:
 10. whether the feature is actually demand-dependent
 11. whether evaluator authority is growing faster than measured evaluator trust
 12. whether claimed large-workflow support is measured for both quality and usability
+13. whether the change improves access to first value
+14. whether it creates legitimate repeat-use/revision value
+15. whether it broadens data/provider/security boundaries and has the required governance
 
 Do not prioritize primarily by marketing novelty or feature count.
+
+Use the scorecard and promotion rules in `docs/roadmap/EXECUTION_GATES.md` for major stage/gate decisions.
 
 ---
 
@@ -568,12 +726,15 @@ Do not prioritize primarily by marketing novelty or feature count.
 
 A roadmap change should be reflected here only after Product Architecture review.
 
-For each change document:
+For each material change document:
 
 - what changed
 - why
 - dependency impact
 - whether a stage moved, split, merged, or became conditional
 - whether existing active packet scope changes
+- whether migration/security/data ownership boundaries changed
+
+Material durable changes should also create/update an ADR under `docs/decisions/`.
 
 Never silently reinterpret a current packet because the long-term roadmap changed.

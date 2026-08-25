@@ -4,6 +4,15 @@ Status: **Authoritative engineering and release rules**
 
 These rules apply to product changes, architecture changes, implementation, QA, GitHub management, and Vercel release work unless a stricter active packet exists.
 
+Cross-cutting required references where relevant:
+
+- `docs/SECURITY_RELIABILITY_BASELINE.md`
+- `docs/DATA_AND_AI_GOVERNANCE.md`
+- `docs/roadmap/EXECUTION_GATES.md`
+- `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
+- `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
+- `docs/decisions/`
+
 ## 0. Source-of-truth rule
 
 Before substantial work, re-check:
@@ -38,6 +47,9 @@ Engineering decisions should follow these durable principles:
 - user-owned source/runtime direction
 - portability and visible lossiness
 - existing analytics preservation
+- evaluator authority must not grow faster than measured evaluator trust
+- data/provider scope must not silently broaden
+- platform security/reliability is a current cross-cutting requirement, not a future workflow-policy feature
 
 Do not optimize engineering priority around marketing/growth work unless explicitly selected as a product dependency.
 
@@ -82,7 +94,7 @@ Invalid evidence/target references must fail closed according to the active pack
 
 ## 3.4 Trust boundary
 
-Workflow-authored text is untrusted analyzed data. Agent role/goal/backstory, task descriptions, expected output, and tool descriptions must not be interpreted as evaluator control instructions.
+Workflow-authored/imported text is untrusted analyzed data. Agent role/goal/backstory, task descriptions, expected output, tool descriptions, source comments/strings, and imported text must not be interpreted as evaluator control instructions.
 
 ## 3.5 Failure isolation
 
@@ -91,6 +103,23 @@ AI provider timeout, invalid schema, unsupported response, or unavailable config
 ## 3.6 Knowledge discipline
 
 Do not let AI convert runtime-only or external-dependent Unknowns into Known facts.
+
+## 3.7 Evaluator change governance
+
+A model/provider/prompt/rubric/schema/post-validation change that can materially change evaluator behavior must follow `docs/DATA_AND_AI_GOVERNANCE.md`:
+
+```text
+change
+→ contract tests
+→ benchmark comparison
+→ hard-violation check
+→ quality/stability review
+→ latency/failure/cost review
+→ deploy
+→ monitor / rollback
+```
+
+Do not silently swap a Production model and assume evaluator behavior remains equivalent.
 
 ---
 
@@ -112,6 +141,8 @@ If a packet only implements evaluation/proposals, do not add mutation as a conve
 
 When safe apply exists, stale proposal detection must prevent applying a patch to a workflow revision that changed after proposal generation.
 
+Before Stage 3 mutation authority, `docs/roadmap/EXECUTION_GATES.md` Gate C must be satisfied by the selected packet architecture.
+
 ---
 
 # 5. Domain and architecture rules
@@ -123,7 +154,10 @@ When safe apply exists, stale proposal detection must prevent applying a patch t
 - Prefer deterministic canonicalization/fingerprints for stale detection where appropriate.
 - Keep visual grouping, semantic modules, and runtime orchestration separate.
 - Do not add a second target framework through scattered giant conditionals; introduce capability/lossiness boundaries first.
-- Do not silently degrade unsupported semantics during export/build.
+- Do not silently degrade unsupported semantics during export/build/import.
+- Do not create Graph/Workflow V2 merely to mirror the long-term architecture diagram; use `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md` triggers.
+- Imported external projects are untrusted data and must not be executed merely to statically map them unless a separately specified sandboxed execution feature exists.
+- Project identity, workflow identity, semantic revision, layout state, and cloud/team persistence are separate concepts.
 
 ---
 
@@ -139,6 +173,9 @@ Every Sprint/Packet must explicitly define:
 - Domain/API changes
 - UX changes
 - Migration/backward compatibility
+- Security/privacy implications when relevant
+- Data persistence/provider-flow implications when relevant
+- Reliability/degraded-state behavior when relevant
 - Acceptance Criteria
 - Test Matrix
 
@@ -164,6 +201,8 @@ For schema/domain changes, define:
 
 Do not silently reinterpret old workflow meaning.
 
+A new persisted workflow major version requires an ADR and must follow `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`.
+
 ---
 
 # 8. Analytics regression rules
@@ -174,7 +213,7 @@ Rules:
 
 - do not remove/rename existing events casually
 - do not change event meaning without explicit specification
-- do not leak workflow semantic content, prompts, secrets, provider responses, credentials, or full Evidence payloads into analytics
+- do not leak workflow semantic content, imported source, prompts, secrets, provider responses, credentials, runtime trace bodies, or full Evidence payloads into analytics
 - additive events must use documented minimal metadata
 - AI failure/details should be reported with bounded categorical metadata, not sensitive raw content
 
@@ -202,7 +241,7 @@ Before **Implementation Complete**:
 
 ```text
 npm test
-npx tsc --noEmit
+npm run typecheck
 npm run build
 ```
 
@@ -214,7 +253,30 @@ Do not declare completion based only on type checking or a successful Vercel dep
 
 ---
 
-# 11. Independent QA
+# 11. Repository CI / merge enforcement
+
+The repository CI workflow should run on pull requests to `main` and on `main` pushes:
+
+```text
+npm ci
+→ npm test
+→ npm run typecheck
+→ npm run build
+```
+
+Normal merge policy should use GitHub branch protection/rulesets to require the CI check where the repository/account supports enforcement.
+
+Rules:
+
+- do not intentionally bypass required checks for ordinary feature/docs/code changes
+- if branch protection is unavailable, manual verification remains mandatory
+- a green Vercel Preview does not replace test/typecheck/build
+- CI configuration changes must be reviewed as release-governance changes
+- `main` should remain deployable
+
+---
+
+# 12. Independent QA
 
 Implementation self-test is not Independent QA.
 
@@ -229,6 +291,7 @@ Independent QA should verify, as applicable:
 - provider failure/degraded state
 - no silent mutation
 - analytics regression constraints
+- security/privacy boundaries
 - Production behavior
 
 Use result states such as:
@@ -245,7 +308,7 @@ Classify issues as:
 
 ---
 
-# 12. AI evaluation QA minimums
+# 13. AI evaluation QA minimums
 
 When applicable, test behavioral contracts rather than exact prose only:
 
@@ -263,9 +326,32 @@ When applicable, test behavioral contracts rather than exact prose only:
 
 Do not consider an AI evaluator production-ready because one manually tested response looks good.
 
+Evaluator promotion to stronger authority is governed separately by `docs/roadmap/EXECUTION_GATES.md`; a packet release benchmark is not automatically a permanent authority threshold.
+
 ---
 
-# 13. Git / commit rules
+# 14. Security / data review triggers
+
+Explicit review against `docs/SECURITY_RELIABILITY_BASELINE.md` and/or `docs/DATA_AND_AI_GOVERNANCE.md` is required when adding/changing, as applicable:
+
+- authentication/authorization
+- account/cloud persistence
+- external project/source import
+- arbitrary file/archive parsing
+- provider/model/provider credentials
+- mutation APIs
+- collaboration/RBAC
+- payment/billing authority
+- runtime trace ingestion
+- sensitive-data handling
+- third-party data transmission
+- persistent evaluation/revision history
+
+Do not treat workflow-level policy evaluation as a substitute for AgentGraph platform security.
+
+---
+
+# 15. Git / commit rules
 
 - Start from current `main` or a clearly documented current feature branch.
 - Keep commits scoped and understandable.
@@ -275,9 +361,11 @@ Do not consider an AI evaluator production-ready because one manually tested res
 
 For concurrent work, re-check current `main` before merge/release and resolve conflicts against current repository reality, not the original packet baseline.
 
+Durable Product/Architecture decisions that materially change boundaries/sequencing/migration/security/data ownership should be recorded in `docs/decisions/` rather than buried only in a chat or commit message.
+
 ---
 
-# 14. Vercel release gate
+# 16. Vercel release gate
 
 Before **Production Verified**, confirm:
 
@@ -299,7 +387,7 @@ A Preview deployment is not Production Verified.
 
 ---
 
-# 15. Status model
+# 17. Status model
 
 Use the following lifecycle:
 
@@ -323,9 +411,11 @@ Do not skip semantic meaning:
 - Production Verified: production deployment verified
 - Sprint Complete: closure accepted with blockers resolved
 
+Roadmap stage promotion is a separate Product Architecture decision from Sprint status. Use `docs/roadmap/EXECUTION_GATES.md` for stage/gate promotion.
+
 ---
 
-# 16. Completion report
+# 18. Completion report
 
 After implementation/release work report:
 
@@ -342,13 +432,24 @@ If any required check was not run, say so explicitly and do not imply it passed.
 
 ---
 
-# 17. Documentation maintenance
+# 19. Documentation maintenance
 
 Permanent Product/Architecture decisions belong in:
 
 - `docs/PRODUCT_MASTER.md`
 - `docs/ARCHITECTURE.md`
 - `docs/roadmap/MASTER_ROADMAP.md`
+
+Cross-stage execution and governance belong in:
+
+- `docs/roadmap/EXECUTION_GATES.md`
+- `docs/SECURITY_RELIABILITY_BASELINE.md`
+- `docs/DATA_AND_AI_GOVERNANCE.md`
+- relevant `docs/architecture/` contracts
+
+Material durable decision history belongs in:
+
+- `docs/decisions/`
 
 Implementation-specific authoritative contracts belong in:
 

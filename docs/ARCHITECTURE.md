@@ -3,6 +3,14 @@
 Status: **Authoritative long-term architecture direction**  
 Current packet implementations under `docs/specs/` remain authoritative for their scoped version.
 
+Supporting authoritative contracts:
+
+- `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md` — persisted semantic-model migration runway
+- `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md` — import, Project/Workspace, revision-compatible foundation
+- `docs/SECURITY_RELIABILITY_BASELINE.md` — AgentGraph platform security/reliability
+- `docs/DATA_AND_AI_GOVERNANCE.md` — persistence/provider/evaluator governance
+- `docs/roadmap/EXECUTION_GATES.md` — stage promotion and authority expansion
+
 ## 0. Source-of-truth rule
 
 This document defines durable architectural boundaries and intended evolution. It does not mean every described layer exists today.
@@ -13,7 +21,8 @@ Implementation conflict priority:
 2. current Production behavior
 3. active packet under `docs/specs/`
 4. this Architecture Master
-5. Product Master / Roadmap
+5. applicable cross-cutting security/data/migration contracts
+6. Product Master / Roadmap
 
 If the active packet intentionally defers a future architecture migration, follow the packet.
 
@@ -70,8 +79,21 @@ Examples:
 - Current Stage 1 packet explicitly keeps `GraphDocumentV1` unchanged. Follow that packet.
 - Future persisted Workflow Intent is a planned direction, not a requirement for Stage 1 v0.
 - Future framework-neutral IR is introduced only after target capability/lossiness contracts mature.
+- Future Project/Workspace work must not silently redefine JSON export as cloud persistence.
 
 Architecture direction must reduce future migration cost without expanding current Sprint scope unnecessarily.
+
+For persisted schema evolution, use `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md` and prefer:
+
+```text
+Graph V1
+→ canonical semantic projection
+→ stable identities/fingerprints
+→ additive contracts where sufficient
+→ explicit new persisted version only when justified
+```
+
+A new persisted workflow major version requires an explicit decision/migration packet, not an opportunistic implementation change.
 
 ---
 
@@ -127,6 +149,18 @@ Visual/logical organization, separate from execution semantics.
 
 Semantic workflow state should eventually have an immutable revision identity or equivalent deterministic fingerprint so proposals cannot be silently applied to a workflow that has changed since proposal generation.
 
+## 3.5 Identity boundaries
+
+Long-term contracts should distinguish:
+
+- Project/Workspace identity
+- logical workflow identity
+- semantic revision/fingerprint
+- layout/presentation state
+- stable target/entity identity where required
+
+Do not use coordinates or accidental array order as durable semantic identity.
+
 ---
 
 # 4. Three Separate Composition Concepts
@@ -153,7 +187,34 @@ Do not encode one concept by reusing another merely because the UI appears simil
 
 ---
 
-# 5. Deterministic Analysis Layer
+# 5. Import and External Source Boundary
+
+Existing-project import should map external source into the same canonical semantic boundaries used by native AgentGraph workflows.
+
+Preferred direction:
+
+```text
+External Source
+→ Safe Static Parse
+→ Source Facts
+→ Semantic Mapping
+→ Mapping Diagnostics / Provenance
+→ AgentGraph Canonical Semantics
+```
+
+Rules:
+
+- do not execute arbitrary imported project code merely to inspect/convert it
+- dynamic/unsupported behavior remains `Unknown`, inferred, lossy, or unsupported as appropriate
+- framework-specific parser types must not define core domain types
+- source provenance and mapping versions should be retained
+- original external source is not silently rewritten
+
+See `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`.
+
+---
+
+# 6. Deterministic Analysis Layer
 
 Deterministic systems own facts that can be derived reliably from workflow source/configuration.
 
@@ -167,6 +228,7 @@ Existing validation/transpilation behavior remains separate from AI availability
 
 Long-term deterministic analysis may additionally cover:
 
+- import mapping diagnostics
 - permission/side-effect maps
 - policy checks
 - target capability checks
@@ -177,7 +239,7 @@ AI must not become a dependency of core deterministic analysis.
 
 ---
 
-# 6. Evidence Layer
+# 7. Evidence Layer
 
 The Evidence layer is the bridge between deterministic analysis and AI reasoning.
 
@@ -191,9 +253,9 @@ Required characteristics:
 - machine-readable
 - suitable for UI, AI evaluation, CLI/CI, and later runtime evidence
 
-Evidence should preserve provenance and distinguish evidence originating from deterministic analysis, workflow semantic configuration, policy/compatibility sources, runtime observation, or external registries.
+Evidence should preserve provenance and distinguish evidence originating from deterministic analysis, workflow semantic configuration, import mapping, policy/compatibility sources, runtime observation, or external registries.
 
-## 6.1 Knowledge Status
+## 7.1 Knowledge Status
 
 First-class statuses:
 
@@ -205,7 +267,7 @@ Unknown
 
 Deterministic generation should not emit `Inferred`. AI reasoning may produce inference. External-dependent facts should include source/version/time context or remain Unknown.
 
-## 6.2 Finding Class
+## 7.2 Finding Class
 
 Use:
 
@@ -217,7 +279,7 @@ External-dependent
 
 Do not invent pseudo-confidence for deterministic facts. Use confidence only where it materially helps heuristic/external interpretation.
 
-## 6.3 Provenance
+## 7.3 Provenance
 
 Long-term evaluation/finding metadata should support concepts such as:
 
@@ -233,9 +295,11 @@ Long-term evaluation/finding metadata should support concepts such as:
 
 Current packet-specific exact contracts live in `docs/specs/`.
 
+Persistence/retention/provider handling of Evidence must follow `docs/DATA_AND_AI_GOVERNANCE.md`.
+
 ---
 
-# 7. AI Architecture Intelligence
+# 8. AI Architecture Intelligence
 
 AI is a reasoning layer over bounded workflow semantics and Evidence, not the source of truth for deterministic graph facts.
 
@@ -252,11 +316,11 @@ ArchitectureEvaluationProvider
 
 Domain types must not depend on provider-specific response shapes.
 
-## 7.1 Server-side boundary
+## 8.1 Server-side boundary
 
 Provider calls belong server-side. Secrets must never be exposed to the browser, analytics, source repository, or user-visible logs.
 
-## 7.2 Structured output
+## 8.2 Structured output
 
 AI evaluation should produce structured, runtime-validated output. Free-form prose parsing must not be the core contract.
 
@@ -268,19 +332,25 @@ Post-validation should reject or degrade invalid output, including:
 - invalid knowledge status/class combination
 - unsupported claim where contract requires Unknown
 
-## 7.3 Untrusted workflow text
+## 8.3 Untrusted workflow/import text
 
-Agent roles, goals, backstories, task descriptions, expected output text, and tool descriptions are **data being analyzed**. They are not instructions to the evaluator.
+Agent roles, goals, backstories, task descriptions, expected output text, tool descriptions, imported source comments/strings, and external project text are **data being analyzed**. They are not instructions to the evaluator.
 
 Evaluation prompts and transport must preserve this trust boundary.
 
-## 7.4 Failure isolation
+## 8.4 Failure isolation
 
 AI timeout/provider failure/invalid response must not break deterministic analysis, import/export, code generation, or unrelated editor behavior.
 
+## 8.5 Evaluator change management
+
+Production model/provider/prompt/rubric/schema/post-validation changes are governed changes. Follow `docs/DATA_AND_AI_GOVERNANCE.md` and compare benchmark/stability/operational behavior before assuming equivalence.
+
+Evaluator authority expansion is governed by `docs/roadmap/EXECUTION_GATES.md`, not merely by successful provider connectivity.
+
 ---
 
-# 8. Architecture Review Result Direction
+# 9. Architecture Review Result Direction
 
 A durable evaluation result should be capable of representing:
 
@@ -301,7 +371,7 @@ UI should prioritize understanding over raw technical output. Raw evidence belon
 
 ---
 
-# 9. Improvement Proposal Layer
+# 10. Improvement Proposal Layer
 
 Architecture findings should later feed a proposal model separate from mutation.
 
@@ -324,9 +394,11 @@ ImprovementProposal
 
 A proposal is advisory. It does not alter the source graph.
 
+Stage 2 should not be selected merely because Stage 1 shipped. Gate B in `docs/roadmap/EXECUTION_GATES.md` must review whether evaluator quality/context is sufficient for the proposed authority.
+
 ---
 
-# 10. Semantic Patch Layer
+# 11. Semantic Patch Layer
 
 When safe transformation is introduced, prefer domain operations over user-facing raw JSON diff.
 
@@ -344,7 +416,7 @@ Potential operations:
 
 Every semantic patch must be validated against its base revision/fingerprint before apply.
 
-## 10.1 Risk classes
+## 11.1 Risk classes
 
 Useful direction:
 
@@ -354,7 +426,7 @@ Useful direction:
 
 Higher-impact changes require stronger review/approval.
 
-## 10.2 Apply pipeline
+## 11.2 Apply pipeline
 
 Target flow:
 
@@ -376,9 +448,11 @@ Proposal
 
 If validation fails, the source workflow must remain unchanged.
 
+Before semantic apply exists, Gate C in `docs/roadmap/EXECUTION_GATES.md` must be satisfied.
+
 ---
 
-# 11. Revision and Semantic Diff
+# 12. Revision and Semantic Diff
 
 Revision history is a prerequisite for trustworthy automated change, not a cosmetic history feature.
 
@@ -404,9 +478,11 @@ Semantic Diff should describe domain changes such as:
 
 Do not expose only line-based JSON diffs as the primary review experience.
 
+Project/Workspace/revision-compatible foundation follows `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`.
+
 ---
 
-# 12. Permission and Side-effect Architecture
+# 13. Permission and Side-effect Architecture
 
 Long-term tool/action semantics should support capability metadata such as:
 
@@ -424,9 +500,11 @@ A versioned built-in capability registry may provide known capabilities for reco
 
 Security evaluation should eventually combine deterministic permission facts with AI reasoning; AI should not be the enforcement layer.
 
+This workflow-policy domain is distinct from AgentGraph's own Product/Platform Security baseline in `docs/SECURITY_RELIABILITY_BASELINE.md`.
+
 ---
 
-# 13. Policy Layer
+# 14. Policy Layer
 
 Policy should be declarative and separable from LLM prompt text.
 
@@ -451,7 +529,7 @@ Policy inputs should come from structured workflow/evidence data. A future adapt
 
 ---
 
-# 14. Target Capability and Lossiness
+# 15. Target Capability and Lossiness
 
 Before a broad framework-neutral IR, introduce explicit target capability and lossiness contracts.
 
@@ -477,9 +555,11 @@ UNSUPPORTED
 
 Silent semantic degradation is prohibited.
 
+A second major target must pass the framework-expansion gate in `docs/roadmap/EXECUTION_GATES.md`.
+
 ---
 
-# 15. Compilation and Portable Build
+# 16. Compilation and Portable Build
 
 Current deterministic CrewAI Python export is the foundation, not the final build model.
 
@@ -525,7 +605,7 @@ Generated code is an artifact; workflow source remains authoritative.
 
 ---
 
-# 16. Headless Core and Machine Interfaces
+# 17. Headless Core and Machine Interfaces
 
 Domain/evaluation logic should remain callable independently of React UI.
 
@@ -545,7 +625,7 @@ Machine-readable outputs should be suitable for CI and coding-agent use.
 
 ---
 
-# 17. Runtime Evidence and Observability
+# 18. Runtime Evidence and Observability
 
 Runtime evidence is a later Evidence source, not a replacement for design-time analysis.
 
@@ -569,9 +649,11 @@ Runtime Evidence should eventually model trajectory/outcome data including:
 
 Standards are time-sensitive; verify current OpenTelemetry/framework semantics at implementation time.
 
+Runtime Evidence ingestion/persistence must follow `docs/DATA_AND_AI_GOVERNANCE.md`.
+
 ---
 
-# 18. Design vs Actual
+# 19. Design vs Actual
 
 Long-term comparison layer:
 
@@ -590,11 +672,11 @@ Examples:
 - required approval vs observed approval
 - static resource expectation vs observed resource use
 
-Runtime failures should be candidates for regression fixtures in the evaluation benchmark suite.
+Runtime failures should be candidates for regression fixtures in the evaluation benchmark suite where privacy/governance permits.
 
 ---
 
-# 19. Reusable Packages
+# 20. Reusable Packages
 
 Reusable package contracts should not depend on a marketplace existing.
 
@@ -622,7 +704,7 @@ Marketplace is a distribution/business layer over reusable artifact contracts, n
 
 ---
 
-# 20. Evaluation Benchmark Architecture
+# 21. Evaluation Benchmark Architecture
 
 AI evaluation must have a benchmark/eval harness as a first-class engineering component.
 
@@ -637,11 +719,13 @@ Do not primarily test exact prose. Test behavioral contracts such as:
 - stable behavior under irrelevant reordering/renaming where appropriate
 - good workflows do not receive invented critical problems
 
-Benchmark fixtures should grow from curated architecture cases and later real runtime/production failures.
+Benchmark fixtures should grow from curated architecture cases and later real runtime/production failures where governance permits.
+
+Benchmark results must name their dataset/rubric/version. Packet release thresholds do not automatically become permanent authority-promotion thresholds; follow `docs/roadmap/EXECUTION_GATES.md`.
 
 ---
 
-# 21. Architecture Invariants
+# 22. Architecture Invariants
 
 Unless an explicit Architecture Decision revises them:
 
@@ -651,9 +735,15 @@ Unless an explicit Architecture Decision revises them:
 4. semantic AI change requires preview/user control
 5. visual organization is not runtime execution semantics
 6. generated code is not the canonical workflow source
-7. target lossiness is visible
+7. target/import lossiness is visible
 8. AI/provider failure does not disable deterministic core
 9. provider-specific types do not define domain contracts
 10. core semantics are not UI-only
 11. existing analytics must not be broken by unrelated product work
-12. secrets never enter client-visible state, analytics, repository docs, or logs
+12. secrets never enter client-visible state, analytics, repository docs, or normal logs
+13. imported projects are untrusted and are not executed merely for static analysis
+14. Project/Workflow/Semantic Revision/Layout identities remain distinct where their semantics differ
+15. data persistence/provider scope does not silently broaden
+16. evaluator model/prompt/rubric changes are governed and benchmarked when behavior can materially change
+17. evaluator authority does not grow faster than measured trust
+18. a new persisted workflow major version requires explicit migration justification, not speculative cleanup

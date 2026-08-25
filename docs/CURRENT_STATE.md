@@ -1,21 +1,23 @@
 # AgentGraph Studio — Current State Snapshot
 
-Snapshot date: **2026-08-25**  
-This file is a coordination snapshot, **not** a replacement for live GitHub/Vercel checks.
+Snapshot date: **2026-08-26**  
+This file is a coordination snapshot, **not** a live deployment registry.
 
 ## 0. Live-state rule
 
-Before using any SHA or deployment below as current, re-check:
+Before any implementation, QA, release, roadmap-promotion, or current-state decision, re-check:
 
 1. latest GitHub `main`
 2. latest Vercel Production deployment
 3. actual Production behavior
 
-If live state differs, live state wins and this file should be updated after the relevant Sprint/release decision.
+Do **not** use a SHA written in this file as proof of current state. Live checks win.
+
+This file intentionally emphasizes the current milestone/status/next gate rather than embedding frequently stale deployment SHAs.
 
 ---
 
-# 1. Product baseline
+# 1. Current Product baseline
 
 Current Production foundation includes:
 
@@ -41,6 +43,13 @@ Long-term direction is defined in:
 - `docs/ARCHITECTURE.md`
 - `docs/roadmap/MASTER_ROADMAP.md`
 
+Cross-stage execution/governance is defined in:
+
+- `docs/roadmap/EXECUTION_GATES.md`
+- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+- `docs/SECURITY_RELIABILITY_BASELINE.md`
+- `docs/DATA_AND_AI_GOVERNANCE.md`
+
 ---
 
 # 2. Current selected major milestone
@@ -51,64 +60,101 @@ Current authoritative packet:
 
 - `docs/specs/AGS-EGAI-AR-V0-P1.md`
 
-Packet status in the specification: **Specified**.
+Packet document status: **Specified**.
 
-Observed repository activity on 2026-08-25 shows implementation work has begun on branch:
+Observed repository implementation work exists on:
 
 - `feat/evidence-grounded-architecture-review-v0`
 
-Observed implementation commit:
+Therefore the overall Sprint is at least **Implementation Started** until a newer live repository/QA state proves a later lifecycle status.
 
-- `04c7464241911ffba68ee75d1007577825fcf4b2` — `Add evidence-grounded architecture review`
-
-Therefore the overall Sprint is at least **Implementation Started**, but it must not be considered Implementation Complete, QA Complete, Production Verified, or Sprint Complete until the required gates are independently verified.
+Do not infer Implementation Complete / QA Complete / Production Verified / Sprint Complete from branch existence alone.
 
 ---
 
-# 3. Main / Production snapshot before product-master documentation merge
+# 3. Current Stage 1 product intent
 
-GitHub `main` observed:
+The milestone adds an evidence-grounded architecture interpretation layer without replacing deterministic Preflight.
 
-- SHA: `abe22da888dd6c79e663cdced07370323991af9c`
-- Commit: `Add evidence-grounded architecture review specification`
-
-Vercel Production observed:
-
-- state: `READY`
-- target: `production`
-- `githubCommitSha`: `abe22da888dd6c79e663cdced07370323991af9c`
-
-At that observation point:
-
-```text
-GitHub main SHA = Vercel Production githubCommitSha
-```
-
-This SHA is a snapshot only. It will become stale after future merges.
-
----
-
-# 4. Stage 1 product intent
-
-The current milestone adds an evidence-grounded architecture interpretation layer without replacing deterministic Preflight.
-
-Required architecture ordering:
+Required ordering:
 
 ```text
 Canonical Workflow
-→ existing deterministic analysis
+→ deterministic analysis
 → Evidence Contract
 → AI reasoning
 → Architecture Evaluation
 ```
 
-Current v0 intentionally keeps deterministic Preflight authoritative and independent from AI availability.
+Current v0 intentionally keeps deterministic Preflight authoritative and AI-independent.
 
-Current v0 also intentionally defers later roadmap work including semantic mutation, Semantic Patch, Apply, persisted Workflow Intent, runtime tracing, framework-neutral compilation, collaboration, and marketplace.
+Current v0 also intentionally defers later work including:
+
+- semantic mutation / Apply
+- Semantic Patch
+- persisted top-level Workflow Intent
+- runtime tracing/evidence
+- framework-neutral compilation
+- collaboration
+- marketplace
+- broader Stage 1.5 Import/Workspace/History foundation unless separately selected
 
 ---
 
-# 5. Status model
+# 4. Required next gates for Stage 1
+
+Before **Implementation Complete**:
+
+- implementation scope matches `AGS-EGAI-AR-V0-P1`
+- `npm test` passes
+- `npm run typecheck` passes
+- `npm run build` passes
+- packet-defined AI/evidence tests pass
+
+Before **QA Complete**:
+
+- Independent QA against Acceptance Criteria
+- grounding/Unknown/invalidation/failure cases checked
+- existing Preflight/import/export/transpiler/analytics regressions checked
+- accessibility and stale-result behavior checked as specified
+- security/privacy boundaries checked
+
+Before **Production Verified**:
+
+- release to `main`
+- Vercel `READY`
+- `target=production`
+- Production smoke
+- relevant runtime errors checked
+- GitHub `main` SHA equals Vercel Production `githubCommitSha`
+
+---
+
+# 5. After Stage 1
+
+Do not mechanically select Stage 2 after Stage 1.
+
+Use:
+
+- `docs/roadmap/EXECUTION_GATES.md`
+- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+
+Expected decision flow:
+
+```text
+Stage 1 Production evidence
+→ Gate A — Evaluation Trust & Scale
+→ select quality/scale/context foundation as justified
+→ Stage 1.5 Adoption & Context Foundation packet(s) where justified
+→ Gate B — Evaluator Authority Expansion
+→ Stage 2 Guided Improvement only when evidence supports it
+```
+
+Stage 1.5 candidates include CrewAI static import, Project/Local Workspace, persisted Intent & Constraints, Review/Locate improvements, and revision/evaluation-history foundations. These are candidates, not automatically one Sprint.
+
+---
+
+# 6. Status model
 
 Use:
 
@@ -122,52 +168,24 @@ Selected
 → Sprint Complete
 ```
 
-Do not advance a status based on assumptions.
-
-For Stage 1, implementation activity exists, but the later statuses require explicit verification.
-
----
-
-# 6. Required next gates for Stage 1
-
-Before **Implementation Complete**:
-
-- implementation scope matches `AGS-EGAI-AR-V0-P1`
-- `npm test` passes
-- `npx tsc --noEmit` passes
-- `npm run build` passes
-- packet-defined AI/evidence tests pass
-
-Before **QA Complete**:
-
-- Independent QA against Acceptance Criteria
-- grounding/Unknown/invalidation/failure cases checked
-- existing Preflight/import/export/transpiler/analytics regressions checked
-- accessibility and stale-result behavior checked as specified
-
-Before **Production Verified**:
-
-- merge/release to `main`
-- Vercel `READY`
-- `target=production`
-- Production smoke
-- relevant runtime errors checked
-- GitHub `main` SHA equals Vercel Production `githubCommitSha`
+Roadmap gate/stage promotion is a separate Product Architecture decision from Sprint lifecycle status.
 
 ---
 
 # 7. Coordination rule for chats / Work / Codex
 
-All development surfaces should read the repository documents instead of relying on a prior chat's remembered state.
+All development surfaces should read repository documents instead of relying on a prior chat's remembered state.
 
-Recommended reading order:
+Recommended baseline reading order:
 
 1. `AGENTS.md`
 2. `docs/PRODUCT_MASTER.md`
 3. `docs/ARCHITECTURE.md`
 4. `docs/DEVELOPMENT_RULES.md`
 5. `docs/roadmap/MASTER_ROADMAP.md`
-6. this snapshot
-7. active packet under `docs/specs/`
+6. `docs/roadmap/EXECUTION_GATES.md`
+7. relevant cross-stage security/data/evaluation/import contracts
+8. this snapshot
+9. active packet under `docs/specs/`
 
-For current Sprint implementation details, the active packet is authoritative even when the long-term Master describes a later architecture direction.
+For current Sprint implementation details, the active packet remains authoritative even when the long-term documents describe later architecture.

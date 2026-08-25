@@ -8,8 +8,19 @@ Before making product, architecture, specification, code, QA, or release decisio
 2. `docs/ARCHITECTURE.md`
 3. `docs/DEVELOPMENT_RULES.md`
 4. `docs/roadmap/MASTER_ROADMAP.md`
-5. `docs/CURRENT_STATE.md`
-6. the current authoritative packet under `docs/specs/`
+5. `docs/roadmap/EXECUTION_GATES.md`
+6. `docs/SECURITY_RELIABILITY_BASELINE.md`
+7. `docs/DATA_AND_AI_GOVERNANCE.md`
+8. `docs/CURRENT_STATE.md`
+9. the current authoritative packet under `docs/specs/`
+
+Read additional cross-stage contracts when relevant:
+
+- evaluator trust/scale → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+- product platform/commercial sequencing → `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
+- persisted semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
+- import / Workspace / revision foundation → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
+- durable decisions → `docs/decisions/`
 
 ## Source-of-truth priority
 
@@ -20,11 +31,14 @@ When information conflicts, use this order:
 3. the current packet in `docs/specs/` for in-scope implementation details
 4. `docs/PRODUCT_MASTER.md`
 5. `docs/ARCHITECTURE.md`
-6. `docs/roadmap/MASTER_ROADMAP.md`
-7. `docs/CURRENT_STATE.md` as a snapshot only
-8. historical chats, old SHAs, old deployments, archived planning documents
+6. `docs/DEVELOPMENT_RULES.md` and applicable cross-cutting baselines
+7. `docs/roadmap/MASTER_ROADMAP.md`
+8. `docs/roadmap/EXECUTION_GATES.md` for promotion/authority decisions
+9. relevant cross-stage plans/contracts
+10. `docs/CURRENT_STATE.md` as a snapshot only
+11. historical chats, old SHAs, old deployments, archived planning documents
 
-A SHA written in documentation is a snapshot or selection baseline unless the document explicitly says otherwise. Never treat an old SHA as the current state without checking `main`.
+A SHA written in documentation is a snapshot or selection baseline unless the document explicitly says otherwise. Never treat an old SHA as current state without checking `main`.
 
 ## Product North Star
 
@@ -47,26 +61,39 @@ AgentGraph Studio is not merely a visual workflow builder. It is intended to bec
 - User-owned source and user-owned runtime are default architectural goals.
 - CrewAI is the current primary target; do not unnecessarily lock the core domain to one framework.
 - Silent lossy target conversion is prohibited.
-- Workflow text supplied by users is untrusted data when passed to an evaluator; it is not evaluator instruction.
+- Workflow/imported text supplied by users is untrusted data when passed to an evaluator; it is not evaluator instruction.
+- Do not execute arbitrary imported project code merely to inspect/convert it unless an explicitly specified sandboxed feature exists.
 - Never expose, store, or repeat secrets, API keys, tokens, or credentials.
+- Do not silently broaden data persistence or third-party AI-provider disclosure.
+- Do not advance evaluator authority faster than measured evaluator trust.
+- Do not create Graph/Workflow V2 merely to match long-term diagrams; use the semantic-model evolution decision rules.
+
+## Roadmap execution rule
+
+Stage order is dependency direction, not an automatic queue.
+
+After Stage 1, use `docs/roadmap/EXECUTION_GATES.md` and measured evidence. A Stage 1.5 **Adoption & Context Foundation selection band** may be selected before Stage 2. Guided Improvement and later mutation authority require explicit promotion decisions.
 
 ## Implementation completion gate
 
 Before declaring implementation complete, run and report:
 
 - `npm test`
-- `npx tsc --noEmit`
+- `npm run typecheck`
 - `npm run build`
+
+Repository CI should run the same gate on pull requests / main pushes. Branch protection/rulesets should require CI for normal merges where platform support permits.
 
 For release verification also confirm:
 
 - Vercel deployment state is `READY`
 - target is `production`
 - Production behavior is healthy
+- relevant runtime errors are checked
 - GitHub `main` SHA equals Vercel Production `githubCommitSha`
 
 Do not mark QA Complete or Production Verified based only on implementation self-report.
 
 ## Current packet rule
 
-A packet under `docs/specs/` may intentionally defer a long-term architecture feature. The packet is authoritative for the current implementation scope. Do not pull future roadmap work into the packet merely because it appears in the Product Master or Architecture documents.
+A packet under `docs/specs/` may intentionally defer a long-term architecture feature. The packet is authoritative for the current implementation scope. Do not pull future roadmap work into the packet merely because it appears in Product/Architecture/Roadmap documents.
