@@ -8,8 +8,9 @@ This directory is the shared development knowledge base for ChatGPT chats, Work,
 2. [`ARCHITECTURE.md`](./ARCHITECTURE.md) — long-term architecture boundaries and evolution
 3. [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) — implementation, QA, Git, analytics regression, and release gates
 4. [`roadmap/MASTER_ROADMAP.md`](./roadmap/MASTER_ROADMAP.md) — stage sequencing and dependency logic
-5. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; always re-check live GitHub/Vercel before treating its SHA as current
-6. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
+5. [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md) — cross-stage evaluation trust, benchmark quality, large-workflow scale, Search/Locate/Scoped Evaluation direction
+6. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; always re-check live GitHub/Vercel before treating its SHA as current
+7. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
 
 ## Source-of-truth hierarchy
 
@@ -22,11 +23,20 @@ latest GitHub main / repository reality
 → Product Master
 → Architecture Master
 → Master Roadmap
+→ relevant cross-stage plans
 → Current State snapshot
 → historical plans/chats
 ```
 
-The Product/Architecture/Roadmap documents describe durable direction. They do not automatically expand the scope of an active packet.
+The Product/Architecture/Roadmap documents and cross-stage plans describe durable direction. They do not automatically expand the scope of an active packet.
+
+## Evaluation trust / scale
+
+When a decision concerns evaluator quality, claims of evaluator accuracy, design-time vs runtime evaluation, large-workflow evaluation limits, Search/Locate/Focus, or scoped evaluation, also read:
+
+- [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md)
+
+That document is a cross-stage plan and does not alter the active Stage 1 packet unless a later Product Architecture decision explicitly selects additional work.
 
 ## Current Stage 1 packet
 
