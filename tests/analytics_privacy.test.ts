@@ -369,7 +369,7 @@ test('PostHog before_send strips private properties from every Unified Preflight
   }
 });
 
-test('ANALYTICS_EVENTS contains exactly the seventeen expected events', () => {
+test('ANALYTICS_EVENTS contains exactly the twenty expected events', () => {
   const expected = [
     'template_selected',
     'json_imported',
@@ -388,6 +388,16 @@ test('ANALYTICS_EVENTS contains exactly the seventeen expected events', () => {
     'preflight_review_re_evaluated',
     'preflight_activation_prompt_shown',
     'preflight_first_value_reached',
+    'architecture_review_requested',
+    'architecture_review_completed',
+    'architecture_review_failed',
   ];
   assert.deepEqual([...ANALYTICS_EVENTS], expected);
+});
+
+test('Architecture Review analytics retain only version and sanitized error codes', () => {
+  const privateContent = { workflow: 'secret', evidence_id: 'E001', node_id: 'node-1', prompt: 'secret', findings: ['secret'], recommendation: 'secret', model_id: 'secret', locale: 'ja', raw_provider_error: 'secret' };
+  assert.deepEqual(sanitizeAnalyticsProperties('architecture_review_requested', { review_version: '0.1.0', evidence_version: '0.1.0', ...privateContent }), { review_version: '0.1.0', evidence_version: '0.1.0' });
+  assert.deepEqual(sanitizeAnalyticsProperties('architecture_review_completed', { review_version: '0.1.0', evidence_version: '0.1.0', ...privateContent }), { review_version: '0.1.0', evidence_version: '0.1.0' });
+  assert.deepEqual(sanitizeAnalyticsProperties('architecture_review_failed', { review_version: '0.1.0', error_code: 'provider_error', ...privateContent }), { review_version: '0.1.0', error_code: 'provider_error' });
 });

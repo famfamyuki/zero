@@ -32,6 +32,7 @@ import {
   type PreflightSelectionOwner,
 } from '@/lib/preflight-navigation';
 import { useUnifiedPreflight } from '@/hooks/useUnifiedPreflight';
+import { useArchitectureReview } from '@/hooks/useArchitectureReview';
 import { UnifiedPreflightPanel } from '@/components/editor/unified-preflight/UnifiedPreflightPanel';
 import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/types/unified-preflight';
 import {
@@ -166,6 +167,8 @@ export default function EditorPage() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const readinessGraph = useMemo<GraphData>(() => ({ nodes, edges, crewConfig }), [nodes, edges, crewConfig]);
   const preflight = useUnifiedPreflight(readinessGraph);
+  const architectureReview = useArchitectureReview(readinessGraph, preflight, lang);
+  const architectureTargetKeys = useMemo(() => new Set(nodes.map((node) => `node:${node.id}`)), [nodes]);
   const readiness = preflight.readiness;
   const executionPreview = preflight.execution;
   const resourceAnalysis = preflight.resources;
@@ -580,6 +583,17 @@ export default function EditorPage() {
     setIsPreflightReviewOpen(false);
     restoreEntryFocus(preflightReviewEntryRef.current);
   }, [restoreEntryFocus]);
+
+  const handleLocateArchitecture = useCallback((targetKey: string) => {
+    if (!targetKey.startsWith('node:')) return;
+    const nodeId = targetKey.slice('node:'.length);
+    const node = latestNodes.current.find((item) => item.id === nodeId);
+    if (!node) return;
+    setNodes((items) => items.map((item) => ({ ...item, selected: item.id === nodeId })));
+    setEdges((items) => items.map((item) => ({ ...item, selected: false })));
+    setSelectedNode(node);
+    requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId } })));
+  }, [setEdges, setNodes]);
 
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
     const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);
@@ -1021,7 +1035,7 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
-        <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} />
+        <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} architectureReview={architectureReview} architectureTargetKeys={architectureTargetKeys} onLocateArchitecture={handleLocateArchitecture} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} />
       </div>
 
       {/* Transpiled Python Code Export Modal */}

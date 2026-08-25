@@ -23,7 +23,7 @@ test('UPR acceptance: one surface composes the three existing semantic sources',
   }
   assert.equal((source('components/editor/Canvas.tsx').match(/<UnifiedPreflightEntryButton/g) ?? []).length, 1);
   assert.doesNotMatch(source('components/editor/Canvas.tsx'), /<ReadinessEntryButton|<ExecutionPreviewEntryButton|<ResourceAnalysisEntryButton/);
-  assert.deepEqual(unifiedPreflightStages, ['overview', 'readiness', 'execution', 'resources']);
+  assert.deepEqual(unifiedPreflightStages, ['overview', 'architecture', 'readiness', 'execution', 'resources']);
   for (const content of ['ReadinessStageContent', 'ExecutionPreviewStageContent', 'ResourceAnalysisStageContent']) {
     assert.match(panel, new RegExp(`<${content}`));
   }
@@ -96,13 +96,11 @@ test('UPR acceptance: tabs, ARIA, and responsive shell remain hardened without J
 });
 
 test('UPR acceptance: analytics taxonomy, emission boundaries, and privacy are exact', () => {
-  assert.equal(ANALYTICS_EVENTS.length, 17);
-  assert.deepEqual(ANALYTICS_EVENTS.slice(-5), [
-    'preflight_review_opened',
-    'preflight_review_stage_selected',
-    'preflight_review_re_evaluated',
-    'preflight_activation_prompt_shown',
-    'preflight_first_value_reached',
+  assert.equal(ANALYTICS_EVENTS.length, 20);
+  assert.deepEqual(ANALYTICS_EVENTS.slice(-3), [
+    'architecture_review_requested',
+    'architecture_review_completed',
+    'architecture_review_failed',
   ]);
   assert.equal((page.match(/trackEvent\('preflight_review_opened'/g) ?? []).length, 1);
   assert.equal((page.match(/trackEvent\('preflight_review_stage_selected'/g) ?? []).length, 1);
