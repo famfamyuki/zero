@@ -14,6 +14,12 @@ Stage status terms:
 - Long-term Vision
 - Conditional / Business Validation Required
 
+Cross-stage evaluation trust/scale direction is defined in:
+
+- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+
+That plan is authoritative for evaluation-quality/scale decisions but does not automatically expand an active packet.
+
 ---
 
 # 1. Roadmap Logic
@@ -31,10 +37,10 @@ Understand
 The sequencing principle is:
 
 1. establish reliable deterministic facts
-2. make architecture understandable/evaluable
-3. create improvement proposals
+2. make architecture understandable/evaluable and establish measurable trust in the evaluator
+3. create improvement proposals only as evaluator quality justifies them
 4. make semantic changes safe and reviewable
-5. scale to larger workflows
+5. scale evaluation and navigation to larger workflows
 6. add policy/security boundaries
 7. make architecture reusable/composable
 8. compile/package for user ownership
@@ -102,11 +108,48 @@ Current authoritative packet:
 
 Important scope discipline:
 
-Current v0 intentionally defers direct mutation, Semantic Patch, Apply, persisted top-level Workflow Intent, runtime tracing, framework-neutral compilation, and marketplace.
+Current v0 intentionally defers direct mutation, Semantic Patch, Apply, persisted top-level Workflow Intent, runtime tracing, framework-neutral compilation, marketplace, and large-workflow navigation/scale work not explicitly included in the packet.
 
 Exit condition:
 
 A user can explicitly request an architecture-level review and understand the most important strengths, weaknesses, uncertainties, and justified improvement direction without AI inventing deterministic facts or modifying the workflow.
+
+---
+
+# Cross-stage Gate — Evaluation Trust & Scale
+
+Status: **Planned decision gate; not automatically part of the current Stage 1 packet**
+
+Primary purpose:
+
+Determine whether the evaluation engine is trustworthy and scalable enough to justify expanding its authority into Guided Improvement and later Safe Transformation.
+
+Authoritative cross-stage plan:
+
+- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+
+Key concerns:
+
+- separate Evaluation Safety from Evaluation Quality
+- grow from contract tests into expert-annotated gold datasets
+- measure issue precision/recall and good-workflow false positives
+- measure top-issue prioritization and repeated-run stability
+- test adversarial and ambiguous architectures
+- benchmark approximately 10 / 50 / 100 / 250 / 500+ node tiers as benchmark sizes, not product limits
+- measure Evidence/input size, latency, timeout/failure behavior, and semantic quality by size
+- introduce scoped/hierarchical evaluation when monolithic review is no longer sufficient
+- prohibit silent truncation of large workflows
+- determine when Search / Locate / Focus / Scoped Evaluation becomes an evaluator dependency
+- avoid unsupported "world's best" or equivalent evaluator claims without reproducible comparative evidence
+
+Decision outcomes may include:
+
+- proceed directly to Stage 2
+- select an Evaluation Quality hardening Sprint
+- select an Evaluation Scale foundation Sprint
+- select a combined Trust & Scale Sprint when that is the simplest sufficient dependency solution
+
+This gate must be resolved from measured evidence, not mechanically from stage order.
 
 ---
 
@@ -132,6 +175,8 @@ Capabilities:
 - proposal provenance
 
 No direct semantic apply unless Stage 3 safety contracts are present.
+
+Evaluation authority must not grow faster than evaluation trust. If Stage 1 findings are not sufficiently precise, well-prioritized, and false-positive controlled, harden the evaluator before expanding recommendation automation.
 
 Exit condition:
 
@@ -169,6 +214,8 @@ Required invariant:
 Proposal → Patch → Validation → Preview → User Apply
 ```
 
+A safe patch pipeline does not compensate for a poor upstream finding. Trustworthy Finding → Justified Proposal remains a prerequisite for reliable transformation.
+
 Exit condition:
 
 AI-supported improvements can modify workflow semantics only through an explicit, reviewable, validated, reversible user-controlled path.
@@ -181,7 +228,7 @@ Status: **Planned**
 
 Primary value:
 
-Make complex workflows understandable without changing semantics merely for visualization.
+Make complex workflows understandable and evaluable without changing semantics merely for visualization.
 
 Capabilities:
 
@@ -189,13 +236,16 @@ Capabilities:
 - nested grouping
 - collapse/expand
 - outline/tree navigator
+- block/node search across relevant labels, roles, goals, task text, tool types, output contracts, groups, findings, and stable target identifiers where appropriate
 - search/filter
 - semantic zoom
 - dependency path isolation
 - issue-only view
 - group-level finding/preflight summaries
+- finding/search-result → target navigation
 - Locate → Expand → Focus
 - boundary-edge aggregation for collapsed groups
+- explicit scoped review entry points where a future packet defines scoped Evidence/Evaluation contracts
 
 Invariant:
 
@@ -203,9 +253,15 @@ Invariant:
 Visual Group ≠ Semantic Module ≠ Runtime Orchestration
 ```
 
+Navigation/search scope must not silently become execution meaning. A scoped Architecture Review must identify itself as partial/scoped and must not imply conclusions about unreviewed regions.
+
+Roadmap flexibility:
+
+The full Stage 4 UX remains here. A lightweight Search / Locate / Scoped Evidence foundation may be selected earlier only through explicit Product Architecture review when measured evaluator scale makes it a dependency.
+
 Exit condition:
 
-Large workflows remain navigable and evaluable while visual organization stays separate from execution meaning.
+Large workflows remain navigable and evaluable while visual organization stays separate from execution meaning, and users can reliably locate findings/targets without scanning the entire canvas manually.
 
 ---
 
@@ -308,7 +364,7 @@ Status: **Long-term Vision**
 
 Primary value:
 
-Bring observed execution back into the same Evidence model.
+Bring observed execution back into the same Evidence model without replacing design-time evaluation.
 
 Capabilities:
 
@@ -325,6 +381,15 @@ Principle:
 ```text
 Own your runtime, bring your observability.
 ```
+
+Design-time and runtime responsibilities remain distinct:
+
+```text
+Design-time: Should this architecture be implemented/run in this form?
+Runtime: What actually happened when it ran?
+```
+
+Runtime-only facts remain Unknown until observed evidence exists.
 
 Exit condition:
 
@@ -350,6 +415,7 @@ Capabilities:
 - failure/retry/approval scenarios
 - runtime outcome vs designed expectation
 - production failures promoted into regression fixtures
+- runtime evidence used to confirm/falsify design-time hypotheses and improve future evaluator benchmarks without turning runtime-specific observations into universal static rules
 
 Exit condition:
 
@@ -432,9 +498,18 @@ Key dependency chains:
 Deterministic Analysis
 → Evidence
 → AI Evaluation
+→ Evaluation Trust / Calibration
 → Improvement Proposal
 → Semantic Patch
 → Revision / Diff / Apply
+```
+
+```text
+Small-workflow Evaluation
+→ Scale Benchmark
+→ Search / Locate / Scoped Evidence when needed
+→ Local / Cross-region Evaluation
+→ Global Synthesis
 ```
 
 ```text
@@ -463,6 +538,7 @@ Design-time Evidence
 → Runtime Evidence
 → Design vs Actual
 → Behavioral Evaluation
+→ Curated Evaluation Regression Fixtures
 ```
 
 ---
@@ -481,6 +557,8 @@ When choosing the next Sprint, evaluate:
 8. human control/safety
 9. compatibility with existing Production
 10. whether the feature is actually demand-dependent
+11. whether evaluator authority is growing faster than measured evaluator trust
+12. whether claimed large-workflow support is measured for both quality and usability
 
 Do not prioritize primarily by marketing novelty or feature count.
 
