@@ -9,8 +9,9 @@ This directory is the shared development knowledge base for ChatGPT chats, Work,
 3. [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) — implementation, QA, Git, analytics regression, and release gates
 4. [`roadmap/MASTER_ROADMAP.md`](./roadmap/MASTER_ROADMAP.md) — stage sequencing and dependency logic
 5. [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md) — cross-stage evaluation trust, benchmark quality, large-workflow scale, Search/Locate/Scoped Evaluation direction
-6. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; always re-check live GitHub/Vercel before treating its SHA as current
-7. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
+6. [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md) — cross-stage category position, adoption wedge, durable moat, monetization boundaries, final workspace UX, and commercialization-oriented product sequencing
+7. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; always re-check live GitHub/Vercel before treating its SHA as current
+8. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
 
 ## Source-of-truth hierarchy
 
@@ -37,6 +38,14 @@ When a decision concerns evaluator quality, claims of evaluator accuracy, design
 - [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md)
 
 That document is a cross-stage plan and does not alter the active Stage 1 packet unless a later Product Architecture decision explicitly selects additional work.
+
+## Product platform / commercialization strategy
+
+When a decision concerns the long-term category position, competitive differentiation, import/adoption wedge, Project/Workspace direction, review-centric final UX, durable moat, recurring-use loop, Free/Pro/Team/Enterprise value boundaries, Git/CI distribution, or how product sequencing should support a durable business, also read:
+
+- [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md)
+
+This strategy treats AgentGraph as an **AI Workflow Architecture Intelligence & Control Layer** while preserving the Product Master definition of a portable architecture engineering toolchain. It does not turn short-term marketing/growth analytics into the center of engineering prioritization and does not expand the active packet automatically.
 
 ## Current Stage 1 packet
 
