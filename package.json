@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --import tsx --test tests/**/*.test.ts",
+    "docs:check": "node scripts/check-docs.mjs",
+    "test": "node scripts/run-tests.mjs",
     "typecheck": "tsc --noEmit",
     "eval:architecture-review": "node --import tsx scripts/eval-architecture-review.ts"
   },
