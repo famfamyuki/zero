@@ -57,7 +57,7 @@ Cross-stage execution/governance is defined in:
 
 ## Stage 1 — Evidence-Grounded AI Architecture Review v0
 
-Current authoritative packet:
+Current authoritative Stage 1 packet:
 
 - `docs/specs/AGS-EGAI-AR-V0-P1.md`
 
@@ -67,13 +67,19 @@ Observed repository implementation work exists on:
 
 - `feat/evidence-grounded-architecture-review-v0`
 
-Therefore the overall Sprint is at least **Implementation Started** until a newer live repository/QA state proves a later lifecycle status.
+Therefore the overall Stage 1 Sprint is at least **Implementation Started** until a newer live repository/QA state proves a later lifecycle status.
 
 Do not infer Implementation Complete / QA Complete / Production Verified / Sprint Complete from branch existence alone.
 
-## Stage 1 Production release prerequisite
+## Stage 1 Production release prerequisite — Paid Access & Usage Control
 
-The provider-backed Architecture Review release is blocked until paid entitlement and server-enforced usage control are specified, implemented, and independently verified.
+Authoritative coupled prerequisite packet:
+
+- `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md`
+
+Packet document status: **Specified**.
+
+The provider-backed Architecture Review release remains blocked until this paid-access prerequisite is implemented, independently QA-complete, released, and Production Verified together with the applicable Stage 1 release requirements.
 
 Accepted direction:
 
@@ -82,12 +88,13 @@ Accepted direction:
 - Unlimited provider-backed review is not approved; a hard user quota is required.
 - BYOK is not part of the initial offering.
 - Free deterministic Preflight, portability, and deterministic export remain available and AI-independent.
+- public price/currency, included quota, cost-guard numeric thresholds, and commercial launch inputs are explicit pre-enable configuration/evidence decisions; C01 must not invent them.
 
 The durable cost/access decision is recorded in `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`.
 
 The durable commercial-validation decision is recorded in `docs/decisions/ADR-0007-commercial-validation-before-paid-expansion.md` and refined by `docs/roadmap/MONETIZATION_ARCHITECTURE.md`.
 
-The selected next specification work is **Architecture Review Paid Access & Usage Control v0**. Exact price, included quota, entitlement lifecycle details, commercial-operations behavior, and privacy-safe measurement details must be specified before public paid launch as applicable.
+Current next lifecycle action for the prerequisite is **C01 implementation against the Specified packet**. Implementation must start from latest `main`; an unmerged specification branch is not durable current state.
 
 Important state distinction:
 
@@ -135,7 +142,7 @@ Commercial planning does not change these Stage 1 scope boundaries.
 
 Before **Implementation Complete**:
 
-- implementation scope matches `AGS-EGAI-AR-V0-P1`
+- implementation scope matches `AGS-EGAI-AR-V0-P1` and the coupled paid-access packet where provider-backed release is included
 - `npm run docs:check` passes
 - `npm test` passes
 - `npm run typecheck` passes
@@ -149,8 +156,9 @@ Before **QA Complete**:
 - existing Preflight/import/export/transpiler/analytics regressions checked
 - accessibility and stale-result behavior checked as specified
 - security/privacy boundaries checked
+- paid entitlement/quota/idempotency/billing lifecycle/cost-control requirements independently checked for the provider-backed release
 
-Before **Production Verified** for the provider-backed paid offering, the coupled paid-access prerequisite must also satisfy its own packet and commercial release requirements, including commercial-use-eligible hosting verification.
+Before **Production Verified** for the provider-backed paid offering, the coupled paid-access prerequisite must satisfy its own packet and commercial release requirements, including commercial-use-eligible hosting verification.
 
 Normal Production verification still requires:
 
