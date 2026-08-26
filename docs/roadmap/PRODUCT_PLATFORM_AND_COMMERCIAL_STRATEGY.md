@@ -601,6 +601,16 @@ Do not use private workflow content as a hidden training asset or competitive cl
 
 Pricing details remain a business decision to validate, but product boundaries should support a natural value ladder.
 
+Current provider-backed review boundary:
+
+- the initial Production Architecture Review offering is paid-entitlement only
+- AgentGraph Studio owns the provider credential; BYOK is not part of the initial offering
+- paid access has a server-enforced hard quota; unlimited review is not approved
+- exact pricing, included usage, quota period, and subscription lifecycle behavior belong to the selected implementation packet
+- deterministic Preflight, portability, and deterministic export remain useful free capabilities
+
+See `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`.
+
 ## Free / Community
 
 Purpose: maximize useful first value and ecosystem adoption without crippling the core product.
@@ -610,7 +620,6 @@ Likely capabilities:
 - local/manual workflow design
 - supported import
 - deterministic Preflight
-- limited or quota-based AI Architecture Review
 - JSON portability
 - deterministic CrewAI build/export
 - basic templates
@@ -624,7 +633,7 @@ Purpose: monetize repeated individual professional value.
 
 Likely value boundaries:
 
-- higher AI evaluation usage
+- quota-based AI Architecture Review with server-side entitlement and cost controls
 - multiple projects/workflows
 - persisted evaluation/revision history
 - Review Delta / regression

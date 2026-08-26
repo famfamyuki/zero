@@ -47,7 +47,8 @@ Stage 1 Architecture Review
 
 | Capability / decision | Program state | Primary dependency | Evidence / gate required | Next action |
 |---|---|---|---|---|
-| Evidence-Grounded AI Architecture Review v0 | Current selected major milestone | Stage 0 deterministic foundation | Active packet AC, implementation checks, Independent QA, Production verification | Complete current packet lifecycle before promotion |
+| Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; Production release blocked | Stage 0 deterministic foundation plus paid access/cost control | Active packet AC, implementation checks, Independent QA, paid entitlement/quota prerequisite, Production verification | Keep provider-backed review unreleased until the paid-access packet is implemented and independently verified |
+| Architecture Review Paid Access & Usage Control v0 | Selected release prerequisite | `ADR-0006`, existing auth/Stripe/Supabase reality, provider cost evidence | Dedicated packet covering server-side entitlement, hard quota, idempotent accounting, security/privacy, degraded mode, and release verification | 【02】specifies the smallest implementation-ready packet; C01 starts only after Definition of Ready |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
 | Search / Locate / Scoped Evidence | Candidate after Stage 1 | Review usability or scale bottleneck | Gate A evidence showing navigation/scope is a dependency | Select minimal addressable navigation foundation |
