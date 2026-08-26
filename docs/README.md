@@ -2,6 +2,10 @@
 
 This directory is the shared durable development knowledge base for Chat, Work, Codex, and human contributors.
 
+## Navigation shortcut
+
+For a lossless responsibility map and task-based smallest sufficient reading paths, use [`DEVELOPMENT_PLAN_MAP.md`](./DEVELOPMENT_PLAN_MAP.md). It is a non-authoritative navigation aid and does not replace or alter any document below.
+
 ## Read first
 
 1. [`PRODUCT_MASTER.md`](./PRODUCT_MASTER.md) — final product definition, North Star, durable product principles
