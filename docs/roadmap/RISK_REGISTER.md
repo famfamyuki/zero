@@ -48,6 +48,7 @@ Risk severity reflects potential program impact, not certainty.
 | R-019 | Paid plan unit economics degrade because provider/failure/high-usage costs exceed the planned envelope | High | WATCH | Successful or failed review cost distributions, high-workflow-size usage, payment/infrastructure cost, or model/provider drift makes representative or high-usage contribution unacceptable | Rebaseline cost; adjust request guard/model/quota/price; do not use average cost alone; keep provider budget/kill switch active |
 | R-020 | Billing, entitlement, and quota lifecycle diverge and cause incorrect paid access or credit accounting | Critical | WATCH | Stripe state, entitlement read model, quota period/reset, cancellation/past-due behavior, reservation recovery, or idempotency disagree under retries/concurrency/degraded sync | Paid-access packet must define authoritative state transitions, reconciliation, idempotency, failure recovery, and Independent QA; fail closed where entitlement is uncertain without corrupting deterministic free features |
 | R-021 | Public paid launch is technically functional but commercially/operationally incomplete | High | WATCH | Missing commercial-use hosting eligibility, unclear cancellation/refund/payment-failure behavior, missing billing support path, unresolved tax/terms/privacy/provider disclosure, or Production still presents contradictory “100% Free” messaging | Treat as `COMMERCIAL_BLOCKER` for public paid launch; satisfy the minimum Commercial Operations launch gate in `MONETIZATION_ARCHITECTURE.md` without expanding into speculative enterprise scope |
+| R-022 | The product remains technically correct but intended non-engineering professional users cannot reach or act on core value because framework/code/graph concepts are imposed too early | High | WATCH | Representative users cannot choose an entry path, understand the top finding, locate the affected area, compare a next action, or complete the relevant flow without CrewAI/Python/JSON/schema knowledge that is not essential to the decision; UX grows canvas/settings-first despite final Product direction | Enforce the Product Master progressive-disclosure contract; use goal-first entry/plain-language Review/optional technical detail; add proportionate task-level usability AC to relevant future packets; do not create a divergent beginner semantic model; keep AI drafting under scoped `AE2` authority rather than bypassing trust for convenience |
 
 ---
 
@@ -58,6 +59,7 @@ Risk severity reflects potential program impact, not certainty.
 | Evaluator safety/quality/drift | Gate A, Gate B, Evaluation Trust & Scale, Data & AI Governance |
 | Large-workflow scale | Gate A, Gate D |
 | Context / Scenario quality | Stage 1.5 selection, Scenario & Acceptance Contract |
+| Professional usability / first-value conceptual load | Product Master progressive-disclosure contract; Stage 1.5 selection where non-authority foundations are justified; Gate B / `AE2` where AI Architecture Drafting is proposed |
 | Semantic mutation authority | Gate B, Gate C, AI Authority Envelope |
 | Capability/security-sensitive mutation | Gate C scope boundary, Security & Reliability, later Workflow Security/Policy |
 | Migration/versioning | Semantic Model Evolution, Engineering Execution Governance |
@@ -105,4 +107,5 @@ Examples:
 - enabling branch protection mitigates repository merge enforcement risk, but future settings changes must still be live-verified;
 - one safe import adapter does not close arbitrary external import/security risk for all future formats;
 - one commercially successful month does not permanently close recurring-value or unit-economics risk;
-- one correct Stripe webhook test does not close subscription/entitlement reconciliation risk.
+- one correct Stripe webhook test does not close subscription/entitlement reconciliation risk;
+- one successful usability pass does not permanently close the risk that later features reintroduce unnecessary conceptual load.

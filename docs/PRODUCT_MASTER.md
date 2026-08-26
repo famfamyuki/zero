@@ -235,11 +235,56 @@ A target capability result should eventually distinguish:
 
 Loss of workflow semantics must be surfaced, never silently degraded.
 
+## 4.10 Accessible Professional UX Through Progressive Disclosure
+
+AgentGraph Studio should remain a professional engineering tool without requiring every intended user to understand CrewAI internals, Python, JSON schemas, or graph-modeling terminology before reaching core value.
+
+The product must preserve **one semantic truth**. Do not create a separate simplified workflow model merely for beginners.
+
+Preferred UX direction:
+
+```text
+User Goal / Existing Workflow
+→ understandable workflow representation
+→ plain-language Review / decision support
+→ progressively disclosed Evidence / advanced settings
+→ Build / technical artifacts when needed
+```
+
+Required principles:
+
+- prefer goal-first entry over framework-first configuration where practical;
+- explain problems, effects, evidence, recommendations, trade-offs, and unknowns before exposing raw technical detail as the primary interface;
+- use progressive disclosure for advanced settings, raw Evidence, JSON, generated code, framework details, and other implementation-specific information;
+- provide safe/default configuration where defaults do not hide semantic choices, unsupported assumptions, or security-sensitive authority;
+- keep technical detail inspectable for users who need it rather than deleting or weakening it;
+- preserve `Known / Inferred / Unknown`, finding class, provenance, and no-silent-change rules for every experience level;
+- do not require a user to understand framework/code/schema details that are irrelevant to the decision they are currently making.
+
+For intended non-engineering professional users, a mature core-value path should allow them to understand a workflow, review important architecture findings, locate the affected area, compare a justified next action, and hand off or build further without first becoming a CrewAI/Python/JSON expert.
+
+This is not a promise that every general consumer can operate every advanced engineering capability. The target is an understandable professional tool whose conceptual depth is disclosed as needed rather than imposed at the first interaction.
+
 ---
 
 # 5. Final Product Workspaces
 
 The final UX should not force all capabilities into the current right-side Preflight panel.
+
+## Start / Project Home
+
+The mature entry experience should be goal-first rather than canvas-first.
+
+Preferred final-state entry points, when their required capabilities and authority exist:
+
+```text
+Import Existing Workflow
+Describe New Workflow
+Start from Template
+Recent Projects / Workflows
+```
+
+`Describe New Workflow` is an AI architecture-proposal capability, not an exception to AI Authority or validation rules. Its staged execution placement is governed by `docs/roadmap/MASTER_ROADMAP.md` and `docs/roadmap/EXECUTION_GATES.md`.
 
 Long-term primary workspaces:
 
@@ -572,6 +617,8 @@ Unless explicitly revisited through Product Architecture decision:
 - do not silently degrade semantics when compiling to a target
 - do not treat visual grouping as runtime orchestration
 - do not require proprietary AgentGraph observability for runtime insight
+- do not make CrewAI/Python/JSON/graph-schema knowledge an unnecessary prerequisite for first value
+- do not create a separate beginner semantic model that can diverge from the canonical workflow meaning
 
 ---
 
@@ -591,3 +638,5 @@ Understand
 ```
 
 while maintaining provenance, portability, reproducibility, and clear boundaries between deterministic fact, AI inference, external-dependent knowledge, and unknowns.
+
+For intended non-engineering professional users, product completion also requires that the core decision path be understandable without unnecessary framework/code/schema knowledge. Relevant future user-facing packets should translate this durable requirement into task-level Acceptance Criteria and proportionate usability evidence rather than assuming architectural correctness alone implies usability.
