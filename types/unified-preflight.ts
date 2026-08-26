@@ -13,7 +13,7 @@ export type UnifiedPreflightReviewState =
   | 'partial'
   | 'available';
 
-export type UnifiedPreflightStage = 'overview' | 'readiness' | 'execution' | 'resources';
+export type UnifiedPreflightStage = 'overview' | 'architecture' | 'readiness' | 'execution' | 'resources';
 
 export type UnifiedPreflightReadinessState =
   | 'refreshing'

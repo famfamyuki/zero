@@ -2,6 +2,7 @@ import type { UnifiedPreflightStage } from '@/types/unified-preflight';
 
 export const unifiedPreflightStages: readonly UnifiedPreflightStage[] = [
   'overview',
+  'architecture',
   'readiness',
   'execution',
   'resources',

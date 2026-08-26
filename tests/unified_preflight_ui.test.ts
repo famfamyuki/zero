@@ -84,8 +84,8 @@ test('Unified shell retains identity, tabs, focus, Escape, responsive shell, and
   assert.match(source, /event\.key === 'Escape'/); assert.match(source, /onClose\(\)/);
 });
 
-test('Unified tabs keep the exact four-stage order and complete ARIA roving-tabindex contract', () => {
-  assert.deepEqual(unifiedPreflightStages, ['overview', 'readiness', 'execution', 'resources']);
+test('Unified tabs keep the exact five-stage order and complete ARIA roving-tabindex contract', () => {
+  assert.deepEqual(unifiedPreflightStages, ['overview', 'architecture', 'readiness', 'execution', 'resources']);
   const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
   assert.match(source, /role="tablist"/);
   assert.match(source, /role="tab"/);
@@ -101,8 +101,8 @@ test('Unified tabs keep the exact four-stage order and complete ARIA roving-tabi
 
 test('Unified automatic tabs support ArrowRight, ArrowLeft, Home, End, and ignore unsupported keys', () => {
   const stages = [...unifiedPreflightStages];
-  const right = ['readiness', 'execution', 'resources', 'overview'];
-  const left = ['resources', 'overview', 'readiness', 'execution'];
+  const right = ['architecture', 'readiness', 'execution', 'resources', 'overview'];
+  const left = ['resources', 'overview', 'architecture', 'readiness', 'execution'];
 
   stages.forEach((stage, index) => {
     assert.equal(getUnifiedPreflightTabDestination(stage, 'ArrowRight'), right[index]);
