@@ -48,7 +48,7 @@ The sequencing principle is:
 2. make architecture understandable/evaluable and establish measurable trust in the evaluator
 3. resolve evaluation quality/scale limits before expanding authority
 4. strengthen adoption/context foundations where they materially improve first value, evaluator context, repeat use, or migration leverage
-5. create improvement proposals only as evaluator quality justifies them
+5. create architecture proposals, including improvement directions or new-workflow drafts, only as evaluator/proposal authority is justified
 6. make semantic changes safe and reviewable
 7. scale navigation/evaluation to larger workflows as required
 8. add policy/security boundaries
@@ -233,6 +233,8 @@ Selection discipline:
 - multi-workflow value must not require proprietary cloud lock-in
 - Stage 1.5 does not silently grant direct AI mutation authority
 
+`Describe New Workflow` / AI-assisted Architecture Drafting is **not** an authority-free Stage 1.5 default. It creates a new architecture proposal and therefore belongs under the scoped proposal-authority decision described at Gate B / Stage 2. Stage 1.5 may still reduce non-engineer first-value friction through import, templates, Review/Locate, Intent/Constraints, or other evidence-justified foundations without granting `AE2` merely for onboarding convenience.
+
 Exit condition for a selected Stage 1.5 packet depends on that packet. The selection band as a whole is complete only when Product Architecture decides no further Adoption/Context prerequisite is required before Gate B/Stage 2.
 
 ---
@@ -243,7 +245,7 @@ Status: **Planned decision gate**
 
 Primary purpose:
 
-Decide whether the evaluator is reliable and sufficiently contextualized for structured Guided Improvement proposals within a defined scope.
+Decide whether the evaluator is reliable and sufficiently contextualized for structured architecture proposals within a defined scope, including Guided Improvement and any separately selected new-workflow drafting capability.
 
 Review at minimum:
 
@@ -254,12 +256,12 @@ Review at minimum:
 - repeated-run stability
 - intent/context quality for the proposal scope
 - evidence-groundability of proposed recommendations
-- revision/provenance sufficiency
+- revision/provenance sufficiency where an existing workflow is being changed
 - large-workflow scope disclosure
 
 Decision question:
 
-> Is the reviewer reliable enough that users should reasonably act on its structured improvement proposals within the proposed scope?
+> Is the reviewer/proposal system reliable enough that users should reasonably act on structured architecture proposals within the proposed scope?
 
 If no, select evaluator/context hardening instead of mechanically entering Stage 2.
 
@@ -285,14 +287,31 @@ Capabilities:
 - assumptions
 - trade-offs
 - proposal provenance
+- AI-assisted new-workflow Architecture Drafting (`Describe New Workflow`) from declared Intent/Constraints when separately selected inside an approved `AE2` scope
+- for new-workflow drafting, explain responsibilities, boundaries, assumptions, and important unknowns before user acceptance
+- deterministically validate a proposed new workflow and run Architecture Review before treating the draft as an accepted workflow source
+
+Preferred new-workflow drafting flow:
+
+```text
+Declared Intent / Constraints
+→ AI Architecture Draft Proposal
+→ Explain Responsibilities / Boundaries / Assumptions
+→ Deterministic Validation
+→ Architecture Review
+→ User Accepts / Edits
+→ Workflow Source
+```
+
+A draft is advisory until the user accepts it. No direct semantic apply to an existing workflow is authorized by this capability.
 
 No direct semantic apply unless Stage 3 safety contracts are present.
 
-Evaluation authority must not grow faster than evaluation trust. Gate B is a prerequisite for materially stronger automated recommendations.
+Evaluation/proposal authority must not grow faster than measured trust. Gate B is a prerequisite for materially stronger automated recommendations or AI-assisted architecture drafting.
 
 Exit condition:
 
-Users can compare meaningful improvement directions and understand why they differ before any graph mutation.
+Users can compare meaningful improvement directions and understand why they differ before any graph mutation. Where AI-assisted new-workflow drafting has been explicitly selected, users can also produce a reviewable, validated architecture proposal from declared intent without the product presenting the generated architecture as automatically correct.
 
 ---
 
@@ -642,6 +661,15 @@ Deterministic Analysis
 ```
 
 ```text
+Declared Intent / Constraints
+→ scoped AE2 Architecture Proposal authority
+→ AI New-Workflow Draft
+→ Deterministic Validation
+→ Architecture Review
+→ User Accept / Edit
+```
+
+```text
 Small-workflow Evaluation
 → Scale Benchmark
 → Search / Locate / Scoped Evidence when needed
@@ -715,6 +743,7 @@ When choosing the next Sprint, evaluate:
 13. whether the change improves access to first value
 14. whether it creates legitimate repeat-use/revision value
 15. whether it broadens data/provider/security boundaries and has the required governance
+16. whether the intended professional user can reach the relevant core value without unnecessary framework/code/schema knowledge, using progressive disclosure rather than a divergent simplified semantic model
 
 Do not prioritize primarily by marketing novelty or feature count.
 
