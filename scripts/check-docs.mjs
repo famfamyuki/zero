@@ -22,6 +22,7 @@ const requiredPaths = [
   'docs/roadmap/RISK_REGISTER.md',
   'docs/roadmap/EVALUATION_TRUST_AND_SCALE.md',
   'docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md',
+  'docs/roadmap/MONETIZATION_ARCHITECTURE.md',
   'docs/architecture/SEMANTIC_MODEL_EVOLUTION.md',
   'docs/architecture/IMPORT_WORKSPACE_CONTRACT.md',
   'docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md',
