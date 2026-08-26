@@ -70,6 +70,20 @@ Therefore the overall Sprint is at least **Implementation Started** until a newe
 
 Do not infer Implementation Complete / QA Complete / Production Verified / Sprint Complete from branch existence alone.
 
+## Stage 1 Production release prerequisite
+
+The provider-backed Architecture Review release is blocked until paid entitlement and server-enforced usage control are specified, implemented, and independently verified.
+
+Accepted direction:
+
+- AgentGraph Studio owns the provider credential and provider cost.
+- Initial Production access is paid-plan only.
+- Unlimited provider-backed review is not approved; a hard user quota is required.
+- BYOK is not part of the initial offering.
+- Free deterministic Preflight, portability, and deterministic export remain available and AI-independent.
+
+The durable decision is recorded in `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`. The selected next specification work is Architecture Review Paid Access & Usage Control v0. Exact pricing and quota lifecycle details are not yet specified.
+
 ---
 
 # 3. Current Stage 1 product intent
