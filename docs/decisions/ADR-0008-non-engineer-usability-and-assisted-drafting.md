@@ -58,7 +58,7 @@ This is a final-state Product direction. It does not mean every entry mode belon
 
 AI-assisted new-workflow drafting is an architecture proposal capability, not a Stage 1.5 authority-free adoption foundation.
 
-It belongs inside the same capability-scoped authority discipline as `AE2 — Architecture Proposal` in `docs/roadmap/EXECUTION_GATES.md`.
+It belongs inside the same capability-scoped authority discipline as `AE2 — Architecture Proposal` in `docs/roadmap/EXECUTION_GATES.md`. This ADR classifies the capability under the existing AE2 boundary; it does not redefine or broaden AE2 by itself.
 
 Therefore it must not be selected merely because it could reduce onboarding friction. Selection requires Gate B or an explicit equivalent scoped authority decision supported by evidence for the intended proposal scope.
 
