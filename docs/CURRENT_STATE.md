@@ -1,19 +1,16 @@
 # AgentGraph Studio — Current State Snapshot
 
 Snapshot date: **2026-08-26**  
-This file is a coordination snapshot, **not** a live deployment registry.
+Status: **Coordination snapshot — not a live deployment registry**
 
-## 0. Live-state rule
-
-Before any implementation, QA, release, roadmap-promotion, commercial-launch, or current-state decision, re-check:
+Before any current-state, implementation, QA, release, roadmap-promotion, or commercial-launch decision, re-check:
 
 1. latest GitHub `main`
 2. latest Vercel Production deployment
 3. actual Production behavior
+4. active packet under `docs/specs/`
 
-Do **not** use a SHA written in this file as proof of current state. Live checks win.
-
-This file intentionally emphasizes the current milestone/status/next gate rather than embedding frequently stale deployment SHAs.
+Do not use a SHA or status written here as proof of live state. The canonical source hierarchy and reading paths are in `docs/README.md`.
 
 ---
 
@@ -31,25 +28,7 @@ Current Production foundation includes:
   - Resource Analysis
 - First-Value Preflight activation/measurement foundation
 
-Product North Star:
-
-```text
-Understand → Evaluate → Improve → Verify → Own
-```
-
-Long-term direction is defined in:
-
-- `docs/PRODUCT_MASTER.md`
-- `docs/ARCHITECTURE.md`
-- `docs/roadmap/MASTER_ROADMAP.md`
-
-Cross-stage execution/governance is defined in:
-
-- `docs/roadmap/EXECUTION_GATES.md`
-- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
-- `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
-- `docs/SECURITY_RELIABILITY_BASELINE.md`
-- `docs/DATA_AND_AI_GOVERNANCE.md`
+The durable Product/Architecture/Roadmap definition lives in `PRODUCT_MASTER.md`, `ARCHITECTURE.md`, and `roadmap/MASTER_ROADMAP.md`; it is not repeated here.
 
 ---
 
@@ -57,54 +36,23 @@ Cross-stage execution/governance is defined in:
 
 ## Stage 1 — Evidence-Grounded AI Architecture Review v0
 
-Current authoritative packet:
+Authoritative packet:
 
 - `docs/specs/AGS-EGAI-AR-V0-P1.md`
 
 Packet document status: **Specified**.
 
-Observed repository implementation work exists on:
+Observed implementation work exists on:
 
 - `feat/evidence-grounded-architecture-review-v0`
 
-Therefore the overall Sprint is at least **Implementation Started** until a newer live repository/QA state proves a later lifecycle status.
+Therefore the Sprint is at least **Implementation Started** until newer live repository/QA evidence proves a later lifecycle state.
 
-Do not infer Implementation Complete / QA Complete / Production Verified / Sprint Complete from branch existence alone.
+Branch existence alone is not evidence of Implementation Complete, QA Complete, Production Verified, or Sprint Complete.
 
-## Stage 1 Production release prerequisite
+### Current Stage 1 intent
 
-The provider-backed Architecture Review release is blocked until paid entitlement and server-enforced usage control are specified, implemented, and independently verified.
-
-Accepted direction:
-
-- AgentGraph Studio owns the provider credential and provider cost.
-- Initial Production access is paid-plan only.
-- Unlimited provider-backed review is not approved; a hard user quota is required.
-- BYOK is not part of the initial offering.
-- Free deterministic Preflight, portability, and deterministic export remain available and AI-independent.
-
-The durable cost/access decision is recorded in `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`.
-
-The durable commercial-validation decision is recorded in `docs/decisions/ADR-0007-commercial-validation-before-paid-expansion.md` and refined by `docs/roadmap/MONETIZATION_ARCHITECTURE.md`.
-
-The selected next specification work is **Architecture Review Paid Access & Usage Control v0**. Exact price, included quota, entitlement lifecycle details, commercial-operations behavior, and privacy-safe measurement details must be specified before public paid launch as applicable.
-
-Important state distinction:
-
-```text
-Paid Access implemented / Production Verified
-≠ Initial subscription model commercially validated
-```
-
-The initial paid offering remains a commercial-validation phase until Commercial Validation Gate M0 has sufficient real evidence for a scoped decision.
-
----
-
-# 3. Current Stage 1 product intent
-
-The milestone adds an evidence-grounded architecture interpretation layer without replacing deterministic Preflight.
-
-Required ordering:
+Stage 1 adds evidence-grounded architecture interpretation while keeping deterministic Preflight authoritative and AI-independent:
 
 ```text
 Canonical Workflow
@@ -114,9 +62,7 @@ Canonical Workflow
 → Architecture Evaluation
 ```
 
-Current v0 intentionally keeps deterministic Preflight authoritative and AI-independent.
-
-Current v0 also intentionally defers later work including:
+Current v0 intentionally defers:
 
 - semantic mutation / Apply
 - Semantic Patch
@@ -131,47 +77,65 @@ Commercial planning does not change these Stage 1 scope boundaries.
 
 ---
 
-# 4. Required next gates for Stage 1
+# 3. Current Production release blocker / selected prerequisite
 
-Before **Implementation Complete**:
+Provider-backed Architecture Review must remain unreleased until paid entitlement and server-enforced usage control are specified, implemented, and independently verified.
 
-- implementation scope matches `AGS-EGAI-AR-V0-P1`
-- `npm run docs:check` passes
-- `npm test` passes
-- `npm run typecheck` passes
-- `npm run build` passes
-- packet-defined AI/evidence tests and evaluation requirements pass
+Accepted direction:
 
-Before **QA Complete**:
+- AgentGraph Studio owns the provider credential and provider cost
+- initial Production Architecture Review access is paid-plan only
+- unlimited provider-backed review is not approved
+- a hard server-enforced user quota is required
+- BYOK is not part of the initial offering
+- free deterministic Preflight, portability, and deterministic export remain AI-independent
 
-- Independent QA against Acceptance Criteria
-- grounding/Unknown/invalidation/failure cases checked
-- existing Preflight/import/export/transpiler/analytics regressions checked
-- accessibility and stale-result behavior checked as specified
-- security/privacy boundaries checked
+Durable decisions:
 
-Before **Production Verified** for the provider-backed paid offering, the coupled paid-access prerequisite must also satisfy its own packet and commercial release requirements, including commercial-use-eligible hosting verification.
+- cost/access boundary → `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`
+- commercial validation → `docs/decisions/ADR-0007-commercial-validation-before-paid-expansion.md`
+- commercial architecture/M0 → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
 
-Normal Production verification still requires:
+Selected next specification work:
 
-- QA-approved revision released to `main`
-- Vercel `READY`
-- `target=production`
-- Production smoke
-- relevant runtime errors checked
-- GitHub `main` SHA equals Vercel Production `githubCommitSha`
+> **Architecture Review Paid Access & Usage Control v0**
+
+Before public paid launch, its packet must resolve the applicable price, included quota, entitlement lifecycle, commercial-operations behavior, privacy-safe measurement, and other launch requirements defined by the commercial architecture.
+
+Keep the distinction:
+
+```text
+Paid Access implemented / Production Verified
+≠ Initial subscription model commercially validated
+```
+
+The first paid offering remains a commercial-validation phase until M0 has enough real evidence for a scoped decision.
+
+---
+
+# 4. What remains before Stage 1 completion
+
+The exact Acceptance Criteria/Test Matrix come from `AGS-EGAI-AR-V0-P1.md`; engineering lifecycle requirements come from `docs/DEVELOPMENT_RULES.md`.
+
+Stage 1 must still demonstrate, at minimum:
+
+- packet scope implementation
+- required docs/test/typecheck/build verification
+- packet-defined AI/evidence evaluation checks
+- Independent QA against packet Acceptance Criteria
+- grounding / Unknown / invalidation / provider-failure behavior
+- regression protection for existing Preflight/import/export/transpiler/analytics
+- accessibility/stale-result/security/privacy behavior as specified
+
+For the provider-backed paid Production offering, the coupled Paid Access & Usage Control prerequisite and applicable commercial-launch requirements must also be satisfied.
+
+Production Verified still requires live Production evidence, including GitHub `main` SHA = Vercel Production `githubCommitSha`, as defined in `DEVELOPMENT_RULES.md`.
 
 ---
 
 # 5. After Stage 1
 
-Do not mechanically select Stage 2 after Stage 1.
-
-Use:
-
-- `docs/roadmap/EXECUTION_GATES.md`
-- `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
-- `docs/roadmap/MONETIZATION_ARCHITECTURE.md` where paid evidence is relevant
+Do not mechanically select Stage 2.
 
 Expected evidence flow:
 
@@ -179,96 +143,61 @@ Expected evidence flow:
 Stage 1 Production evidence
 ├→ Gate A — Evaluation Trust & Scale
 └→ M0 — Commercial Validation when sufficient paid evidence exists
-→ select quality / scale / context / repeat-value foundation as justified
-→ Stage 1.5 Adoption & Context Foundation packet(s) where justified
+→ select quality / scale / context / repeat-value foundation only as justified
+→ Stage 1.5 packet(s) where justified
 → Gate B — Evaluator Authority Expansion
 → Stage 2 Guided Improvement only when evidence supports it
 ```
 
 Gate A and M0 answer different questions. M0 must not block independently justified evaluator safety/quality hardening while commercial sample size is insufficient.
 
-Stage 1.5 candidates include CrewAI static import, Project/Local Workspace, persisted Intent & Constraints, Review/Locate improvements, and revision/evaluation-history foundations. These are candidates, not automatically one Sprint or a prebuilt Pro bundle.
+Current Stage 1.5 candidate areas remain:
+
+- CrewAI static import
+- Project / Local Workspace
+- persisted Intent & Constraints
+- Review / Locate improvements
+- revision / evaluation-history foundations
+
+These are candidates, not a mandatory Sprint sequence or a prebuilt Pro bundle. Selection remains governed by `EXECUTION_GATES.md` and `PROGRAM_BOARD.md`.
 
 ---
 
-# 6. Status model
+# 6. Current operating mode
 
-Use:
+The project remains in **development-only focus mode**.
 
-```text
-Selected
-→ Specified
-→ Implementation Started
-→ Implementation Complete
-→ QA Complete
-→ Production Verified
-→ Sprint Complete
-```
-
-Roadmap gate/stage promotion and M0 commercial validation are separate Product Architecture decisions from Sprint lifecycle status.
-
----
-
-# 7. Current development operating model
-
-The project is currently in **development-only focus mode**. Marketing/SNS/Growth/Analytics work is not maintained as permanent development lanes.
-
-Canonical persistent lanes are exactly:
+Canonical persistent lanes remain:
 
 ```text
-Chat:
 00  Program Control & Current State
 01  Product Architecture & Roadmap
 02  UX & Implementation Specification
-
-Codex:
 C01 Current Sprint Implementation
-
-Work:
 W01 Independent QA & Production Verification
 ```
 
-Default lifecycle handoff:
+Role boundaries, lifecycle handoff, replacement policy, and noncanonical-lane rules live only in `docs/CHAT_ROLE_REGISTRY.md`; they are not duplicated here.
 
-```text
-01 Selected
-→ 02 Specified
-→ C01 Implementation Complete
-→ W01 independent QA / QA Complete
-→ C01 merge/release exact QA-approved revision
-→ W01 Production Verified
-→ 00 Sprint Complete
-→ 01 next Gate / selection
-```
-
-There is no permanent canonical W00/03/04/05/06 lane in development-only focus mode.
-
-- Work mode may be used by 00/01/02 for complex repository/document work without creating a W00 authority.
-- Pure release/current-state coordination belongs to 00.
-- normal QA-approved merge/release belongs to C01.
-- independent Production verification belongs to W01.
-- Product/commercial gate decisions including M0 remain 01 Product Architecture decisions; temporary analytics/research work does not create a permanent analytics lane.
-- if code/behavior changes after QA Complete, the QA approval is stale and must be repeated before release.
-
-Authoritative role details are in `docs/CHAT_ROLE_REGISTRY.md` and `docs/decisions/ADR-0005-minimal-development-only-operating-model.md`.
+Current commercial/Product gate decisions including M0 remain Product Architecture decisions under lane `01`.
 
 ---
 
-# 8. Coordination / reading rule
+# 7. Immediate coordination summary
 
-All development surfaces should read repository documents instead of relying on a prior conversation's remembered state.
+```text
+Current major milestone:
+Stage 1 — Evidence-Grounded AI Architecture Review v0
 
-Recommended baseline reading order:
+Observed lifecycle floor:
+Implementation Started
 
-1. `AGENTS.md`
-2. `docs/PRODUCT_MASTER.md`
-3. `docs/ARCHITECTURE.md`
-4. `docs/DEVELOPMENT_RULES.md`
-5. `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
-6. `docs/roadmap/MASTER_ROADMAP.md`
-7. `docs/roadmap/EXECUTION_GATES.md`
-8. relevant cross-stage security/data/evaluation/import/commercial contracts
-9. this snapshot
-10. active packet under `docs/specs/`
+Current release blocker:
+Provider-backed review lacks Production-verified paid entitlement + hard usage control
 
-For current Sprint implementation details, the active packet remains authoritative even when long-term or commercial documents describe later architecture.
+Selected next specification:
+Architecture Review Paid Access & Usage Control v0
+
+After Stage 1:
+Production evidence → Gate A and, when sufficient paid evidence exists, M0 → explicit smallest next selection
+```
