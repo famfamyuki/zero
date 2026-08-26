@@ -39,12 +39,14 @@ Stage 1 Architecture Review
 └→ M0 Commercial Validation when sufficient paid evidence exists
 → smallest justified Stage 1.5 foundation work
 → Gate B scoped authority decision
-→ Stage 2 Guided Improvement only inside an approved authority envelope
+→ Stage 2 Guided Improvement / Architecture Proposal capabilities only inside an approved authority envelope
 → Gate C safe transformation readiness
 → Stage 3 transformation only inside an approved mutation scope
 ```
 
 M0 is a commercial evidence gate, not an AI-authority gate. It does not block clearly justified evaluator safety/quality work while commercial evidence is still immature.
+
+Cross-cutting Product direction from `docs/PRODUCT_MASTER.md` also requires that intended non-engineering professional users can reach relevant core decision value without unnecessary CrewAI/Python/JSON/graph-schema knowledge. This is achieved through progressive disclosure over the same canonical semantics, not a separate beginner workflow model.
 
 ---
 
@@ -55,6 +57,7 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 | Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; Production release blocked | Stage 0 deterministic foundation plus paid access/cost control | Active packet AC, implementation checks, Independent QA, paid entitlement/quota prerequisite, Production verification | Keep provider-backed review unreleased until the paid-access packet is implemented and independently verified |
 | Architecture Review Paid Access & Usage Control v0 | **Specified release prerequisite** — `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, provider cost/value evidence for launch config | Packet AC/test matrix, server-side entitlement, hard quota, idempotent accounting, request-cost guard, security/privacy, degraded mode, commercial enablement inputs, Independent QA, Production verification | C01 implements the Specified packet from latest `main`; public paid enablement remains blocked until approved price/quota/cost/legal/hosting/Auth launch inputs and W01 verification |
 | Commercial Validation Gate M0 | Planned evidence gate after paid Production usage exists | Paid Access & Usage Control Production Verified; privacy-safe commercial measurement; real paid usage | `MONETIZATION_ARCHITECTURE.md`: value/WTP evidence, repeat-use behavior, quota utilization, provider-cost distributions, contribution cases, cancellation/refund/support signals | Do not treat the initial subscription model as commercially validated until M0 has sufficient evidence; use the result to adjust price/quota or identify one concrete repeat-value dependency |
+| Professional / non-engineer usability | **Cross-cutting durable Product requirement**, not a standalone current Sprint | Product Master progressive-disclosure contract; same canonical workflow semantics | Relevant user-facing packet AC and proportionate task-level usability evidence when Start/Review/Changes/Build/onboarding materially changes | Trace this requirement into relevant future packets; do not create a separate simplified semantic model or pull unrelated UX work into the active Stage 1 packet |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
 | Search / Locate / Scoped Evidence | Candidate after Stage 1 | Review usability or scale bottleneck | Gate A evidence or M0/product evidence showing navigation/scope is a concrete dependency | Select minimal addressable navigation foundation |
@@ -63,6 +66,7 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 | CrewAI static import | Stage 1.5 candidate | Safe static semantic mapping | Mapping feasibility, diagnostics quality, import security review; adoption/commercial evidence that redraw/re-entry blocks first value | Select when import materially improves access to first value |
 | Project / Local Workspace | Stage 1.5 candidate | Repeat-use / identity / revision needs | Persistence/data governance and identity contract; evidence that durable project identity is a repeat-use dependency | Select when repeat use, revision identity, or multi-workflow ownership requires durable local/project context |
 | Revision / Evaluation History | Stage 1.5 candidate | Review Delta / proposal provenance | Revision identity and persistence contract; evidence that inability to compare/revisit reviews limits repeat value | Select before features that require durable historical comparison and when evidence justifies the persistence foundation |
+| AI Architecture Drafting / `Describe New Workflow` | **Planned Stage 2 / AE2 candidate; not a Stage 1.5 authority-free candidate** | Gate B scoped `AE2 — Architecture Proposal`; sufficient Intent/Constraints; deterministic validation + Architecture Review path | Proposal-quality evidence matching the intended draft scope, clear assumptions/Unknown handling, user acceptance/edit UX, relevant usability evidence | Consider only after the scoped authority decision; do not select merely because drafting could simplify onboarding |
 | Guided Improvement | Planned | Gate B | Scoped evaluator authority approval | Do not select as a blanket AI-authority expansion |
 | Safe Transformation | Planned | Gate C | Patch/revision/validation + approved mutation scope | Start architecture-only unless capability/policy prerequisites are present |
 | Security / Policy Engineering | Planned | Capability model and structured evidence | Relevant roadmap gate / packet | May contribute prerequisite foundations earlier when transformation scope requires them |
@@ -88,6 +92,8 @@ Commercial evidence can strengthen a selection only when it identifies a concret
 | Evaluation Scale foundation | Quality, latency, failure rate, or truncation risk materially worsens by measured size/topology | A fixed node-count threshold has been guessed |
 
 Selection should identify the **smallest coherent packet** that resolves the measured dependency.
+
+`Describe New Workflow` is intentionally excluded from this Stage 1.5 matrix. It creates an AI architecture proposal and therefore requires a scoped `AE2` authority decision at Gate B or an explicit equivalent gate decision; onboarding convenience alone is not evidence for authority expansion.
 
 ---
 
@@ -133,6 +139,7 @@ Rules:
 - every data/security-sensitive capability must trace to the applicable governance review
 - paid access/pricing/quota/commercial-launch requirements must trace to `ADR-0006`, `ADR-0007`, and `MONETIZATION_ARCHITECTURE.md` where applicable
 - every Scenario/Acceptance requirement implemented must trace to an explicit test or documented future-verification limitation
+- user-facing packets that materially affect intended non-engineering professional task flows should trace the Product Master progressive-disclosure requirement to proportionate, task-level Acceptance Criteria rather than assuming technical correctness implies usability
 - do not create a repository-wide heavy requirements-management system unless scale justifies it
 
 ---
