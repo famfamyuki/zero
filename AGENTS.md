@@ -2,7 +2,9 @@
 
 This repository is the implementation source for **AgentGraph Studio**.
 
-Before material Product, Architecture, Specification, Implementation, QA, or Release work, read current `main` versions of the relevant durable documents. Baseline references:
+Before material Product, Architecture, Specification, Implementation, QA, or Release work, read current `main` versions of the relevant durable documents.
+
+Baseline references:
 
 1. `docs/PRODUCT_MASTER.md`
 2. `docs/ARCHITECTURE.md`
@@ -43,57 +45,42 @@ latest GitHub main / repository reality
 → relevant cross-stage plans/contracts
 → Program Board / Risk Register
 → Current State snapshot
-→ historical chats / Work / Codex / old SHAs
+→ historical Chat / Work / Codex / old SHAs
 ```
 
 A SHA in docs is a snapshot/baseline unless explicitly live-verified.
 
-## Chat / Work / Codex operating model
+## Development operating model
 
-`docs/CHAT_ROLE_REGISTRY.md` is authoritative for role activation and surface ownership.
+`docs/CHAT_ROLE_REGISTRY.md` is authoritative.
+
+Current development-only model uses exactly five canonical lanes:
+
+```text
+Chat:
+00  Program Control & Current State
+01  Product Architecture & Roadmap
+02  UX & Implementation Specification
+
+Codex:
+C01 Current Sprint Implementation
+
+Work:
+W01 Independent QA & Production Verification
+```
 
 Core separation:
 
 ```text
-Chat  = reasoning / decision / coordination
-Work  = persistent operations / independent verification
-Codex = packet-bound repository implementation
 GitHub main = durable truth
+Chat        = Product / specification / coordination reasoning
+Codex       = packet-bound repository implementation
+Work        = independent verification when independence matters
 ```
 
-Canonical Chat roles:
+There is no permanent canonical `03`, `04`, `05`, `06`, or `W00` in development-only focus mode.
 
-```text
-00  Program Control & Current State
-01  Product Architecture & Roadmap
-02  UX & Implementation Specification
-03  GitHub, Vercel & Release Operations
-05  Marketing & Developer Communication
-06  Analytics & Growth Evidence
-```
-
-Canonical Work roles:
-
-```text
-W00 Development Operations Workspace
-W01 Independent QA & Production Verification
-```
-
-Canonical Codex role:
-
-```text
-C01 Current Sprint Implementation
-```
-
-Legacy aliases:
-
-```text
-04 → C01
-07 → 01
-08 → 02
-```
-
-A short declaration such as `ここは01として使います。` is sufficient. Resolve it from current `main`; do not ask the user to paste old role prompts or stale state.
+Complex repository/document work may use Work mode under the existing `00`, `01`, or `02` authority; using Work does not create a W00 role.
 
 Lifecycle authority:
 
@@ -103,7 +90,7 @@ Specified               → 02
 Implementation Started  → C01
 Implementation Complete → C01
 QA Complete             → W01
-Release execution/facts → 03
+normal merge/release    → C01 after W01 QA of the same revision
 Production Verified     → W01
 Sprint Complete         → 00
 ```
@@ -111,10 +98,12 @@ Sprint Complete         → 00
 Normal handoff:
 
 ```text
-01 → 02 → C01 → W01 QA → 03 release → W01 Production verification → 00 → 01
+01 → 02 → C01 → W01 QA → C01 release → W01 Production verification → 00 → 01
 ```
 
-Implementation self-test is not Independent QA. Release execution is not the same as Production Verified.
+If implementation/behavior changes after QA Complete, re-run independent QA before release.
+
+A short role declaration such as `ここは01として使います。` is sufficient. Resolve it from current `main`; do not ask for old prompts or stale state.
 
 ## Product North Star
 
@@ -155,7 +144,13 @@ AgentGraph Studio aims to become a portable AI workflow architecture engineering
 
 Stage order is dependency direction, not an automatic queue.
 
-After a stage, use measured Evidence → Gate Review → Explicit Next Selection. Stage 1.5 is a selection band, not a mandatory backlog.
+After a stage use:
+
+```text
+Evidence → Gate Review → Explicit Next Selection
+```
+
+Stage 1.5 is a selection band, not a mandatory backlog.
 
 The active packet under `docs/specs/` controls current implementation scope. Do not pull future roadmap work into a packet merely because it appears in Product/Architecture/Roadmap documents.
 
@@ -182,13 +177,18 @@ npm run build
 
 plus packet-defined evaluations/benchmarks where applicable.
 
-Normal `main` merges should use the repository's required CI/protection path. Live Branch Protection/Ruleset state must be checked rather than inferred from documentation.
+Normal `main` merges must use the required repository CI/protection path. Live Branch Protection/Ruleset state must be checked rather than inferred from docs.
 
-## Release verification
+## Independent QA and release
 
-Before **Production Verified**, independently confirm:
+Implementation self-test is not Independent QA.
+
+`W01` performs pre-release independent QA. After QA Complete, `C01` may merge/release only the same approved revision. Any behavior-changing fix invalidates that QA approval and returns to W01.
+
+Before **Production Verified**, W01 independently confirms:
 
 - latest GitHub `main`;
+- released code corresponds to the QA-approved change set;
 - Vercel `READY`;
 - `target=production`;
 - correct alias/domain;
@@ -197,3 +197,15 @@ Before **Production Verified**, independently confirm:
 - `GitHub main SHA = Vercel Production githubCommitSha`.
 
 Do not mark QA Complete or Production Verified from implementation self-report or deployment READY alone.
+
+## Context policy
+
+- `00`, `01`, `02` may be long-lived while role context stays clean;
+- prefer a fresh `C01` Codex task per packet/material PR;
+- prefer a fresh `W01` Work session per packet/release cycle;
+- replace a long-lived chat when stale Sprints/SHAs or unrelated work interfere with GitHub-grounded reasoning;
+- do not recreate every lane on a fixed schedule.
+
+## Dormant/noncanonical work
+
+Marketing/SNS/analytics/growth are not canonical persistent development lanes during the current focus period. If temporarily needed, use task-specific conversations first. Add a durable role only when repeated evidence shows a genuine independent authority/context boundary.
