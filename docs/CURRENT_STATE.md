@@ -5,7 +5,7 @@ This file is a coordination snapshot, **not** a live deployment registry.
 
 ## 0. Live-state rule
 
-Before any implementation, QA, release, roadmap-promotion, or current-state decision, re-check:
+Before any implementation, QA, release, roadmap-promotion, commercial-launch, or current-state decision, re-check:
 
 1. latest GitHub `main`
 2. latest Vercel Production deployment
@@ -47,6 +47,7 @@ Cross-stage execution/governance is defined in:
 
 - `docs/roadmap/EXECUTION_GATES.md`
 - `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+- `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
 - `docs/SECURITY_RELIABILITY_BASELINE.md`
 - `docs/DATA_AND_AI_GOVERNANCE.md`
 
@@ -82,7 +83,20 @@ Accepted direction:
 - BYOK is not part of the initial offering.
 - Free deterministic Preflight, portability, and deterministic export remain available and AI-independent.
 
-The durable decision is recorded in `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`. The selected next specification work is Architecture Review Paid Access & Usage Control v0. Exact pricing and quota lifecycle details are not yet specified.
+The durable cost/access decision is recorded in `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`.
+
+The durable commercial-validation decision is recorded in `docs/decisions/ADR-0007-commercial-validation-before-paid-expansion.md` and refined by `docs/roadmap/MONETIZATION_ARCHITECTURE.md`.
+
+The selected next specification work is **Architecture Review Paid Access & Usage Control v0**. Exact price, included quota, entitlement lifecycle details, commercial-operations behavior, and privacy-safe measurement details must be specified before public paid launch as applicable.
+
+Important state distinction:
+
+```text
+Paid Access implemented / Production Verified
+≠ Initial subscription model commercially validated
+```
+
+The initial paid offering remains a commercial-validation phase until Commercial Validation Gate M0 has sufficient real evidence for a scoped decision.
 
 ---
 
@@ -113,6 +127,8 @@ Current v0 also intentionally defers later work including:
 - marketplace
 - broader Stage 1.5 Import/Workspace/History foundation unless separately selected
 
+Commercial planning does not change these Stage 1 scope boundaries.
+
 ---
 
 # 4. Required next gates for Stage 1
@@ -134,7 +150,9 @@ Before **QA Complete**:
 - accessibility and stale-result behavior checked as specified
 - security/privacy boundaries checked
 
-Before **Production Verified**:
+Before **Production Verified** for the provider-backed paid offering, the coupled paid-access prerequisite must also satisfy its own packet and commercial release requirements, including commercial-use-eligible hosting verification.
+
+Normal Production verification still requires:
 
 - QA-approved revision released to `main`
 - Vercel `READY`
@@ -153,19 +171,23 @@ Use:
 
 - `docs/roadmap/EXECUTION_GATES.md`
 - `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+- `docs/roadmap/MONETIZATION_ARCHITECTURE.md` where paid evidence is relevant
 
-Expected decision flow:
+Expected evidence flow:
 
 ```text
 Stage 1 Production evidence
-→ Gate A — Evaluation Trust & Scale
-→ select quality/scale/context foundation as justified
+├→ Gate A — Evaluation Trust & Scale
+└→ M0 — Commercial Validation when sufficient paid evidence exists
+→ select quality / scale / context / repeat-value foundation as justified
 → Stage 1.5 Adoption & Context Foundation packet(s) where justified
 → Gate B — Evaluator Authority Expansion
 → Stage 2 Guided Improvement only when evidence supports it
 ```
 
-Stage 1.5 candidates include CrewAI static import, Project/Local Workspace, persisted Intent & Constraints, Review/Locate improvements, and revision/evaluation-history foundations. These are candidates, not automatically one Sprint.
+Gate A and M0 answer different questions. M0 must not block independently justified evaluator safety/quality hardening while commercial sample size is insufficient.
+
+Stage 1.5 candidates include CrewAI static import, Project/Local Workspace, persisted Intent & Constraints, Review/Locate improvements, and revision/evaluation-history foundations. These are candidates, not automatically one Sprint or a prebuilt Pro bundle.
 
 ---
 
@@ -183,7 +205,7 @@ Selected
 → Sprint Complete
 ```
 
-Roadmap gate/stage promotion is a separate Product Architecture decision from Sprint lifecycle status.
+Roadmap gate/stage promotion and M0 commercial validation are separate Product Architecture decisions from Sprint lifecycle status.
 
 ---
 
@@ -225,6 +247,7 @@ There is no permanent canonical W00/03/04/05/06 lane in development-only focus m
 - Pure release/current-state coordination belongs to 00.
 - normal QA-approved merge/release belongs to C01.
 - independent Production verification belongs to W01.
+- Product/commercial gate decisions including M0 remain 01 Product Architecture decisions; temporary analytics/research work does not create a permanent analytics lane.
 - if code/behavior changes after QA Complete, the QA approval is stale and must be repeated before release.
 
 Authoritative role details are in `docs/CHAT_ROLE_REGISTRY.md` and `docs/decisions/ADR-0005-minimal-development-only-operating-model.md`.
@@ -244,8 +267,8 @@ Recommended baseline reading order:
 5. `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
 6. `docs/roadmap/MASTER_ROADMAP.md`
 7. `docs/roadmap/EXECUTION_GATES.md`
-8. relevant cross-stage security/data/evaluation/import contracts
+8. relevant cross-stage security/data/evaluation/import/commercial contracts
 9. this snapshot
 10. active packet under `docs/specs/`
 
-For current Sprint implementation details, the active packet remains authoritative even when long-term documents describe later architecture.
+For current Sprint implementation details, the active packet remains authoritative even when long-term or commercial documents describe later architecture.
