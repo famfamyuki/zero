@@ -4,6 +4,9 @@ import test from 'node:test';
 import { estimateActualCostMicroUsd, estimateWorstCaseCostMicroUsd, parsePaidArchitectureReviewConfig } from '../lib/paid-architecture-review/config';
 import { readBearerToken } from '../lib/paid-architecture-review/auth';
 import { sanitizeAnalyticsProperties } from '../lib/analytics-config';
+import { isExpectedFinalState } from '../lib/paid-architecture-review/quota';
+import { hasDuplicateActiveArchitectureReviewSubscriptions } from '../lib/paid-architecture-review/stripe-reconciliation';
+import type Stripe from 'stripe';
 
 const completeEnv: Record<string, string | undefined> = {
   ARCHITECTURE_REVIEW_PAID_ENABLED: 'true', STRIPE_SECRET_KEY: 'test', STRIPE_WEBHOOK_SECRET: 'test',
@@ -51,6 +54,25 @@ test('bearer parsing accepts only one bounded token and never trusts body identi
   assert.equal(readBearerToken(new Request('https://example.test', { headers: { authorization: 'Bearer one two' } })), null);
 });
 
+test('accounting finalize accepts only the requested terminal state', () => {
+  assert.equal(isExpectedFinalState('consumed', 'consumed'), true);
+  assert.equal(isExpectedFinalState('released', 'released'), true);
+  assert.equal(isExpectedFinalState('released', 'consumed'), false);
+  assert.equal(isExpectedFinalState('consumed', 'released'), false);
+  assert.equal(isExpectedFinalState('missing', 'consumed'), false);
+});
+
+test('subscription inventory remains degraded across webhook replay while duplicate active subscriptions exist', () => {
+  const subscription = (id: string, status: Stripe.Subscription.Status, priceId = 'price_test') => ({
+    id, status, items: { data: [{ price: { id: priceId } }] },
+  }) as unknown as Stripe.Subscription;
+  const duplicated = [subscription('sub_old', 'active'), subscription('sub_new', 'active')];
+  assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions(duplicated, 'price_test'), true);
+  assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([...duplicated].reverse(), 'price_test'), true);
+  assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([subscription('sub_old', 'canceled'), subscription('sub_new', 'active')], 'price_test'), false);
+  assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([subscription('sub_other', 'active', 'price_other'), subscription('sub_new', 'active')], 'price_test'), false);
+});
+
 test('migration provides additive RLS tables, atomic quota, one-in-flight, stale recovery, and idempotent finalize', () => {
   const sql = readFileSync('supabase/migrations/20260826190000_architecture_review_paid_access_v0.sql', 'utf8');
   for (const table of ['billing_customers','architecture_review_entitlements','architecture_review_usage_periods','architecture_review_usage_attempts','stripe_webhook_events']) assert.match(sql, new RegExp(`create table if not exists public\\.${table}`));
@@ -63,6 +85,20 @@ test('migration provides additive RLS tables, atomic quota, one-in-flight, stale
   assert.match(sql, /if v_attempt\.state <> 'reserved' then return v_attempt\.state/);
   assert.match(sql, /revoke all on function public\.reserve_architecture_review[\s\S]*from public,anon,authenticated/);
   assert.doesNotMatch(sql, /workflow_json|evidence_payload|prompt_text|provider_response|customer_email/);
+});
+
+test('billing refresh uses a shared atomic database rate limit and fails closed', () => {
+  const sql = readFileSync('supabase/migrations/20260827120000_architecture_review_paid_access_qa_fixes.sql', 'utf8');
+  const route = readFileSync('app/api/billing/architecture-review/refresh/route.ts', 'utf8');
+  assert.match(sql, /create table if not exists public\.architecture_review_billing_refresh_limits/);
+  assert.match(sql, /pg_advisory_xact_lock/);
+  assert.match(sql, /for update/);
+  assert.match(sql, /claim_architecture_review_billing_refresh/);
+  assert.match(sql, /enable row level security/);
+  assert.match(sql, /revoke all on function public\.claim_architecture_review_billing_refresh[\s\S]*from public,anon,authenticated/);
+  assert.match(sql, /delete from public\.architecture_review_billing_refresh_limits where updated_at < p_before/);
+  assert.match(route, /claimBillingRefresh/);
+  assert.doesNotMatch(route, /new Map|Date\.now/);
 });
 
 test('review hot path enforces auth, idempotency, entitlement, reservation, cost guard, start, consume/release in order', () => {

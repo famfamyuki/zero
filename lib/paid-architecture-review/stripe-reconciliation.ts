@@ -10,21 +10,48 @@ function subscriptionPeriod(subscription: Stripe.Subscription) {
   return { start: new Date(item.current_period_start * 1000).toISOString(), end: new Date(item.current_period_end * 1000).toISOString() };
 }
 
+function matchesArchitectureReviewPrice(subscription: Stripe.Subscription, priceId: string) {
+  return subscription.items.data.some((item) => item.price.id === priceId);
+}
+
+export function hasDuplicateActiveArchitectureReviewSubscriptions(subscriptions: Stripe.Subscription[], priceId: string) {
+  return subscriptions.filter((subscription) => subscription.status === 'active' && matchesArchitectureReviewPrice(subscription, priceId)).length > 1;
+}
+
+async function listArchitectureReviewSubscriptions(customerId: string, config: PaidArchitectureReviewConfig) {
+  const subscriptions = await getStripe().subscriptions.list({ customer: customerId, status: 'all', limit: 100, expand: ['data.items.data.price'] });
+  if (subscriptions.has_more) throw new Error('subscription_inventory_incomplete');
+  return subscriptions.data.filter((subscription) => matchesArchitectureReviewPrice(subscription, config.stripePriceId));
+}
+
+async function markEntitlementDegraded(userId: string, eventId: string | null = null) {
+  const { error } = await getSupabaseAdmin().from('architecture_review_entitlements').update({
+    sync_state: 'degraded', last_stripe_event_id: eventId, last_synced_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+  }).eq('user_id', userId);
+  if (error) throw new Error('entitlement_degrade_failed');
+}
+
 export async function reconcileArchitectureReviewSubscription(subscriptionId: string, eventId: string | null, config: PaidArchitectureReviewConfig) {
   const subscription = await getStripe().subscriptions.retrieve(subscriptionId, { expand: ['items.data.price'] });
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
   const admin = getSupabaseAdmin();
   const { data: customer, error: customerError } = await admin.from('billing_customers').select('user_id').eq('stripe_customer_id', customerId).maybeSingle();
   if (customerError || !customer) throw new Error('billing_customer_not_mapped');
+  let customerSubscriptions: Stripe.Subscription[];
+  try {
+    customerSubscriptions = await listArchitectureReviewSubscriptions(customerId, config);
+  } catch (error) {
+    await markEntitlementDegraded(customer.user_id, eventId);
+    throw error;
+  }
+  if (hasDuplicateActiveArchitectureReviewSubscriptions(customerSubscriptions, config.stripePriceId)) {
+    await markEntitlementDegraded(customer.user_id, eventId);
+    throw new Error('duplicate_active_subscription');
+  }
   const matchingItems = subscription.items.data.filter((item) => item.price.id === config.stripePriceId);
   if (matchingItems.length !== 1 || subscription.items.data.length !== 1) {
-    await admin.from('architecture_review_entitlements').update({ sync_state: 'degraded', last_synced_at: new Date().toISOString() }).eq('user_id', customer.user_id);
+    await markEntitlementDegraded(customer.user_id, eventId);
     throw new Error('subscription_shape_invalid');
-  }
-  const { data: existing } = await admin.from('architecture_review_entitlements').select('stripe_subscription_id,stripe_status').eq('user_id', customer.user_id).maybeSingle();
-  if (existing && existing.stripe_subscription_id !== subscription.id && existing.stripe_status === 'active' && subscription.status === 'active') {
-    await admin.from('architecture_review_entitlements').update({ sync_state: 'degraded', last_stripe_event_id: eventId, last_synced_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('user_id', customer.user_id);
-    throw new Error('duplicate_active_subscription');
   }
   const { start, end } = subscriptionPeriod(subscription);
   const { error } = await admin.from('architecture_review_entitlements').upsert({
@@ -41,11 +68,16 @@ export async function findAndReconcileUserSubscription(userId: string, config: P
   const admin = getSupabaseAdmin();
   const { data: mapping, error } = await admin.from('billing_customers').select('stripe_customer_id').eq('user_id', userId).maybeSingle();
   if (error || !mapping) return null;
-  const subscriptions = await getStripe().subscriptions.list({ customer: mapping.stripe_customer_id, status: 'all', limit: 20, expand: ['data.items.data.price'] });
-  const matching = subscriptions.data.filter((subscription) => subscription.items.data.some((item) => item.price.id === config.stripePriceId));
+  let matching: Stripe.Subscription[];
+  try {
+    matching = await listArchitectureReviewSubscriptions(mapping.stripe_customer_id, config);
+  } catch (listingError) {
+    await markEntitlementDegraded(userId);
+    throw listingError;
+  }
   const eligible = matching.filter((subscription) => subscription.status === 'active');
   if (eligible.length > 1) {
-    await admin.from('architecture_review_entitlements').update({ sync_state: 'degraded', last_synced_at: new Date().toISOString() }).eq('user_id', userId);
+    await markEntitlementDegraded(userId);
     throw new Error('duplicate_active_subscription');
   }
   const selected = eligible[0] ?? matching.sort((a, b) => b.created - a.created)[0];

@@ -1,6 +1,10 @@
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import type { ProviderUsageMetadata } from '@/types/paid-architecture-review';
 
+export function isExpectedFinalState(actual: unknown, expected: 'consumed' | 'released'): actual is 'consumed' | 'released' {
+  return actual === expected;
+}
+
 export async function reservePaidReview(input: {
   userId: string; requestId: string; quotaLimit: number; reviewVersion: string; evidenceVersion: string;
   reviewerVersion: string; providerId: string; modelId: string; preflightCostMicroUsd: number; costProfileVersion: string;
@@ -32,7 +36,7 @@ export async function finalizePaidReview(input: {
       p_total_tokens: input.usage?.totalTokens ?? null, p_post_call_cost_estimate_micro_usd: input.postCallCostMicroUsd ?? null,
       p_cost_estimate_status: input.costEstimateStatus ?? null,
     });
-    if (!error && (data === input.state || data === 'consumed' || data === 'released')) return data;
+    if (!error && isExpectedFinalState(data, input.state)) return data;
     lastError = error ?? new Error('unexpected_finalize_state');
   }
   throw lastError instanceof Error ? lastError : new Error('accounting_unavailable');

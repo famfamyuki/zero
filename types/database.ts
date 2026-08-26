@@ -91,6 +91,12 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['stripe_webhook_events']['Row']>;
         Relationships: [];
       };
+      architecture_review_billing_refresh_limits: {
+        Row: { user_id: string; window_started_at: string; request_count: number; updated_at: string };
+        Insert: { user_id: string; window_started_at: string; request_count?: number; updated_at?: string };
+        Update: Partial<Database['public']['Tables']['architecture_review_billing_refresh_limits']['Insert']>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -104,6 +110,7 @@ export interface Database {
         Returns: string;
       };
       cleanup_architecture_review_operational_metadata: { Args: { p_before?: string }; Returns: number };
+      claim_architecture_review_billing_refresh: { Args: { p_user_id: string; p_window_seconds: number; p_request_limit: number }; Returns: boolean };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
