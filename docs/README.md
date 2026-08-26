@@ -2,7 +2,7 @@
 
 This directory is the durable development knowledge base for Chat, Work, Codex, and human contributors.
 
-The documentation is intentionally organized by **decision ownership**, not by a requirement to read every file for every task.
+The documentation is organized by **decision ownership**, not by a requirement to read every file for every task.
 
 ## 1. Global source-of-truth hierarchy
 
@@ -29,11 +29,9 @@ A long-term document never expands the active Sprint by implication.
 
 # 2. Core authority documents
 
-These define the development system itself.
-
 | Responsibility | Authority |
 |---|---|
-| Final Product definition, North Star, durable Product principles | [`PRODUCT_MASTER.md`](./PRODUCT_MASTER.md) |
+| Final Product definition, strategy, North Star, adoption wedge, moat, value ladder, durable Product principles | [`PRODUCT_MASTER.md`](./PRODUCT_MASTER.md) |
 | Durable architecture and evolution boundaries | [`ARCHITECTURE.md`](./ARCHITECTURE.md) |
 | Engineering, Definition of Ready, implementation, QA, CI, release, versioning, traceability | [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) |
 | Chat / Codex / Work role ownership | [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) |
@@ -45,7 +43,10 @@ These define the development system itself.
 | Exact current Sprint implementation contract | [`specs/`](./specs/) |
 | Durable decision history/rationale | [`decisions/`](./decisions/) |
 
-`ENGINEERING_EXECUTION_GOVERNANCE.md` is retained only as a compatibility pointer. Its unique requirements are now consolidated into `DEVELOPMENT_RULES.md`.
+Compatibility pointers retained for old links, not as separate authority sources:
+
+- [`ENGINEERING_EXECUTION_GOVERNANCE.md`](./ENGINEERING_EXECUTION_GOVERNANCE.md) → consolidated into `DEVELOPMENT_RULES.md`
+- [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md) → durable Product strategy consolidated into `PRODUCT_MASTER.md`; detailed commercial architecture remains in `MONETIZATION_ARCHITECTURE.md`
 
 ---
 
@@ -58,7 +59,6 @@ These define the development system itself.
 
 ## Commercial / monetization
 
-- [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md) — market position, adoption wedge, moat, long-term product/business strategy
 - [`roadmap/MONETIZATION_ARCHITECTURE.md`](./roadmap/MONETIZATION_ARCHITECTURE.md) — free/paid value contract, pricing/quota evidence, unit economics, paid-launch readiness, Commercial Validation Gate M0
 
 ## Security / reliability
@@ -149,7 +149,7 @@ latest Product/Production evidence
 → Gate A evidence only where evaluator quality affects paid value
 ```
 
-Long-term Team/Enterprise/Marketplace strategy is not current implementation scope unless explicitly Selected.
+Long-term Team/Enterprise/Marketplace value boundaries live in `PRODUCT_MASTER.md`; they are not current implementation scope unless explicitly Selected.
 
 ---
 
