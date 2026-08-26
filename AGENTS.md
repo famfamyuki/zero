@@ -24,6 +24,7 @@ Read relevant cross-stage contracts when needed:
 
 - evaluator trust/scale → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
 - product platform/commercial sequencing → `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
+- monetization/pricing/paid launch/commercial validation → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
 - semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
 - import / Workspace / revision → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
 - designed expectations / later verification → `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`
@@ -151,6 +152,8 @@ Evidence → Gate Review → Explicit Next Selection
 ```
 
 Stage 1.5 is a selection band, not a mandatory backlog.
+
+Commercial Validation Gate M0 is likewise evidence-driven. Paid entitlement/cost control does not by itself prove recurring value, and commercial conversion must not expand AI authority. Use `docs/roadmap/MONETIZATION_ARCHITECTURE.md` for paid-value, price/quota, unit-economics, and paid-expansion decisions.
 
 The active packet under `docs/specs/` controls current implementation scope. Do not pull future roadmap work into a packet merely because it appears in Product/Architecture/Roadmap documents.
 
