@@ -15,14 +15,15 @@ This directory is the shared durable development knowledge base for Chat, Work, 
 9. [`roadmap/RISK_REGISTER.md`](./roadmap/RISK_REGISTER.md) — durable cross-stage risks
 10. [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md) — evaluator trust, benchmark quality, scale, Search/Locate/Scoped Evaluation
 11. [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md) — product platform/commercial sequencing
-12. [`SECURITY_RELIABILITY_BASELINE.md`](./SECURITY_RELIABILITY_BASELINE.md) — platform security/reliability baseline
-13. [`DATA_AND_AI_GOVERNANCE.md`](./DATA_AND_AI_GOVERNANCE.md) — data classification, persistence/provider boundaries, evaluator/model governance
-14. [`architecture/SEMANTIC_MODEL_EVOLUTION.md`](./architecture/SEMANTIC_MODEL_EVOLUTION.md) — semantic-model migration runway
-15. [`architecture/IMPORT_WORKSPACE_CONTRACT.md`](./architecture/IMPORT_WORKSPACE_CONTRACT.md) — import, mapping, Workspace/Project, revision/local-first contract
-16. [`architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`](./architecture/SCENARIO_ACCEPTANCE_CONTRACT.md) — designed expectations and static-to-runtime verification bridge
-17. [`decisions/`](./decisions/) — durable Product/Architecture/operating-model ADRs
-18. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; live checks win
-19. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
+12. [`roadmap/MONETIZATION_ARCHITECTURE.md`](./roadmap/MONETIZATION_ARCHITECTURE.md) — paid value contract, unit economics, pricing evidence, Commercial Validation Gate M0, and paid-launch readiness
+13. [`SECURITY_RELIABILITY_BASELINE.md`](./SECURITY_RELIABILITY_BASELINE.md) — platform security/reliability baseline
+14. [`DATA_AND_AI_GOVERNANCE.md`](./DATA_AND_AI_GOVERNANCE.md) — data classification, persistence/provider boundaries, evaluator/model governance
+15. [`architecture/SEMANTIC_MODEL_EVOLUTION.md`](./architecture/SEMANTIC_MODEL_EVOLUTION.md) — semantic-model migration runway
+16. [`architecture/IMPORT_WORKSPACE_CONTRACT.md`](./architecture/IMPORT_WORKSPACE_CONTRACT.md) — import, mapping, Workspace/Project, revision/local-first contract
+17. [`architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`](./architecture/SCENARIO_ACCEPTANCE_CONTRACT.md) — designed expectations and static-to-runtime verification bridge
+18. [`decisions/`](./decisions/) — durable Product/Architecture/operating-model ADRs
+19. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; live checks win
+20. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
 
 ## Source-of-truth hierarchy
 
@@ -144,6 +145,7 @@ For stage/gate decisions read:
 - [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md)
 - [`roadmap/RISK_REGISTER.md`](./roadmap/RISK_REGISTER.md)
 - [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md) when evaluator quality/scale is involved
+- [`roadmap/MONETIZATION_ARCHITECTURE.md`](./roadmap/MONETIZATION_ARCHITECTURE.md) when paid value, pricing/quota, unit economics, commercial launch, or commercial-validation evidence is involved
 
 Use:
 
@@ -153,7 +155,7 @@ Evidence
 → Explicit Next Selection
 ```
 
-Stage 1.5 is a selection band, not a mandatory backlog. AI authority is capability-scoped; mutation scope is separately gated.
+Stage 1.5 is a selection band, not a mandatory backlog. AI authority is capability-scoped; mutation scope is separately gated. Commercial Validation Gate M0 is likewise evidence-driven and does not automatically select a paid-expansion feature.
 
 ---
 
