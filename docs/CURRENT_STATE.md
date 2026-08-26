@@ -106,10 +106,11 @@ Current v0 also intentionally defers later work including:
 Before **Implementation Complete**:
 
 - implementation scope matches `AGS-EGAI-AR-V0-P1`
+- `npm run docs:check` passes
 - `npm test` passes
 - `npm run typecheck` passes
 - `npm run build` passes
-- packet-defined AI/evidence tests pass
+- packet-defined AI/evidence tests and evaluation requirements pass
 
 Before **QA Complete**:
 
@@ -121,7 +122,7 @@ Before **QA Complete**:
 
 Before **Production Verified**:
 
-- release to `main`
+- QA-approved revision released to `main`
 - Vercel `READY`
 - `target=production`
 - Production smoke
@@ -172,9 +173,53 @@ Roadmap gate/stage promotion is a separate Product Architecture decision from Sp
 
 ---
 
-# 7. Coordination rule for chats / Work / Codex
+# 7. Current development operating model
 
-All development surfaces should read repository documents instead of relying on a prior chat's remembered state.
+The project is currently in **development-only focus mode**. Marketing/SNS/Growth/Analytics work is not maintained as permanent development lanes.
+
+Canonical persistent lanes are exactly:
+
+```text
+Chat:
+00  Program Control & Current State
+01  Product Architecture & Roadmap
+02  UX & Implementation Specification
+
+Codex:
+C01 Current Sprint Implementation
+
+Work:
+W01 Independent QA & Production Verification
+```
+
+Default lifecycle handoff:
+
+```text
+01 Selected
+→ 02 Specified
+→ C01 Implementation Complete
+→ W01 independent QA / QA Complete
+→ C01 merge/release exact QA-approved revision
+→ W01 Production Verified
+→ 00 Sprint Complete
+→ 01 next Gate / selection
+```
+
+There is no permanent canonical W00/03/04/05/06 lane in development-only focus mode.
+
+- Work mode may be used by 00/01/02 for complex repository/document work without creating a W00 authority.
+- Pure release/current-state coordination belongs to 00.
+- normal QA-approved merge/release belongs to C01.
+- independent Production verification belongs to W01.
+- if code/behavior changes after QA Complete, the QA approval is stale and must be repeated before release.
+
+Authoritative role details are in `docs/CHAT_ROLE_REGISTRY.md` and `docs/decisions/ADR-0005-minimal-development-only-operating-model.md`.
+
+---
+
+# 8. Coordination / reading rule
+
+All development surfaces should read repository documents instead of relying on a prior conversation's remembered state.
 
 Recommended baseline reading order:
 
@@ -182,10 +227,11 @@ Recommended baseline reading order:
 2. `docs/PRODUCT_MASTER.md`
 3. `docs/ARCHITECTURE.md`
 4. `docs/DEVELOPMENT_RULES.md`
-5. `docs/roadmap/MASTER_ROADMAP.md`
-6. `docs/roadmap/EXECUTION_GATES.md`
-7. relevant cross-stage security/data/evaluation/import contracts
-8. this snapshot
-9. active packet under `docs/specs/`
+5. `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
+6. `docs/roadmap/MASTER_ROADMAP.md`
+7. `docs/roadmap/EXECUTION_GATES.md`
+8. relevant cross-stage security/data/evaluation/import contracts
+9. this snapshot
+10. active packet under `docs/specs/`
 
-For current Sprint implementation details, the active packet remains authoritative even when the long-term documents describe later architecture.
+For current Sprint implementation details, the active packet remains authoritative even when long-term documents describe later architecture.
