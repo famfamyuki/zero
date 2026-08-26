@@ -1,10 +1,12 @@
 # ADR-0004 — Separate Chat, Work, and Codex Responsibilities
 
-Status: **Accepted**
+Status: **Superseded**
 
 Date: 2026-08-26
 
 Supersedes: `ADR-0002-canonical-chat-operating-model.md`
+
+Superseded by: `ADR-0005-minimal-development-only-operating-model.md`
 
 ## Context
 
