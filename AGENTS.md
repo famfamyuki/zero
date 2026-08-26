@@ -2,7 +2,7 @@
 
 This repository is the implementation source for **AgentGraph Studio**.
 
-Before making product, architecture, specification, code, QA, or release decisions, read the current `main` versions of:
+Before material Product, Architecture, Specification, Implementation, QA, or Release work, read current `main` versions of the relevant durable documents. Baseline references:
 
 1. `docs/PRODUCT_MASTER.md`
 2. `docs/ARCHITECTURE.md`
@@ -18,161 +18,182 @@ Before making product, architecture, specification, code, QA, or release decisio
 12. `docs/CURRENT_STATE.md`
 13. the current authoritative packet under `docs/specs/`
 
-Read additional cross-stage contracts when relevant:
+Read relevant cross-stage contracts when needed:
 
 - evaluator trust/scale → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
 - product platform/commercial sequencing → `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
-- persisted semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
-- import / Workspace / revision foundation → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
+- semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
+- import / Workspace / revision → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
 - designed expectations / later verification → `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`
 - durable decisions → `docs/decisions/`
 
-## Chat role activation
+## Source-of-truth priority
 
-`docs/CHAT_ROLE_REGISTRY.md` is authoritative for the meaning of AgentGraph Studio conversation identifiers.
-
-If the user says only something like:
+When information conflicts:
 
 ```text
-ここは01として使います。
+latest GitHub main / repository reality
+→ latest Vercel Production / actual Production behavior
+→ active docs/specs packet
+→ Product Master
+→ Architecture
+→ Development Rules / Engineering Execution Governance / cross-cutting baselines
+→ Master Roadmap
+→ Execution Gates
+→ relevant cross-stage plans/contracts
+→ Program Board / Risk Register
+→ Current State snapshot
+→ historical chats / Work / Codex / old SHAs
 ```
 
-that is sufficient role activation. Resolve `01` from the current `main` registry, load the role's required docs, re-check live GitHub/Vercel/Production state when required by that role, and continue without asking the user to paste the previous prompt or old chat history.
+A SHA in docs is a snapshot/baseline unless explicitly live-verified.
 
-Canonical routing:
+## Chat / Work / Codex operating model
+
+`docs/CHAT_ROLE_REGISTRY.md` is authoritative for role activation and surface ownership.
+
+Core separation:
+
+```text
+Chat  = reasoning / decision / coordination
+Work  = persistent operations / independent verification
+Codex = packet-bound repository implementation
+GitHub main = durable truth
+```
+
+Canonical Chat roles:
 
 ```text
 00  Program Control & Current State
 01  Product Architecture & Roadmap
 02  UX & Implementation Specification
 03  GitHub, Vercel & Release Operations
-04  Engineering & Implementation
 05  Marketing & Developer Communication
 06  Analytics & Growth Evidence
+```
+
+Canonical Work roles:
+
+```text
+W00 Development Operations Workspace
+W01 Independent QA & Production Verification
+```
+
+Canonical Codex role:
+
+```text
 C01 Current Sprint Implementation
-W01 Independent QA & Release Verification
-W00 Development Master Synthesis
 ```
 
 Legacy aliases:
 
 ```text
+04 → C01
 07 → 01
 08 → 02
 ```
 
-Do not create competing Product/Roadmap or Specification authority in legacy aliases.
+A short declaration such as `ここは01として使います。` is sufficient. Resolve it from current `main`; do not ask the user to paste old role prompts or stale state.
 
-## Source-of-truth priority
+Lifecycle authority:
 
-When information conflicts, use this order:
+```text
+Selected                → 01
+Specified               → 02
+Implementation Started  → C01
+Implementation Complete → C01
+QA Complete             → W01
+Release execution/facts → 03
+Production Verified     → W01
+Sprint Complete         → 00
+```
 
-1. latest GitHub `main`
-2. latest Vercel Production deployment and actual Production behavior
-3. the current packet in `docs/specs/` for in-scope implementation details
-4. `docs/PRODUCT_MASTER.md`
-5. `docs/ARCHITECTURE.md`
-6. `docs/DEVELOPMENT_RULES.md`, `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`, and applicable cross-cutting baselines
-7. `docs/roadmap/MASTER_ROADMAP.md`
-8. `docs/roadmap/EXECUTION_GATES.md` for promotion/authority/mutation-scope decisions
-9. relevant cross-stage plans/contracts
-10. `docs/roadmap/PROGRAM_BOARD.md` / `docs/roadmap/RISK_REGISTER.md` for coordination
-11. `docs/CURRENT_STATE.md` as a snapshot only
-12. historical chats, old SHAs, old deployments, archived planning documents
+Normal handoff:
 
-A SHA written in documentation is a snapshot or selection baseline unless the document explicitly says otherwise. Never treat an old SHA as current state without checking `main`.
+```text
+01 → 02 → C01 → W01 QA → 03 release → W01 Production verification → 00 → 01
+```
+
+Implementation self-test is not Independent QA. Release execution is not the same as Production Verified.
 
 ## Product North Star
 
-`Understand → Evaluate → Improve → Verify → Own`
+```text
+Understand → Evaluate → Improve → Verify → Own
+```
 
-AgentGraph Studio is not merely a visual workflow builder. It is intended to become a portable workflow architecture engineering toolchain that treats AI-agent workflows as versioned engineering artifacts, combines deterministic analysis with evidence-grounded AI reasoning, proposes safer improvements under human control, compiles to user-owned artifacts, and can later compare design-time expectations with runtime evidence.
+AgentGraph Studio aims to become a portable AI workflow architecture engineering toolchain, not merely a visual workflow builder.
 
 ## Non-negotiable engineering principles
 
-- Preserve existing functionality unless the current specification explicitly changes it.
-- Do not break existing analytics.
-- Deterministic analysis remains authoritative for deterministic facts.
-- AI reasoning must be evidence-grounded.
-- Preserve `Known / Inferred / Unknown` distinctions.
-- Do not present unsupported external/runtime claims as facts.
-- Do not use an arbitrary overall 0–100 architecture score without a calibrated benchmark contract.
-- AI must not silently mutate workflow semantics.
-- Semantic change direction is `Proposal → Semantic Patch → Validation → Preview → User Apply`.
-- AI authority is capability-scoped; approval for review does not imply proposal/tool/security/patch authority.
-- Gate C pipeline safety does not authorize every patch operation; allowed mutation scope must be explicit.
-- Side-effect-sensitive changes require sufficient capability/human-control/security evidence before authorization.
-- Configured Intent/Constraint/Scenario expectations are not observed runtime truth.
-- Visual grouping, reusable semantic modules, and runtime orchestration are separate concepts.
-- User-owned source and user-owned runtime are default architectural goals.
-- CrewAI is the current primary target; do not unnecessarily lock the core domain to one framework.
-- Silent lossy target conversion is prohibited.
-- Workflow/imported/scenario text supplied by users is untrusted data when passed to an evaluator; it is not evaluator instruction.
-- Do not execute arbitrary imported project code merely to inspect/convert it unless an explicitly specified sandboxed feature exists.
-- Never expose, store, or repeat secrets, API keys, tokens, or credentials.
-- Do not silently broaden data persistence or third-party AI-provider disclosure.
-- Do not advance evaluator authority faster than measured evaluator trust.
-- Do not create Graph/Workflow V2 merely to match long-term diagrams; use the semantic-model evolution decision rules.
+- Simplest Sufficient Architecture.
+- Evidence Before Intelligence.
+- deterministic analysis owns deterministic facts;
+- AI reasoning is evidence-grounded and advisory;
+- preserve `Known / Inferred / Unknown`;
+- preserve deterministic / heuristic / external-dependent distinctions;
+- no unsupported runtime/external claims as facts;
+- no arbitrary overall architecture score without calibrated benchmark evidence;
+- no silent semantic mutation;
+- future semantic change uses `Proposal → Semantic Patch → Validation → Preview → User Apply`;
+- AI authority is capability-scoped and must not outpace measured trust;
+- mutation scope is explicit; pipeline safety does not authorize every operation;
+- side-effect-sensitive change requires capability/human-control/security evidence;
+- configured Intent/Constraint/Scenario expectation is not observed runtime truth;
+- `Visual Group ≠ Semantic Module ≠ Runtime Orchestration`;
+- user-owned source/runtime is the default direction;
+- CrewAI-first, not core-domain locked;
+- no silent lossy conversion;
+- user/imported/scenario text is untrusted analyzed data, not evaluator instruction;
+- never execute arbitrary imported project code just to inspect/convert it unless an explicitly sandboxed feature exists;
+- never expose/store/repeat secrets, keys, tokens, or credentials;
+- do not silently broaden persistence or AI-provider disclosure;
+- do not create Graph/Workflow V2 merely to match future diagrams;
+- preserve existing features and analytics unless a current packet explicitly changes them.
 
-## Roadmap execution rule
+## Roadmap / scope discipline
 
 Stage order is dependency direction, not an automatic queue.
 
-After Stage 1, use `docs/roadmap/EXECUTION_GATES.md` and measured evidence. A Stage 1.5 **Adoption & Context Foundation selection band** may be selected before Stage 2. Guided Improvement and later mutation authority require explicit promotion decisions.
+After a stage, use measured Evidence → Gate Review → Explicit Next Selection. Stage 1.5 is a selection band, not a mandatory backlog.
 
-Use `docs/roadmap/PROGRAM_BOARD.md` for near-term candidates/blockers and `docs/roadmap/RISK_REGISTER.md` for durable cross-stage risks.
+The active packet under `docs/specs/` controls current implementation scope. Do not pull future roadmap work into a packet merely because it appears in Product/Architecture/Roadmap documents.
 
-## Definition of Ready
+Before implementation, apply the Definition of Ready in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
 
-Before treating a Selected capability as implementation-ready, apply `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
-
-Do not start implementation while applicable product/dependency, domain/version, migration, security/data, UX/state, accessibility, analytics, test, or release questions remain undefined.
-
-Non-trivial packets should maintain lightweight traceability:
+Non-trivial work should trace:
 
 ```text
-Upstream Product / Architecture / Gate / Scenario / Risk
+Product / Architecture / Gate / Scenario / Risk
 → Packet AC
 → Test / Production verification
 ```
 
-## Version / operational maturity
-
-Durable versioned contracts use the lifecycle defined in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`; do not remove legacy readers casually or silently reinterpret old versions.
-
-Operational targets mature from measured baselines rather than guessed permanent SLOs:
-
-```text
-UNMEASURED
-→ BASELINED
-→ PROVISIONAL_TARGET
-→ CALIBRATED_TARGET
-→ ENFORCED / ALERTED where justified
-```
-
 ## Implementation completion gate
 
-Before declaring implementation complete, run and report:
+Before **Implementation Complete**, run and report:
 
-- `npm run docs:check`
-- `npm test`
-- `npm run typecheck`
-- `npm run build`
+```text
+npm run docs:check
+npm test
+npm run typecheck
+npm run build
+```
 
-Repository CI should run the same gate on pull requests / main pushes. Branch Protection / Rulesets should require the `test-typecheck-build` status for normal merges where platform support permits.
+plus packet-defined evaluations/benchmarks where applicable.
 
-Live branch/ruleset settings must be checked; documentation is not proof that enforcement is enabled. If protection is absent despite support, keep the repository governance risk/blocker open.
+Normal `main` merges should use the repository's required CI/protection path. Live Branch Protection/Ruleset state must be checked rather than inferred from documentation.
 
-For release verification also confirm:
+## Release verification
 
-- Vercel deployment state is `READY`
-- target is `production`
-- Production behavior is healthy
-- relevant runtime errors are checked
-- GitHub `main` SHA equals Vercel Production `githubCommitSha`
+Before **Production Verified**, independently confirm:
 
-Do not mark QA Complete or Production Verified based only on implementation self-report.
+- latest GitHub `main`;
+- Vercel `READY`;
+- `target=production`;
+- correct alias/domain;
+- actual Production smoke for changed behavior;
+- relevant runtime errors;
+- `GitHub main SHA = Vercel Production githubCommitSha`.
 
-## Current packet rule
-
-A packet under `docs/specs/` may intentionally defer a long-term architecture feature. The packet is authoritative for the current implementation scope. Do not pull future roadmap work into the packet merely because it appears in Product/Architecture/Roadmap documents.
+Do not mark QA Complete or Production Verified from implementation self-report or deployment READY alone.

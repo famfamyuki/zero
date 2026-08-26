@@ -36,8 +36,8 @@ Risk severity reflects potential program impact, not certainty.
 | R-007 | Static import executes or overclaims dynamic external project semantics | Critical | WATCH | Import implementation evaluates arbitrary code or converts unsupported dynamics into Known semantics | Safe static parse; diagnostics/provenance; Unknown/lossiness; security review |
 | R-008 | Provider-backed public API is abused or creates runaway cost | High | WATCH | Missing rate limits/body limits/concurrency/timeout, unexpected usage spike | Security baseline controls, explicit invocation, bounded retries, usage monitoring |
 | R-009 | Private workflow/Evidence/scenario/runtime content leaks to analytics/logs/providers beyond specified scope | Critical | WATCH | Raw content appears in analytics/logs or provider payload expands silently | Data minimization, allowlists, sanitized logs, provider disclosure/review |
-| R-010 | Repository merge policy does not enforce required CI | High | ACTIVE | `main` live settings show no branch/ruleset protection or required status enforcement | Enable Ruleset/Branch Protection; classify as repository governance gap until live-verified |
-| R-011 | Authoritative documentation grows inconsistent or broken | Medium | ACTIVE | Broken links, renamed files without index updates, missing required docs, conflicting execution references | `npm run docs:check`, indexed docs, same-change reference updates |
+| R-010 | Repository merge policy does not enforce required CI | High | MITIGATED | Live verification on 2026-08-26 showed `main` Branch Protection enabled with required `test-typecheck-build` status. Risk reactivates if protection/required checks are removed or bypassed. | `03` must continue live verification during release operations; re-open as ACTIVE/BLOCKING if enforcement regresses |
+| R-011 | Authoritative documentation grows inconsistent or broken | Medium | ACTIVE | Broken links, renamed files without index updates, missing required docs, conflicting execution references | `npm run docs:check`, indexed docs, same-change reference updates, operating-model ADRs for authority changes |
 | R-012 | Versioned contracts accumulate without a retirement/migration lifecycle | High | ACTIVE | Multiple Evidence/API/evaluator/workflow versions with undefined reader/deprecation behavior | Apply Engineering Execution Governance version lifecycle |
 | R-013 | Operational quality remains qualitative indefinitely | Medium | WATCH | Provider-backed features have production traffic but no baseline/provisional/calibrated targets | Use operational-quality maturity model; establish privacy-safe baselines and calibrated targets |
 | R-014 | Workspace/history/cloud work creates accidental platform lock-in | High | WATCH | Repeat-use features require proprietary cloud persistence or weaken export/local ownership | Preserve local/project artifact path; separate local/browser/cloud/team trust levels |
@@ -89,10 +89,10 @@ Do not “accept” a critical risk merely to keep stage sequencing moving.
 
 # 4. Closure rule
 
-A risk is `CLOSED` only when the durable risk no longer applies. A single successful packet normally moves a risk to `MITIGATED`, not permanently closed, when the underlying class can recur.
+A risk is `CLOSED` only when the durable risk no longer applies. A successful packet/control normally moves a recurring risk to `MITIGATED`, not permanently `CLOSED`.
 
 Examples:
 
-- one safe evaluator model release does not close evaluator drift risk
-- enabling branch protection may mitigate repository merge enforcement risk, but future settings changes must still be live-verified
-- one safe import adapter does not close arbitrary external import/security risk for all future formats
+- one safe evaluator model release does not close evaluator drift risk;
+- enabling branch protection mitigates repository merge enforcement risk, but future settings changes must still be live-verified;
+- one safe import adapter does not close arbitrary external import/security risk for all future formats.

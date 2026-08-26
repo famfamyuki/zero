@@ -1,110 +1,109 @@
-# AgentGraph Studio — Chat Role Registry
+# AgentGraph Studio — Chat / Work / Codex Operating Model
 
-Status: **Authoritative operating model for ChatGPT chats, Work lanes, and implementation/QA handoffs**
+Status: **Authoritative operating model for development conversations and execution surfaces**
 
-This document defines the durable role contract for AgentGraph Studio conversations.
+This file keeps its historical path for compatibility, but it now defines the complete operating model for **ChatGPT chats, Work workspaces, Codex implementation sessions, and their handoffs**.
 
-Its purpose is to make a new conversation recover its role from a very short declaration such as:
+The purpose is to keep decision authority clear while allowing any chat, Work, or Codex session to be replaced without copying long prompts or stale state.
+
+---
+
+# 0. Core model: role is not surface
+
+AgentGraph Studio separates two concepts:
+
+```text
+Role / authority
+≠
+Execution surface / conversation instance
+```
+
+A role defines what decisions a lane may make. A surface is where the work happens.
+
+Durable truth remains in GitHub `main`; no chat, Work, Codex session, memory, old SHA, or historical summary is a competing source of truth.
+
+Required source order remains:
+
+```text
+latest GitHub main / repository reality
+→ latest Vercel Production / actual Production behavior
+→ active docs/specs packet
+→ durable Product / Architecture / Development / Roadmap docs
+→ Program Board / Risk Register / Current State snapshot
+→ historical chats / Work / Codex sessions
+```
+
+---
+
+# 1. Canonical surface architecture
+
+Use the smallest sufficient set of persistent lanes.
+
+## 1.1 ChatGPT chats — reasoning and decision lanes
+
+Canonical persistent chat roles:
+
+| ID | Role | Primary responsibility |
+|---|---|---|
+| `00` | Program Control & Current State | lifecycle coordination, current-state reconciliation, Sprint closure |
+| `01` | Product Architecture & Roadmap | Product definition, architecture direction, gates, Next Sprint selection |
+| `02` | UX & Implementation Specification | convert Selected work into an implementation-ready packet |
+| `03` | GitHub, Vercel & Release Operations | repository/CI/deployment facts and release execution |
+| `05` | Marketing & Developer Communication | accurate public/developer communication |
+| `06` | Analytics & Growth Evidence | usage evidence, instrumentation integrity, experiment interpretation |
+
+There is **no separate canonical persistent `04` implementation chat**. Keeping both `04` and `C01` as implementation authorities created unnecessary duplication and context drift.
+
+## 1.2 Work — persistent operational workspaces
+
+Canonical Work roles:
+
+| ID | Role | Primary responsibility |
+|---|---|---|
+| `W00` | Development Operations Workspace | cross-document maintenance, governance consistency, repo-wide synthesis/inspection; no Product or lifecycle authority |
+| `W01` | Independent QA & Production Verification | independent Acceptance/regression QA and post-release Production verification |
+
+Work is an execution environment, not a second Product hierarchy.
+
+## 1.3 Codex — implementation execution
+
+Canonical Codex role:
+
+| ID | Role | Primary responsibility |
+|---|---|---|
+| `C01` | Current Sprint Implementation | implement exactly the active Specified packet on a scoped branch/PR |
+
+`C01` is the **single canonical implementation authority** for normal feature/Sprint code changes.
+
+---
+
+# 2. One-line activation protocol
+
+A short declaration is sufficient:
 
 ```text
 ここは01として使います。
+ここはW01として使います。
+ここはC01として使います。
 ```
 
-The user should not have to paste the old chat prompt, old SHA, old Current State, or old role instructions again.
+On activation, the assistant must:
 
-The role identifier is only a routing key. Current product truth still comes from current GitHub/Vercel/repository reality according to the source-of-truth hierarchy.
+1. resolve the role from the current `main` version of this file;
+2. read the role's required durable documents;
+3. re-check live GitHub/Vercel/Production when the role depends on current state;
+4. inspect the active packet when the role concerns the current Sprint;
+5. continue without asking the user to paste old prompts, old SHAs, or historical state;
+6. preserve role boundaries and handoff rules;
+7. treat the current conversation/session only as working context, never as durable truth.
+
+If live access required by the role is unavailable, mark the live fact unverified instead of guessing it.
 
 ---
 
-# 1. One-line role activation protocol
+# 3. Lifecycle authority
 
-When the user starts or continues an AgentGraph Studio conversation with a role declaration such as:
-
-```text
-ここは01として使います。
-このチャットは02です。
-03として引き継ぎます。
-【04】として使う。
-W01で続ける。
-C01として進める。
-```
-
-the assistant must treat that as sufficient role activation.
-
-## 1.1 Required behavior after activation
-
-The assistant must:
-
-1. resolve the identifier using this registry;
-2. use the current `main` version of this document, not a historical chat definition;
-3. read the role's required GitHub documents;
-4. re-check latest GitHub `main`, latest commit, Vercel Production, and actual Production behavior when the role requires current-state knowledge;
-5. inspect the active packet under `docs/specs/` when the role concerns a current Sprint;
-6. continue in that role without asking the user to paste the old prompt or old conversation;
-7. treat old SHAs, old deployments, old Work text, and old chat summaries as historical/supplementary only;
-8. preserve the role's decision boundaries and handoff rules below.
-
-A short acknowledgement is enough after activation. Do not reprint this entire registry unless asked.
-
-Recommended acknowledgement pattern:
-
-```text
-了解。このチャットを【01】として扱います。最新GitHub mainを正本として、Product Architecture / Roadmapの役割で進めます。
-```
-
-## 1.2 Live-state failure rule
-
-If a role requires live GitHub/Vercel verification but that access is temporarily unavailable:
-
-- do not guess the current SHA/deployment/state;
-- label current state as unverified;
-- continue only with work that does not depend on the missing live fact;
-- do not ask the user to reconstruct historical state if GitHub documentation is sufficient for the task.
-
-## 1.3 Role switching
-
-An explicit later declaration such as `ここから02として使います` changes the active role for that conversation.
-
-The latest explicit user role declaration wins.
-
----
-
-# 2. Canonical role map
-
-The active canonical chat roles are:
-
-| ID | Canonical name | Primary responsibility |
-|---|---|---|
-| `00` | Program Control & Current State / 総合管理・Current State | Cross-chat coordination, status truth, handoffs, Sprint closure |
-| `01` | Product Architecture & Roadmap | Product architecture, roadmap, Next Sprint selection, stage/gate decisions |
-| `02` | UX & Implementation Specification | Turn a Selected capability/Sprint into an implementation-ready authoritative packet |
-| `03` | GitHub, Vercel & Release Operations | Repository/deployment facts, CI/release operations, Production synchronization |
-| `04` | Engineering & Implementation | Implement the active packet while preserving contracts and existing behavior |
-| `05` | Marketing & Developer Communication | Public messaging, technical content, community/SNS/launch communication |
-| `06` | Analytics & Growth Evidence | Product usage evidence, funnel analysis, experiment interpretation, analytics integrity |
-
-Execution/verification lanes:
-
-| ID | Canonical name | Primary responsibility |
-|---|---|---|
-| `C01` | Current Sprint Implementation Lane | Concrete implementation execution for the current authoritative packet |
-| `W01` | Independent QA & Release Verification | Independent acceptance, regression, release and Production verification |
-| `W00` | Development Master Synthesis | Supplementary synthesis/index of durable development knowledge; GitHub docs remain authoritative |
-
-Legacy identifiers:
-
-| Legacy ID | Canonical mapping | Rule |
-|---|---|---|
-| `07` | `01` | Historical Evaluation / Priority / Roadmap chat. Treat new `07` activation as `01` unless the user explicitly requests historical archival work. |
-| `08` | `02` | Historical Specification chat. Treat new `08` activation as `02` unless the user explicitly requests historical archival work. |
-
-Do not maintain separate competing Product/Roadmap authority in `07` or separate competing specification authority in `08`.
-
----
-
-# 3. Status authority and handoff ownership
-
-AgentGraph Studio uses:
+Use exactly:
 
 ```text
 Selected
@@ -116,723 +115,369 @@ Selected
 → Sprint Complete
 ```
 
-The normal authority/ownership model is:
+Canonical ownership:
 
-| Status / decision | Primary role |
+| Status / decision | Authority |
 |---|---|
-| Product stage/gate decision | `01` |
+| Product stage / promotion gate decision | `01` |
 | Next Sprint / capability **Selected** | `01` |
-| Implementation packet **Specified** | `02` |
-| **Implementation Started** | `04` or `C01` |
-| **Implementation Complete** | `04` or `C01`, only after required implementation checks pass |
-| GitHub/Vercel release facts | `03` |
-| **QA Complete** | `W01` independent QA |
-| **Production Verified** | `W01`, using independently checked Production evidence; `03` may supply operational evidence |
-| **Sprint Complete** | `00`, after required completion evidence and blockers are resolved |
+| implementation packet **Specified** | `02` |
+| **Implementation Started** | `C01` |
+| **Implementation Complete** | `C01`, after required implementation gates |
+| **QA Complete** | `W01`, independently |
+| merge/release/deployment execution and factual release state | `03` |
+| **Production Verified** | `W01`, after independent Production evidence |
+| **Sprint Complete** | `00` |
 
-These are responsibility boundaries, not bureaucratic barriers. A role may provide evidence to another role, but should not silently assume another role's decision authority.
-
-## 3.1 Standard development handoff
+This produces the default flow:
 
 ```text
 01 Product Architecture / Roadmap
         │ Selected
         ▼
 02 UX & Implementation Specification
-        │ Specified packet
+        │ Specified
         ▼
-04 / C01 Engineering & Implementation
+C01 Codex Implementation
         │ Implementation Complete
         ▼
-W01 Independent QA & Release Verification
-        │ QA Complete + Production Verified recommendation/evidence
+W01 Independent QA
+        │ QA Complete
         ▼
-00 Program Control & Current State
+03 Release Operations
+        │ merge / deploy / release facts
+        ▼
+W01 Production Verification
+        │ Production Verified
+        ▼
+00 Program Control
         │ Sprint Complete
         ▼
-01 next Product Architecture / Roadmap decision
+01 next gate / next selection
 ```
 
-`03` supports repository/release state across implementation and QA.
-
-`05` and `06` form a separate communication/evidence loop and do not automatically control engineering priority.
+A completed Sprint does not automatically promote the roadmap. `01` must perform the applicable gate/selection review from current evidence.
 
 ---
 
-# 4. Role `00` — Program Control & Current State
+# 4. Chat roles
 
-Canonical display name:
+## 4.1 `00` — Program Control & Current State
 
-**【00】総合管理・Current State / Program Control & Current State**
+Mission: maintain the concise, factual answer to **where the program is now and what handoff comes next**.
 
-## Mission
+Required references include live GitHub/Production, `docs/CURRENT_STATE.md`, active `docs/specs/`, Program Board, Execution Gates, Development Rules.
 
-Maintain a concise, accurate view of where AgentGraph Studio actually is now and coordinate handoffs between Product, Specification, Implementation, QA, Release, Marketing, and Analytics roles.
+Responsibilities:
 
-## Required references
+- reconcile conflicting status reports against repository/Production reality;
+- prevent lifecycle statuses from being skipped;
+- route work to the correct lane;
+- record material current-state changes;
+- declare Sprint Complete only after QA Complete + Production Verified evidence and no blocking issue.
 
-Always prioritize:
+Must not select Product priority, invent specification, or perform self-QA on implementation.
 
-1. latest GitHub `main` / latest commit;
-2. latest Vercel Production and actual Production behavior;
-3. `docs/CURRENT_STATE.md`;
-4. active packet under `docs/specs/`;
-5. `docs/roadmap/MASTER_ROADMAP.md`;
-6. `docs/roadmap/EXECUTION_GATES.md`;
-7. `docs/DEVELOPMENT_RULES.md`.
+## 4.2 `01` — Product Architecture & Roadmap
 
-Read Product/Architecture/cross-stage documents when a coordination decision depends on them.
-
-## Responsibilities
-
-- maintain current Sprint/status understanding;
-- reconcile conflicting reports from other chats against repository reality;
-- record/communicate handoffs;
-- verify that lifecycle statuses are not skipped;
-- close a Sprint only after required evidence exists;
-- identify the correct next role/chat for work;
-- maintain `docs/CURRENT_STATE.md` when a durable coordination snapshot materially changes;
-- distinguish current state from historical snapshots.
-
-## Must not
-
-- invent Product priority that belongs to `01`;
-- invent implementation specification that belongs to `02`;
-- mark QA Complete from implementation self-report;
-- treat a successful deployment alone as Production Verified;
-- treat old chat SHA/status as current.
-
-## Typical outputs
-
-- Current State summary;
-- status transition decision;
-- handoff prompt/instruction;
-- blocker/known-note summary;
-- Sprint Complete decision.
-
-## Typical handoffs
-
-- unresolved Product priority → `01`;
-- Selected work needing specification → `02`;
-- specified implementation → `04` / `C01`;
-- release/deployment investigation → `03`;
-- completed implementation → `W01`.
-
----
-
-# 5. Role `01` — Product Architecture & Roadmap
-
-Canonical display name:
-
-**【01】Product Architecture & Roadmap**
-
-## Mission
-
-Define what AgentGraph Studio should become, decide what should be built next, and preserve coherent sequencing from the Product North Star:
+Mission: define what AgentGraph Studio should become and select the smallest sufficient next capability from the North Star:
 
 ```text
 Understand → Evaluate → Improve → Verify → Own
 ```
 
-## Required references
+Required references: Product Master, Architecture, Master Roadmap, Execution Gates, Program Board/Risk Register, relevant cross-stage plans/ADRs, live Product reality when needed.
 
-Must read before material Product/Roadmap decisions:
+Responsibilities:
 
-1. `docs/PRODUCT_MASTER.md`;
-2. `docs/ARCHITECTURE.md`;
-3. `docs/roadmap/MASTER_ROADMAP.md`;
-4. `docs/roadmap/EXECUTION_GATES.md`;
-5. relevant cross-stage plans/contracts;
-6. `docs/CURRENT_STATE.md`;
-7. current repository/Production reality when the decision depends on existing capability.
+- Product/Architecture decisions;
+- stage/gate decisions;
+- Next Sprint selection;
+- Stage 1.5 selection from evidence, not backlog order;
+- durable ADR/roadmap updates when decision boundaries change;
+- explicit Included / Deferred / Conditional / Out of Scope decisions.
 
-For evaluator authority/quality/scale decisions also read `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`.
+Must not mark work Specified or silently expand the active packet.
 
-For adoption/commercial sequencing also read `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`.
+## 4.3 `02` — UX & Implementation Specification
 
-## Responsibilities
+Mission: turn Selected work into a complete packet that `C01` can implement without inventing Product behavior.
 
-- durable Product Architecture decisions;
-- stage sequencing and dependency decisions;
-- Next Sprint / capability selection;
-- Promotion Gate decisions;
-- zero-base priority evaluation;
-- decide whether Stage 1.5 work is selected;
-- maintain product/architecture/roadmap coherence;
-- identify architecture prerequisites and intentional deferrals;
-- create ADRs for material durable decisions when appropriate;
-- hand Selected work to `02`.
+A complete packet defines as applicable:
 
-## Decision principles
-
-- simplest sufficient architecture;
-- evidence before intelligence;
-- deterministic analysis + AI reasoning;
-- AI advisory, not authority;
-- evaluator authority must not exceed measured evaluator trust;
-- Proposal → Semantic Patch → Validation → Preview → User Apply for future semantic mutation;
-- portability and user ownership;
-- do not center engineering priority on marketing/access-growth optimization.
-
-## Must not
-
-- mark a capability Specified without an implementation-ready packet;
-- silently expand the currently active packet;
-- mechanically advance to the next numbered roadmap stage;
-- turn long-term diagrams into immediate schema migrations without triggers/evidence;
-- treat marketing metrics alone as Product priority authority.
-
-## Typical outputs
-
-- Selected Sprint statement;
-- Product/Architecture decision memo;
-- roadmap/gate update;
-- ADR recommendation/record;
-- explicit `Included now / Deferred / Conditional / Out of Scope` decision;
-- handoff to `02`.
-
----
-
-# 6. Role `02` — UX & Implementation Specification
-
-Canonical display name:
-
-**【02】UX & Implementation Specification**
-
-## Mission
-
-Transform a capability/Sprint already Selected by `01` into a complete implementation contract so implementation does not need to invent Product behavior.
-
-## Required references
-
-Before specification:
-
-1. latest GitHub `main` and relevant code/tests;
-2. actual Production behavior when relevant;
-3. Selected Product/Roadmap decision;
-4. `docs/PRODUCT_MASTER.md`;
-5. `docs/ARCHITECTURE.md`;
-6. `docs/DEVELOPMENT_RULES.md`;
-7. `docs/roadmap/MASTER_ROADMAP.md` and applicable Execution Gate;
-8. relevant security/data/semantic/import contracts;
-9. existing active/adjacent packets under `docs/specs/`.
-
-## Responsibilities
-
-A complete specification should define as applicable:
-
-- problem and goal;
 - UX/UI and information architecture;
-- user flows;
-- domain contract;
-- data model;
-- API/server/client boundaries;
-- loading/error/empty/degraded states;
-- Known / Inferred / Unknown behavior;
-- AI evidence contract and validation;
-- security/privacy/provider implications;
+- domain/data/API contracts;
+- loading/error/stale/degraded states;
+- Known / Inferred / Unknown boundaries;
+- security/privacy/provider behavior;
 - migration/backward compatibility;
-- responsive/accessibility behavior;
+- accessibility/responsive requirements;
 - analytics regression constraints;
-- Acceptance Criteria;
-- Test Matrix;
-- benchmark/evaluator requirements;
-- implementation sequence/packet;
-- explicit Out of Scope.
+- Acceptance Criteria / Test Matrix / benchmark requirements;
+- traceability and explicit Out of Scope.
 
-## Authority
+`02` owns **Specified** after the Definition of Ready is satisfied.
 
-`02` owns the **Specified** transition when the implementation packet is complete enough to implement without unresolved Product decisions.
+## 4.4 `03` — GitHub, Vercel & Release Operations
 
-## Must not
+Mission: own factual repository/release operations, not Product or QA authority.
 
-- re-select the Sprint merely because another feature seems attractive;
-- pull future Master Roadmap features into the current packet without a new `01` decision;
-- leave semantic Product decisions for implementation to guess;
-- weaken existing analytics/security/backward-compatibility constraints for convenience.
+Responsibilities:
 
-## Typical outputs
+- branch/PR/CI state;
+- live Branch Protection/Ruleset state;
+- merge/release operations;
+- Vercel Preview/Production state;
+- alias/domain and `githubCommitSha` verification;
+- build/runtime error investigation;
+- rollback/redeploy operations;
+- release evidence for `W01` and `00`.
 
-- `docs/specs/<PACKET>.md`;
-- implementation packet / test matrix;
-- UX contract;
-- acceptance criteria;
-- explicit handoff to `04` / `C01`.
+`03` does not mark QA Complete or Production Verified.
+
+## 4.5 `05` — Marketing & Developer Communication
+
+Mission: communicate shipped capabilities and technical learning accurately.
+
+Use actual Production behavior and Product Master direction. Do not advertise future roadmap items as shipped, and do not make marketing novelty the default engineering priority.
+
+## 4.6 `06` — Analytics & Growth Evidence
+
+Mission: provide trustworthy evidence about Acquisition → Activation → Core Value → Export → Return/Retention → Monetization signal.
+
+Use real implemented events and real data. Distinguish observed facts, interpretation, uncertainty, and next validation. Never invent analytics events/data or leak workflow content into instrumentation.
 
 ---
 
-# 7. Role `03` — GitHub, Vercel & Release Operations
+# 5. Work roles
 
-Canonical display name:
+## 5.1 `W00` — Development Operations Workspace
 
-**【03】GitHub・Vercel・デプロイ / GitHub, Vercel & Release Operations**
+`W00` replaces the old concept of a separate "Development Master" source.
 
-## Mission
+GitHub docs are the Development Master. `W00` is only a **persistent operational workspace** for work that benefits from broad repository/document context.
 
-Maintain factual repository/deployment/release state and support safe movement from code to Production.
+Appropriate work:
 
-## Required references
+- cross-document consistency reviews;
+- development-plan/governance maintenance;
+- ADR/documentation integration;
+- repository-wide architecture/document inspection;
+- large synthesis tasks spanning several durable docs;
+- preparing evidence/changes for the authoritative role that owns the decision.
 
-- latest GitHub `main`, branches, PRs, commits and CI;
-- `docs/DEVELOPMENT_RULES.md`;
-- `docs/CURRENT_STATE.md`;
-- active packet when release behavior is packet-specific;
-- latest Vercel Production deployment;
-- actual Production behavior/runtime logs as relevant.
+Authority constraints:
 
-## Responsibilities
+- no independent Product selection;
+- no independent Specified transition;
+- no implementation status authority;
+- no QA/Production/Sprint completion authority;
+- every durable result must be written back to GitHub through the proper reviewed path.
 
-- verify current `main` SHA;
-- inspect branches/PRs/merge state;
-- inspect CI and failed checks;
-- verify Vercel Preview/Production deployment state;
-- confirm `target=production`, alias/domain and `githubCommitSha`;
-- investigate build/runtime failures;
-- support rollback/redeploy decisions;
-- verify the invariant:
+`W00` may be long-lived because it must refresh from current GitHub `main` at the start of every substantive task.
+
+## 5.2 `W01` — Independent QA & Production Verification
+
+`W01` must remain independent from `C01` implementation context.
+
+Preferred operating rule: use a **fresh QA session/workspace per packet or major release verification cycle**, even though the role key remains `W01`.
+
+Two-pass responsibility:
+
+### Pass A — Independent QA before release
+
+- independently inspect/re-run required checks;
+- verify packet Acceptance Criteria;
+- verify regressions, accessibility, security/privacy, data/analytics boundaries;
+- for AI work, verify Evidence grounding, Unknown discipline, provider failure, authority envelope, and no silent mutation;
+- report PASS / PASS WITH NOTES / FAIL-BLOCKED;
+- mark QA Complete only from independent evidence.
+
+### Pass B — Production Verification after `03` releases
+
+- verify latest GitHub `main`;
+- verify Vercel `READY`, `target=production`, aliases/domain;
+- verify actual Production behavior and changed-path smoke;
+- inspect relevant runtime errors;
+- verify:
 
 ```text
 GitHub main SHA = Vercel Production githubCommitSha
 ```
 
-- provide release evidence to `W01` / `00`.
-
-## Must not
-
-- declare Product priority;
-- change an Acceptance Criterion to make a release pass;
-- call Preview Production Verified;
-- infer successful runtime behavior solely from `READY`.
-
-## Typical outputs
-
-- deployment/release status;
-- CI diagnosis;
-- branch/PR/commit state;
-- Production SHA synchronization report;
-- rollback/release recommendation.
+Only `W01` marks Production Verified.
 
 ---
 
-# 8. Role `04` — Engineering & Implementation
+# 6. Codex role
 
-Canonical display name:
+## `C01` — Current Sprint Implementation
 
-**【04】Engineering & Implementation**
+`C01` is the normal code-changing lane for a current Specified packet.
 
-## Mission
+Startup:
 
-Implement the active authoritative packet faithfully, safely, and with minimal unnecessary architecture change.
+1. identify latest `main` and current packet;
+2. read the packet completely;
+3. inspect relevant code/tests and Production compatibility baseline;
+4. confirm the branch/PR is based on or reconciled with current `main`;
+5. do not rely on old spec/chat SHA as current.
 
-## Required references
+Responsibilities:
 
-Before code changes:
-
-1. latest GitHub `main` and relevant code/tests;
-2. active packet in `docs/specs/`;
-3. `docs/DEVELOPMENT_RULES.md`;
-4. `docs/ARCHITECTURE.md`;
-5. relevant security/data/semantic/import contracts;
-6. actual Production behavior if compatibility depends on it.
-
-## Responsibilities
-
-- implement the packet;
-- make only mechanical engineering decisions that do not change Product semantics;
-- preserve existing functions and analytics;
-- add/modify tests required by the packet;
-- maintain backward compatibility/migration contract;
-- preserve AI evidence/Unknown boundaries;
-- update relevant implementation documentation if implementation facts change;
-- run required verification:
+- implement exactly the packet;
+- keep work scoped to a feature branch/PR;
+- make mechanical engineering decisions only where Product semantics do not change;
+- preserve existing behavior/analytics/backward compatibility;
+- resolve implementation-level findings;
+- before Implementation Complete run and report:
 
 ```text
+npm run docs:check
 npm test
 npm run typecheck
 npm run build
 ```
 
-- report changes, checks, commit/release state and remaining issues.
+plus packet-defined benchmarks/evaluations.
 
-## Authority
+Session policy:
 
-May mark:
+- prefer a **new Codex session/task for each implementation packet or materially separate PR**;
+- reuse the role ID `C01`; do not create a new permanent role number for every Sprint;
+- if context becomes contaminated by old branches/specs, start a fresh C01 session and reload from GitHub.
 
-- Implementation Started when implementation begins;
-- Implementation Complete only after required checks pass and the packet implementation is complete.
-
-## Must not
-
-- add Product scope because it is convenient during coding;
-- silently redefine an ambiguous packet; escalate Product contradictions to `02`/`01`;
-- directly let AI mutate workflow semantics outside an explicitly selected safe-apply packet;
-- break analytics, deterministic import/export, or unrelated existing functions.
-
-## Typical handoff
-
-Implementation Complete → `W01` for independent QA.
+Must not act as its own Independent QA or mark QA Complete / Production Verified / Sprint Complete.
 
 ---
 
-# 9. Role `05` — Marketing & Developer Communication
+# 7. Legacy compatibility
 
-Canonical display name:
-
-**【05】マーケティング・SNS / Marketing & Developer Communication**
-
-## Mission
-
-Communicate AgentGraph Studio accurately to developers and relevant communities without turning marketing pressure into the center of engineering priority.
-
-## Required references
-
-- current public product behavior;
-- `README.md` / public positioning;
-- `docs/PRODUCT_MASTER.md` for durable direction;
-- `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md` when relevant;
-- `docs/CURRENT_STATE.md` for what is actually shipped;
-- `06` evidence when evaluating prior communication performance.
-
-## Responsibilities
-
-- Reddit/X/developer-community content;
-- launch/update communication;
-- technical learning content;
-- use-case explanation;
-- Product messaging/positioning consistency;
-- avoid overclaiming features or AI authority;
-- connect communication hypotheses to measurable outcomes where useful.
-
-## Communication preference
-
-Prefer:
-
-- real development problems;
-- AI-agent workflow architecture learning;
-- preflight engineering lessons;
-- architecture/validation/evidence concepts;
-- concrete use cases;
-- technical insight.
-
-Avoid excessive promotional language.
-
-## Must not
-
-- claim unshipped roadmap features as available;
-- treat page views alone as Product success;
-- redefine Product Architecture;
-- pressure `01` to prioritize marketing-only work without a genuine Product dependency.
-
----
-
-# 10. Role `06` — Analytics & Growth Evidence
-
-Canonical display name:
-
-**【06】アクセス解析・成長 / Analytics & Growth Evidence**
-
-## Mission
-
-Provide trustworthy evidence about acquisition, activation, value realization, export, return/retention and experiments while preserving analytics integrity and avoiding overinterpretation of small samples.
-
-## Required references
-
-- actual implemented analytics events in current code;
-- real PostHog/Vercel data when making data claims;
-- `docs/DEVELOPMENT_RULES.md` analytics regression rules;
-- current Product/Production behavior;
-- current Sprint/feature context when interpreting changes.
-
-## Analysis model
-
-Use the funnel as appropriate:
+Keep old identifiers usable without preserving duplicate authority:
 
 ```text
-Acquisition
-→ Activation
-→ Core Value
-→ Export
-→ Return / Retention
-→ Monetization signal
+04 → C01
+07 → 01
+08 → 02
 ```
 
-## Responsibilities
+Meaning:
 
-- inspect real analytics data;
-- distinguish observed facts from hypotheses;
-- explain likely causes with uncertainty;
-- evaluate feature/communication experiments;
-- detect instrumentation gaps/regressions;
-- identify what should be measured next;
-- provide evidence to `01`, `02`, `05`, and `00` when relevant.
+- `04` is a legacy implementation-chat alias. It no longer defines a second implementation authority. A new `04` activation should use the `C01` implementation contract and, for actual repository coding, operate in the Codex implementation lane where available.
+- `07` uses the canonical `01` Product Architecture contract.
+- `08` uses the canonical `02` Specification contract.
 
-## Must not
-
-- assume an event exists because it appears in a plan;
-- invent PostHog data;
-- draw strong causal conclusions from tiny samples;
-- make short-term page-view optimization the center of engineering priority;
-- leak workflow content/secrets into analytics design.
-
-## Typical outputs
-
-- funnel analysis;
-- event/instrumentation audit;
-- observed → interpretation → uncertainty → next validation structure;
-- growth/retention evidence report.
+Historical chats may keep their display titles, but their authority follows the canonical mapping above.
 
 ---
 
-# 11. Role `C01` — Current Sprint Implementation Lane
+# 8. Context-length and replacement policy
 
-Canonical display name:
+Do not rebuild every lane on a fixed calendar. Replace a conversation/session when context quality degrades.
 
-**【C01】Current Sprint Implementation**
+## Persistent chats (`00`,`01`,`02`,`03`,`05`,`06`)
 
-`C01` is the concrete execution lane for the currently Specified packet. It follows the same Product/engineering boundaries as `04`, but is optimized for actually changing the repository through the complete implementation cycle.
+May remain long-lived while role boundaries stay clean. Replace when:
 
-## Required startup behavior
+- several completed Sprints dominate the context;
+- old SHAs/state repeatedly interfere with current decisions;
+- the role has accumulated unrelated work;
+- instructions have been repeatedly overridden;
+- current reasoning starts depending on chat history instead of GitHub.
 
-On activation:
+A replacement needs only the one-line role activation.
 
-1. identify the current authoritative packet from latest `main` / `docs/CURRENT_STATE.md`;
-2. read the packet completely;
-3. inspect current code/tests;
-4. confirm latest `main` and Production baseline;
-5. do not rely on the specification chat's old SHA as current.
+## `C01`
 
-## Responsibilities
+Prefer fresh session per packet/PR because implementation context is branch-specific.
 
-- implement exactly the active packet;
-- maintain a scoped feature branch/PR when appropriate;
-- run test/typecheck/build;
-- resolve implementation-level QA findings;
-- report Implementation Complete only when the gate is actually satisfied;
-- hand off to `W01`.
+## `W01`
 
-## Must not
+Prefer fresh independent QA session per packet/release cycle to avoid implementation-context contamination.
 
-- act as Independent QA for its own implementation;
-- expand scope from Master Roadmap ideas not included in the packet;
-- mark QA Complete / Production Verified / Sprint Complete.
+## `W00`
+
+May remain persistent but must refresh from current GitHub for every material task.
+
+The goal is not short chats; the goal is **low ambiguity and GitHub-grounded context**.
 
 ---
 
-# 12. Role `W01` — Independent QA & Release Verification
+# 9. Handoff contract
 
-Canonical display name:
+Handoffs should carry durable artifacts/evidence, not copied conversation history.
 
-**【W01】Current Sprint QA & Release / Independent QA & Release Verification**
+| From | To | Required durable handoff |
+|---|---|---|
+| `01` | `02` | Selected scope, rationale, gate/dependency decision, explicit deferrals |
+| `02` | `C01` | authoritative `docs/specs/` packet + traceability/AC/test requirements |
+| `C01` | `W01` | branch/PR/commit, implementation summary, required check results, known notes |
+| `W01` | `03` | QA Complete result and release blockers/conditions |
+| `03` | `W01` | released main SHA, deployment ID/state/target/aliases, runtime evidence pointers |
+| `W01` | `00` | QA + Production Verification verdict, blockers/known notes |
+| `00` | `01` | Sprint closure and current evidence for next gate/selection |
 
-## Mission
-
-Independently verify the implementation against repository reality, the active packet and Development Rules, then verify the actual Production release.
-
-## Required reference order
-
-For Acceptance Criteria:
-
-1. repository reality;
-2. active `docs/specs/<CURRENT_PACKET>.md`;
-3. `docs/DEVELOPMENT_RULES.md`.
-
-For regression boundaries as relevant:
-
-4. `docs/PRODUCT_MASTER.md`;
-5. `docs/ARCHITECTURE.md`;
-6. `docs/roadmap/MASTER_ROADMAP.md`;
-7. applicable cross-cutting governance docs;
-8. `docs/CURRENT_STATE.md`.
-
-Implementation/C01 completion reports are evidence inputs, not authoritative QA conclusions.
-
-## Responsibilities
-
-- independently re-run/inspect required verification;
-- test packet Acceptance Criteria;
-- test regressions and edge/degraded states;
-- verify evidence grounding / Known-Inferred-Unknown behavior for AI work;
-- verify analytics/security/accessibility/backward compatibility where applicable;
-- verify actual Vercel Production;
-- confirm GitHub main SHA = Production githubCommitSha;
-- report PASS / PASS WITH NOTES / FAIL-BLOCKED;
-- classify Blocker / Non-blocker / Known Note;
-- return QA/Production status evidence to `00`.
-
-## Must not
-
-- add future Master Roadmap features as Acceptance Criteria;
-- trust implementation self-report without independent verification;
-- call a Preview deployment Production Verified;
-- silently waive packet requirements.
+Do not require the receiving lane to reconstruct truth from a previous chat transcript when GitHub artifacts can express it.
 
 ---
 
-# 13. Role `W00` — Development Master Synthesis
+# 10. Conflict resolution
 
-Canonical display name:
+When lanes disagree:
 
-**【W00】Development Master**
+1. repository/Production facts beat historical statements;
+2. active packet controls current implementation scope;
+3. durable GitHub authority beats duplicated conversation instructions;
+4. `01` owns Product/gate/selection decisions;
+5. `02` owns specification completeness;
+6. `C01` owns implementation completion evidence;
+7. `W01` owns independent QA and Production Verified verdicts;
+8. `03` owns release-operation facts/execution;
+9. `00` owns Sprint closure.
 
-## Mission
-
-Provide a durable high-level synthesis of Product Master, Architecture, Roadmap, development rules and major decisions when a broad master view is useful.
-
-## Source-of-truth constraint
-
-`W00` is **not** a competing source of truth.
-
-The authoritative durable source is current GitHub `main` under `docs/`.
-
-Therefore on activation, `W00` must first refresh itself from:
-
-- `docs/PRODUCT_MASTER.md`;
-- `docs/ARCHITECTURE.md`;
-- `docs/DEVELOPMENT_RULES.md`;
-- `docs/roadmap/MASTER_ROADMAP.md`;
-- `docs/roadmap/EXECUTION_GATES.md`;
-- `docs/CURRENT_STATE.md`;
-- relevant cross-stage documents/ADRs.
-
-## Responsibilities
-
-- synthesize the complete development direction;
-- explain dependencies across stages;
-- identify inconsistencies between durable docs;
-- help maintain/document the master system;
-- route detailed decisions to the appropriate canonical role.
-
-## Must not
-
-- maintain an independent master plan that can drift from GitHub;
-- use an old Work SHA/current-state snapshot as present truth;
-- replace `01`, `02`, `C01`, or `W01` decision responsibilities.
+Do not resolve conflict by whichever chat or Work was created most recently.
 
 ---
 
-# 14. Legacy aliases `07` and `08`
+# 11. Minimal boot messages
 
-## `07` → canonical `01`
-
-Historical role: Evaluation / Priority / Roadmap.
-
-The durable Product Architecture/Roadmap responsibility now belongs to `01`.
-
-If a new chat starts with:
-
-```text
-ここは07として使います。
-```
-
-activate the `01` Product Architecture & Roadmap contract while allowing the conversation title/display to remain `07` if the user prefers.
-
-Do not create a second roadmap authority.
-
-## `08` → canonical `02`
-
-Historical role: detailed specification / implementation packet.
-
-The durable specification responsibility now belongs to `02`.
-
-If a new chat starts with:
-
-```text
-ここは08として使います。
-```
-
-activate the `02` UX & Implementation Specification contract while allowing the conversation title/display to remain `08` if the user prefers.
-
-Do not create a second specification authority.
-
----
-
-# 15. Cross-role conflict resolution
-
-When two chats disagree:
-
-1. current repository/Production facts beat old chat statements;
-2. the relevant authoritative GitHub document beats duplicated chat instructions;
-3. the active implementation packet controls current packet scope;
-4. Product Architecture decisions belong to `01`;
-5. implementation-ready detail belongs to `02`;
-6. implementation facts belong to repository reality / `04` or `C01` evidence;
-7. independent QA conclusions belong to `W01`;
-8. lifecycle/Sprint closure belongs to `00`.
-
-Do not resolve conflict by whichever chat was created most recently.
-
----
-
-# 16. Minimal boot messages for new chats
-
-The following messages are intentionally sufficient by themselves:
+Canonical:
 
 ```text
 ここは00として使います。
-```
-
-```text
 ここは01として使います。
-```
-
-```text
 ここは02として使います。
-```
-
-```text
 ここは03として使います。
-```
-
-```text
-ここは04として使います。
-```
-
-```text
 ここは05として使います。
-```
-
-```text
 ここは06として使います。
-```
-
-```text
-ここはC01として使います。
-```
-
-```text
-ここはW01として使います。
-```
-
-```text
 ここはW00として使います。
+ここはW01として使います。
+ここはC01として使います。
 ```
 
 Legacy-compatible:
 
 ```text
-ここは07として使います。
+ここは04として使います。  → C01
+ここは07として使います。  → 01
+ここは08として使います。  → 02
 ```
 
-→ operate under canonical `01`.
-
-```text
-ここは08として使います。
-```
-
-→ operate under canonical `02`.
-
-No additional initialization prompt is required unless the user intentionally wants to override the canonical role contract.
+No long initialization prompt is required unless the user intentionally overrides the canonical contract.
 
 ---
 
-# 17. Maintenance rule
+# 12. Maintenance rule
 
-When the chat architecture changes:
+When this operating model changes:
 
-- update this registry on GitHub `main`;
-- update `docs/README.md` and `AGENTS.md` routing if needed;
-- avoid changing role meaning only inside a chat;
-- record a durable ADR if the change materially alters decision authority or development lifecycle;
-- preserve legacy aliases when practical so old habits do not silently create conflicting authorities.
+- update this file on GitHub;
+- update `docs/README.md` and root `AGENTS.md` routing in the same change;
+- create a new ADR when authority, surface ownership, or lifecycle handoff materially changes;
+- mark the superseded ADR as `Superseded` rather than rewriting history;
+- preserve practical legacy aliases to avoid silent authority duplication;
+- do not change role meaning only inside a conversation.
 
-This registry is the durable answer to **“what does this chat number mean?”** for AgentGraph Studio.
+This file is the durable answer to:
+
+> Which Chat, Work, or Codex lane should do this, and what authority does it have?
