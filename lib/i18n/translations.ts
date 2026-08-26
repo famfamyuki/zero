@@ -4,7 +4,7 @@ export const translations = {
   en: {
     // Header
     appName: 'AgentGraph Studio',
-    zeroCostBadge: '100% Free Tool',
+    zeroCostBadge: 'Free Core',
     subTitle: 'Preflight Engineering for CrewAI • Visual Design • Deterministic Python Export',
     loadPreset: 'Load Presets',
     presetWorkflows: 'Preset Workflows',
@@ -287,7 +287,7 @@ export const translations = {
   ja: {
     // Header
     appName: 'AgentGraph Studio',
-    zeroCostBadge: 'コスト完全ゼロ',
+    zeroCostBadge: '無料コア機能',
     subTitle: 'CrewAI向けPreflight Engineering • ビジュアル設計 • Pythonコード出力',
     loadPreset: 'プリセット読込',
     presetWorkflows: 'プリセットワークフロー',

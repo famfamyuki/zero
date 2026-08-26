@@ -96,8 +96,8 @@ test('UPR acceptance: tabs, ARIA, and responsive shell remain hardened without J
 });
 
 test('UPR acceptance: analytics taxonomy, emission boundaries, and privacy are exact', () => {
-  assert.equal(ANALYTICS_EVENTS.length, 20);
-  assert.deepEqual(ANALYTICS_EVENTS.slice(-3), [
+  assert.equal(ANALYTICS_EVENTS.length, 24);
+  assert.deepEqual(ANALYTICS_EVENTS.slice(17, 20), [
     'architecture_review_requested',
     'architecture_review_completed',
     'architecture_review_failed',

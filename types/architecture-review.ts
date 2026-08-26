@@ -42,7 +42,11 @@ export interface ArchitectureReviewEvidenceBundleV0 {
 }
 
 export type ArchitectureFindingClass = 'Deterministic' | 'Heuristic' | 'External-dependent';
-export type ArchitectureReviewErrorCode = 'invalid_request' | 'unsupported_contract_version' | 'invalid_evidence' | 'input_too_large' | 'review_unavailable' | 'rate_limited' | 'provider_timeout' | 'provider_error' | 'invalid_reviewer_output';
+export type ArchitectureReviewErrorCode = 'invalid_request' | 'unsupported_contract_version' | 'invalid_evidence' | 'input_too_large' | 'review_unavailable' | 'rate_limited' | 'provider_timeout' | 'provider_error' | 'invalid_reviewer_output'
+  | 'authentication_required' | 'paid_entitlement_required' | 'billing_inactive' | 'entitlement_unavailable'
+  | 'quota_exhausted' | 'review_in_progress' | 'review_already_completed' | 'review_attempt_closed'
+  | 'idempotency_key_required' | 'invalid_idempotency_key' | 'request_cost_limit_exceeded'
+  | 'accounting_unavailable' | 'review_disabled';
 export type ArchitectureReviewLocale = 'en' | 'ja';
 
 export interface ArchitectureReviewerDraftV0 {
