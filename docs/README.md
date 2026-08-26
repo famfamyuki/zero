@@ -1,14 +1,14 @@
 # AgentGraph Studio Development Documentation
 
-This directory is the shared durable development knowledge base for ChatGPT chats, Work, Codex, and human contributors.
+This directory is the shared durable development knowledge base for Chat, Work, Codex, and human contributors.
 
 ## Read first
 
 1. [`PRODUCT_MASTER.md`](./PRODUCT_MASTER.md) — final product definition, North Star, durable product principles
 2. [`ARCHITECTURE.md`](./ARCHITECTURE.md) — long-term architecture boundaries and evolution
-3. [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) — implementation, QA, Git, analytics regression, and release gates
+3. [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) — implementation, QA, Git, regression, and release gates
 4. [`ENGINEERING_EXECUTION_GOVERNANCE.md`](./ENGINEERING_EXECUTION_GOVERNANCE.md) — Definition of Ready, version lifecycle, traceability, operational-quality maturity, repository/docs enforcement
-5. [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) — authoritative Chat / Work / Codex operating model, role authority, lifecycle ownership, aliases, reset policy, handoffs
+5. [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) — authoritative development operating model for Chat / Work / Codex
 6. [`roadmap/MASTER_ROADMAP.md`](./roadmap/MASTER_ROADMAP.md) — authoritative stage sequencing and dependency logic
 7. [`roadmap/EXECUTION_GATES.md`](./roadmap/EXECUTION_GATES.md) — stage promotion, evaluator authority, Stage 1.5 selection, safe-transformation/mutation gates
 8. [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md) — near-term capability/gate/blocker coordination
@@ -38,79 +38,52 @@ latest GitHub main / repository reality
 → relevant cross-stage plans/contracts
 → Program Board / Risk Register
 → Current State snapshot
-→ historical chats / Work / Codex / old SHAs
+→ historical Chat / Work / Codex / old SHAs
 ```
 
 Durable Product/Architecture/Roadmap documents do not automatically expand an active packet.
 
 ---
 
-# Chat / Work / Codex operating model
+# Development operating model
 
-The canonical model is defined in [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) and ADR-0004 under [`decisions/`](./decisions/).
+The canonical model is defined in [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) and `ADR-0005-minimal-development-only-operating-model.md` under [`decisions/`](./decisions/).
 
-The key distinction is:
+The current project is in **development-only focus mode**. The permanent operating model is intentionally limited to five lanes.
 
-```text
-Role / authority
-≠
-Execution surface / conversation instance
-```
-
-Use:
+## Canonical lanes
 
 ```text
-Chat  = reasoning / decision / coordination
-Work  = persistent operational workspace / independent verification
-Codex = packet-bound repository implementation
-GitHub main = durable truth
-```
-
-## Canonical Chat roles
-
-```text
+Chat:
 00  Program Control & Current State
 01  Product Architecture & Roadmap
 02  UX & Implementation Specification
-03  GitHub, Vercel & Release Operations
-05  Marketing & Developer Communication
-06  Analytics & Growth Evidence
-```
 
-`04` is no longer a separate canonical persistent implementation chat.
+Codex:
+C01 Current Sprint Implementation
 
-## Canonical Work roles
-
-```text
-W00 Development Operations Workspace
+Work:
 W01 Independent QA & Production Verification
 ```
 
-`W00` is not a competing Development Master. GitHub docs are the Development Master/source of truth.
-
-## Canonical Codex role
+Core separation:
 
 ```text
-C01 Current Sprint Implementation
+GitHub main = durable truth
+Chat        = Product / specification / coordination reasoning
+Codex       = packet-bound repository implementation
+Work        = independent verification when independence matters
 ```
 
-`C01` is the single normal implementation authority for a current Specified packet.
+There is no permanent canonical `03`, `04`, `05`, `06`, or `W00` during development-only focus mode.
 
-## Legacy aliases
+This does **not** remove those activities from possibility. It means they do not justify permanent independent lanes now.
 
-```text
-04 → C01
-07 → 01
-08 → 02
-```
-
-A new/replacement surface needs only a short declaration such as:
-
-```text
-ここは01として使います。
-```
-
-The assistant must recover current role meaning from GitHub rather than asking for an old prompt.
+- release execution is a C01 lifecycle step after W01 pre-release QA;
+- pure release/current-state coordination is handled by 00;
+- Production verification remains independently owned by W01;
+- cross-document Work tasks may be performed under 00/01/02 authority without creating W00;
+- Marketing/SNS/Analytics/Growth tasks are temporary/noncanonical until explicitly reintroduced.
 
 ## Lifecycle / handoff
 
@@ -118,30 +91,47 @@ The assistant must recover current role meaning from GitHub rather than asking f
 01 Selected
 → 02 Specified
 → C01 Implementation Started / Implementation Complete
-→ W01 Independent QA / QA Complete
-→ 03 merge + release operations
+→ W01 independent QA / QA Complete
+→ C01 merge + release exact QA-approved revision
 → W01 Production Verified
 → 00 Sprint Complete
-→ 01 next gate / next selection
+→ 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
 Important boundaries:
 
 - implementation self-test is not Independent QA;
-- release execution is not the Production Verified verdict;
-- a completed Sprint does not automatically promote the roadmap;
-- Marketing/Analytics evidence may inform decisions but does not automatically own Product priority.
+- release execution is not Production Verified;
+- if code/behavior changes after QA Complete, return to W01 before release;
+- a completed Sprint does not automatically promote the roadmap.
+
+## Why W00 is not permanent
+
+Work is a surface/capability, not automatically an authority.
+
+When 00/01/02 need broad repository/document work, they may use Work mode while retaining the same role authority. GitHub docs are the durable Development Master, so a permanent W00 role is redundant.
 
 ## Context-length / replacement policy
 
 Do not recreate every surface on a fixed schedule.
 
-- `00/01/02/03/05/06`: may stay long-lived while role boundaries remain clean;
-- `C01`: prefer a fresh Codex session/task per packet or materially separate PR;
-- `W01`: prefer a fresh independent QA workspace/session per packet/release cycle;
-- `W00`: may stay persistent but must refresh from latest GitHub on every substantive task.
+- `00`, `01`, `02`: may remain long-lived while role boundaries stay clean;
+- `C01`: prefer a fresh Codex task per packet or materially separate PR;
+- `W01`: prefer a fresh independent Work session per packet/release cycle.
 
-Replace a long-lived conversation when old Sprints/SHAs or unrelated work start interfering with current decisions. One-line activation is enough to recover the role.
+Replace a long-lived chat when stale Sprints/SHAs, unrelated work, or repeated instruction overrides interfere with GitHub-grounded reasoning.
+
+A new/replacement role needs only:
+
+```text
+ここは00として使います。
+ここは01として使います。
+ここは02として使います。
+ここはC01として使います。
+ここはW01として使います。
+```
+
+The assistant must recover role meaning from current GitHub `main`, not old prompts.
 
 ---
 
