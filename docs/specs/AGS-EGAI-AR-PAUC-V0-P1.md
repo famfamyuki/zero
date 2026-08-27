@@ -376,6 +376,15 @@ and updates `types/database.ts` to match.
 
 No workflow schema/document migration occurs.
 
+Repository migration history must also be sufficient to bootstrap the pre-existing
+`templates` and `purchases` contracts on an empty Supabase project. Their baseline
+migration preserves the typed database contract: public read-only template access,
+service-role-only purchase access, `templates.id` as the template identity, and
+`purchases.stripe_session_id` as the Stripe webhook idempotency key. If either table
+already exists, the migration must validate required columns, types, nullability, and
+primary-key identity and fail explicitly on incompatible drift; it must not hide drift
+behind `create table if not exists` or rewrite existing rows.
+
 ## PAUC-R16 — Required tables
 
 ### `billing_customers`

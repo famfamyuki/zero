@@ -87,6 +87,24 @@ test('migration provides additive RLS tables, atomic quota, one-in-flight, stale
   assert.doesNotMatch(sql, /workflow_json|evidence_payload|prompt_text|provider_response|customer_email/);
 });
 
+test('template purchase baseline bootstraps fresh databases and rejects incompatible legacy schemas', () => {
+  const sql = readFileSync('supabase/migrations/20260827180000_template_purchase_schema_baseline.sql', 'utf8');
+  assert.match(sql, /to_regclass\('public\.templates'\) is null[\s\S]*create table public\.templates/);
+  assert.match(sql, /to_regclass\('public\.purchases'\) is null[\s\S]*create table public\.purchases/);
+  assert.doesNotMatch(sql, /create table if not exists public\.(templates|purchases)/);
+  for (const column of ['title_en', 'title_ja', 'description_en', 'description_ja', 'preview_nodes_count', 'graph_data', 'stripe_session_id', 'template_id', 'amount', 'customer_email', 'created_at']) {
+    assert.match(sql, new RegExp(`'${column}'`));
+  }
+  assert.match(sql, /template\/purchase schema is incompatible/);
+  assert.match(sql, /templates\.id must be the primary key/);
+  assert.match(sql, /purchases\.stripe_session_id must be the primary key/);
+  assert.equal((sql.match(/enable row level security/g) ?? []).length, 2);
+  assert.match(sql, /grant select on public\.templates to anon, authenticated/);
+  assert.match(sql, /create policy templates_public_read[\s\S]*for select to anon, authenticated[\s\S]*using \(true\)/);
+  assert.doesNotMatch(sql, /grant (?:select|insert|update|delete|all).*public\.purchases to (?:anon|authenticated)/);
+  assert.match(sql, /grant select, insert, update, delete on public\.purchases to service_role/);
+});
+
 test('billing refresh uses a shared atomic database rate limit and fails closed', () => {
   const sql = readFileSync('supabase/migrations/20260827120000_architecture_review_paid_access_qa_fixes.sql', 'utf8');
   const route = readFileSync('app/api/billing/architecture-review/refresh/route.ts', 'utf8');
