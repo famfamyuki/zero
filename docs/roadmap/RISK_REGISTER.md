@@ -48,6 +48,7 @@ Risk severity reflects potential program impact, not certainty.
 | R-019 | Paid plan unit economics degrade because provider/failure/high-usage costs exceed the planned envelope | High | WATCH | Successful or failed review cost distributions, high-workflow-size usage, payment/infrastructure cost, or model/provider drift makes representative or high-usage contribution unacceptable | Rebaseline cost; adjust request guard/model/quota/price; do not use average cost alone; keep provider budget/kill switch active |
 | R-020 | Billing, entitlement, and quota lifecycle diverge and cause incorrect paid access or credit accounting | Critical | WATCH | Stripe state, entitlement read model, quota period/reset, cancellation/past-due behavior, reservation recovery, or idempotency disagree under retries/concurrency/degraded sync | Paid-access packet must define authoritative state transitions, reconciliation, idempotency, failure recovery, and Independent QA; fail closed where entitlement is uncertain without corrupting deterministic free features |
 | R-021 | Public paid launch is technically functional but commercially/operationally incomplete | High | WATCH | Missing commercial-use hosting eligibility, unclear cancellation/refund/payment-failure behavior, missing billing support path, unresolved tax/terms/privacy/provider disclosure, or Production still presents contradictory “100% Free” messaging | Treat as `COMMERCIAL_BLOCKER` for public paid launch; satisfy the minimum Commercial Operations launch gate in `MONETIZATION_ARCHITECTURE.md` without expanding into speculative enterprise scope |
+| R-022 | Required provider-backed evaluation cannot complete within the available development API budget | High | ACTIVE | A required live benchmark or exact-candidate QA run is interrupted by `credit_balance_exhausted`, or repeated evaluator tuning consumes the available budget before a complete release-gate result exists | Do not lower or bypass evaluation gates; use fake reviewers and bounded 1–3 fixture smoke during development; budget full runs only for mature candidates; hold the affected AI release when funding is unavailable; allow separately selected API-independent work to proceed without declaring the blocked Sprint complete |
 
 ---
 
@@ -63,6 +64,7 @@ Risk severity reflects potential program impact, not certainty.
 | Migration/versioning | Semantic Model Evolution, Engineering Execution Governance |
 | Import | Import/Workspace Contract, Security/Data review triggers |
 | Provider/API operations | Security & Reliability, Data & AI Governance, ADR-0006 |
+| Provider evaluation budget / evidence continuity | Program Board blocker model, active packet evaluation gate, Engineering Execution Governance |
 | Paid value / pricing / unit economics / paid expansion | Commercial Validation Gate M0, Monetization Architecture, ADR-0007 |
 | Billing lifecycle / commercial operations | Paid Access & Usage Control packet, ADR-0006, ADR-0007, Monetization Architecture |
 | Repository/release | Development Rules, Engineering Execution Governance |
