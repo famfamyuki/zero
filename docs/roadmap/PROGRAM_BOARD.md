@@ -29,20 +29,27 @@ Understand
 → Own
 ```
 
-Near-term sequencing remains:
+Near-term sequencing currently has one held provider-backed track and one separately selected deterministic foundation track:
 
 ```text
-Stage 1 Architecture Review
-+ Paid Access & Usage Control release prerequisite
-→ Stage 1 Production evidence
+Stage 1 Architecture Review + Paid Access & Usage Control
+= held / QA incomplete while required evaluator evidence cannot be completed
+├→ when evaluation budget returns: resume bounded evaluator hardening → exact-candidate W01 QA → release lifecycle
+└→ independently selected Stage 1.5 foundation: CrewAI Static Import v0
+    → 02 specification
+    → separate C01 implementation / W01 QA / release lifecycle
+
+Stage 1 Production evidence, when eventually available
 ├→ Gate A Evaluation Trust & Scale
 └→ M0 Commercial Validation when sufficient paid evidence exists
-→ smallest justified Stage 1.5 foundation work
+→ smallest further justified Stage 1.5 foundation work, if any
 → Gate B scoped authority decision
 → Stage 2 Guided Improvement only inside an approved authority envelope
 → Gate C safe transformation readiness
 → Stage 3 transformation only inside an approved mutation scope
 ```
+
+Selecting CrewAI Static Import v0 does not declare Stage 1 complete, pass Gate A, or expand AI/mutation authority.
 
 M0 is a commercial evidence gate, not an AI-authority gate. It does not block clearly justified evaluator safety/quality work while commercial evidence is still immature.
 
@@ -54,14 +61,13 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 |---|---|---|---|---|
 | Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; **FAIL-BLOCKED / QA incomplete** | Reliable structured evaluator output plus paid access/cost control | Active packet requires 30 live runs, zero hard violations, >= 90% semantic rubric, exact-candidate Independent QA, and Production verification | Keep unreleased; resume bounded evaluator hardening only when evaluation budget is available, then produce a new candidate and repeat full W01 Pass A |
 | Architecture Review Paid Access & Usage Control v0 | Specified release prerequisite; database/access/billing controls substantially QA-verified but overall QA cannot complete while the coupled evaluator gate fails | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, coupled Stage 1 evaluator trust | Exact-candidate packet AC/test matrix and W01 Pass A remain mandatory; behavior-changing evaluator fixes invalidate prior candidate approval | Preserve verified migration/access evidence, but do not merge/release until the coupled evaluator fix passes and the new exact revision completes full W01 QA |
-| API-independent next packet selection | **Awaiting 01 selection; no capability selected yet** | A Product/Architecture dependency that can progress without live provider calls | Latest `main`, relevant gate/trigger evidence, Definition of Ready, explicit active packet | 01 selects at most the smallest coherent API-independent packet; cost avoidance is a delivery constraint, not sufficient Product priority evidence; use a separate branch/C01 task |
+| CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Selected — awaiting 02 specification** | Current graph/domain model, safe static semantic mapping, import security boundary | `ADR-0009`, `IMPORT_WORKSPACE_CONTRACT`, R-007/R-006, Definition of Ready, explicit supported-source/mapping/diagnostics/test contract | 02 specifies the smallest implementation-ready packet; no arbitrary code execution, no silent loss, no Graph V2, no AI/mutation authority expansion; use a separate C01 branch/task from held evaluator WIP |
 | Commercial Validation Gate M0 | Planned evidence gate after paid Production usage exists | Paid Access & Usage Control Production Verified; privacy-safe commercial measurement; real paid usage | `MONETIZATION_ARCHITECTURE.md`: value/WTP evidence, repeat-use behavior, quota utilization, provider-cost distributions, contribution cases, cancellation/refund/support signals | Do not treat the initial subscription model as commercially validated until M0 has sufficient evidence; use the result to adjust price/quota or identify one concrete repeat-value dependency |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
 | Search / Locate / Scoped Evidence | Candidate after Stage 1 | Review usability or scale bottleneck | Gate A evidence or M0/product evidence showing navigation/scope is a concrete dependency | Select minimal addressable navigation foundation |
 | Persisted Intent & Constraints | Stage 1.5 candidate | Evaluation ambiguity / proposal context | Ambiguity evidence and Scenario/Acceptance contract alignment; commercial evidence may strengthen priority if missing context materially harms paid usefulness | Select when missing declared context materially limits review/proposal quality |
 | Scenario / Acceptance Contract | Cross-stage foundation | Intent/context and later behavioral verification | `architecture/SCENARIO_ACCEPTANCE_CONTRACT.md` | Introduce only through a selected packet that defines persistence/UX scope |
-| CrewAI static import | Stage 1.5 candidate | Safe static semantic mapping | Mapping feasibility, diagnostics quality, import security review; adoption/commercial evidence that redraw/re-entry blocks first value | Select when import materially improves access to first value |
 | Project / Local Workspace | Stage 1.5 candidate | Repeat-use / identity / revision needs | Persistence/data governance and identity contract; evidence that durable project identity is a repeat-use dependency | Select when repeat use, revision identity, or multi-workflow ownership requires durable local/project context |
 | Revision / Evaluation History | Stage 1.5 candidate | Review Delta / proposal provenance | Revision identity and persistence contract; evidence that inability to compare/revisit reviews limits repeat value | Select before features that require durable historical comparison and when evidence justifies the persistence foundation |
 | Guided Improvement | Planned | Gate B | Scoped evaluator authority approval | Do not select as a blanket AI-authority expansion |
@@ -88,7 +94,16 @@ Commercial evidence can strengthen a selection only when it identifies a concret
 | Revision / Evaluation History | Review Delta, proposal provenance, stale detection, safe transformation, or measured repeat-value friction needs persistent ancestry/history | A history screen would be convenient or seems easy to monetize |
 | Evaluation Scale foundation | Quality, latency, failure rate, or truncation risk materially worsens by measured size/topology | A fixed node-count threshold has been guessed |
 
-Selection should identify the **smallest coherent packet** that resolves the measured dependency.
+Current selection result:
+
+```text
+Static CrewAI import trigger = satisfied for the selected v0 direction
+Decision = FOUNDATION_FIRST
+Selected packet = CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics
+Next authority = 02
+```
+
+The selection is grounded in access-to-first-value and architectural reuse, not merely in avoiding API cost.
 
 ---
 
@@ -128,7 +143,7 @@ Owner lane: C01 for implementation/self-evaluation, W01 for exact-candidate inde
 Re-check condition: evaluation budget is available and a complete 30-run result can be collected without quota interruption.
 ```
 
-This blocker does not authorize skipping Stage 1 gates. It also does not block 01 from selecting a separate deterministic/API-independent packet when that packet independently satisfies selection and readiness requirements.
+This blocker does not authorize skipping Stage 1 gates. It also does not block the separately Selected deterministic CrewAI Static Import v0 packet because that packet has its own Product/Architecture rationale and does not depend on live provider calls or stronger AI authority.
 
 ---
 
@@ -146,6 +161,7 @@ Rules:
 - every authority-expanding capability must trace to an Execution Gate decision
 - every data/security-sensitive capability must trace to the applicable governance review
 - paid access/pricing/quota/commercial-launch requirements must trace to `ADR-0006`, `ADR-0007`, and `MONETIZATION_ARCHITECTURE.md` where applicable
+- static-import requirements must trace to `ADR-0009`, `IMPORT_WORKSPACE_CONTRACT`, and relevant R-006/R-007 boundaries
 - every Scenario/Acceptance requirement implemented must trace to an explicit test or documented future-verification limitation
 - do not create a repository-wide heavy requirements-management system unless scale justifies it
 

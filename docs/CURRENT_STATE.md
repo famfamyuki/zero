@@ -53,7 +53,7 @@ Cross-stage execution/governance is defined in:
 
 ---
 
-# 2. Current selected major milestone
+# 2. Current selected work
 
 ## Stage 1 — Evidence-Grounded AI Architecture Review v0
 
@@ -125,6 +125,48 @@ Paid Access implemented / Production Verified
 
 The initial paid offering remains a commercial-validation phase until Commercial Validation Gate M0 has sufficient real evidence for a scoped decision.
 
+## API-independent Stage 1.5 foundation — CrewAI Static Import v0
+
+Product Architecture decision:
+
+- **Selected:** `CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics`
+- durable decision: `docs/decisions/ADR-0009-select-crewai-static-import-v0.md`
+- decision class: `FOUNDATION_FIRST`
+- next authority: **02 — UX & Implementation Specification**
+
+Product objective:
+
+> A user with a supported existing CrewAI project can reach AgentGraph Studio's current deterministic design/Preflight value without manually rebuilding the workflow first.
+
+Required architecture direction:
+
+```text
+Supported existing CrewAI source
+→ safe static parse
+→ source facts
+→ semantic mapping
+→ mapping diagnostics / provenance
+→ existing GraphData / GraphDocumentV1-compatible projection
+→ existing deterministic validation / Unified Preflight / export
+```
+
+Selection boundaries:
+
+- no arbitrary imported Python execution;
+- no silent lossy conversion;
+- dynamic/unsupported semantics remain Unknown/inferred/lossy/unsupported as appropriate;
+- no speculative Graph/Workflow V2;
+- no Project/Local Workspace persistence in this packet;
+- no source write-back/synchronization;
+- no generic/multi-framework import;
+- no Architecture Review/evaluator dependency;
+- no AI authority expansion;
+- no mutation authority expansion.
+
+This packet is selected because it lowers first-value friction and reuses the current deterministic architecture. The absence of provider API cost is a delivery constraint, not the Product-priority justification by itself.
+
+The packet is **Selected, not Specified**. 02 must define the supported-source contract, mapping/diagnostic semantics, security/data boundaries, UX, compatibility/migration behavior, Acceptance Criteria, tests/fixtures, accessibility/responsive expectations, analytics regression constraints, and Production verification requirements before C01 implementation begins.
+
 ---
 
 # 3. Current Stage 1 product intent
@@ -153,6 +195,8 @@ Current v0 also intentionally defers later work including:
 - collaboration
 - marketplace
 - broader Stage 1.5 Import/Workspace/History foundation unless separately selected
+
+CrewAI Static Import v0 is now separately Selected under its own deterministic/API-independent Product/Architecture rationale. That selection does not expand or alter the Stage 1 packet.
 
 Commercial planning does not change these Stage 1 scope boundaries.
 
@@ -191,7 +235,7 @@ Normal Production verification still requires:
 
 ---
 
-# 5. After Stage 1
+# 5. Roadmap / next selection discipline
 
 Do not mechanically select Stage 2 after Stage 1.
 
@@ -201,23 +245,34 @@ Use:
 - `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
 - `docs/roadmap/MONETIZATION_ARCHITECTURE.md` where paid evidence is relevant
 
-Expected evidence flow:
+Expected Stage 1 evidence flow remains:
 
 ```text
 Stage 1 Production evidence
 ├→ Gate A — Evaluation Trust & Scale
 └→ M0 — Commercial Validation when sufficient paid evidence exists
 → select quality / scale / context / repeat-value foundation as justified
-→ Stage 1.5 Adoption & Context Foundation packet(s) where justified
+→ further Stage 1.5 Adoption & Context Foundation packet(s) only where justified
 → Gate B — Evaluator Authority Expansion
 → Stage 2 Guided Improvement only when evidence supports it
 ```
 
 Gate A and M0 answer different questions. M0 must not block independently justified evaluator safety/quality hardening while commercial sample size is insufficient.
 
-Stage 1.5 candidates include CrewAI static import, Project/Local Workspace, persisted Intent & Constraints, Review/Locate improvements, and revision/evaluation-history foundations. These are candidates, not automatically one Sprint or a prebuilt Pro bundle.
+Current Stage 1.5 state:
 
-While the Stage 1 provider-backed release is held for evaluation funding, 01 may select an API-independent foundation packet without declaring Stage 1 complete or promoting AI authority. The selection must identify the smallest coherent Product dependency and may not treat “costs no API money” as sufficient Product evidence by itself.
+```text
+CrewAI Static Import v0 = Selected
+Project / Local Workspace = candidate
+Persisted Intent & Constraints = candidate
+Review / Locate = candidate
+Revision / Evaluation History = candidate
+Scenario / Acceptance persistence = conditional foundation
+```
+
+Do not turn the remaining candidate set into an automatic backlog. After CrewAI Static Import v0 completes, use new evidence and the normal gate/selection process again.
+
+The held Stage 1 provider-backed release and the selected static-import packet are separate lifecycle tracks. Completing the static-import packet does not mark Stage 1 complete or promote AI authority.
 
 ---
 
@@ -236,6 +291,11 @@ Selected
 ```
 
 Roadmap gate/stage promotion and M0 commercial validation are separate Product Architecture decisions from Sprint lifecycle status.
+
+Current explicit lifecycle states:
+
+- Stage 1 Architecture Review / paid release track: **FAIL-BLOCKED / QA incomplete**
+- CrewAI Static Import v0: **Selected**
 
 ---
 
