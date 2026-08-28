@@ -132,7 +132,19 @@ Product Architecture decision:
 - **Selected:** `CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics`
 - durable decision: `docs/decisions/ADR-0009-select-crewai-static-import-v0.md`
 - decision class: `FOUNDATION_FIRST`
-- next authority: **02 — UX & Implementation Specification**
+
+Authoritative implementation packet:
+
+- `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`
+
+Packet document status: **Specified**.
+
+Lifecycle state:
+
+```text
+CrewAI Static Import v0 = Specified
+next authority = C01 — Current Sprint Implementation
+```
 
 Product objective:
 
@@ -150,22 +162,33 @@ Supported existing CrewAI source
 → existing deterministic validation / Unified Preflight / export
 ```
 
-Selection boundaries:
+Specified v0 source boundary:
+
+- one local UTF-8 `.py` workflow-definition source unit;
+- CrewAI direct-constructor static subset only;
+- browser-local syntax parsing/static mapping;
+- supported semantics must map into current `GraphData` / `GraphDocumentV1`;
+- mapping diagnostics use explicit `MAPPED`, `MAPPED_WITH_INFERENCE`, `LOSSY`, `UNKNOWN`, `UNSUPPORTED` states;
+- only presentation-only inference may remain non-blocking;
+- any reachable material `LOSSY`, `UNKNOWN`, or `UNSUPPORTED` mapping blocks Apply;
+- mapping report/provenance is session-scoped and is not added to Graph V1 persistence.
+
+Selection/specification boundaries remain:
 
 - no arbitrary imported Python execution;
 - no silent lossy conversion;
-- dynamic/unsupported semantics remain Unknown/inferred/lossy/unsupported as appropriate;
 - no speculative Graph/Workflow V2;
 - no Project/Local Workspace persistence in this packet;
 - no source write-back/synchronization;
 - no generic/multi-framework import;
+- no CrewAI Flow, decorator/YAML project, archive/repository, or multi-file import in v0;
 - no Architecture Review/evaluator dependency;
 - no AI authority expansion;
 - no mutation authority expansion.
 
-This packet is selected because it lowers first-value friction and reuses the current deterministic architecture. The absence of provider API cost is a delivery constraint, not the Product-priority justification by itself.
+The packet is Specified because the supported-source contract, static parse boundary, semantic mapping, mapping diagnostics, Known/Inferred/Unknown semantics, lossiness/provenance, import security, UX, migration/compatibility, Acceptance Criteria, tests/fixtures, accessibility/responsive behavior, analytics regression boundary, rollback, and Production verification requirements are now explicit.
 
-The packet is **Selected, not Specified**. 02 must define the supported-source contract, mapping/diagnostic semantics, security/data boundaries, UX, compatibility/migration behavior, Acceptance Criteria, tests/fixtures, accessibility/responsive expectations, analytics regression constraints, and Production verification requirements before C01 implementation begins.
+C01 must implement against the packet without broadening source support or inventing Product behavior. Implementation must use a separate task/branch from the held Stage 1 evaluator WIP.
 
 ---
 
@@ -196,7 +219,7 @@ Current v0 also intentionally defers later work including:
 - marketplace
 - broader Stage 1.5 Import/Workspace/History foundation unless separately selected
 
-CrewAI Static Import v0 is now separately Selected under its own deterministic/API-independent Product/Architecture rationale. That selection does not expand or alter the Stage 1 packet.
+CrewAI Static Import v0 is separately Specified under its own deterministic/API-independent Product/Architecture rationale. That specification does not expand or alter the Stage 1 packet.
 
 Commercial planning does not change these Stage 1 scope boundaries.
 
@@ -262,7 +285,7 @@ Gate A and M0 answer different questions. M0 must not block independently justif
 Current Stage 1.5 state:
 
 ```text
-CrewAI Static Import v0 = Selected
+CrewAI Static Import v0 = Specified
 Project / Local Workspace = candidate
 Persisted Intent & Constraints = candidate
 Review / Locate = candidate
@@ -272,7 +295,7 @@ Scenario / Acceptance persistence = conditional foundation
 
 Do not turn the remaining candidate set into an automatic backlog. After CrewAI Static Import v0 completes, use new evidence and the normal gate/selection process again.
 
-The held Stage 1 provider-backed release and the selected static-import packet are separate lifecycle tracks. Completing the static-import packet does not mark Stage 1 complete or promote AI authority.
+The held Stage 1 provider-backed release and the specified static-import packet are separate lifecycle tracks. Completing the static-import packet does not mark Stage 1 complete or promote AI authority.
 
 ---
 
@@ -295,7 +318,7 @@ Roadmap gate/stage promotion and M0 commercial validation are separate Product A
 Current explicit lifecycle states:
 
 - Stage 1 Architecture Review / paid release track: **FAIL-BLOCKED / QA incomplete**
-- CrewAI Static Import v0: **Selected**
+- CrewAI Static Import v0: **Specified — next C01**
 
 ---
 
