@@ -36,7 +36,7 @@ Stage 1 Architecture Review + Paid Access & Usage Control
 = held / QA incomplete while required evaluator evidence cannot be completed
 ├→ when evaluation budget returns: resume bounded evaluator hardening → exact-candidate W01 QA → release lifecycle
 └→ independently selected Stage 1.5 foundation: CrewAI Static Import v0
-    → 02 specification
+    → Specified packet: docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md
     → separate C01 implementation / W01 QA / release lifecycle
 
 Stage 1 Production evidence, when eventually available
@@ -49,7 +49,7 @@ Stage 1 Production evidence, when eventually available
 → Stage 3 transformation only inside an approved mutation scope
 ```
 
-Selecting CrewAI Static Import v0 does not declare Stage 1 complete, pass Gate A, or expand AI/mutation authority.
+Specifying CrewAI Static Import v0 does not declare Stage 1 complete, pass Gate A, or expand AI/mutation authority.
 
 M0 is a commercial evidence gate, not an AI-authority gate. It does not block clearly justified evaluator safety/quality work while commercial evidence is still immature.
 
@@ -61,7 +61,7 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 |---|---|---|---|---|
 | Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; **FAIL-BLOCKED / QA incomplete** | Reliable structured evaluator output plus paid access/cost control | Active packet requires 30 live runs, zero hard violations, >= 90% semantic rubric, exact-candidate Independent QA, and Production verification | Keep unreleased; resume bounded evaluator hardening only when evaluation budget is available, then produce a new candidate and repeat full W01 Pass A |
 | Architecture Review Paid Access & Usage Control v0 | Specified release prerequisite; database/access/billing controls substantially QA-verified but overall QA cannot complete while the coupled evaluator gate fails | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, coupled Stage 1 evaluator trust | Exact-candidate packet AC/test matrix and W01 Pass A remain mandatory; behavior-changing evaluator fixes invalidate prior candidate approval | Preserve verified migration/access evidence, but do not merge/release until the coupled evaluator fix passes and the new exact revision completes full W01 QA |
-| CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Selected — awaiting 02 specification** | Current graph/domain model, safe static semantic mapping, import security boundary | `ADR-0009`, `IMPORT_WORKSPACE_CONTRACT`, R-007/R-006, Definition of Ready, explicit supported-source/mapping/diagnostics/test contract | 02 specifies the smallest implementation-ready packet; no arbitrary code execution, no silent loss, no Graph V2, no AI/mutation authority expansion; use a separate C01 branch/task from held evaluator WIP |
+| CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Specified — ready for separate C01 implementation** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`, current graph/domain model, safe static semantic mapping, import security boundary | Packet AC/test matrix, `ADR-0009`, `IMPORT_WORKSPACE_CONTRACT`, R-007/R-006, exact-candidate Independent QA, Production verification | Start a fresh C01 task/branch from latest `main`; implement only the packet; no arbitrary code execution, no silent loss, no Graph V2, no AI/mutation authority expansion; keep held evaluator WIP separate |
 | Commercial Validation Gate M0 | Planned evidence gate after paid Production usage exists | Paid Access & Usage Control Production Verified; privacy-safe commercial measurement; real paid usage | `MONETIZATION_ARCHITECTURE.md`: value/WTP evidence, repeat-use behavior, quota utilization, provider-cost distributions, contribution cases, cancellation/refund/support signals | Do not treat the initial subscription model as commercially validated until M0 has sufficient evidence; use the result to adjust price/quota or identify one concrete repeat-value dependency |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
@@ -99,8 +99,8 @@ Current selection result:
 ```text
 Static CrewAI import trigger = satisfied for the selected v0 direction
 Decision = FOUNDATION_FIRST
-Selected packet = CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics
-Next authority = 02
+Specified packet = docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md
+Next authority = C01
 ```
 
 The selection is grounded in access-to-first-value and architectural reuse, not merely in avoiding API cost.
@@ -143,7 +143,7 @@ Owner lane: C01 for implementation/self-evaluation, W01 for exact-candidate inde
 Re-check condition: evaluation budget is available and a complete 30-run result can be collected without quota interruption.
 ```
 
-This blocker does not authorize skipping Stage 1 gates. It also does not block the separately Selected deterministic CrewAI Static Import v0 packet because that packet has its own Product/Architecture rationale and does not depend on live provider calls or stronger AI authority.
+This blocker does not authorize skipping Stage 1 gates. It also does not block the separately Specified deterministic CrewAI Static Import v0 packet because that packet has its own Product/Architecture rationale and does not depend on live provider calls or stronger AI authority.
 
 ---
 
