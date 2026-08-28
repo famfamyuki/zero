@@ -15,6 +15,19 @@ const root = fileURLToPath(
 );
 const load = (name: string) => new Uint8Array(readFileSync(`${root}${name}`));
 const run = (name: string) => importCrewAISource(name, load(name));
+const importText = (source: string) =>
+  importCrewAISource("w01-regression.py", new TextEncoder().encode(source));
+const minimalSource = ({
+  llm = 'LLM(model="gpt-4o", temperature=0.1)',
+  agents = 'researcher',
+  agentDefinitions = 'researcher = Agent(role="Researcher", goal="Find facts", backstory="Careful analyst", llm=llm, verbose=True, allow_delegation=False, max_iter=10, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])',
+}: { llm?: string; agents?: string; agentDefinitions?: string } = {}) => `
+from crewai import Agent, Task, Crew, Process, LLM
+llm = ${llm}
+${agentDefinitions}
+task = Task(description="Research", expected_output="Report", agent=${agents.split(',')[0]}, async_execution=False)
+crew = Crew(agents=[${agents}], tasks=[task], process=Process.sequential, verbose=True, memory=False)
+`;
 
 describe("CrewAI Static Import v0", () => {
   test("maps supported fixtures deterministically into current Graph V1", () => {
@@ -114,6 +127,44 @@ describe("CrewAI Static Import v0", () => {
         humanInput: true,
       },
     );
+  });
+  test("W01 regression: omitted LLM temperature is UNKNOWN and blocks Apply", () => {
+    const result = importText(minimalSource({ llm: 'LLM(model="gpt-4o")' }));
+    assert.equal(result.state, "BLOCKED");
+    assert.equal(result.graph, null);
+    assert.ok(result.report.diagnostics.some((d) =>
+      d.code === "SOURCE_VALUE_DYNAMIC" && d.status === "UNKNOWN" && d.blocking && d.details?.field === "temperature"));
+  });
+  test("W01 regression: integer-only max_iter rejects a fractional value while temperature remains numeric", () => {
+    const source = minimalSource({
+      agentDefinitions: 'researcher = Agent(role="Researcher", goal="Find facts", backstory="Careful analyst", llm=llm, verbose=True, allow_delegation=False, max_iter=1.5, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])',
+    });
+    const result = importText(source);
+    assert.equal(result.state, "BLOCKED");
+    assert.ok(result.report.diagnostics.some((d) =>
+      d.code === "SOURCE_VALUE_DYNAMIC" && d.status === "UNKNOWN" && d.blocking && d.details?.field === "max_iter"));
+    assert.equal(result.report.diagnostics.some((d) => d.details?.field === "temperature"), false);
+  });
+  test("W01 regression: Python Unicode escapes are faithfully decoded", () => {
+    const source = minimalSource({
+      agentDefinitions: String.raw`researcher = Agent(role="Researcher\u0020X", goal="Find facts", backstory="Careful analyst", llm=llm, verbose=True, allow_delegation=False, max_iter=10, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])`,
+    });
+    const result = importText(source);
+    assert.equal(result.state, "READY", result.report.diagnostics.filter((d) => d.blocking).map((d) => d.code).join(","));
+    assert.equal(result.graph?.nodes.find((n) => n.type === "agent")?.data.role, "Researcher X");
+  });
+  test("W01 regression: normalized source-symbol ID collisions receive stable suffixes", () => {
+    const definitions = [
+      'Researcher = Agent(role="Upper", goal="Find facts", backstory="Careful analyst", llm=llm, verbose=True, allow_delegation=False, max_iter=10, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])',
+      'researcher = Agent(role="Lower", goal="Find facts", backstory="Careful analyst", llm=llm, verbose=True, allow_delegation=False, max_iter=10, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])',
+    ].join("\n");
+    const source = minimalSource({ agents: "Researcher,researcher", agentDefinitions: definitions });
+    const first = importText(source), second = importText(source);
+    assert.equal(first.state, "READY", first.report.diagnostics.filter((d) => d.blocking).map((d) => d.code).join(","));
+    assert.deepEqual(first, second);
+    assert.deepEqual(first.graph?.nodes.filter((n) => n.type === "agent").map((n) => n.id), ["agent-researcher", "agent-researcher-2"]);
+    assert.ok(first.graph?.edges.some((edge) => edge.source === "agent-researcher" && edge.target === "task-task"));
+    assert.ok(first.report.diagnostics.some((d) => d.source?.symbol === "researcher" && d.target?.nodeId === "agent-researcher-2"));
   });
   test("blocks dynamic, custom, structured, multiple roots, decorator and order conflict", () => {
     const cases: Record<string, string> = {

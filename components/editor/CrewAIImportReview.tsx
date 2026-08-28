@@ -34,13 +34,18 @@ const copy = {
     replace: "Replace workflow",
     disabled: "Apply is unavailable until every material issue is resolved.",
     proposed: "Proposed graph",
+    file: "File",
     mapped: "Mapped",
     inferred: "Inferred",
     lossy: "Lossy",
     unknown: "Unknown",
     unsupported: "Unsupported",
     adapter: "Adapter",
+    mapping: "mapping",
+    ready: "Ready",
+    blocked: "Blocked",
     location: "Source provenance",
+    status: { MAPPED: "Mapped", MAPPED_WITH_INFERENCE: "Inferred", LOSSY: "Lossy", UNKNOWN: "Unknown", UNSUPPORTED: "Unsupported" },
   },
   ja: {
     title: "CrewAI 静的インポート",
@@ -48,23 +53,28 @@ const copy = {
       "キャンバスを変更する前に、対応範囲のマッピングを確認してください。",
     trust: "静的解析のみ — Pythonコードは実行されません",
     subset: "CrewAI Python 直接コンストラクター — 対応サブセット",
-    version: "CrewAIランタイムバージョン: Unknown（未検出）",
+    version: "CrewAIランタイムバージョン: 不明（未検出）",
     provenance:
-      "インポート診断とprovenanceはセッション限定で、このv0ではワークフローに保存されません。",
+      "インポート診断と出典情報はセッション限定で、このv0ではワークフローに保存されません。",
     blocking: "ブロッキング項目",
     info: "警告 / 情報",
     cancel: "キャンセル",
     apply: "インポートを適用",
     replace: "ワークフローを置換",
-    disabled: "すべてのmaterialな問題が解決するまで適用できません。",
+    disabled: "すべての重大な問題が解決するまで適用できません。",
     proposed: "提案グラフ",
-    mapped: "Mapped",
-    inferred: "Inferred",
-    lossy: "Lossy",
-    unknown: "Unknown",
-    unsupported: "Unsupported",
-    adapter: "Adapter",
-    location: "ソースprovenance",
+    file: "ファイル",
+    mapped: "マッピング済み",
+    inferred: "推定",
+    lossy: "欠損あり",
+    unknown: "不明",
+    unsupported: "未対応",
+    adapter: "アダプター",
+    mapping: "マッピング",
+    ready: "準備完了",
+    blocked: "適用不可",
+    location: "ソースの出典情報",
+    status: { MAPPED: "マッピング済み", MAPPED_WITH_INFERENCE: "推定", LOSSY: "欠損あり", UNKNOWN: "不明", UNSUPPORTED: "未対応" },
   },
 };
 
@@ -129,7 +139,7 @@ export function CrewAIImportReview({
           >
             <div className="flex items-start gap-2">
               <span className="mt-0.5 text-[11px] font-bold uppercase text-slate-300">
-                {d.status}
+                {c.status[d.status]}
               </span>
               <code className="min-w-0 break-all text-xs text-slate-200">
                 {d.code}
@@ -161,7 +171,7 @@ export function CrewAIImportReview({
                 {loc.symbol ? ` · ${loc.symbol}` : ""}
                 <br />
                 {result.report.adapterId} {result.report.adapterVersion} ·
-                mapping {result.report.mappingRuleVersion}
+                {c.mapping} {result.report.mappingRuleVersion}
               </div>
             )}
           </li>
@@ -217,7 +227,7 @@ export function CrewAIImportReview({
           </p>
           <dl className="mt-3 grid min-w-0 gap-2 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-slate-500">File</dt>
+              <dt className="text-slate-500">{c.file}</dt>
               <dd
                 className="break-all text-slate-200"
                 title={result.report.sourceFile}
@@ -265,7 +275,7 @@ export function CrewAIImportReview({
             ) : (
               <AlertTriangle className="h-4 w-4" />
             )}
-            {result.state}
+            {result.state === "READY" ? c.ready : c.blocked}
             {result.state === "BLOCKED"
               ? ` — ${blocking.length} ${c.blocking}`
               : ""}

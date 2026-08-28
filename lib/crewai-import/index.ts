@@ -19,6 +19,19 @@ interface Fact { symbol: string; kind: string; kwargs: Map<string, { value: Stat
 const cleanFileName = (name: string) => (name.replace(/\\/g, '/').split('/').pop() || 'workflow.py').replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 180);
 const words = (symbol: string) => symbol.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 const stableId = (type: string, symbol: string) => `${type}-${symbol.toLowerCase().replace(/[^a-z0-9_-]+/g, '-') || 'item'}`;
+function createStableIdAllocator() {
+  const ids = new Map<string, string>(), used = new Set<string>();
+  return (type: string, symbol: string) => {
+    const key = `${type}\u0000${symbol}`;
+    const existing = ids.get(key);
+    if (existing) return existing;
+    const base = stableId(type, symbol);
+    let id = base, suffix = 2;
+    while (used.has(id)) id = `${base}-${suffix++}`;
+    used.add(id); ids.set(key, id);
+    return id;
+  };
+}
 
 export function importCrewAISource(fileName: string, bytes: Uint8Array): CrewAIImportResult {
   const file = cleanFileName(fileName);
@@ -72,6 +85,9 @@ export function importCrewAISource(fileName: string, bytes: Uint8Array): CrewAII
   const agentRefs = requireRefs(crew, 'agents', add), taskRefs = requireRefs(crew, 'tasks', add);
   const process = requireValue(crew, 'process', 'process', add), crewVerbose = requireValue(crew, 'verbose', 'boolean', add), memory = requireValue(crew, 'memory', 'boolean', add);
   const nodes: CustomNode[] = [], edges: Edge[] = [];
+  const idFor = createStableIdAllocator();
+  agentRefs.forEach((ref) => idFor('agent', ref));
+  taskRefs.forEach((ref) => idFor('task', ref));
   const edgeKeys = new Set<string>();
   const addEdge = (sourceId: string, targetId: string, node: SyntaxNode, symbol: string) => {
     const key = `${sourceId}->${targetId}`;
@@ -86,9 +102,9 @@ export function importCrewAISource(fileName: string, bytes: Uint8Array): CrewAII
   const agentAllowed = new Set(['role','goal','backstory','llm','verbose','allow_delegation','max_iter','max_rpm','max_execution_time','respect_context_window','cache','tools']);
   agentRefs.forEach((ref, index) => {
     const fact = resolveFact(ref, 'Agent', crew); if (!fact) return; reachable.add(ref); rejectUnknownKwargs(fact, agentAllowed, add);
-    const id = stableId('agent', ref), model = resolveModel(fact, facts, llmRefs, add);
+    const id = idFor('agent', ref), model = resolveModel(fact, facts, llmRefs, add);
     const role = requireValue(fact, 'role', 'string', add), goal = requireValue(fact, 'goal', 'string', add), backstory = requireValue(fact, 'backstory', 'string', add);
-    const verbose = requireValue(fact, 'verbose', 'boolean', add), allowDelegation = requireValue(fact, 'allow_delegation', 'boolean', add), maxIter = requireValue(fact, 'max_iter', 'number', add);
+    const verbose = requireValue(fact, 'verbose', 'boolean', add), allowDelegation = requireValue(fact, 'allow_delegation', 'boolean', add), maxIter = requireInteger(fact, 'max_iter', add);
     const maxRpm = optionalNumber(fact, 'max_rpm', add), maxExecutionTime = optionalNumber(fact, 'max_execution_time', add), respectContextWindow = requireValue(fact, 'respect_context_window', 'boolean', add), cache = requireValue(fact, 'cache', 'boolean', add);
     const data: AgentNodeData = { label: words(ref), role: stringOrEmpty(role), goal: stringOrEmpty(goal), backstory: stringOrEmpty(backstory), model: model || '', verbose: boolOrFalse(verbose), allowDelegation: boolOrFalse(allowDelegation), maxIter: numberOrZero(maxIter), respectContextWindow: boolOrFalse(respectContextWindow), cache: boolOrFalse(cache), ...(maxRpm !== undefined ? { maxRpm } : {}), ...(maxExecutionTime !== undefined ? { maxExecutionTime } : {}) };
     nodes.push({ id, type: 'agent', position: { x: 360, y: 80 + index * 220 }, data });
@@ -99,33 +115,34 @@ export function importCrewAISource(fileName: string, bytes: Uint8Array): CrewAII
   taskRefs.forEach((ref, index) => {
     const fact = resolveFact(ref, 'Task', crew); if (!fact) return; reachable.add(ref); rejectUnknownKwargs(fact, taskAllowed, add);
     if (fact.kwargs.has('output_pydantic') || fact.kwargs.has('output_json')) add('STRUCTURED_OUTPUT_UNSUPPORTED', 'UNSUPPORTED', 'KNOWN', true, fact.node, ref);
-    const id = stableId('task', ref), description = requireValue(fact, 'description', 'string', add), expected = requireValue(fact, 'expected_output', 'string', add);
+    const id = idFor('task', ref), description = requireValue(fact, 'description', 'string', add), expected = requireValue(fact, 'expected_output', 'string', add);
     const asyncExecution = requireValue(fact, 'async_execution', 'boolean', add);
-    const agent = optionalRef(fact, 'agent', add), assignedAgentId = agent ? stableId('agent', agent) : undefined;
+    const agent = optionalRef(fact, 'agent', add), assignedAgentId = agent ? idFor('agent', agent) : undefined;
     if (agent && !agentRefs.includes(agent)) add('SOURCE_REFERENCE_UNRESOLVED', 'UNKNOWN', 'UNKNOWN', true, fact.node, ref, undefined, { reference: agent });
     const data: TaskNodeData = { label: words(ref), description: stringOrEmpty(description), expectedOutput: stringOrEmpty(expected), asyncExecution: boolOrFalse(asyncExecution), ...(assignedAgentId ? { assignedAgentId } : {}) };
     for (const [key, field] of [['markdown','markdown'],['human_input','humanInput']] as const) { const value = optionalValue(fact, key, 'boolean', add); if (value?.kind === 'boolean') data[field] = value.value; }
     const output = optionalValue(fact, 'output_file', 'string', add); if (output?.kind === 'string') data.outputFile = output.value;
     nodes.push({ id, type: 'task', position: { x: 700, y: 80 + index * 220 }, data });
     add('MAPPED_PRESENTATION_INFERENCE', 'MAPPED_WITH_INFERENCE', 'INFERRED', false, fact.node, ref, { scope: 'node', nodeId: id, field: 'label' });
-    if (agent) addEdge(stableId('agent', agent), id, fact.node, ref);
+    if (agent) addEdge(idFor('agent', agent), id, fact.node, ref);
     optionalRefs(fact, 'tools', add).forEach((tool) => toolRefs.add(tool));
-    optionalRefs(fact, 'context', add).forEach((prior) => { if (!taskRefs.includes(prior)) add('SOURCE_REFERENCE_UNRESOLVED', 'UNKNOWN', 'UNKNOWN', true, fact.node, ref, undefined, { reference: prior }); else { if (taskRefs.indexOf(prior) >= index) add('TASK_ORDER_CONTEXT_CONFLICT', 'LOSSY', 'KNOWN', true, fact.node, ref); addEdge(stableId('task', prior), id, fact.node, ref); } });
+    optionalRefs(fact, 'context', add).forEach((prior) => { if (!taskRefs.includes(prior)) add('SOURCE_REFERENCE_UNRESOLVED', 'UNKNOWN', 'UNKNOWN', true, fact.node, ref, undefined, { reference: prior }); else { if (taskRefs.indexOf(prior) >= index) add('TASK_ORDER_CONTEXT_CONFLICT', 'LOSSY', 'KNOWN', true, fact.node, ref); addEdge(idFor('task', prior), id, fact.node, ref); } });
   });
   const llmAllowed = new Set(['model','temperature','base_url']);
   llmRefs.forEach((ref) => { const f = resolveFact(ref, 'LLM', crew); if (f) { reachable.add(ref); rejectUnknownKwargs(f, llmAllowed, add); } });
   const toolList = [...toolRefs];
+  toolList.forEach((ref) => idFor('tool', ref));
   toolList.forEach((ref, index) => {
     const fact = facts.get(ref); if (!fact) { add('SOURCE_REFERENCE_UNRESOLVED', 'UNKNOWN', 'UNKNOWN', true, crew.node, crew.symbol, undefined, { reference: ref }); return; }
     reachable.add(ref);
     if (!SUPPORTED_TOOLS.has(fact.kind)) { add(fact.kind === 'CustomTool' ? 'CUSTOM_TOOL_UNSUPPORTED' : 'TOOL_TYPE_UNSUPPORTED', 'UNSUPPORTED', 'KNOWN', true, fact.node, ref); return; }
     const allowed = new Set(TOOL_PARAMETER_DEFINITIONS[fact.kind].map((p) => p.key)); rejectToolKwargs(fact, allowed, add);
     const parameters: Record<string, string> = {}; allowed.forEach((key) => { const value = optionalValue(fact, key, 'string', add); if (value?.kind === 'string') parameters[key] = value.value; });
-    const id = stableId('tool', ref); const data: ToolNodeData = { label: words(ref), toolType: fact.kind as ToolNodeData['toolType'], description: `${fact.kind} imported from ${ref}`, parameters };
+    const id = idFor('tool', ref); const data: ToolNodeData = { label: words(ref), toolType: fact.kind as ToolNodeData['toolType'], description: `${fact.kind} imported from ${ref}`, parameters };
     nodes.push({ id, type: 'tool', position: { x: 20, y: 80 + index * 180 }, data });
     add('MAPPED_PRESENTATION_INFERENCE', 'MAPPED_WITH_INFERENCE', 'INFERRED', false, fact.node, ref, { scope: 'node', nodeId: id, field: 'label' });
-    agentRefs.forEach((owner) => { const f = facts.get(owner); if (f && optionalRefs(f, 'tools', add).includes(ref)) addEdge(id, stableId('agent', owner), f.node, owner); });
-    taskRefs.forEach((owner) => { const f = facts.get(owner); if (f && optionalRefs(f, 'tools', add).includes(ref)) addEdge(id, stableId('task', owner), f.node, owner); });
+    agentRefs.forEach((owner) => { const f = facts.get(owner); if (f && optionalRefs(f, 'tools', add).includes(ref)) addEdge(id, idFor('agent', owner), f.node, owner); });
+    taskRefs.forEach((owner) => { const f = facts.get(owner); if (f && optionalRefs(f, 'tools', add).includes(ref)) addEdge(id, idFor('task', owner), f.node, owner); });
   });
   const manager = optionalRef(crew, 'manager_llm', add); let managerLlm: string | undefined;
   if (manager) { llmRefs.add(manager); const managerFact = resolveFact(manager, 'LLM', crew); if (managerFact) managerLlm = resolveLlm(managerFact, add) || undefined; }
@@ -143,7 +160,7 @@ export function importCrewAISource(fileName: string, bytes: Uint8Array): CrewAII
   if (!header) add('MAPPED_PRESENTATION_INFERENCE', 'MAPPED_WITH_INFERENCE', 'INFERRED', false, crew.node, crew.symbol, { scope: 'crew', field: 'name' });
   const graph: GraphData = { nodes, edges, crewConfig: { name: header || words(inferredName), process: process?.kind === 'process' ? process.value : 'sequential', verbose: boolOrFalse(crewVerbose), memory: boolOrFalse(memory), ...(managerLlm ? { managerLlm } : {}) } };
   if (!diagnostics.some((d) => d.blocking)) { const validation = validateGraph(graph.nodes, graph.edges, graph.crewConfig, 'scaffold'); if (!validation.isValid) add('GRAPH_VALIDATION_FAILED', 'UNKNOWN', 'UNKNOWN', true, crew.node, crew.symbol, undefined, { errorCount: validation.errors.length }); }
-  if (!diagnostics.some((d) => d.blocking)) addMappedDiagnostics(crew, agentRefs, taskRefs, toolList, add);
+  if (!diagnostics.some((d) => d.blocking)) addMappedDiagnostics(crew, agentRefs, taskRefs, toolList, idFor, add);
   return finish(graph);
 }
 
@@ -163,18 +180,43 @@ function parseAssignment(node: SyntaxNode, source: string, aliases: Map<string,s
   return {symbol:text(source,lhs),kind,kwargs,node};
 }
 function parseValue(node: SyntaxNode, source:string):StaticValue { const raw=text(source,node); if(node.name==='String'){try{return{kind:'string',value:decodePythonString(raw)}}catch{return{kind:'dynamic'}}} if(node.name==='Boolean')return{kind:'boolean',value:raw==='True'}; if(node.name==='None')return{kind:'none'}; if(node.name==='Number'&&/^-?\d+(?:\.\d+)?$/.test(raw))return{kind:'number',value:Number(raw)}; if(node.name==='VariableName')return{kind:'ref',value:raw}; if(node.name==='ArrayExpression'||node.name==='TupleExpression'){const vals=children(node).filter((n)=>n.name==='VariableName').map((n)=>text(source,n)); return{kind:'refs',value:vals};} if(node.name==='MemberExpression'&&(raw==='Process.sequential'||raw==='Process.hierarchical'))return{kind:'process',value:raw.endsWith('sequential')?'sequential':'hierarchical'}; return{kind:'dynamic'}; }
-function decodePythonString(raw:string){ let s=raw; const prefix=s.match(/^[rRuUbBfF]+/)?.[0]||''; if(prefix.toLowerCase().includes('f'))throw new Error(); s=s.slice(prefix.length); const q=s.startsWith("'''")?"'''":s.startsWith('"""')?'"""':s[0]; const body=s.slice(q.length,-q.length); if(prefix.toLowerCase().includes('r'))return body; return body.replace(/\\n/g,'\n').replace(/\\r/g,'\r').replace(/\\t/g,'\t').replace(/\\(['"\\])/g,'$1'); }
+function decodePythonString(raw:string){
+  let s=raw; const prefix=s.match(/^[rRuUbBfF]+/)?.[0]||'', lower=prefix.toLowerCase();
+  if(lower.includes('f')||lower.includes('b'))throw new Error();
+  s=s.slice(prefix.length); const q=s.startsWith("'''")?"'''":s.startsWith('"""')?'"""':s[0];
+  if((q!=="'"&&q!=='"'&&q!=="'''"&&q!=='"""')||!s.endsWith(q))throw new Error();
+  const body=s.slice(q.length,-q.length); if(lower.includes('r'))return body;
+  let out='';
+  for(let i=0;i<body.length;i++){
+    if(body[i]!=='\\'){out+=body[i];continue;}
+    if(++i>=body.length)throw new Error(); const c=body[i];
+    const simple:Record<string,string>={a:'\x07',b:'\b',f:'\f',n:'\n',r:'\r',t:'\t',v:'\v','\\':'\\',"'":"'",'"':'"'};
+    if(c in simple){out+=simple[c];continue;}
+    if(c==='\n'){continue;} if(c==='\r'&&body[i+1]==='\n'){i++;continue;}
+    if(c==='x'||c==='u'||c==='U'){
+      const width=c==='x'?2:c==='u'?4:8, hex=body.slice(i+1,i+1+width);
+      if(hex.length!==width||!new RegExp(`^[0-9a-fA-F]{${width}}$`).test(hex))throw new Error();
+      const point=Number.parseInt(hex,16); if(point>0x10ffff)throw new Error();
+      out+=String.fromCodePoint(point); i+=width; continue;
+    }
+    if(/[0-7]/.test(c)){const oct=(c+(body.slice(i+1,i+3).match(/^[0-7]{0,2}/)?.[0]||''));out+=String.fromCodePoint(Number.parseInt(oct,8));i+=oct.length-1;continue;}
+    // Named Unicode escapes and unknown escape forms are blocked instead of being silently changed.
+    throw new Error();
+  }
+  return out;
+}
 type Add = (code:CrewAIImportDiagnosticCode,status:CrewAIImportMappingStatus,knowledge:CrewAIImportKnowledge,blocking:boolean,node?:SyntaxNode,symbol?:string,target?:CrewAIImportDiagnostic['target'],details?:CrewAIImportDiagnostic['details'])=>void;
 function rejectUnknownKwargs(f:Fact,allowed:Set<string>,add:Add){f.kwargs.forEach((_,key)=>{if(!allowed.has(key))add('SOURCE_SEMANTIC_LOSSY','LOSSY','KNOWN',true,f.node,f.symbol,undefined,{keyword:key});});}
 function rejectToolKwargs(f:Fact,allowed:Set<string>,add:Add){f.kwargs.forEach((_,key)=>{if(!allowed.has(key))add('TOOL_PARAMETER_UNSUPPORTED','LOSSY','KNOWN',true,f.node,f.symbol,undefined,{keyword:key});});}
 function requireValue(f:Fact,key:string,kind:StaticValue['kind'],add:Add){const item=f.kwargs.get(key);if(!item){add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,f.node,f.symbol,undefined,{field:key});return undefined;}if(item.value.kind!==kind){add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,item.node,f.symbol,undefined,{field:key});return undefined;}return item.value;}
 function optionalValue(f:Fact,key:string,kind:StaticValue['kind'],add:Add){const item=f.kwargs.get(key);if(!item)return undefined;if(item.value.kind!==kind){add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,item.node,f.symbol,undefined,{field:key});return undefined;}return item.value;}
+function requireInteger(f:Fact,key:string,add:Add){const value=requireValue(f,key,'number',add);if(value?.kind==='number'&&!Number.isInteger(value.value)){add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,f.kwargs.get(key)?.node,f.symbol,undefined,{field:key});return undefined;}return value;}
 function requireRefs(f:Fact,key:string,add:Add){const v=requireValue(f,key,'refs',add);return v?.kind==='refs'?duplicateCheck(v.value,f,key,add):[];}
 function optionalRefs(f:Fact,key:string,add:Add){const v=optionalValue(f,key,'refs',add);return v?.kind==='refs'?duplicateCheck(v.value,f,key,add):[];}
 function duplicateCheck(values:string[],f:Fact,key:string,add:Add){if(new Set(values).size!==values.length)add('DUPLICATE_SOURCE_REFERENCE','LOSSY','KNOWN',true,f.node,f.symbol,undefined,{field:key});return values;}
 function optionalRef(f:Fact,key:string,add:Add){const v=optionalValue(f,key,'ref',add);return v?.kind==='ref'?v.value:undefined;}
 function optionalNumber(f:Fact,key:string,add:Add){const item=f.kwargs.get(key);if(!item||item.value.kind==='none')return undefined;if(item.value.kind!=='number'||!Number.isInteger(item.value.value)){add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,item.node,f.symbol,undefined,{field:key});return undefined;}return item.value.value;}
 function resolveModel(agent:Fact,facts:Map<string,Fact>,refs:Set<string>,add:Add){const item=agent.kwargs.get('llm');if(!item){add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,agent.node,agent.symbol,undefined,{field:'llm'});return undefined;}if(item.value.kind==='string')return item.value.value;if(item.value.kind==='ref'){refs.add(item.value.value);const llm=facts.get(item.value.value);if(!llm||llm.kind!=='LLM'){add('SOURCE_REFERENCE_UNRESOLVED','UNKNOWN','UNKNOWN',true,item.node,agent.symbol,undefined,{reference:item.value.value});return undefined;}return resolveLlm(llm,add);}add('SOURCE_VALUE_DYNAMIC','UNKNOWN','UNKNOWN',true,item.node,agent.symbol,undefined,{field:'llm'});return undefined;}
-function resolveLlm(llm:Fact,add:Add){const allowed=new Set(['model','temperature','base_url']);rejectUnknownKwargs(llm,allowed,add);const model=requireValue(llm,'model','string',add);const temp=optionalValue(llm,'temperature','number',add);if(temp?.kind==='number'&&temp.value!==0.1)add('MODEL_CONFIG_UNREPRESENTABLE','LOSSY','KNOWN',true,llm.node,llm.symbol,undefined,{field:'temperature'});const base=optionalValue(llm,'base_url','string',add);if(base?.kind==='string'&&base.value!=='http://localhost:11434')add('MODEL_CONFIG_UNREPRESENTABLE','LOSSY','KNOWN',true,llm.node,llm.symbol,undefined,{field:'base_url'});return model?.kind==='string'?model.value:undefined;}
+function resolveLlm(llm:Fact,add:Add){const allowed=new Set(['model','temperature','base_url']);rejectUnknownKwargs(llm,allowed,add);const model=requireValue(llm,'model','string',add);const temp=requireValue(llm,'temperature','number',add);if(temp?.kind==='number'&&temp.value!==0.1)add('MODEL_CONFIG_UNREPRESENTABLE','LOSSY','KNOWN',true,llm.node,llm.symbol,undefined,{field:'temperature'});const base=optionalValue(llm,'base_url','string',add);if(base?.kind==='string'&&base.value!=='http://localhost:11434')add('MODEL_CONFIG_UNREPRESENTABLE','LOSSY','KNOWN',true,llm.node,llm.symbol,undefined,{field:'base_url'});return model?.kind==='string'?model.value:undefined;}
 function stringOrEmpty(v:StaticValue|undefined){return v?.kind==='string'?v.value:''} function boolOrFalse(v:StaticValue|undefined){return v?.kind==='boolean'?v.value:false} function numberOrZero(v:StaticValue|undefined){return v?.kind==='number'?v.value:0}
-function addMappedDiagnostics(crew:Fact,agents:string[],tasks:string[],tools:string[],add:Add){add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,crew.symbol,{scope:'crew'});agents.forEach((s)=>add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,s,{scope:'node',nodeId:stableId('agent',s)}));tasks.forEach((s)=>add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,s,{scope:'node',nodeId:stableId('task',s)}));tools.forEach((s)=>add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,s,{scope:'node',nodeId:stableId('tool',s)}));}
+function addMappedDiagnostics(crew:Fact,agents:string[],tasks:string[],tools:string[],idFor:(type:string,symbol:string)=>string,add:Add){add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,crew.symbol,{scope:'crew'});agents.forEach((s)=>add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,s,{scope:'node',nodeId:idFor('agent',s)}));tasks.forEach((s)=>add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,s,{scope:'node',nodeId:idFor('task',s)}));tools.forEach((s)=>add('MAPPED_PRESENTATION_INFERENCE','MAPPED','KNOWN',false,crew.node,s,{scope:'node',nodeId:idFor('tool',s)}));}
