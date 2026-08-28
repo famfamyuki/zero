@@ -9,6 +9,7 @@ import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/
 type AnalyticsProperties = {
   template_selected: { template_id: string; source: 'library' | 'sidebar' };
   json_imported: { source: 'button' | 'drag_drop' };
+  crewai_imported: { adapter_version: '0.1.0'; mapping_quality: 'mapped' | 'mapped_with_presentation_inference' };
   code_generated: never;
   code_downloaded: {
     download_type: 'single_file' | 'all_files';

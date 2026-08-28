@@ -8,6 +8,7 @@ import { Sidebar } from '@/components/editor/Sidebar';
 import { Canvas } from '@/components/editor/Canvas';
 import { Inspector } from '@/components/editor/Inspector';
 import { CodeExportModal } from '@/components/editor/CodeExportModal';
+import { CrewAIImportReview } from '@/components/editor/CrewAIImportReview';
 import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
@@ -16,6 +17,7 @@ import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink, Upload } f
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
 import { deserializeGraph, GraphDeserializationError, serializeGraph } from '@/lib/graph-json';
+import type { CrewAIImportResult } from '@/types/crewai-import';
 import { validateGraph } from '@/lib/transpiler/validation';
 import type { ReadinessFinding } from '@/types/readiness';
 import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
@@ -777,6 +779,10 @@ export default function EditorPage() {
     },
     [edges.length, nodes.length, setNodes, setEdges, t]
   );
+  const [crewAIImportResult, setCrewAIImportResult] = useState<CrewAIImportResult | null>(null);
+  const [isCrewAIImportOpen, setIsCrewAIImportOpen] = useState(false);
+  const mobileCrewAIInputRef = useRef<HTMLInputElement>(null);
+  const crewAIImportRequestRef = useRef(0);
 
   const handleImportJson = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -786,6 +792,37 @@ export default function EditorPage() {
     },
     [importGraphFile]
   );
+
+  const handleImportCrewAI = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    const requestId = ++crewAIImportRequestRef.current;
+    setCrewAIImportResult(null);
+    setIsCrewAIImportOpen(true);
+    // ArrayBuffer is read locally; no source body is logged or transmitted.
+    const { importCrewAISource } = await import('@/lib/crewai-import');
+    const result = importCrewAISource(file.name, new Uint8Array(await file.arrayBuffer()));
+    if (requestId !== crewAIImportRequestRef.current) return;
+    setCrewAIImportResult(result);
+  }, []);
+
+  const closeCrewAIImport = useCallback(() => {
+    setIsCrewAIImportOpen(false);
+    requestAnimationFrame(() => Array.from(document.querySelectorAll<HTMLElement>('[data-crewai-entry]')).find((item) => item.offsetParent !== null)?.focus());
+  }, []);
+
+  const applyCrewAIImport = useCallback(() => {
+    const graph = crewAIImportResult?.graph;
+    if (!graph || crewAIImportResult.state !== 'READY') return;
+    // Confirm against the current graph at Apply time, never the parse-time snapshot.
+    if ((latestNodes.current.length > 0 || latestEdges.current.length > 0) && !window.confirm(lang === 'ja' ? '現在のワークフローをCrewAIインポートで置き換えますか？' : 'Replace the current workflow with this CrewAI import?')) return;
+    setNodes(graph.nodes); setEdges(graph.edges); setCrewConfig(graph.crewConfig); setSelectedNode(null);
+    historyRef.current = [{ nodes: graph.nodes, edges: graph.edges }]; historyIndexRef.current = 0;
+    try { localStorage.setItem(STORAGE_KEY, serializeGraph(graph)); } catch (error) { console.error('Failed to save imported workflow to localStorage:', error instanceof Error ? error.name : 'storage error'); }
+    trackEvent('crewai_imported', { adapter_version: '0.1.0', mapping_quality: crewAIImportResult.report.summary.mappedWithInference > 0 ? 'mapped_with_presentation_inference' : 'mapped' });
+    closeCrewAIImport();
+  }, [closeCrewAIImport, crewAIImportResult, lang, setEdges, setNodes]);
 
   const handleWorkspaceDragEnter = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     if (Array.from(event.dataTransfer.types).includes('Files')) {
@@ -824,6 +861,8 @@ export default function EditorPage() {
         onGenerateCode={handleGenerateCode}
         onExportJson={handleExportJson}
         onImportJson={handleImportJson}
+        onImportCrewAI={handleImportCrewAI}
+        onViewCrewAIReport={crewAIImportResult ? () => setIsCrewAIImportOpen(true) : undefined}
         onClearCanvas={handleClearCanvas}
         onLoadPreset={handleLoadPreset}
         onToggleSettings={() => {
@@ -961,6 +1000,11 @@ export default function EditorPage() {
             <input type="file" accept=".json,application/json" onChange={handleImportJson} className="hidden" />
           </label>
 
+          <button data-crewai-entry type="button" onClick={() => mobileCrewAIInputRef.current?.click()} className="flex min-h-11 cursor-pointer items-center gap-1 rounded-full border border-violet-500/40 bg-slate-800 px-3 text-[11px] font-semibold text-violet-200 transition hover:bg-slate-700 shrink-0" title={t('importCrewAITitle')}>
+            <Upload className="h-3.5 w-3.5 shrink-0" /><span className="shrink-0">{t('importCrewAI')}</span>
+          </button>
+          <input ref={mobileCrewAIInputRef} aria-label={t('importCrewAITitle')} type="file" accept=".py,text/x-python" onChange={handleImportCrewAI} className="sr-only" tabIndex={-1} />
+
           <button
             onClick={handleGenerateCode}
             className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/30 shrink-0"
@@ -1033,6 +1077,8 @@ export default function EditorPage() {
         edges={edges}
         crewConfig={crewConfig}
       />
+      {isCrewAIImportOpen && crewAIImportResult && <CrewAIImportReview result={crewAIImportResult} lang={lang} replacing={nodes.length > 0 || edges.length > 0} onClose={closeCrewAIImport} onApply={applyCrewAIImport} />}
+      {isCrewAIImportOpen && !crewAIImportResult && <div role="status" aria-live="polite" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/85 p-4"><div className="rounded-xl border border-violet-700 bg-slate-900 px-6 py-5 font-semibold text-violet-200">{lang === 'ja' ? 'CrewAIソースを解析中…' : 'Analyzing CrewAI source…'}</div></div>}
     </div>
   );
 }

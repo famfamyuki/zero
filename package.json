@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "docs": "npm run docs:check",
     "start": "next start",
     "docs:check": "node scripts/check-docs.mjs",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@lezer/python": "^1.1.19",
     "@stripe/stripe-js": "^9.12.1",
     "@supabase/supabase-js": "^2.111.0",
     "@types/canvas-confetti": "^1.9.0",
