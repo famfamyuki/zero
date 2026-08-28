@@ -52,8 +52,9 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 
 | Capability / decision | Program state | Primary dependency | Evidence / gate required | Next action |
 |---|---|---|---|---|
-| Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; Production release blocked | Stage 0 deterministic foundation plus paid access/cost control | Active packet AC, implementation checks, Independent QA, paid entitlement/quota prerequisite, Production verification | Keep provider-backed review unreleased until the paid-access packet is implemented and independently verified |
-| Architecture Review Paid Access & Usage Control v0 | **Specified release prerequisite** — `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, provider cost/value evidence for launch config | Packet AC/test matrix, server-side entitlement, hard quota, idempotent accounting, request-cost guard, security/privacy, degraded mode, commercial enablement inputs, Independent QA, Production verification | C01 implements the Specified packet from latest `main`; public paid enablement remains blocked until approved price/quota/cost/legal/hosting/Auth launch inputs and W01 verification |
+| Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; **FAIL-BLOCKED / QA incomplete** | Reliable structured evaluator output plus paid access/cost control | Active packet requires 30 live runs, zero hard violations, >= 90% semantic rubric, exact-candidate Independent QA, and Production verification | Keep unreleased; resume bounded evaluator hardening only when evaluation budget is available, then produce a new candidate and repeat full W01 Pass A |
+| Architecture Review Paid Access & Usage Control v0 | Specified release prerequisite; database/access/billing controls substantially QA-verified but overall QA cannot complete while the coupled evaluator gate fails | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, coupled Stage 1 evaluator trust | Exact-candidate packet AC/test matrix and W01 Pass A remain mandatory; behavior-changing evaluator fixes invalidate prior candidate approval | Preserve verified migration/access evidence, but do not merge/release until the coupled evaluator fix passes and the new exact revision completes full W01 QA |
+| API-independent next packet selection | **Awaiting 01 selection; no capability selected yet** | A Product/Architecture dependency that can progress without live provider calls | Latest `main`, relevant gate/trigger evidence, Definition of Ready, explicit active packet | 01 selects at most the smallest coherent API-independent packet; cost avoidance is a delivery constraint, not sufficient Product priority evidence; use a separate branch/C01 task |
 | Commercial Validation Gate M0 | Planned evidence gate after paid Production usage exists | Paid Access & Usage Control Production Verified; privacy-safe commercial measurement; real paid usage | `MONETIZATION_ARCHITECTURE.md`: value/WTP evidence, repeat-use behavior, quota utilization, provider-cost distributions, contribution cases, cancellation/refund/support signals | Do not treat the initial subscription model as commercially validated until M0 has sufficient evidence; use the result to adjust price/quota or identify one concrete repeat-value dependency |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
@@ -115,6 +116,19 @@ Re-check condition:
 ```
 
 Do not hide blockers inside general notes.
+
+Current Stage 1 blocker:
+
+```text
+Blocker: EVALUATION_BLOCKER — structured evaluator reliability remains below the zero-hard-violation release gate, and the API credit required for another complete live evaluation is currently unavailable.
+Evidence: W01 observed 25/30 structured schema failures; C01 grounding hardening materially improved a later run but still produced 1/30 hard violations, and a subsequent confirmation run stopped satisfying the evaluation contract after credit_balance_exhausted.
+Affected capability/gate: Stage 1 Architecture Review Implementation Complete / W01 QA Complete / provider-backed paid release.
+Smallest safe resolution: retain grounding/schema hardening as blocked WIP; restore bounded evaluation funding; complete the prescribed C01 live evaluation; create a new candidate; repeat full W01 Pass A.
+Owner lane: C01 for implementation/self-evaluation, W01 for exact-candidate independent QA, 00/01 for hold/selection coordination.
+Re-check condition: evaluation budget is available and a complete 30-run result can be collected without quota interruption.
+```
+
+This blocker does not authorize skipping Stage 1 gates. It also does not block 01 from selecting a separate deterministic/API-independent packet when that packet independently satisfies selection and readiness requirements.
 
 ---
 

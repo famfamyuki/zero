@@ -1,6 +1,6 @@
 # AgentGraph Studio — Current State Snapshot
 
-Snapshot date: **2026-08-26**  
+Snapshot date: **2026-08-28**
 This file is a coordination snapshot, **not** a live deployment registry.
 
 ## 0. Live-state rule
@@ -94,7 +94,27 @@ The durable cost/access decision is recorded in `docs/decisions/ADR-0006-paid-ac
 
 The durable commercial-validation decision is recorded in `docs/decisions/ADR-0007-commercial-validation-before-paid-expansion.md` and refined by `docs/roadmap/MONETIZATION_ARCHITECTURE.md`.
 
-Current next lifecycle action for the prerequisite is **C01 implementation against the Specified packet**. Implementation must start from latest `main`; an unmerged specification branch is not durable current state.
+Current implementation/QA work for this prerequisite is **FAIL-BLOCKED / QA incomplete**. Independent QA verified the additive Supabase migration, RLS/permissions, template-purchase regression, paid consume/release behavior, quota exhaustion, Stripe payment-failure recovery, and expired-token fail-closed behavior, but the required 30-run Stage 1 live evaluation did not meet the packet threshold because structured evaluator results were not sufficiently reliable.
+
+C01 has identified Evidence-to-target grounding as the dominant structured-result failure and has local prompt/schema hardening under development. A follow-up live evaluation showed material improvement but did not reach the required zero-hard-violation threshold; a later confirmation run could not complete after the OpenAI API project credit balance was exhausted. These unmerged changes are **blocked WIP**, not an approved candidate, Implementation Complete, or QA Complete revision.
+
+Current hold decision:
+
+- do not merge or release the provider-backed Architecture Review;
+- do not lower the live-evaluation, grounding, or Independent QA gates because evaluation funding is unavailable;
+- preserve the packet branch/WIP for later resumption;
+- allow 01 to select a separate API-independent packet while this Sprint is held, provided selection follows Product value, dependency, gate, and risk evidence rather than cost avoidance alone;
+- implement any newly selected packet on a separate branch/C01 task so the held evaluator work is not mixed with unrelated scope.
+
+Resume condition:
+
+```text
+OpenAI evaluation budget available
+→ C01 completes the packet 30-run evaluation with zero hard violations and >= 90% semantic rubric
+→ new candidate revision
+→ W01 full Pass A on that exact revision
+→ normal merge/release/Production verification lifecycle
+```
 
 Important state distinction:
 
@@ -196,6 +216,8 @@ Stage 1 Production evidence
 Gate A and M0 answer different questions. M0 must not block independently justified evaluator safety/quality hardening while commercial sample size is insufficient.
 
 Stage 1.5 candidates include CrewAI static import, Project/Local Workspace, persisted Intent & Constraints, Review/Locate improvements, and revision/evaluation-history foundations. These are candidates, not automatically one Sprint or a prebuilt Pro bundle.
+
+While the Stage 1 provider-backed release is held for evaluation funding, 01 may select an API-independent foundation packet without declaring Stage 1 complete or promoting AI authority. The selection must identify the smallest coherent Product dependency and may not treat “costs no API money” as sufficient Product evidence by itself.
 
 ---
 
