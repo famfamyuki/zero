@@ -135,6 +135,21 @@ describe("CrewAI Static Import v0", () => {
     assert.ok(result.report.diagnostics.some((d) =>
       d.code === "SOURCE_VALUE_DYNAMIC" && d.status === "UNKNOWN" && d.blocking && d.details?.field === "temperature"));
   });
+  test("W01 regression: Agent llm string cannot bypass explicit LLM temperature", () => {
+    const source = minimalSource({
+      agentDefinitions: 'researcher = Agent(role="R", goal="G", backstory="B", llm="gpt-4o", verbose=True, allow_delegation=False, max_iter=10, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])',
+    });
+    const result = importText(source);
+    assert.equal(result.state, "BLOCKED");
+    assert.equal(result.graph, null);
+    assert.ok(result.report.diagnostics.some((d) =>
+      d.code === "SOURCE_VALUE_DYNAMIC" && d.status === "UNKNOWN" && d.knowledge === "UNKNOWN" && d.blocking && d.details?.field === "llm"));
+  });
+  test("W01 regression: explicit supported LLM configuration remains READY", () => {
+    const result = importText(minimalSource());
+    assert.equal(result.state, "READY", result.report.diagnostics.filter((d) => d.blocking).map((d) => d.code).join(","));
+    assert.equal(result.graph?.nodes.find((n) => n.type === "agent")?.data.model, "gpt-4o");
+  });
   test("W01 regression: integer-only max_iter rejects a fractional value while temperature remains numeric", () => {
     const source = minimalSource({
       agentDefinitions: 'researcher = Agent(role="Researcher", goal="Find facts", backstory="Careful analyst", llm=llm, verbose=True, allow_delegation=False, max_iter=1.5, max_rpm=None, max_execution_time=None, respect_context_window=True, cache=True, tools=[])',
