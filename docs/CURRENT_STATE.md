@@ -60,27 +60,35 @@ Production capability detail belongs in the implementation code and packet; this
 
 | Track | Current state | Authority / packet | Next condition |
 |---|---|---|---|
-| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **FAIL-BLOCKED / QA incomplete** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | Resume only when the evaluation-budget condition in §4 is satisfied |
+| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **FAIL-BLOCKED / QA incomplete** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | Resume only when the existing evaluation-budget re-check condition in §4 becomes true |
 | CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009` | Remains complete; no automatic source/Stage/authority expansion |
-| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`; decision class `HARDEN_FIRST` | 01 performs Evidence → Gate Review → Explicit Next Selection |
+| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`; decision class `HARDEN_FIRST` | Post-completion 01 review is complete; decision = `DEFER`; no new Sprint selected |
 
 Current coordination state:
 
 ```text
-Current next authority
-= 01 — Product Architecture & Roadmap
+01 Evidence → Gate Review → Explicit Next Selection
+= COMPLETE
 
-Current next action
-= Evidence → Gate Review → Explicit Next Selection
+Decision
+= DEFER
 
-Next capability
-= NOT YET SELECTED
+Selected next capability
+= NONE
 
 Newly selected work
-= NONE pending explicit 01 selection
+= NONE
+
+Immediate 02 handoff
+= NONE
+
+Current program mode
+= wait for an explicit resume or evidence trigger
 ```
 
-The held Stage 1 packets remain authoritative for that blocked track; `Newly selected work = NONE` means no additional packet has been selected after the completed UX-hardening Sprint.
+`DEFER` means current evidence does not justify selecting a new Product capability or Sprint. It does not mean project stopped, Stage failed, or development was abandoned.
+
+The held Stage 1 packets remain authoritative for that blocked track. No additional packet has been selected after the completed UX-hardening Sprint.
 
 ---
 
@@ -119,7 +127,7 @@ Why:
 
 ---
 
-# 4. Active blocker and resume condition
+# 4. Active blocker and existing Stage 1 resume condition
 
 Stage 1 remains held because the required provider-backed evaluation evidence is incomplete.
 
@@ -143,6 +151,8 @@ OpenAI evaluation budget available
 → W01 full Pass A on that exact revision
 → normal merge/release/Production verification lifecycle
 ```
+
+This is resumption of the already-held Stage 1 track, not a new Product selection.
 
 Paid-access implementation evidence may be preserved, but:
 
@@ -168,13 +178,16 @@ Detailed Acceptance Criteria, implementation scope, explicit deferrals, regressi
 
 ---
 
-# 6. Known / Unknown relevant to next selection
+# 6. Known / Unknown relevant to the next trigger
 
 ## Known
 
 - the current Production Product identity/review journey hardening is shipped and Production Verified;
 - CrewAI Static Import v0 is shipped and Production Verified;
 - the provider-backed Stage 1 track remains blocked by evaluator evidence/budget;
+- the post-completion 01 review is complete with `Decision = DEFER`;
+- no new capability or Sprint is selected;
+- there is no immediate 02 handoff;
 - no additional Stage 1.5 capability or Stage 2 work is currently Selected;
 - AI Authority and Mutation Authority have not expanded.
 
@@ -188,20 +201,32 @@ Unknown means insufficient evidence, not evidence of absence or lack of demand.
 
 ---
 
-# 7. Next action
+# 7. Next program triggers
 
-Canonical flow now is:
+No new Sprint is selected.
+
+The program moves again through one of two distinct routes:
 
 ```text
-Completed UX hardening Sprint
-→ 00 Sprint Complete
-→ 01 Evidence → Gate Review → Explicit Next Selection
-→ 02 only after a new work item is explicitly Selected
+A. Existing held Stage 1 resume
+
+existing evaluation-budget re-check condition becomes true
+→ resume the existing Stage 1 lifecycle
+→ no new Product-priority selection required
+
+OR
+
+B. New Product / Production evidence
+
+concrete evidence satisfies a remaining selection trigger
+→ 01 Evidence
+→ Gate Review
+→ Explicit Next Selection
 ```
 
-01 must not mechanically select Stage 2 or another Stage 1.5 candidate merely to keep development moving.
+Examples of route-B evidence include a material repeat-use bottleneck from missing durable workflow identity, inability to compare prior evaluations, finding-to-target navigation friction, materially missing evaluation context, or scale/topology-driven quality/navigation degradation. These are trigger examples, not currently Selected capabilities.
 
-The held Stage 1 track remains independently resumable only when its existing evaluation-budget re-check condition is satisfied; resuming that held track is not a new Product-priority decision.
+A candidate appearing in the roadmap is not itself selection evidence.
 
 ---
 
@@ -216,6 +241,12 @@ Canonical lanes remain exactly:
 C01 — Current Sprint Implementation
 W01 — Independent QA & Production Verification
 ```
+
+There is currently no automatic handoff to `02` or `C01`.
+
+When route A becomes true, the existing held Stage 1 track may resume through its existing lifecycle owner sequence.
+
+When route B becomes true, return to `01` for a new explicit Product/roadmap decision.
 
 Lifecycle ownership remains:
 
