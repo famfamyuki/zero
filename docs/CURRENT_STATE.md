@@ -21,7 +21,8 @@ This file intentionally emphasizes the current milestone/status/next gate rather
 
 Current Production foundation includes:
 
-- Visual Workflow Builder
+- Product identity / review journey organized around `Overview | Design | Preflight`
+- Visual Workflow Builder as the Design surface
 - workflow templates
 - JSON import/export portability
 - deterministic CrewAI Python export
@@ -211,32 +212,49 @@ The completed implementation remains bounded by the specified source contract, s
 
 Completion of this packet does not broaden source support, create Graph V2, or expand AI/mutation authority.
 
-## Current API-independent UX hardening — Existing-Capability Product Identity & Review Journey UX Restructuring
+## Completed API-independent UX hardening — Existing-Capability Product Identity & Review Journey UX Restructuring
 
-Product Architecture / specification state:
+Product Architecture / implementation contract:
 
 ```text
 Selected work = Existing-Capability Product Identity & Review Journey UX Restructuring
 Decision class = HARDEN_FIRST
 Specification = Specified
 Authoritative packet = docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md
-Current lifecycle = 01 Selected → 02 Specified
-Next canonical lane = C01 — Current Sprint Implementation
-C01 Implementation Started = NO
+QA Complete = W01 PASS on source revision 84eb403a7bcc9cf113f41e32b7fbddab28d8de81
+Production Verified = W01 Pass B on released main 7e4e6f92aa9ae849559252140f9e4031a3104f2b
+Sprint Complete = 00 reconciled after W01 Production Verification
+Current lifecycle = 01 Selected → 02 Specified → C01 Implementation Complete → W01 QA Complete → C01 release → W01 Production Verified → 00 Sprint Complete
+Next canonical lane = 01 — Product Architecture & Roadmap
+Next action = Evidence → Gate Review → Explicit Next Selection
+Next capability = NOT YET SELECTED
 ```
+
+00 independently reconciled the W01 closure handoff against live state on 2026-08-29:
+
+- PR #26 merged the W01 QA-approved revision `84eb403a7bcc9cf113f41e32b7fbddab28d8de81` to main as `7e4e6f92aa9ae849559252140f9e4031a3104f2b`;
+- the QA-approved revision and released main are tree-equivalent;
+- Vercel Production deployment `dpl_5VzknCFtEzjaNuxd4DLoQHXdPwfK` is `READY` and `target=production`;
+- Production `githubCommitSha` equals the reconciled GitHub `main` SHA;
+- the canonical Production domain returns HTTP 200 and exposes the shipped `Overview | Design | Preflight` Product journey;
+- W01 reports packet Production verification PASS including AC-13, AC-18 and major regressions, with no relevant browser console/runtime error;
+- 00 observed no relevant Production runtime errors during closure reconciliation.
 
 This is bounded existing-capability Product identity / information-architecture / review-journey hardening. It does **not** select a new Product capability, an additional Stage 1.5 capability, or Stage 2.
 
 The packet preserves current domain, persistence, AI/provider, mutation, import-source, and security boundaries. In particular, it does not authorize Project/Workspace/History persistence, GraphDocumentV1/Graph V2 changes, Architecture Review activation, AI-generated improvement proposals, Semantic Patch/Apply, source write-back, Runtime Evidence, generic/multi-framework import, or broader CrewAI import support.
 
-Current coordination state for this packet:
+Post-completion coordination state:
 
 ```text
 01 selection = complete
 02 specification = complete
-00 Current State reconciliation = this snapshot
-ready for explicit C01 handoff = YES
-Implementation Started = NO until C01 explicitly starts from latest main and this packet
+C01 implementation/release = complete
+W01 QA Complete = PASS
+W01 Production Verified = PASS
+00 Sprint Complete = complete
+Current next authority = 01
+Next Selection = pending explicit 01 decision
 ```
 
 ---
@@ -268,7 +286,7 @@ Current v0 also intentionally defers later work including:
 - marketplace
 - broader Stage 1.5 Import/Workspace/History foundation unless separately selected
 
-CrewAI Static Import v0 is separately Production Verified and Sprint Complete under its own deterministic/API-independent Product/Architecture rationale. Its completion does not expand or alter the Stage 1 packet.
+CrewAI Static Import v0 and the Product Identity / Review Journey UX hardening Sprint are separately Production Verified and Sprint Complete under their own deterministic/API-independent Product/Architecture rationale. Their completion does not expand or alter the held Stage 1 packet.
 
 Commercial planning does not change these Stage 1 scope boundaries.
 
@@ -311,7 +329,7 @@ Gate A is **not reached** while Stage 1 itself has not reached Production Verifi
 
 # 5. Roadmap / next selection discipline
 
-Do not mechanically select Stage 2 after Stage 1.
+Do not mechanically select Stage 2 after Stage 1 or automatically select another packet after an API-independent Sprint completes.
 
 Use:
 
@@ -339,12 +357,13 @@ Current Stage 1.5 / current-selection state:
 CrewAI Static Import v0 = Sprint Complete / Production Verified
 initial post-completion 01 review = DEFER / no new capability selected
 later Product / UX Competitive Research review = HARDEN_FIRST
-Selected current work = Existing-Capability Product Identity & Review Journey UX Restructuring
-Specification = Specified
+Existing-Capability Product Identity & Review Journey UX Restructuring = Sprint Complete / Production Verified
 Additional Stage 1.5 capability = NONE
 Stage 2 = NOT SELECTED
 AI Authority = UNCHANGED
 Mutation Authority = UNCHANGED
+Current next authority = 01 — Evidence → Gate Review → Explicit Next Selection
+Next capability = NOT YET SELECTED
 
 Project / Local Workspace = candidate
 Persisted Intent & Constraints = candidate
@@ -353,9 +372,9 @@ Revision / Evaluation History = candidate
 Scenario / Acceptance persistence = conditional foundation
 ```
 
-The current HARDEN_FIRST packet is existing-capability UX/IA hardening, not a Stage 1.5 capability selection. Do not turn the remaining candidate set into an automatic backlog. Re-evaluate a candidate only when new Product/Production evidence satisfies the corresponding selection trigger.
+The completed HARDEN_FIRST Sprint was existing-capability UX/IA hardening, not a Stage 1.5 capability selection. Do not turn the remaining candidate set into an automatic backlog. Re-evaluate a candidate only when new Product/Production evidence satisfies the corresponding selection trigger and 01 explicitly selects it.
 
-The held Stage 1 provider-backed release, completed static-import packet, and current UX-hardening packet are separate lifecycle tracks. The current UX-hardening packet does not mark Stage 1 complete, reach Gate A/B, select Stage 2, or promote AI/mutation authority.
+The held Stage 1 provider-backed release, completed static-import Sprint, and completed UX-hardening Sprint are separate lifecycle tracks. Completing either API-independent Sprint does not mark Stage 1 complete, reach Gate A/B, select Stage 2, or promote AI/mutation authority.
 
 ---
 
@@ -379,11 +398,14 @@ Current explicit lifecycle / coordination states:
 
 - Stage 1 Architecture Review / paid release track: **FAIL-BLOCKED / QA incomplete**
 - CrewAI Static Import v0: **Sprint Complete / Production Verified**
-- Existing-Capability Product Identity & Review Journey UX Restructuring: **Specified — `01 Selected → 02 Specified`**
-- decision class for current UX hardening: **HARDEN_FIRST**
+- Existing-Capability Product Identity & Review Journey UX Restructuring: **Sprint Complete / Production Verified**
+- decision class for completed UX hardening: **HARDEN_FIRST**
 - authoritative packet: `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`
-- next canonical lane for current UX hardening: **C01 — Current Sprint Implementation**
-- C01 implementation state for current UX hardening: **not started**
+- QA-approved revision: `84eb403a7bcc9cf113f41e32b7fbddab28d8de81`
+- Production-verified released main: `7e4e6f92aa9ae849559252140f9e4031a3104f2b`
+- current next canonical lane: **01 — Product Architecture & Roadmap**
+- current next action: **Evidence → Gate Review → Explicit Next Selection**
+- next capability: **not yet selected**
 - Additional Stage 1.5 capability: **none**
 - Gate A: **not reached** because Stage 1 is not Production Verified
 - Gate B: **not reached**
@@ -394,10 +416,10 @@ Current explicit lifecycle / coordination states:
 Current next action:
 
 ```text
-Existing-Capability Product Identity & Review Journey UX Restructuring
-→ 00 Current State reconciled
-→ ready for explicit C01 handoff
-→ C01 starts only after re-checking latest main and reading the complete Specified packet
+Completed UX hardening Sprint
+→ 00 Sprint Complete
+→ 01 Evidence → Gate Review → Explicit Next Selection
+→ do not automatically select another capability
 
 Held Stage 1 Architecture Review remains separate:
 OpenAI evaluation budget available
@@ -437,7 +459,7 @@ Default lifecycle handoff:
 → C01 merge/release exact QA-approved revision
 → W01 Production Verified
 → 00 Sprint Complete
-→ 01 next Gate / selection
+→ 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
 There is no permanent canonical W00/03/04/05/06 lane in development-only focus mode.

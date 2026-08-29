@@ -29,7 +29,7 @@ Understand
 → Own
 ```
 
-Near-term sequencing currently has one held provider-backed track, one completed deterministic Stage 1.5 foundation, and one explicitly selected existing-capability UX hardening packet direction:
+Near-term sequencing currently has one held provider-backed track and two completed API-independent Sprints, with the latest completed Sprint now awaiting an explicit 01 Next Selection decision:
 
 ```text
 Stage 1 Architecture Review + Paid Access & Usage Control
@@ -40,10 +40,11 @@ Stage 1 Architecture Review + Paid Access & Usage Control
     → initial post-completion 01 review = DEFER / no new capability selected
     → later 01 Product / UX Competitive Research review
       = HARDEN_FIRST
-      = Selected next packet direction: Existing-Capability Product Identity & Review Journey UX Restructuring
-      = selected new Product capability: NONE
-      = additional Stage 1.5 capability: NONE
-      = immediate 02 handoff: YES
+      → Existing-Capability Product Identity & Review Journey UX Restructuring
+        = Sprint Complete / Production Verified
+        → 00 closure complete
+        → next authority = 01 Evidence → Gate Review → Explicit Next Selection
+        → next capability = NOT YET SELECTED
 
 Stage 1 Production evidence, when eventually available
 ├→ Gate A Evaluation Trust & Scale
@@ -57,7 +58,7 @@ Stage 1 Production evidence, when eventually available
 
 Completing CrewAI Static Import v0 does not declare Stage 1 complete, pass Gate A, or expand AI/mutation authority.
 
-The selected UX hardening work likewise does not select another Stage 1.5 capability, reach Gate A/B, select Stage 2, or expand AI/mutation authority. Remaining Stage 1.5 candidates stay available only when their evidence triggers are satisfied.
+Completing the UX hardening Sprint likewise does not select another Stage 1.5 capability, reach Gate A/B, select Stage 2, or expand AI/mutation authority. Remaining Stage 1.5 candidates stay available only when their evidence triggers are satisfied and 01 explicitly selects them.
 
 M0 is a commercial evidence gate, not an AI-authority gate. It does not block clearly justified evaluator safety/quality work while commercial evidence is still immature.
 
@@ -70,7 +71,7 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 | Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; **FAIL-BLOCKED / QA incomplete** | Reliable structured evaluator output plus paid access/cost control | Active packet requires 30 live runs, zero hard violations, >= 90% semantic rubric, exact-candidate Independent QA, and Production verification | Keep unreleased; resume bounded evaluator hardening only when evaluation budget is available, then produce a new candidate and repeat full W01 Pass A |
 | Architecture Review Paid Access & Usage Control v0 | Specified release prerequisite; database/access/billing controls substantially QA-verified but overall QA cannot complete while the coupled evaluator gate fails | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, coupled Stage 1 evaluator trust | Exact-candidate packet AC/test matrix and W01 Pass A remain mandatory; behavior-changing evaluator fixes invalidate prior candidate approval | Preserve verified migration/access evidence, but do not merge/release until the coupled evaluator fix passes and the new exact revision completes full W01 QA |
 | CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | Completed packet `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009`; current graph/domain model; import security boundary | W01 QA PASS on source revision `634cf507ae55e60122bc59c3e20b4c5abce60bad`; released `main` tree-equivalent revision; W01 Production Verification Pass B; live Production READY/production; Production SHA matched `main`; packet smoke passed; no blocker | Remains complete. Its completion does not expand source support, Stage 1 status, AI authority, or mutation authority |
-| Existing-Capability Product Identity & Review Journey UX Restructuring | **Selected — HARDEN_FIRST**; bounded UX/IA hardening of current Production capabilities; **no new Product capability selected** | Current Production behavior, Product Master statement that the Canvas is one interface rather than the Product definition, existing deterministic Preflight/import/export/Locate behavior, competitive research as non-authoritative supporting evidence | 02 must produce an implementation-ready packet that stays inside current capability/domain contracts and preserves all explicit deferrals/authority boundaries below | **Handoff to 02** for specification. Do not implement from this board directly |
+| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified**; decision class `HARDEN_FIRST`; bounded UX/IA hardening of existing capabilities; **no new Product capability selected** | Packet `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`; current Product/domain contracts; existing deterministic Preflight/import/export/Locate behavior | W01 QA-approved revision `84eb403a7bcc9cf113f41e32b7fbddab28d8de81`; released main `7e4e6f92aa9ae849559252140f9e4031a3104f2b` is tree-equivalent; W01 Production Verification Pass B; Vercel Production READY/production; Production SHA matched `main`; packet Production smoke passed with no blocker | **Handoff to 01** for `Evidence → Gate Review → Explicit Next Selection`. Do not automatically select another capability, Stage 1.5 item, or Stage 2 |
 | Commercial Validation Gate M0 | Planned evidence gate after paid Production usage exists | Paid Access & Usage Control Production Verified; privacy-safe commercial measurement; real paid usage | `MONETIZATION_ARCHITECTURE.md`: value/WTP evidence, repeat-use behavior, quota utilization, provider-cost distributions, contribution cases, cancellation/refund/support signals | Do not treat the initial subscription model as commercially validated until M0 has sufficient evidence; use the result to adjust price/quota or identify one concrete repeat-value dependency |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
@@ -85,7 +86,7 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 
 This board is intentionally small. Do not turn it into a duplicate full roadmap or a permanent growth dashboard.
 
-## 2.1 Selected UX hardening scope boundary
+## 2.1 Completed UX hardening scope boundary
 
 Decision class:
 
@@ -93,13 +94,26 @@ Decision class:
 HARDEN_FIRST
 ```
 
-Selected next packet direction:
+Completed packet direction:
 
 ```text
 Existing-Capability Product Identity & Review Journey UX Restructuring
 ```
 
-Nature of selection:
+Lifecycle closure:
+
+```text
+01 Selected
+→ 02 Specified
+→ C01 Implementation Complete
+→ W01 QA Complete
+→ C01 released exact QA-approved change set
+→ W01 Production Verified
+→ 00 Sprint Complete
+→ 01 Evidence → Gate Review → Explicit Next Selection
+```
+
+Nature of selection and completion:
 
 ```text
 existing Product UX / information-architecture hardening
@@ -111,14 +125,14 @@ existing Product UX / information-architecture hardening
 Product rationale:
 
 - Product Master defines AgentGraph Studio as a **Portable AI Workflow Architecture Engineering Toolchain** and explicitly states that the Canvas is one human interface to the workflow source rather than the Product definition.
-- Actual Production currently gives the Canvas and CrewAI-oriented builder controls dominant visual/information-architecture weight.
-- Current Production already contains enough deterministic capability to express a more coherent `Entry → Understand → Evaluate → manual Improve → Verify → Own` journey without adding Project/Workspace/History/AI proposal/mutation capabilities.
-- Product / UX Competitive Research at commit `df18ef5b1c953531c15834b66ef57bed1073a508` is supporting Research Evidence / Proposal only. It does not independently authorize this selection and does not become a Product authority document.
-- Because this is a low-migration, authority-preserving correction between durable Product definition and current Product presentation, 01 selected bounded hardening rather than waiting for paid user research that is not proportionate to the current individual-development constraints.
+- Prior Production gave the Canvas and CrewAI-oriented builder controls dominant visual/information-architecture weight.
+- Existing deterministic capability was sufficient to express a more coherent `Entry → Understand → Evaluate → manual Improve → Verify → Own` journey without adding Project/Workspace/History/AI proposal/mutation capabilities.
+- Product / UX Competitive Research at commit `df18ef5b1c953531c15834b66ef57bed1073a508` was supporting Research Evidence / Proposal only. It did not independently authorize this selection and does not become a Product authority document.
+- Because this was a low-migration, authority-preserving correction between durable Product definition and Product presentation, 01 selected bounded hardening rather than waiting for paid user research that was not proportionate to the current individual-development constraints.
 
-### Included for 02 specification
+### Implemented packet boundary
 
-02 may specify only the smallest coherent restructuring of **existing Production capabilities**, including:
+The completed packet stayed inside existing Production capabilities, including:
 
 - Product positioning/value hierarchy that makes architecture understanding, deterministic Evidence/Preflight, verification, portability, and user ownership more legible while preserving CrewAI-first reality;
 - entry hierarchy for currently supported paths such as supported CrewAI source, AgentGraph JSON, example/template, and manual design;
@@ -132,13 +146,13 @@ Product rationale:
 - clearer current-capability journey such as `Import → Mapping → Apply → Preflight → Locate → Edit → Re-evaluate → Export` where those states already exist;
 - Preflight finding presentation that consistently answers as much as existing deterministic data supports of `What / Why / Where / Impact / Evidence / Next / Unknown`, without inventing missing data or using AI to fill gaps;
 - shared visual language for epistemic/evidence distinctions, preserving the difference between `Known / Inferred / Unknown`, deterministic/heuristic/external-dependent ownership, and configured/static/observed or not-observed status where applicable;
-- existing Locate/focus interaction hardening where it can be implemented using current target/addressing and UI state contracts;
-- mobile review/inspection/action-priority hardening, including current action overflow and unnecessary competition for review space, without requiring full mobile authoring parity;
+- existing Locate/focus interaction hardening using current target/addressing and UI state contracts;
+- mobile review/inspection/action-priority hardening without requiring full mobile authoring parity;
 - accessibility, responsive, analytics, import/export, Preflight, builder, template, and code-generation regression protection.
 
 ### Explicit Deferred / not selected
 
-This selection does **not** select:
+Completion of this Sprint does **not** select or imply:
 
 - Project / Local Workspace;
 - cloud/browser/project persistence expansion;
@@ -157,23 +171,6 @@ This selection does **not** select:
 - generic or multi-framework import;
 - broader CrewAI import source support.
 
-### Conditional — must return to 01
-
-02 must stop and return to 01 rather than silently widening scope if the desired UX would require any of the following:
-
-- new durable Project/Workflow/Revision identity;
-- new persistence level or cloud/account data boundary;
-- new semantic/domain fields solely to support presentation;
-- a new persistent issue-to-target navigation capability that cannot reuse current target/addressing/UI-state contracts;
-- full Search/Outline/Scoped Evidence capability;
-- GraphDocumentV1 change or Graph/Workflow V2;
-- a new AI/provider interaction or broader provider disclosure;
-- Architecture Review behavior from the held Stage 1 track;
-- AI-generated improvement proposals;
-- semantic patch/apply or other semantic mutation;
-- source write-back/synchronization;
-- import source-boundary expansion.
-
 ### Authority / roadmap boundary
 
 ```text
@@ -184,7 +181,8 @@ Gate B = NOT REACHED
 Stage 2 = NOT SELECTED
 AI Authority = UNCHANGED
 Mutation Authority = UNCHANGED
-Immediate 02 handoff = YES, for this bounded UX hardening packet only
+Current next authority = 01 — Evidence → Gate Review → Explicit Next Selection
+Next capability = NOT YET SELECTED
 ```
 
 ---
@@ -215,20 +213,22 @@ Lifecycle = Sprint Complete / Production Verified
 
 Initial post-completion 01 review = DEFER / no new capability selected
 Later Product / UX Competitive Research review = HARDEN_FIRST
-Selected next packet direction = Existing-Capability Product Identity & Review Journey UX Restructuring
+Completed packet = Existing-Capability Product Identity & Review Journey UX Restructuring
+Lifecycle = Sprint Complete / Production Verified
 Selected new Product capability = NONE
 Additional Stage 1.5 capability = NONE
 Stage 2 = NOT SELECTED
 AI Authority = UNCHANGED
 Mutation Authority = UNCHANGED
-Immediate 02 handoff = YES
+Current next authority = 01 — Evidence → Gate Review → Explicit Next Selection
+Next capability = NOT YET SELECTED
 ```
 
-The later HARDEN_FIRST decision does not establish that any remaining Stage 1.5 trigger is satisfied. Available Production telemetry still does not provide dedicated CrewAI import success/failure/apply/repeat-use evidence sufficient to infer repeat-use or adoption friction. Treat that gap as **Unknown / insufficient evidence**, not as evidence that demand does not exist.
+The HARDEN_FIRST decision did not establish that any remaining Stage 1.5 trigger is satisfied. Available Production telemetry still does not provide dedicated CrewAI import success/failure/apply/repeat-use evidence sufficient to infer repeat-use or adoption friction. Treat that gap as **Unknown / insufficient evidence**, not as evidence that demand does not exist.
 
-The selected UX hardening packet is grounded in an observed Product-definition / Production-presentation mismatch and the ability to improve the current Product journey using already shipped capabilities. It is not evidence for Project, History, Intent, Search/Outline, Runtime Evidence, or another Stage 1.5 foundation.
+The completed UX hardening packet was grounded in an observed Product-definition / Production-presentation mismatch and the ability to improve the Product journey using already shipped capabilities. Its completion is not evidence for Project, History, Intent, Search/Outline, Runtime Evidence, or another Stage 1.5 foundation.
 
-No remaining Stage 1.5 candidate is automatically Selected by this decision. Re-evaluate only when the corresponding trigger gains concrete evidence.
+No remaining Stage 1.5 candidate is automatically Selected by this completion. Re-evaluate only when the corresponding trigger gains concrete evidence and 01 makes an explicit selection decision.
 
 ---
 
@@ -268,7 +268,7 @@ Owner lane: C01 for implementation/self-evaluation, W01 for exact-candidate inde
 Re-check condition: evaluation budget is available and a complete 30-run result can be collected without quota interruption.
 ```
 
-This blocker does not authorize skipping Stage 1 gates. It also does not retroactively affect the completed deterministic CrewAI Static Import v0 packet or the selected existing-capability UX hardening packet, neither of which depends on stronger AI authority.
+This blocker does not authorize skipping Stage 1 gates. It also does not retroactively affect either completed API-independent Sprint, neither of which depends on stronger AI authority.
 
 ---
 
