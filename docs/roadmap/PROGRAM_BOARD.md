@@ -72,9 +72,11 @@ Current next authority
 Current next action
 = Evidence → Gate Review → Explicit Next Selection
 
-New active packet
+Newly selected work
 = NONE pending explicit 01 selection
 ```
+
+The held Stage 1 packets remain authoritative for that blocked track; `Newly selected work = NONE` means no additional packet has been selected after the completed UX-hardening Sprint.
 
 A completed API-independent Sprint does not complete Stage 1, reach Gate A/B, select Stage 2, or expand AI/mutation authority.
 
