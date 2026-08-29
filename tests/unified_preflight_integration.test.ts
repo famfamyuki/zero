@@ -15,12 +15,12 @@ test('entry and page retain explicit trigger focus ownership', () => {
   assert.match(page, /preflightReviewEntryRef\.current = trigger/);
 });
 
-test('normal Close and Escape share owner release and double-rAF focus restoration', () => {
+test('surface close releases owner and restores entry while Escape does not close the Product surface', () => {
   const close = between('const closePreflightReview', 'const handleLocateExecutionPreview');
   const restore = between('const restoreEntryFocus', 'const closePreflightReview');
   assert.match(close, /preflightSelectionOwnerRef\.current = null/); assert.match(close, /setIsPreflightReviewOpen\(false\)/); assert.match(close, /restoreEntryFocus\(preflightReviewEntryRef\.current\)/);
   assert.equal((restore.match(/requestAnimationFrame/g) ?? []).length, 2); assert.match(restore, /entry\?\.isConnected/);
-  assert.match(panel, /event\.key === 'Escape'/); assert.match(panel, /onClose\(\)/); assert.match(page, /onClose=\{closePreflightReview\}/);
+  assert.doesNotMatch(panel, /event\.key === 'Escape'/); assert.match(panel, /onClick=\{onClose\}/); assert.match(page, /onClose=\{closePreflightReview\}/);
 });
 
 test('Unified owner is claimed before opening and suppresses passive selection', () => {
@@ -131,7 +131,7 @@ test('successful Resource Task, Tool, and Crew destinations close Unified and re
 test('all three Open Validation paths use one overlap-safe parent transition', () => {
   assert.equal((panel.match(/onOpenValidation=\{props\.onOpenValidation\}/g) ?? []).length, 3);
   const wiring = page.slice(page.indexOf('<UnifiedPreflightPanel'), page.indexOf('/>', page.indexOf('<UnifiedPreflightPanel')) + 2);
-  assert.match(wiring, /onOpenValidation=\{\(\) => \{ preflightSelectionOwnerRef\.current = null; setIsPreflightReviewOpen\(false\); setIsCodeModalOpen\(true\); \}\}/);
+  assert.match(wiring, /onOpenValidation=\{\(\) => \{ preflightSelectionOwnerRef\.current = null;[\s\S]*setIsPreflightReviewOpen\(false\); setIsCodeModalOpen\(true\); \}\}/);
 });
 
 test('single-entry, Unified-hook, persistence, codegen, and analytics boundaries remain intact', () => {

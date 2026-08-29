@@ -27,8 +27,8 @@ const expected = {
 } as const;
 
 test('public metadata matches the canonical positioning contract exactly', () => {
-  assert.match(layout, /title: 'AgentGraph Studio \| Preflight Engineering for CrewAI Workflows'/);
-  assert.match(layout, /description: 'Design or import CrewAI workflows, review readiness, execution structure, and resource implications before you run them, then export deterministic Python\.'/);
+  assert.match(layout, /title: 'AgentGraph Studio \| Workflow Architecture Preflight & Portable Export'/);
+  assert.match(layout, /description: 'Understand, evaluate, and manually improve AI workflow architecture with deterministic Preflight\./);
 });
 
 test('English and Japanese public positioning copy is exact', () => {
@@ -39,10 +39,9 @@ test('English and Japanese public positioning copy is exact', () => {
   }
 });
 
-test('existing public copy bindings remain unchanged', () => {
-  assert.match(header, /t\('subTitle'\)/);
-  assert.match(page, /t\('mainCopy'\)/);
-  assert.match(page, /t\('subCopy'\)/);
+test('Product shell uses the packet positioning while template positioning remains bound', () => {
+  assert.match(header, /Portable AI Workflow Architecture Engineering Toolchain/);
+  assert.match(source('components/editor/WorkflowOverview.tsx'), /Understand the workflow before you run it\./);
   assert.match(templatesPage, /t\('templatesSub'\)/);
   assert.match(templatesPage, /t\('templatesFooter'\)/);
 });

@@ -15,7 +15,7 @@ type AnalyticsProperties = {
     download_type: 'single_file' | 'all_files';
     export_mode: 'scaffold' | 'production';
   };
-  buymeacoffee_clicked: { placement: 'header' | 'mobile_sticky' };
+  buymeacoffee_clicked: { placement: 'header' | 'mobile_sticky' | 'mobile_more' };
   affiliate_clicked: {
     provider: 'conoha';
     placement: 'editor_mobile' | 'templates_header' | 'templates_mobile' | 'code_export';

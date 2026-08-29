@@ -77,11 +77,11 @@ test('Readiness stale notice is optional and announced politely', () => {
   assert.match(panelSource, /notice=\{props\.readinessNotice\}/);
 });
 
-test('Unified shell retains identity, tabs, focus, Escape, responsive shell, and one scroll owner', () => {
+test('Unified shell is a first-class review surface with tabs, focus, and one scroll owner', () => {
   const source = readFileSync('components/editor/unified-preflight/UnifiedPreflightPanel.tsx', 'utf8');
   assert.match(source, /id="unified-preflight-panel"/); assert.match(source, /id="unified-preflight-heading"/); assert.match(source, /role="tablist"/); assert.match(source, /role="tab"/); assert.match(source, /role="tabpanel"/);
-  assert.match(source, /md:w-\[440px\]/); assert.match(source, /lg:w-\[480px\]/); assert.match(source, /max-h-\[80dvh\]/); assert.equal((source.match(/overflow-y-auto/g) ?? []).length, 1);
-  assert.match(source, /event\.key === 'Escape'/); assert.match(source, /onClose\(\)/);
+  assert.match(source, /max-w-5xl/); assert.match(source, /flex min-h-0 flex-1 flex-col/); assert.equal((source.match(/overflow-y-auto/g) ?? []).length, 1);
+  assert.doesNotMatch(source, /event\.key === 'Escape'/); assert.match(source, /onClick=\{onClose\}/);
 });
 
 test('Unified tabs keep the exact four-stage order and complete ARIA roving-tabindex contract', () => {
