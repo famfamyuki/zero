@@ -37,7 +37,8 @@ Stage 1 Architecture Review + Paid Access & Usage Control
 ├→ when evaluation budget returns: resume bounded evaluator hardening → exact-candidate W01 QA → release lifecycle
 └→ CrewAI Static Import v0
     = Sprint Complete / Production Verified
-    → Evidence → Gate Review → Explicit Next Selection in 01
+    → 01 Evidence → Gate Review → Explicit Next Selection completed
+    → Decision = DEFER / selected next capability = NONE
 
 Stage 1 Production evidence, when eventually available
 ├→ Gate A Evaluation Trust & Scale
@@ -51,6 +52,8 @@ Stage 1 Production evidence, when eventually available
 
 Completing CrewAI Static Import v0 does not declare Stage 1 complete, pass Gate A, or expand AI/mutation authority.
 
+The post-completion 01 review likewise does not auto-select another Stage 1.5 candidate. Remaining candidates stay available only when their evidence triggers are satisfied.
+
 M0 is a commercial evidence gate, not an AI-authority gate. It does not block clearly justified evaluator safety/quality work while commercial evidence is still immature.
 
 ---
@@ -61,7 +64,7 @@ M0 is a commercial evidence gate, not an AI-authority gate. It does not block cl
 |---|---|---|---|---|
 | Evidence-Grounded AI Architecture Review v0 | Current selected major milestone; **FAIL-BLOCKED / QA incomplete** | Reliable structured evaluator output plus paid access/cost control | Active packet requires 30 live runs, zero hard violations, >= 90% semantic rubric, exact-candidate Independent QA, and Production verification | Keep unreleased; resume bounded evaluator hardening only when evaluation budget is available, then produce a new candidate and repeat full W01 Pass A |
 | Architecture Review Paid Access & Usage Control v0 | Specified release prerequisite; database/access/billing controls substantially QA-verified but overall QA cannot complete while the coupled evaluator gate fails | `ADR-0006`, `ADR-0007`, existing auth/Stripe/Supabase reality, coupled Stage 1 evaluator trust | Exact-candidate packet AC/test matrix and W01 Pass A remain mandatory; behavior-changing evaluator fixes invalidate prior candidate approval | Preserve verified migration/access evidence, but do not merge/release until the coupled evaluator fix passes and the new exact revision completes full W01 QA |
-| CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | Completed packet `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009`; current graph/domain model; import security boundary | W01 QA PASS on source revision `634cf507ae55e60122bc59c3e20b4c5abce60bad`; released `main` tree-equivalent revision; W01 Production Verification Pass B; live Production READY/production; Production SHA matched `main`; packet smoke passed; no blocker | Hand completion evidence to 01 for **Evidence → Gate Review → Explicit Next Selection**. Do not auto-select another Stage 1.5 candidate and do not change Stage 1 or AI/mutation authority |
+| CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified**; post-completion 01 review = **DEFER / no new capability selected** | Completed packet `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009`; current graph/domain model; import security boundary | W01 QA PASS on source revision `634cf507ae55e60122bc59c3e20b4c5abce60bad`; released `main` tree-equivalent revision; W01 Production Verification Pass B; live Production READY/production; Production SHA matched `main`; packet smoke passed; no blocker; post-completion evidence did not satisfy another Stage 1.5 selection trigger | No immediate 02 handoff. Keep remaining Stage 1.5 items as evidence-triggered candidates. Re-enter 01 when new Product/Production evidence satisfies a trigger, or resume the held Stage 1 track when evaluation budget returns. Do not change Stage 1, Stage 2, AI authority, or mutation authority from this completion |
 | Commercial Validation Gate M0 | Planned evidence gate after paid Production usage exists | Paid Access & Usage Control Production Verified; privacy-safe commercial measurement; real paid usage | `MONETIZATION_ARCHITECTURE.md`: value/WTP evidence, repeat-use behavior, quota utilization, provider-cost distributions, contribution cases, cancellation/refund/support signals | Do not treat the initial subscription model as commercially validated until M0 has sufficient evidence; use the result to adjust price/quota or identify one concrete repeat-value dependency |
 | Evaluation Quality hardening | Candidate after Stage 1 | Production evaluator evidence | Gate A gold-set / safety / quality / stability evidence | Select only if evaluator quality is the limiting dependency |
 | Evaluation Scale foundation | Candidate after Stage 1 | Measured size/topology degradation | Gate A scale/reliability evidence | Select only if full-review quality or reliability degrades materially |
@@ -101,12 +104,21 @@ Static CrewAI import trigger = satisfied for the selected v0 direction
 Decision = FOUNDATION_FIRST
 Packet = docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md
 Lifecycle = Sprint Complete / Production Verified
-Next authority = 01 — Evidence → Gate Review → Explicit Next Selection
+
+Post-completion 01 review = completed
+Decision = DEFER
+Selected next capability = NONE
+Additional Stage 1.5 packet = NONE
+Stage 2 = NOT SELECTED
+AI Authority = UNCHANGED
+Mutation Authority = UNCHANGED
 ```
 
-The completed selection was grounded in access-to-first-value and architectural reuse, not merely in avoiding API cost.
+Evidence reviewed after completion did not establish that any remaining Stage 1.5 trigger is currently satisfied. In particular, the available Production telemetry does not provide dedicated CrewAI import success/failure/apply/repeat-use evidence sufficient to infer repeat-use or adoption friction. Treat that gap as **Unknown / insufficient evidence**, not as evidence that demand does not exist.
 
-No remaining Stage 1.5 candidate is automatically Selected by this completion.
+The completed Static CrewAI import selection was grounded in access-to-first-value and architectural reuse, not merely in avoiding API cost.
+
+No remaining Stage 1.5 candidate is automatically Selected by this completion or by the DEFER decision. Re-evaluate only when the corresponding trigger gains concrete evidence.
 
 ---
 
@@ -195,8 +207,8 @@ Required flow:
 Sprint Complete
 → update evidence/current limitations
 → gate/selection review if applicable
-→ explicit next Selected packet
-→ specification
+→ explicit next Selected packet or explicit DEFER / no-selection decision
+→ specification only when a capability is Selected
 ```
 
 For paid work, distinguish:
