@@ -22,6 +22,7 @@ interface Props {
   onLocateExecution: (type: ExecutionPreviewTargetType, id: string | undefined, source: ExecutionPreviewLocateSource) => boolean;
   onLocateResources: (target: ResourceAnalysisTarget, context: ResourceAnalysisLocateContext) => boolean; onOpenValidation: () => void;
   onReevaluate: () => void; updatedNotice: string | null;
+  focusHeadingOnOpen?: boolean;
 }
 
 export function UnifiedPreflightPanel(props: Props) {
@@ -43,11 +44,11 @@ export function UnifiedPreflightPanel(props: Props) {
   };
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || props.focusHeadingOnOpen === false) return;
     let second = 0;
     const first = requestAnimationFrame(() => { second = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true })); });
     return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, props.focusHeadingOnOpen]);
 
   if (!isOpen) return null;
   return <main id="unified-preflight-panel" aria-labelledby="unified-preflight-heading" aria-busy={preflight.isRefreshing} className="flex min-h-0 flex-1 flex-col bg-slate-950">

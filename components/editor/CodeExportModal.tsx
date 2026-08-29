@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   X,
   Copy,
@@ -141,18 +141,51 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
   const [showWarnings, setShowWarnings] = useState(false);
   const [showInfos, setShowInfos] = useState(false);
   const [showDeploymentOptions, setShowDeploymentOptions] = useState(true);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Close on Escape key
+  // Modal focus entry, containment, and Escape close.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         onClose();
+        return;
+      }
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter((element) => element.offsetParent !== null);
+        if (focusable.length === 0) {
+          e.preventDefault();
+          dialogRef.current.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!dialogRef.current.contains(document.activeElement)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first).focus();
+        } else if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
+    let secondFrame = 0;
+    let firstFrame = 0;
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
+      firstFrame = requestAnimationFrame(() => {
+        secondFrame = requestAnimationFrame(() => closeButtonRef.current?.focus({ preventScroll: true }));
+      });
     }
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, onClose]);
 
   // Generate project files and validation results reactively
@@ -224,6 +257,8 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
     >
       {/* Main Modal Container */}
       <div
+        ref={dialogRef}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -306,6 +341,7 @@ export const CodeExportModal: React.FC<CodeExportModalProps> = ({
             </div>}
 
             <button
+              ref={closeButtonRef}
               onClick={onClose}
               aria-label="Close modal"
               className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 active:scale-95 transition-colors border border-transparent hover:border-slate-700 shrink-0"

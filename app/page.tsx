@@ -145,6 +145,7 @@ export default function EditorPage() {
 
   const [selectedNode, setSelectedNode] = useState<CustomNode | null>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const codeExportEntryRef = useRef<HTMLElement | null>(null);
   const [purchaseSuccessMessage, setPurchaseSuccessMessage] = useState<string | null>(null);
   const [recoveryNotice, setRecoveryNotice] = useState(false);
 
@@ -165,6 +166,7 @@ export default function EditorPage() {
   const [activationPromptVisible, setActivationPromptVisible] = useState(false);
   const [currentActivationAttemptSource, setCurrentActivationAttemptSource] = useState<PreflightActivationSource | null>(null);
   const [activePreflightStage, setActivePreflightStage] = useState<UnifiedPreflightStage>('overview');
+  const [focusPreflightHeadingOnOpen, setFocusPreflightHeadingOnOpen] = useState(true);
   const preflightSelectionOwnerRef = useRef<PreflightSelectionOwner>(null);
   const preflightReviewEntryRef = useRef<HTMLButtonElement | null>(null);
   const activationPromptShownEmittedRef = useRef(false);
@@ -494,11 +496,20 @@ export default function EditorPage() {
   }, [setNodes, setEdges, takeSnapshot]);
 
   // Transpile CrewAI Python Code & Open Modal
-  const handleGenerateCode = useCallback(() => {
+  const handleGenerateCode = useCallback((trigger: HTMLButtonElement) => {
     preflightSelectionOwnerRef.current = null;
+    codeExportEntryRef.current = trigger;
     trackEvent('code_generated');
     setIsPreflightReviewOpen(false);
     setIsCodeModalOpen(true);
+  }, []);
+
+  const closeCodeExportModal = useCallback(() => {
+    setIsCodeModalOpen(false);
+    const entry = codeExportEntryRef.current;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (entry?.isConnected) entry.focus({ preventScroll: true });
+    }));
   }, []);
 
   const handleOpenPreflightReview = useCallback((trigger: HTMLButtonElement, source: PreflightActivationSource) => {
@@ -517,6 +528,7 @@ export default function EditorPage() {
       setReadinessNotice(null);
       setExecutionPreviewNotice(null);
       setResourceAnalysisNotice(null);
+      setFocusPreflightHeadingOnOpen(true);
       setIsPreflightReviewOpen(true);
       setSurface('preflight');
     }
@@ -906,6 +918,7 @@ export default function EditorPage() {
   const handleBackToReview = useCallback(() => {
     if (!reviewReturnContext) return;
     setActivePreflightStage(reviewReturnContext.stage);
+    setFocusPreflightHeadingOnOpen(false);
     setIsPreflightReviewOpen(true);
     setSurface('preflight');
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1055,12 +1068,12 @@ export default function EditorPage() {
         />
       </div></> : null}
 
-      {surface === 'preflight' ? <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} /> : null}
+      {surface === 'preflight' ? <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} focusHeadingOnOpen={focusPreflightHeadingOnOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; codeExportEntryRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} /> : null}
 
       {/* Transpiled Python Code Export Modal */}
       <CodeExportModal
         isOpen={isCodeModalOpen}
-        onClose={() => setIsCodeModalOpen(false)}
+        onClose={closeCodeExportModal}
         onEditNode={handleEditExportError}
         nodes={nodes}
         edges={edges}

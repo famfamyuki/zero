@@ -131,7 +131,7 @@ test('successful Resource Task, Tool, and Crew destinations close Unified and re
 test('all three Open Validation paths use one overlap-safe parent transition', () => {
   assert.equal((panel.match(/onOpenValidation=\{props\.onOpenValidation\}/g) ?? []).length, 3);
   const wiring = page.slice(page.indexOf('<UnifiedPreflightPanel'), page.indexOf('/>', page.indexOf('<UnifiedPreflightPanel')) + 2);
-  assert.match(wiring, /onOpenValidation=\{\(\) => \{ preflightSelectionOwnerRef\.current = null; setIsPreflightReviewOpen\(false\); setIsCodeModalOpen\(true\); \}\}/);
+  assert.match(wiring, /onOpenValidation=\{\(\) => \{ preflightSelectionOwnerRef\.current = null;[\s\S]*setIsPreflightReviewOpen\(false\); setIsCodeModalOpen\(true\); \}\}/);
 });
 
 test('single-entry, Unified-hook, persistence, codegen, and analytics boundaries remain intact', () => {
