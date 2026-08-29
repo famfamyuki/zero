@@ -16,7 +16,7 @@ const edge = (id: string, source: string, target: string): Edge => ({ id, source
 const reverse = <T>(items: T[]) => [...items].reverse();
 const rotate = <T>(items: T[]) => items.length < 2 ? [...items] : [...items.slice(1), items[0]];
 const files = (graph: GraphData, mode: 'scaffold' | 'production' = 'scaffold') => generateProjectFiles(graph.nodes, graph.edges, graph.crewConfig, mode).files.map(({ path, content }) => ({ path, content }));
-const astValid = (content: string) => execFileSync('python', ['-c', 'import ast,sys; ast.parse(sys.stdin.read())'], { input: content });
+const astValid = (content: string) => execFileSync('python', ['-c', 'import ast,sys; ast.parse(sys.stdin.read())'], { input: content, env: { ...process.env, PYTHONUTF8: '1' } });
 
 function graph(): GraphData {
   const nodes = [agent('agent-b', 'Same', 'anthropic/claude-sonnet-4-6'), agent('agent-a', 'Same', 'gpt-5.6-terra'), tool('tool-b', 'Read', 'DirectoryReadTool', { directory: '{source_directory}' }), tool('tool-a', 'Read', 'FileReadTool', { file_path: '{source_file}' }), task('task-b', 'Same', 10), task('task-a', 'Same', 10), task('task-c', 'Result', -10, { outputFormat: 'json', outputSchema: '{"summary":"string"}' })];

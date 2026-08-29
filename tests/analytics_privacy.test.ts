@@ -8,8 +8,9 @@ import {
   filterPostHogCapture,
 } from '../lib/analytics-config';
 
-test('only the seventeen approved analytics events are accepted', () => {
+test('only the eighteen approved analytics events are accepted', () => {
   assert.equal(isAnalyticsEvent('template_selected'), true);
+  assert.equal(isAnalyticsEvent('crewai_imported'), true);
   assert.equal(isAnalyticsEvent('affiliate_clicked'), true);
   assert.equal(isAnalyticsEvent('readiness_opened'), true);
   assert.equal(isAnalyticsEvent('readiness_finding_selected'), true);
@@ -57,6 +58,12 @@ test('JSON import keeps only its safe source and discards file contents', () => 
     }),
     { source: 'drag_drop' }
   );
+});
+
+test('CrewAI import keeps only bounded success properties and strips source data', () => {
+  assert.deepEqual(sanitizeAnalyticsProperties('crewai_imported', {
+    adapter_version: '0.1.0', mapping_quality: 'mapped_with_presentation_inference', filename: 'private.py', path: 'C:/private.py', source: 'secret source', symbol: 'private', diagnostic: 'private', model_id: 'private', node_id: 'private',
+  }), { adapter_version: '0.1.0', mapping_quality: 'mapped_with_presentation_inference' });
 });
 
 // --- sanitizePageviewProperties ---
@@ -160,7 +167,7 @@ test('filterPostHogCapture returns null for null input', () => {
   assert.equal(filterPostHogCapture(null), null);
 });
 
-test('filterPostHogCapture passes all seventeen custom analytics events', () => {
+test('filterPostHogCapture passes all eighteen custom analytics events', () => {
   for (const event of ANALYTICS_EVENTS) {
     const result = filterPostHogCapture({
       uuid: 'test',
@@ -369,10 +376,11 @@ test('PostHog before_send strips private properties from every Unified Preflight
   }
 });
 
-test('ANALYTICS_EVENTS contains exactly the seventeen expected events', () => {
+test('ANALYTICS_EVENTS contains exactly the eighteen expected events', () => {
   const expected = [
     'template_selected',
     'json_imported',
+    'crewai_imported',
     'code_generated',
     'code_downloaded',
     'buymeacoffee_clicked',

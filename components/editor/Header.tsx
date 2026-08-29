@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Network, Code2, Download, Upload, Trash2, Sparkles, Globe, Coffee, Settings } from 'lucide-react';
 import { WorkflowTemplate } from '@/types/editor';
@@ -11,6 +11,8 @@ interface HeaderProps {
   onGenerateCode: () => void;
   onExportJson: () => void;
   onImportJson: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportCrewAI: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onViewCrewAIReport?: () => void;
   onClearCanvas: () => void;
   onLoadPreset?: (template: WorkflowTemplate) => void;
   onToggleSettings: () => void;
@@ -21,10 +23,13 @@ export const Header: React.FC<HeaderProps> = ({
   onGenerateCode,
   onExportJson,
   onImportJson,
+  onImportCrewAI,
+  onViewCrewAIReport,
   onClearCanvas,
   onToggleSettings,
 }) => {
   const { lang, setLanguage, t } = useLanguage();
+  const crewAIInputRef = useRef<HTMLInputElement>(null);
 
   const toggleLanguage = () => {
     setLanguage(lang === 'en' ? 'ja' : 'en');
@@ -95,6 +100,20 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="text-xs font-semibold shrink-0">{t('importJson')}</span>
           <input type="file" accept=".json,application/json" onChange={onImportJson} className="hidden" />
         </label>
+
+        <button
+          id="crewai-import-entry"
+          data-crewai-entry
+          type="button"
+          onClick={() => crewAIInputRef.current?.click()}
+          title={t('importCrewAITitle')}
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-violet-800 text-violet-200 hover:text-white hover:border-violet-500 transition cursor-pointer shrink-0 whitespace-nowrap"
+        >
+          <Upload className="w-4 h-4 text-violet-400 shrink-0" />
+          <span className="text-xs font-semibold shrink-0">{t('importCrewAI')}</span>
+        </button>
+        <input ref={crewAIInputRef} aria-label={t('importCrewAITitle')} type="file" accept=".py,text/x-python" onChange={onImportCrewAI} className="sr-only" tabIndex={-1} />
+        {onViewCrewAIReport && <button type="button" onClick={onViewCrewAIReport} className="hidden lg:block rounded-lg px-2 py-1.5 text-xs font-semibold text-violet-300 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{lang === 'ja' ? '読込レポート' : 'Import report'}</button>}
 
         <button
           onClick={onClearCanvas}

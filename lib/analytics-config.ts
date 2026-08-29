@@ -3,6 +3,7 @@ import type { CaptureResult } from 'posthog-js';
 export const ANALYTICS_EVENTS = [
   'template_selected',
   'json_imported',
+  'crewai_imported',
   'code_generated',
   'code_downloaded',
   'buymeacoffee_clicked',
@@ -25,6 +26,7 @@ export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[number];
 const EVENT_PROPERTY_ALLOWLIST: Record<AnalyticsEvent, readonly string[]> = {
   template_selected: ['template_id', 'source'],
   json_imported: ['source'],
+  crewai_imported: ['adapter_version', 'mapping_quality'],
   code_generated: [],
   code_downloaded: ['download_type', 'export_mode'],
   buymeacoffee_clicked: ['placement'],
