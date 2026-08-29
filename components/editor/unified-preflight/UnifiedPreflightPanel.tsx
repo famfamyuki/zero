@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { X } from 'lucide-react';
 import { translations, type Language } from '@/lib/i18n/translations';
 import type { ReadinessCategory, ReadinessFinding } from '@/types/readiness';
 import type { UnifiedPreflightStage } from '@/types/unified-preflight';
@@ -47,22 +46,20 @@ export function UnifiedPreflightPanel(props: Props) {
     if (!isOpen) return;
     let second = 0;
     const first = requestAnimationFrame(() => { second = requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true })); });
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); onClose(); } };
-    window.addEventListener('keydown', escape);
-    return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); window.removeEventListener('keydown', escape); };
+    return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-  return <aside id="unified-preflight-panel" aria-labelledby="unified-preflight-heading" aria-busy={preflight.isRefreshing} className="fixed inset-x-0 bottom-0 z-50 flex max-h-[80dvh] flex-col rounded-t-3xl border border-slate-700 bg-slate-950 shadow-2xl md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[440px] md:max-w-[45vw] md:rounded-none md:border-y-0 md:border-r-0 lg:w-[480px]">
-    <header className="shrink-0 border-b border-slate-800 p-4"><div className="flex items-center justify-between gap-3"><h2 id="unified-preflight-heading" ref={headingRef} tabIndex={-1} className="text-lg font-bold text-white focus:outline-none">{copy.unifiedPreflightTitle}</h2><button type="button" onClick={onClose} aria-label={copy.unifiedPreflightCloseLabel} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"><X className="h-5 w-5" aria-hidden="true" /></button></div>
+  return <main id="unified-preflight-panel" aria-labelledby="unified-preflight-heading" aria-busy={preflight.isRefreshing} className="flex min-h-0 flex-1 flex-col bg-slate-950">
+    <header className="mx-auto w-full max-w-5xl shrink-0 border-b border-slate-800 p-4"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-teal-300">{ja ? 'Evaluate · Verify' : 'Evaluate · Verify'}</p><h2 id="unified-preflight-heading" ref={headingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-white focus:outline-none">{copy.unifiedPreflightTitle}</h2></div><button type="button" onClick={onClose} className="min-h-11 rounded-lg px-3 text-xs font-bold text-slate-300">{ja ? 'Designを開く' : 'Open Design'}</button></div>
       <div className="mt-3 flex items-center gap-2"><button type="button" onClick={props.onReevaluate} className="min-h-11 rounded-lg border border-teal-700 px-3 text-xs font-bold text-teal-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300">{copy.unifiedPreflightReevaluate}</button><div aria-live="polite">{props.updatedNotice ? <span role="status" className="text-xs text-teal-200">{props.updatedNotice}</span> : null}</div></div>
       <div role="tablist" aria-label={ja ? '事前レビューのステージ' : 'Preflight review stages'} className="mt-3 flex gap-1 overflow-x-auto pb-1">{unifiedPreflightStages.map((stage, index) => <button key={stage} ref={(element) => { tabRefs.current[stage] = element ?? undefined; }} id={`unified-preflight-tab-${stage}`} type="button" role="tab" aria-selected={activeStage === stage} aria-controls={`unified-preflight-tabpanel-${stage}`} tabIndex={activeStage === stage ? 0 : -1} onClick={() => onStageChange(stage)} onKeyDown={(event) => handleTabKeyDown(stage, event)} className="min-h-11 shrink-0 rounded-lg px-3 text-xs font-bold text-slate-300 aria-selected:bg-teal-700 aria-selected:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300">{labels[index]}</button>)}</div>
     </header>
-    <div id={`unified-preflight-tabpanel-${activeStage}`} role="tabpanel" aria-labelledby={`unified-preflight-tab-${activeStage}`} className="min-h-0 flex-1 overflow-y-auto p-4 pb-8">
+    <div id={`unified-preflight-tabpanel-${activeStage}`} role="tabpanel" aria-labelledby={`unified-preflight-tab-${activeStage}`} className="mx-auto min-h-0 w-full max-w-5xl flex-1 overflow-y-auto p-4 pb-8">
       {activeStage === 'overview' ? <UnifiedPreflightOverview review={preflight.review} lang={lang} onSelectStage={onStageChange} /> : null}
       {activeStage === 'readiness' ? <ReadinessStageContent result={preflight.readiness.result} error={preflight.readiness.error} isRefreshing={preflight.readiness.isRefreshing} lang={lang} filter={readinessFilter} onFilterChange={setReadinessFilter} targetSummary={props.readinessTargetSummary} onRetry={preflight.readiness.evaluateNow} onLocate={props.onLocateReadiness} onOpenValidation={props.onOpenValidation} notice={props.readinessNotice} /> : null}
       {activeStage === 'execution' ? <><p className="mb-4 text-xs leading-relaxed text-slate-400">{copy.executionPreviewDisclaimer}</p><ExecutionPreviewStageContent state={preflight.execution.state} isRefreshing={preflight.execution.isRefreshing} lang={lang} notice={props.executionNotice} onRetry={preflight.execution.evaluateNow} onLocate={props.onLocateExecution} onOpenValidation={props.onOpenValidation} /></> : null}
       {activeStage === 'resources' ? <><p className="mb-4 text-xs leading-relaxed text-slate-400">{copy.resourceAnalysisDisclaimer}</p><ResourceAnalysisStageContent state={preflight.resources.state} isRefreshing={preflight.resources.isRefreshing} lang={lang} notice={props.resourceNotice} onRetry={preflight.resources.evaluateNow} onOpenValidation={props.onOpenValidation} onLocate={props.onLocateResources} /></> : null}
     </div>
-  </aside>;
+  </main>;
 }

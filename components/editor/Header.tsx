@@ -1,160 +1,54 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
-import { Network, Code2, Download, Upload, Trash2, Sparkles, Globe, Coffee, Settings } from 'lucide-react';
-import { WorkflowTemplate } from '@/types/editor';
+import { ChevronDown, Code2, Coffee, Download, Globe, Network, Settings, Sparkles, Trash2, Upload } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
 
+export type EditorSurface = 'overview' | 'design' | 'preflight';
+
 interface HeaderProps {
+  surface: EditorSurface;
+  onSurfaceChange: (surface: EditorSurface, trigger: HTMLButtonElement) => void;
   onGenerateCode: () => void;
   onExportJson: () => void;
-  onImportJson: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onImportCrewAI: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportJson: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onImportCrewAI: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onViewCrewAIReport?: () => void;
   onClearCanvas: () => void;
-  onLoadPreset?: (template: WorkflowTemplate) => void;
   onToggleSettings: () => void;
-  nodeCount?: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  onGenerateCode,
-  onExportJson,
-  onImportJson,
-  onImportCrewAI,
-  onViewCrewAIReport,
-  onClearCanvas,
-  onToggleSettings,
-}) => {
-  const { lang, setLanguage, t } = useLanguage();
+export const Header: React.FC<HeaderProps> = ({ surface, onSurfaceChange, onGenerateCode, onExportJson, onImportJson, onImportCrewAI, onViewCrewAIReport, onClearCanvas, onToggleSettings }) => {
+  const { lang, setLanguage } = useLanguage();
   const crewAIInputRef = useRef<HTMLInputElement>(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const labels = lang === 'ja' ? { overview: '概要', design: '設計', preflight: 'レビュー' } : { overview: 'Overview', design: 'Design', preflight: 'Preflight' };
 
-  const toggleLanguage = () => {
-    setLanguage(lang === 'en' ? 'ja' : 'en');
-  };
-
-  return (
-    <header className="min-h-[56px] py-2 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md px-3 flex flex-nowrap items-center justify-between shrink-0 z-30 gap-1.5 w-full max-w-full overflow-hidden">
-      {/* Brand / Logo */}
-      <div className="flex items-center gap-2 shrink-0 max-w-[50%]">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-emerald-500 p-0.5 shadow-lg shadow-indigo-500/20 shrink-0">
-          <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-indigo-400">
-            <Network className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="shrink min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span className="font-extrabold text-sm tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-200 to-emerald-300 whitespace-nowrap truncate">
-              {t('appName')}
-            </span>
-            <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/40 whitespace-nowrap hidden sm:inline-block shrink-0">
-              {t('zeroCostBadge')}
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-400 hidden lg:block whitespace-nowrap truncate">
-            {t('subTitle')}
-          </p>
-        </div>
+  return <header className="relative z-50 shrink-0 border-b border-slate-800 bg-slate-950/95 px-3 py-2 backdrop-blur-md">
+    <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center gap-2 lg:flex-nowrap">
+      <div className="flex min-w-0 items-center gap-2 lg:w-[350px]">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-emerald-500 text-white"><Network className="h-4 w-4" aria-hidden="true" /></div>
+        <div className="min-w-0"><div className="truncate text-sm font-extrabold text-white">AgentGraph Studio</div><p className="hidden truncate text-[10px] text-slate-400 sm:block">{lang === 'ja' ? 'ポータブルAIワークフロー・アーキテクチャ・エンジニアリング・ツールチェーン' : 'Portable AI Workflow Architecture Engineering Toolchain'}</p></div>
       </div>
-
-
-
-      {/* Right Actions */}
-      <div className="flex flex-nowrap items-center justify-end gap-1 sm:gap-1.5 shrink-0 ml-auto overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {/* Language Switcher Toggle */}
-        <button
-          onClick={toggleLanguage}
-          title="Switch Language / 言語切り替え"
-          className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs hover:border-indigo-600/60 hover:text-indigo-300 transition shrink-0 whitespace-nowrap"
-        >
-          <Globe className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-          <span className="font-semibold text-[11px] sm:text-xs shrink-0">{lang === 'en' ? 'EN' : '日本語'}</span>
-        </button>
-
-        <Link
-          href="/templates"
-          className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-indigo-900/60 text-indigo-300 text-xs hover:bg-indigo-950/50 hover:border-indigo-700 transition shadow-sm shrink-0 whitespace-nowrap"
-          title={t('freeTemplates')}
-        >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-          <span className="hidden lg:inline shrink-0">{t('freeTemplates')}</span>
-        </Link>
-
-        {/* JSON Import/Export (Desktop) */}
-        <button
-          onClick={onExportJson}
-          title={t('exportJson')}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition shrink-0 whitespace-nowrap"
-        >
-          <Download className="w-4 h-4 text-indigo-400 shrink-0" />
-          <span className="text-xs font-semibold shrink-0">Save</span>
-        </button>
-
-        <label
-          title={t('importJson')}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition cursor-pointer shrink-0 whitespace-nowrap"
-        >
-          <Upload className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="text-xs font-semibold shrink-0">{t('importJson')}</span>
-          <input type="file" accept=".json,application/json" onChange={onImportJson} className="hidden" />
-        </label>
-
-        <button
-          id="crewai-import-entry"
-          data-crewai-entry
-          type="button"
-          onClick={() => crewAIInputRef.current?.click()}
-          title={t('importCrewAITitle')}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-violet-800 text-violet-200 hover:text-white hover:border-violet-500 transition cursor-pointer shrink-0 whitespace-nowrap"
-        >
-          <Upload className="w-4 h-4 text-violet-400 shrink-0" />
-          <span className="text-xs font-semibold shrink-0">{t('importCrewAI')}</span>
-        </button>
-        <input ref={crewAIInputRef} aria-label={t('importCrewAITitle')} type="file" accept=".py,text/x-python" onChange={onImportCrewAI} className="sr-only" tabIndex={-1} />
-        {onViewCrewAIReport && <button type="button" onClick={onViewCrewAIReport} className="hidden lg:block rounded-lg px-2 py-1.5 text-xs font-semibold text-violet-300 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">{lang === 'ja' ? '読込レポート' : 'Import report'}</button>}
-
-        <button
-          onClick={onClearCanvas}
-          title={t('clearCanvas')}
-          className="hidden md:block p-1.5 lg:p-2 rounded-lg bg-slate-900 border border-slate-800 text-red-400 hover:bg-red-950/40 hover:border-red-900/60 transition shrink-0"
-        >
-          <Trash2 className="w-4 h-4 shrink-0" />
-        </button>
-
-        <button
-          onClick={onToggleSettings}
-          title={t('crewGlobalConfig') || 'Settings'}
-          className="hidden md:block p-1.5 lg:p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 transition shrink-0"
-        >
-          <Settings className="w-4 h-4 shrink-0" />
-        </button>
-
-        {/* Export Python Code Button */}
-        <button
-          onClick={onGenerateCode}
-          title={t('generatePython')}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/50 hover:border-emerald-400 text-emerald-300 font-bold text-xs hover:bg-emerald-950/40 transition shrink-0 whitespace-nowrap"
-        >
-          <Code2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="hidden md:inline shrink-0">{t('generatePython')}</span>
-          <span className="hidden sm:inline md:hidden font-bold shrink-0">Code</span>
-        </button>
-
-        {/* Persistent Support CTA Button (Desktop & Tablet) */}
-        <a
-          href="https://www.buymeacoffee.com/agentgraph"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="☕ Support AgentGraph"
-          onClick={() => trackEvent('buymeacoffee_clicked', { placement: 'header' })}
-          className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all shrink-0 border border-amber-300/60 whitespace-nowrap"
-        >
-          <Coffee className="w-3.5 h-3.5 shrink-0" />
-          <span className="hidden lg:inline shrink-0">☕ Support AgentGraph</span>
-        </a>
+      <nav aria-label={lang === 'ja' ? 'プロダクト画面' : 'Product surfaces'} className="order-3 grid w-full grid-cols-3 gap-1 rounded-xl border border-slate-800 bg-slate-900/80 p-1 lg:order-none lg:mx-auto lg:w-auto lg:min-w-[330px]">
+        {(['overview', 'design', 'preflight'] as const).map((item) => <button key={item} type="button" aria-current={surface === item ? 'page' : undefined} onClick={(event) => onSurfaceChange(item, event.currentTarget)} className="min-h-11 rounded-lg px-3 text-xs font-bold text-slate-300 transition hover:bg-slate-800 aria-[current=page]:bg-indigo-600 aria-[current=page]:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300" aria-label={item === 'preflight' && lang === 'ja' ? 'Preflightレビュー' : labels[item]}>{labels[item]}</button>)}
+      </nav>
+      <div className="relative ml-auto flex items-center gap-1 lg:w-[350px] lg:justify-end">
+        <div className="relative"><button type="button" aria-expanded={exportOpen} onClick={() => { setExportOpen((value) => !value); setMoreOpen(false); }} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-emerald-600/60 px-3 text-xs font-bold text-emerald-200"><Download className="h-4 w-4" aria-hidden="true" />Export<ChevronDown className="h-3 w-3" aria-hidden="true" /></button>{exportOpen ? <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-2xl"><button type="button" onClick={() => { setExportOpen(false); onExportJson(); }} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs hover:bg-slate-800"><Download className="h-4 w-4 text-indigo-300" />AgentGraph JSON</button><button type="button" onClick={() => { setExportOpen(false); onGenerateCode(); }} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs hover:bg-slate-800"><Code2 className="h-4 w-4 text-emerald-300" />CrewAI Python</button></div> : null}</div>
+        <div className="relative"><button type="button" aria-expanded={moreOpen} onClick={() => { setMoreOpen((value) => !value); setExportOpen(false); }} className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-slate-700 px-3 text-xs font-bold text-slate-200">{lang === 'ja' ? 'その他' : 'More'}<ChevronDown className="h-3 w-3" /></button>{moreOpen ? <div className="absolute right-0 top-full mt-2 max-h-[70dvh] w-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-2xl">
+          <button data-crewai-entry type="button" onClick={() => crewAIInputRef.current?.click()} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs hover:bg-slate-800"><Upload className="h-4 w-4 text-violet-300" />CrewAI Python</button><input ref={crewAIInputRef} aria-label="Import CrewAI Python — Supported subset" type="file" accept=".py,text/x-python" onChange={onImportCrewAI} className="sr-only" />
+          <label className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-3 text-xs hover:bg-slate-800"><Upload className="h-4 w-4 text-emerald-300" />AgentGraph JSON<input type="file" accept=".json,application/json" onChange={onImportJson} className="sr-only" /></label>
+          <Link href="/templates" className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-xs hover:bg-slate-800"><Sparkles className="h-4 w-4 text-amber-300" />{lang === 'ja' ? 'テンプレート' : 'Templates'}</Link>
+          {onViewCrewAIReport ? <button type="button" onClick={onViewCrewAIReport} className="min-h-11 w-full rounded-lg px-3 text-left text-xs hover:bg-slate-800">{lang === 'ja' ? '読込レポート' : 'Import report'}</button> : null}
+          <button type="button" onClick={onToggleSettings} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs hover:bg-slate-800"><Settings className="h-4 w-4" />{lang === 'ja' ? 'Crew全体設定' : 'Crew settings'}</button>
+          <button type="button" onClick={onClearCanvas} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs text-red-300 hover:bg-red-950/40"><Trash2 className="h-4 w-4" />{lang === 'ja' ? 'ワークフローを消去' : 'Clear workflow'}</button>
+          <button type="button" onClick={() => setLanguage(lang === 'en' ? 'ja' : 'en')} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-xs hover:bg-slate-800"><Globe className="h-4 w-4" />{lang === 'en' ? '日本語' : 'English'}</button>
+          <a href="https://www.buymeacoffee.com/agentgraph" target="_blank" rel="noopener noreferrer" onClick={() => trackEvent('buymeacoffee_clicked', { placement: window.matchMedia('(max-width: 767px)').matches ? 'mobile_more' : 'header' })} className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-xs text-amber-300 hover:bg-slate-800"><Coffee className="h-4 w-4" />{lang === 'ja' ? '開発を支援' : 'Support AgentGraph'}</a>
+        </div> : null}</div>
       </div>
-    </header>
-  );
+    </div>
+  </header>;
 };

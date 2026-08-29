@@ -15,12 +15,12 @@ test('entry and page retain explicit trigger focus ownership', () => {
   assert.match(page, /preflightReviewEntryRef\.current = trigger/);
 });
 
-test('normal Close and Escape share owner release and double-rAF focus restoration', () => {
+test('surface close releases owner and restores entry while Escape does not close the Product surface', () => {
   const close = between('const closePreflightReview', 'const handleLocateExecutionPreview');
   const restore = between('const restoreEntryFocus', 'const closePreflightReview');
   assert.match(close, /preflightSelectionOwnerRef\.current = null/); assert.match(close, /setIsPreflightReviewOpen\(false\)/); assert.match(close, /restoreEntryFocus\(preflightReviewEntryRef\.current\)/);
   assert.equal((restore.match(/requestAnimationFrame/g) ?? []).length, 2); assert.match(restore, /entry\?\.isConnected/);
-  assert.match(panel, /event\.key === 'Escape'/); assert.match(panel, /onClose\(\)/); assert.match(page, /onClose=\{closePreflightReview\}/);
+  assert.doesNotMatch(panel, /event\.key === 'Escape'/); assert.match(panel, /onClick=\{onClose\}/); assert.match(page, /onClose=\{closePreflightReview\}/);
 });
 
 test('Unified owner is claimed before opening and suppresses passive selection', () => {

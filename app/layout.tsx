@@ -5,8 +5,8 @@ import { Analytics } from '@vercel/analytics/react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
-  title: 'AgentGraph Studio | Preflight Engineering for CrewAI Workflows',
-  description: 'Design or import CrewAI workflows, review readiness, execution structure, and resource implications before you run them, then export deterministic Python.',
+  title: 'AgentGraph Studio | Workflow Architecture Preflight & Portable Export',
+  description: 'Understand, evaluate, and manually improve AI workflow architecture with deterministic Preflight. Import supported CrewAI Python or AgentGraph JSON, review static evidence, then export portable JSON or deterministic CrewAI Python.',
 };
 
 export const viewport = {

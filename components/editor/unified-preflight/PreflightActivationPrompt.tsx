@@ -6,7 +6,7 @@ import { translations, type Language } from '@/lib/i18n/translations';
 
 interface Props {
   lang: Language;
-  onReview: () => void;
+  onReview: (trigger: HTMLButtonElement) => void;
   onDismiss: () => void;
   onShown: () => void;
 }
@@ -33,7 +33,7 @@ export function PreflightActivationPrompt({ lang, onReview, onDismiss, onShown }
       </p>
       <button
         type="button"
-        onClick={onReview}
+        onClick={(event) => onReview(event.currentTarget)}
         className="mt-3 inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-teal-600 px-4 text-xs font-bold text-white transition hover:bg-teal-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
       >
         {copy.preflightActivationCta}

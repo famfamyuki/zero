@@ -85,11 +85,9 @@ test('UPR acceptance: tabs, ARIA, and responsive shell remain hardened without J
   assert.match(panel, /aria-controls=\{`unified-preflight-tabpanel-\$\{stage\}`\}/);
   assert.match(panel, /aria-labelledby=\{`unified-preflight-tab-\$\{activeStage\}`\}/);
   assert.match(panel, /tabRefs\.current\[destination\]\?\.focus\(\)/);
-  assert.match(panel, /event\.key === 'Escape'/);
-  assert.match(panel, /max-h-\[80dvh\]/);
-  assert.match(panel, /md:w-\[440px\]/);
-  assert.match(panel, /lg:w-\[480px\]/);
-  assert.match(panel, /md:max-w-\[45vw\]/);
+  assert.doesNotMatch(panel, /event\.key === 'Escape'/);
+  assert.match(panel, /max-w-5xl/);
+  assert.match(panel, /flex min-h-0 flex-1 flex-col/);
   assert.equal((panel.match(/overflow-y-auto/g) ?? []).length, 1);
   assert.match(panel, /overflow-x-auto/);
   assert.doesNotMatch(panel + source('components/editor/unified-preflight/UnifiedPreflightEntryButton.tsx'), /innerWidth|ResizeObserver|addEventListener\(['"]resize/);

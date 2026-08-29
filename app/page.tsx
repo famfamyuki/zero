@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNodesState, useEdgesState, Edge } from '@xyflow/react';
 import confetti from 'canvas-confetti';
-import { Header } from '@/components/editor/Header';
+import { Header, type EditorSurface } from '@/components/editor/Header';
+import { WorkflowOverview, type PresentationOrigin } from '@/components/editor/WorkflowOverview';
+import { ReviewReturnBar, type ReviewReturnContext } from '@/components/editor/ReviewReturnBar';
 import { Sidebar } from '@/components/editor/Sidebar';
 import { Canvas } from '@/components/editor/Canvas';
 import { Inspector } from '@/components/editor/Inspector';
@@ -12,14 +14,14 @@ import { CrewAIImportReview } from '@/components/editor/CrewAIImportReview';
 import { CustomNode, CrewConfig, WorkflowTemplate, GraphData, NodeType, AgentNodeData, TaskNodeData, ToolNodeData } from '@/types/editor';
 import { PRESET_TEMPLATES } from '@/lib/presets';
 import { DEFAULT_LLM_MODEL } from '@/lib/models';
-import Link from 'next/link';
-import { Code2, Zap, Layers, Sliders, Sparkles, Coffee, ExternalLink, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { trackEvent } from '@/lib/analytics';
 import { deserializeGraph, GraphDeserializationError, serializeGraph } from '@/lib/graph-json';
 import type { CrewAIImportResult } from '@/types/crewai-import';
 import { validateGraph } from '@/lib/transpiler/validation';
 import type { ReadinessFinding } from '@/types/readiness';
+import { translateReadinessKey } from '@/lib/readiness/translations';
 import type { ExecutionPreviewLocateSource, ExecutionPreviewTargetType } from '@/components/editor/execution-preview/ExecutionPreviewStepCard';
 import { isNewNodeSelection, resolveExecutionPreviewNavigationTarget } from '@/lib/execution-preview-navigation';
 import type { ResourceAnalysisLocateContext } from '@/components/editor/resource-analysis/ResourceAnalysisPanel';
@@ -153,6 +155,10 @@ export default function EditorPage() {
   const [resourceAnalysisNotice, setResourceAnalysisNotice] = useState<string | null>(null);
   const [preflightUpdatedNotice, setPreflightUpdatedNotice] = useState<string | null>(null);
   const [isPreflightReviewOpen, setIsPreflightReviewOpen] = useState(false);
+  const [surface, setSurface] = useState<EditorSurface>('overview');
+  const [presentationOrigin, setPresentationOrigin] = useState<PresentationOrigin>('example');
+  const [reviewReturnContext, setReviewReturnContext] = useState<ReviewReturnContext | null>(null);
+  const [navigationAnnouncement, setNavigationAnnouncement] = useState('');
   const [workspaceHydrated, setWorkspaceHydrated] = useState(false);
   const [activationPersistenceHydrated, setActivationPersistenceHydrated] = useState(false);
   const [activationPersistentStatus, setActivationPersistentStatus] = useState<PreflightActivationPersistentStatus | null>(null);
@@ -233,6 +239,7 @@ export default function EditorPage() {
         setCrewConfig(graph.crewConfig);
         historyRef.current = [{ nodes: graph.nodes, edges: graph.edges }];
         historyIndexRef.current = 0;
+        setPresentationOrigin('existing_browser_workflow');
       }
     } catch (e) {
       skipNextAutosaveRef.current = true;
@@ -360,6 +367,8 @@ export default function EditorPage() {
       setEdges(template.graphData.edges);
       setCrewConfig(template.graphData.crewConfig);
       setSelectedNode(null);
+      setPresentationOrigin('template');
+      setReviewReturnContext(null);
       try {
         localStorage.setItem(STORAGE_KEY, serializeGraph(template.graphData));
       } catch (e) {
@@ -473,6 +482,8 @@ export default function EditorPage() {
       setNodes([]);
       setEdges([]);
       setSelectedNode(null);
+      setPresentationOrigin('manual');
+      setReviewReturnContext(null);
       try {
         localStorage.removeItem(STORAGE_KEY);
       } catch (e) {
@@ -507,6 +518,7 @@ export default function EditorPage() {
       setExecutionPreviewNotice(null);
       setResourceAnalysisNotice(null);
       setIsPreflightReviewOpen(true);
+      setSurface('preflight');
     }
   }, [isPreflightReviewOpen, preflight]);
 
@@ -580,8 +592,21 @@ export default function EditorPage() {
     preflightSelectionOwnerRef.current = null;
     setPreflightUpdatedNotice(null);
     setIsPreflightReviewOpen(false);
+    setSurface('design');
     restoreEntryFocus(preflightReviewEntryRef.current);
   }, [restoreEntryFocus]);
+
+  const handleSurfaceChange = useCallback((next: EditorSurface, trigger: HTMLButtonElement) => {
+    if (next === 'preflight') {
+      handleOpenPreflightReview(trigger, 'entry');
+      if (isPreflightReviewOpen) setSurface('preflight');
+      return;
+    }
+    setIsPreflightReviewOpen(false);
+    setIsMobileSidebarOpen(false);
+    setSurface(next);
+    requestAnimationFrame(() => document.getElementById(next === 'overview' ? 'overview-heading' : 'design-heading')?.focus({ preventScroll: true }));
+  }, [handleOpenPreflightReview, isPreflightReviewOpen]);
 
   const handleLocateExecutionPreview = useCallback((targetType: ExecutionPreviewTargetType, nodeId: string | undefined, source: ExecutionPreviewLocateSource) => {
     const target = resolveExecutionPreviewNavigationTarget(targetType, nodeId, latestNodes.current);
@@ -589,7 +614,10 @@ export default function EditorPage() {
       preflightSelectionOwnerRef.current = null;
       trackEvent('execution_preview_located', { target_type: 'crew', source });
       setSelectedNode(null);
-    setIsPreflightReviewOpen(false);
+      setIsPreflightReviewOpen(false);
+      setSurface('design');
+      setReviewReturnContext({ stage: 'execution', label: `${targetType} · ${source}`, itemKey: `${targetType}:${nodeId ?? 'crew'}:${source}` });
+      setNavigationAnnouncement(lang === 'ja' ? 'Designで設定を表示しました。指摘に戻れます。' : 'Located configuration in Design. Back to finding is available.');
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => window.dispatchEvent(new Event('focus-manager-llm')));
@@ -607,6 +635,9 @@ export default function EditorPage() {
     setEdges((items) => items.map((item) => ({ ...item, selected: false })));
     setSelectedNode(node);
     setIsPreflightReviewOpen(false);
+    setSurface('design');
+    setReviewReturnContext({ stage: 'execution', label: `${targetType} · ${source}`, itemKey: `${targetType}:${nodeId ?? 'crew'}:${source}` });
+    setNavigationAnnouncement(lang === 'ja' ? `${node.data.label}をDesignで表示し、Inspectorを開きました。指摘に戻れます。` : `Located ${node.data.label} in Design and opened Inspector. Back to finding is available.`);
     setIsMobileSidebarOpen(false);
     setIsInspectorOpen(true);
     requestAnimationFrame(() => {
@@ -614,7 +645,7 @@ export default function EditorPage() {
       window.dispatchEvent(new Event('focus-inspector-heading'));
     });
     return true;
-  }, [executionPreview, setEdges, setNodes, t]);
+  }, [executionPreview, lang, setEdges, setNodes, t]);
 
   const handleLocateResourceAnalysis = useCallback((
     resourceTarget: ResourceAnalysisTarget,
@@ -635,12 +666,15 @@ export default function EditorPage() {
     }
     preflightSelectionOwnerRef.current = null;
     setIsPreflightReviewOpen(false);
+    setSurface('design');
+    setReviewReturnContext({ stage: 'resources', label: context.hotspotKind, itemKey: `${context.hotspotKind}:${'id' in resourceTarget ? resourceTarget.id : 'crew'}` });
     setIsMobileSidebarOpen(false);
     setIsInspectorOpen(true);
     if (target.kind === 'crew') {
       setNodes((items) => items.map((item) => ({ ...item, selected: false })));
       setEdges((items) => items.map((item) => ({ ...item, selected: false })));
       setSelectedNode(null);
+      setNavigationAnnouncement(lang === 'ja' ? 'DesignでCrew設定を表示しました。指摘に戻れます。' : 'Located Crew configuration in Design. Back to finding is available.');
       requestAnimationFrame(() => window.dispatchEvent(new Event('focus-manager-llm')));
       return true;
     }
@@ -648,12 +682,13 @@ export default function EditorPage() {
     setNodes((items) => items.map((item) => ({ ...item, selected: item.id === node.id })));
     setEdges((items) => items.map((item) => ({ ...item, selected: false })));
     setSelectedNode(node);
+    setNavigationAnnouncement(lang === 'ja' ? `${node.data.label}をDesignで表示し、Inspectorを開きました。指摘に戻れます。` : `Located ${node.data.label} in Design and opened Inspector. Back to finding is available.`);
     requestAnimationFrame(() => {
       window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId: node.id } }));
       window.dispatchEvent(new Event('focus-inspector-heading'));
     });
     return true;
-  }, [resourceAnalysis, setEdges, setNodes, t]);
+  }, [lang, resourceAnalysis, setEdges, setNodes, t]);
 
   const handleLocateFinding = useCallback((finding: ReadinessFinding) => {
     const target = finding.target;
@@ -670,6 +705,9 @@ export default function EditorPage() {
       setEdges((items) => items.map((item) => ({ ...item, selected: false })));
       setSelectedNode(node);
       setIsPreflightReviewOpen(false);
+      setSurface('design');
+      setReviewReturnContext({ stage: 'readiness', label: translateReadinessKey(lang, finding.titleKey, finding.params), itemKey: `${finding.ruleId}:${target.nodeId}` });
+      setNavigationAnnouncement(lang === 'ja' ? `${node.data.label}をDesignで表示し、Inspectorを開きました。指摘に戻れます。` : `Located ${node.data.label} in Design and opened Inspector. Back to finding is available.`);
       setIsMobileSidebarOpen(false);
       setIsInspectorOpen(true);
       requestAnimationFrame(() => {
@@ -689,11 +727,17 @@ export default function EditorPage() {
       setNodes((items) => items.map((item) => ({ ...item, selected: false })));
       setEdges((items) => items.map((item) => ({ ...item, selected: item.id === target.edgeId })));
       setSelectedNode(null); setIsInspectorOpen(false); setIsPreflightReviewOpen(false);
+      setSurface('design');
+      setReviewReturnContext({ stage: 'readiness', label: translateReadinessKey(lang, finding.titleKey, finding.params), itemKey: `${finding.ruleId}:${target.edgeId}` });
+      setNavigationAnnouncement(lang === 'ja' ? 'EdgeをDesignで表示しました。指摘に戻れます。' : 'Located edge in Design. Back to finding is available.');
       requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-flow-edge', { detail: { edgeId: target.edgeId } })));
       return;
     }
     preflightSelectionOwnerRef.current = null;
     setSelectedNode(null); setIsPreflightReviewOpen(false); setIsMobileSidebarOpen(false); setIsInspectorOpen(true);
+    setSurface('design');
+    setReviewReturnContext({ stage: 'readiness', label: translateReadinessKey(lang, finding.titleKey, finding.params), itemKey: `${finding.ruleId}:${target.field ?? 'graph'}` });
+    setNavigationAnnouncement(lang === 'ja' ? 'Crew設定をDesignで表示しました。指摘に戻れます。' : 'Located Crew configuration in Design. Back to finding is available.');
     requestAnimationFrame(() => window.dispatchEvent(new Event('focus-inspector-heading')));
   }, [lang, readiness, setEdges, setNodes]);
 
@@ -754,6 +798,9 @@ export default function EditorPage() {
         setEdges(graph.edges);
         setCrewConfig(graph.crewConfig);
         setSelectedNode(null);
+        setPresentationOrigin('agentgraph_json');
+        setReviewReturnContext(null);
+        setSurface('overview');
         historyRef.current = [{ nodes: graph.nodes, edges: graph.edges }];
         historyIndexRef.current = 0;
 
@@ -782,6 +829,7 @@ export default function EditorPage() {
   const [crewAIImportResult, setCrewAIImportResult] = useState<CrewAIImportResult | null>(null);
   const [isCrewAIImportOpen, setIsCrewAIImportOpen] = useState(false);
   const mobileCrewAIInputRef = useRef<HTMLInputElement>(null);
+  const overviewJsonInputRef = useRef<HTMLInputElement>(null);
   const crewAIImportRequestRef = useRef(0);
 
   const handleImportJson = useCallback(
@@ -818,6 +866,7 @@ export default function EditorPage() {
     // Confirm against the current graph at Apply time, never the parse-time snapshot.
     if ((latestNodes.current.length > 0 || latestEdges.current.length > 0) && !window.confirm(lang === 'ja' ? '現在のワークフローをCrewAIインポートで置き換えますか？' : 'Replace the current workflow with this CrewAI import?')) return;
     setNodes(graph.nodes); setEdges(graph.edges); setCrewConfig(graph.crewConfig); setSelectedNode(null);
+    setPresentationOrigin('crewai_python'); setReviewReturnContext(null); setSurface('overview');
     historyRef.current = [{ nodes: graph.nodes, edges: graph.edges }]; historyIndexRef.current = 0;
     try { localStorage.setItem(STORAGE_KEY, serializeGraph(graph)); } catch (error) { console.error('Failed to save imported workflow to localStorage:', error instanceof Error ? error.name : 'storage error'); }
     trackEvent('crewai_imported', { adapter_version: '0.1.0', mapping_quality: crewAIImportResult.report.summary.mappedWithInference > 0 ? 'mapped_with_presentation_inference' : 'mapped' });
@@ -854,44 +903,47 @@ export default function EditorPage() {
     };
   }, []);
 
+  const handleBackToReview = useCallback(() => {
+    if (!reviewReturnContext) return;
+    setActivePreflightStage(reviewReturnContext.stage);
+    setIsPreflightReviewOpen(true);
+    setSurface('preflight');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const item = document.querySelector<HTMLElement>(`[data-review-item="${CSS.escape(reviewReturnContext.itemKey)}"]`);
+      if (item) {
+        item.focus({ preventScroll: false });
+      } else {
+        document.getElementById('unified-preflight-heading')?.focus({ preventScroll: true });
+        setNavigationAnnouncement(lang === 'ja' ? 'ワークフロー変更後、以前のレビュー項目は存在しません。該当ステージを表示しました。' : 'The previous review item is no longer present after the workflow changed. The review stage is open.');
+      }
+    }));
+  }, [lang, reviewReturnContext]);
+
+  const counts = useMemo(() => ({
+    agents: nodes.filter((node) => node.type === 'agent').length,
+    tasks: nodes.filter((node) => node.type === 'task').length,
+    tools: nodes.filter((node) => node.type === 'tool').length,
+  }), [nodes]);
+
   return (
     <div className="min-h-[100dvh] h-[100dvh] w-full max-w-full flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Top Navigation Header */}
       <Header
+        surface={surface}
+        onSurfaceChange={handleSurfaceChange}
         onGenerateCode={handleGenerateCode}
         onExportJson={handleExportJson}
         onImportJson={handleImportJson}
         onImportCrewAI={handleImportCrewAI}
         onViewCrewAIReport={crewAIImportResult ? () => setIsCrewAIImportOpen(true) : undefined}
         onClearCanvas={handleClearCanvas}
-        onLoadPreset={handleLoadPreset}
         onToggleSettings={() => {
           preflightSelectionOwnerRef.current = null;
           setSelectedNode(null);
-    setIsPreflightReviewOpen(false);
+          setSurface('design');
+          setIsPreflightReviewOpen(false);
           setIsInspectorOpen(!isInspectorOpen);
         }}
-        nodeCount={nodes.length}
       />
-
-      {/* Developer & Marketer Target Value Proposition Banner */}
-      <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-violet-950 border-b border-indigo-900/50 px-3 sm:px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 z-20 shadow-md">
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-md bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-300 shrink-0">
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-          </div>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <span className="font-extrabold text-[10px] sm:text-xs text-white tracking-wide uppercase bg-indigo-600/40 px-1.5 py-0.5 rounded border border-indigo-500/40">
-              {t('mainCopy')}
-            </span>
-            <span className="text-[11px] sm:text-xs text-slate-300">
-              {t('subCopy')}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Purchase Success Banner */}
       {purchaseSuccessMessage && (
         <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-b border-emerald-800/60 px-4 py-2 flex items-center justify-between text-xs text-emerald-300 z-40 animate-in slide-in-from-top">
           <span>{purchaseSuccessMessage}</span>
@@ -903,7 +955,6 @@ export default function EditorPage() {
           </button>
         </div>
       )}
-
       {recoveryNotice && (
         <div className="z-40 flex items-center justify-between border-b border-amber-700/60 bg-amber-950 px-4 py-2 text-xs text-amber-200">
           <span>{t('storageRecoveryNotice')}</span>
@@ -912,13 +963,14 @@ export default function EditorPage() {
           </button>
         </div>
       )}
+      <div className="sr-only" aria-live="polite">{navigationAnnouncement}</div>
+      <input ref={mobileCrewAIInputRef} aria-label={t('importCrewAITitle')} type="file" accept=".py,text/x-python" onChange={handleImportCrewAI} className="sr-only" />
+      <input ref={overviewJsonInputRef} aria-label={t('importJson')} type="file" accept=".json,application/json" onChange={handleImportJson} className="sr-only" />
 
-      {/* Main Workspace Area */}
-      <div
-        className="flex-1 flex overflow-hidden relative"
-        ref={workspaceRef}
-        onDragEnter={handleWorkspaceDragEnter}
-      >
+      {surface === 'overview' ? <WorkflowOverview lang={lang} origin={presentationOrigin} crewConfig={crewConfig} agentCount={counts.agents} taskCount={counts.tasks} toolCount={counts.tools} preflight={preflight.review} hasMappingReport={Boolean(crewAIImportResult)} onCrewAI={() => mobileCrewAIInputRef.current?.click()} onJson={() => overviewJsonInputRef.current?.click()} onDesign={() => { setSurface('design'); setIsPreflightReviewOpen(false); }} onPreflight={handleOpenPreflightReview} onMappingReport={() => setIsCrewAIImportOpen(true)} activationPromptVisible={activationPromptVisible} onActivationPromptShown={handleActivationPromptShown} onDismissActivationPrompt={handleDismissActivationPrompt} /> : null}
+
+      {surface === 'design' && reviewReturnContext ? <ReviewReturnBar context={reviewReturnContext} lang={lang} isRefreshing={preflight.isRefreshing} onBack={handleBackToReview} onClear={() => setReviewReturnContext(null)} /> : null}
+      {surface === 'design' ? <><h1 id="design-heading" tabIndex={-1} className="sr-only">{lang === 'ja' ? 'Design — ワークフロー設計' : 'Design — Workflow canvas'}</h1><div className="flex-1 flex overflow-hidden relative" ref={workspaceRef} onDragEnter={handleWorkspaceDragEnter}>
         {isJsonDragActive && (
           <div
             className="absolute inset-0 z-[70] flex items-center justify-center bg-slate-950/85 p-5 backdrop-blur-sm"
@@ -942,7 +994,6 @@ export default function EditorPage() {
             </div>
           </div>
         )}
-        {/* Left Palette & Presets Sidebar */}
         <Sidebar
           onLoadPreset={handleLoadPreset}
           onAddNode={handleAddNode}
@@ -950,7 +1001,6 @@ export default function EditorPage() {
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
 
-        {/* Central React Flow Canvas */}
         <Canvas
           nodes={nodes}
           edges={edges}
@@ -965,14 +1015,12 @@ export default function EditorPage() {
           isFullscreen={isFullscreen}
           isPreflightReviewOpen={isPreflightReviewOpen}
           onOpenPreflightReview={handleOpenPreflightReview}
-          activationPromptVisible={activationPromptVisible}
+          activationPromptVisible={false}
           onActivationPromptShown={handleActivationPromptShown}
           onDismissActivationPrompt={handleDismissActivationPrompt}
           isInspectorOpen={isInspectorOpen}
         />
-
-        {/* Mobile Floating Drawer & Navigation Toolbar */}
-        {!isPreflightReviewOpen && <div className="md:hidden absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-slate-900/95 border border-slate-800 backdrop-blur-md p-1.5 rounded-full shadow-2xl max-w-[95vw] overflow-x-auto">
+        <div className="md:hidden absolute bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-30 grid w-[min(92vw,24rem)] grid-cols-2 gap-2 rounded-2xl border border-slate-700 bg-slate-900/95 p-2 shadow-2xl">
           <button
             onClick={() => {
               preflightSelectionOwnerRef.current = null;
@@ -980,39 +1028,10 @@ export default function EditorPage() {
               setIsInspectorOpen(false);
               setIsPreflightReviewOpen(false);
             }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition shrink-0"
+            className="flex min-h-11 items-center justify-center rounded-xl bg-slate-800 text-xs font-semibold text-slate-200"
           >
-            <Layers className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span className="shrink-0">{t('mobilePalette') || 'Palette'}</span>
+            {t('mobilePalette') || 'Palette'}
           </button>
-
-          <Link
-            href="/templates"
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] font-semibold transition shrink-0 border border-amber-500/30"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span className="shrink-0">{t('mobileTemplates') || 'Templates'}</span>
-          </Link>
-
-          <label className="flex cursor-pointer items-center gap-1 rounded-full border border-emerald-500/30 bg-slate-800 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-300 transition hover:bg-slate-700 shrink-0">
-            <Upload className="h-3.5 w-3.5 shrink-0" />
-            <span className="shrink-0">{t('importJson')}</span>
-            <input type="file" accept=".json,application/json" onChange={handleImportJson} className="hidden" />
-          </label>
-
-          <button data-crewai-entry type="button" onClick={() => mobileCrewAIInputRef.current?.click()} className="flex min-h-11 cursor-pointer items-center gap-1 rounded-full border border-violet-500/40 bg-slate-800 px-3 text-[11px] font-semibold text-violet-200 transition hover:bg-slate-700 shrink-0" title={t('importCrewAITitle')}>
-            <Upload className="h-3.5 w-3.5 shrink-0" /><span className="shrink-0">{t('importCrewAI')}</span>
-          </button>
-          <input ref={mobileCrewAIInputRef} aria-label={t('importCrewAITitle')} type="file" accept=".py,text/x-python" onChange={handleImportCrewAI} className="sr-only" tabIndex={-1} />
-
-          <button
-            onClick={handleGenerateCode}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-[11px] transition shadow-lg shadow-emerald-500/30 shrink-0"
-          >
-            <Code2 className="w-3.5 h-3.5 text-slate-950 shrink-0" />
-            <span className="shrink-0">{t('mobileExport') || 'Export Code'}</span>
-          </button>
-
           <button
             onClick={() => {
               preflightSelectionOwnerRef.current = null;
@@ -1020,42 +1039,11 @@ export default function EditorPage() {
               setIsMobileSidebarOpen(false);
               setIsPreflightReviewOpen(false);
             }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold transition shrink-0"
+            className="flex min-h-11 items-center justify-center rounded-xl bg-slate-800 text-xs font-semibold text-slate-200"
           >
-            <Sliders className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-            <span className="shrink-0">{t('mobileInspector') || 'Inspector'}</span>
+            {t('mobileInspector') || 'Inspector'}
           </button>
-        </div>}
-
-        {/* Dedicated Mobile Bottom Sticky Support Banner (sm:hidden) */}
-        {!isPreflightReviewOpen && <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 px-3 py-2 bg-slate-950/95 border-t border-emerald-500/60 backdrop-blur-md flex items-center justify-between gap-2 shadow-2xl">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border-amber-400/50 text-amber-300 flex items-center justify-center shrink-0 border">
-              <Coffee className="w-3.5 h-3.5 shrink-0" />
-            </div>
-            <div className="truncate">
-              <span className="font-extrabold text-[11px] text-amber-300 block leading-tight truncate">
-                Support AgentGraph Studio
-              </span>
-              <span className="text-[9px] text-slate-400 block truncate">
-                Help fund free templates, documentation, and continued development.
-              </span>
-            </div>
-          </div>
-
-          <a
-            href="https://www.buymeacoffee.com/agentgraph"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackEvent('buymeacoffee_clicked', { placement: 'mobile_sticky' })}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/30 border-amber-300/60 font-extrabold text-[11px] shadow-lg shrink-0 border whitespace-nowrap active:scale-95 transition"
-          >
-            <span className="shrink-0">Buy me a coffee</span>
-            <ExternalLink className="w-3 h-3 shrink-0" />
-          </a>
-        </div>}
-
-        {/* Right Parameter Inspector Panel */}
+        </div>
         <Inspector
           selectedNode={selectedNode}
           onUpdateNodeData={handleUpdateNodeData}
@@ -1065,8 +1053,9 @@ export default function EditorPage() {
           isOpen={isInspectorOpen}
           onClose={() => setIsInspectorOpen(false)}
         />
-        <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} />
-      </div>
+      </div></> : null}
+
+      {surface === 'preflight' ? <UnifiedPreflightPanel isOpen={isPreflightReviewOpen} activeStage={activePreflightStage} onStageChange={handlePreflightStageChange} preflight={preflight} lang={lang} readinessNotice={readinessNotice} executionNotice={executionPreviewNotice} resourceNotice={resourceAnalysisNotice} updatedNotice={preflightUpdatedNotice} onReevaluate={handleReevaluatePreflight} readinessTargetSummary={readinessTargetSummary} onClose={closePreflightReview} onLocateReadiness={handleLocateFinding} onLocateExecution={handleLocateExecutionPreview} onLocateResources={handleLocateResourceAnalysis} onOpenValidation={() => { preflightSelectionOwnerRef.current = null; setIsPreflightReviewOpen(false); setIsCodeModalOpen(true); }} /> : null}
 
       {/* Transpiled Python Code Export Modal */}
       <CodeExportModal
