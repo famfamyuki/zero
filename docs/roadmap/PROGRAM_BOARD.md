@@ -48,6 +48,21 @@ CrewAI Static Import v0
 Existing-Capability Product Identity & Review Journey UX Restructuring
 = Sprint Complete / Production Verified
 
+01 Evidence → Gate Review → Explicit Next Selection
+= COMPLETE
+
+Decision
+= DEFER
+
+Selected next capability
+= NONE
+
+Newly selected work
+= NONE
+
+Immediate 02 handoff
+= NONE
+
 Gate A
 = NOT REACHED
 
@@ -67,16 +82,15 @@ Mutation Authority
 = UNCHANGED
 
 Current next authority
-= 01 — Product Architecture & Roadmap
+= 00 — Program Control & Current State
 
 Current next action
-= Evidence → Gate Review → Explicit Next Selection
-
-Newly selected work
-= NONE pending explicit 01 selection
+= reconcile the completed DEFER / no-selection decision, then wait for an explicit resume or evidence trigger
 ```
 
-The held Stage 1 packets remain authoritative for that blocked track; `Newly selected work = NONE` means no additional packet has been selected after the completed UX-hardening Sprint.
+`DEFER` means current evidence does not justify a new Product capability/Sprint. It is not a Stage failure or project stop.
+
+The held Stage 1 packets remain authoritative for that blocked track. No additional packet has been selected after the completed UX-hardening Sprint.
 
 A completed API-independent Sprint does not complete Stage 1, reach Gate A/B, select Stage 2, or expand AI/mutation authority.
 
@@ -91,7 +105,7 @@ Commercial Validation Gate M0 remains a separate commercial evidence gate. It is
 | Evidence-Grounded AI Architecture Review v0 | **FAIL-BLOCKED / QA incomplete** | Required packet live evaluation has not met the release threshold; a later confirmation run was interrupted by exhausted OpenAI API project credit | Keep unreleased. Resume only under the unchanged condition in §4 |
 | Architecture Review Paid Access & Usage Control v0 | Coupled Stage 1 release prerequisite; substantial implementation/QA evidence exists but overall release remains blocked with Stage 1 | `ADR-0006`, `ADR-0007`, active paid-access packet, coupled evaluator trust gate | Preserve verified evidence; do not merge/release the provider-backed track until the evaluator candidate completes full required evaluation and W01 QA |
 | CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009` | Remains complete; no source-boundary, Stage, AI-authority, or mutation-authority expansion |
-| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified**; `HARDEN_FIRST` | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`; W01 QA/Production verification completed | Handoff to 01 for explicit Next Selection; do not automatically select another capability |
+| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified**; `HARDEN_FIRST` | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`; W01 QA/Production verification completed | Post-completion 01 review complete: **DEFER / no new capability selected**; no immediate 02 handoff |
 | Commercial Validation Gate M0 | Future evidence gate; not implied by technical release readiness | Requires real paid Production evidence under `docs/roadmap/MONETIZATION_ARCHITECTURE.md` | Evaluate only when enough evidence exists for the scoped commercial question |
 
 Detailed completed Sprint scope, ACs, deferrals, and release evidence remain in the authoritative packet/PR history and should not be copied into this board.
@@ -119,7 +133,26 @@ Static CrewAI import trigger
 → Sprint Complete / Production Verified
 ```
 
-Evaluation quality/scale/Search-Locate outcomes after Stage 1 remain governed by Gate A and `docs/roadmap/EXECUTION_GATES.md`; do not turn them into an automatic queue here.
+Latest post-UX-hardening 01 review:
+
+```text
+Evidence → Gate Review → Explicit Next Selection
+= COMPLETE
+
+Decision
+= DEFER
+
+Selected next capability
+= NONE
+
+Additional Stage 1.5 capability
+= NONE
+
+Stage 2
+= NOT SELECTED
+```
+
+No remaining Stage 1.5 trigger is currently supported strongly enough to select a new packet. Evaluation quality/scale/Search-Locate outcomes after Stage 1 remain governed by Gate A and `docs/roadmap/EXECUTION_GATES.md`; do not turn them into an automatic queue here.
 
 Available Production telemetry still does not provide dedicated CrewAI import success/failure/apply/repeat-use evidence sufficient to infer adoption or repeat-use friction. Treat this as **Unknown / insufficient evidence**, not evidence of no demand.
 
@@ -159,7 +192,7 @@ OpenAI evaluation budget available
 → normal merge/release/Production verification lifecycle
 ```
 
-Do not lower or bypass the evaluation gate because funding is unavailable.
+This is resumption of the already-held Stage 1 track, not a new Product selection. Do not lower or bypass the evaluation gate because funding is unavailable.
 
 ---
 
@@ -171,6 +204,20 @@ After a Sprint completes:
 Evidence
 → Gate Review
 → Explicit Next Selection
+```
+
+An explicit decision may select work or may result in `DEFER / no new Sprint`.
+
+After the current `DEFER`, the program moves again only through one of two distinct routes:
+
+```text
+Existing held Stage 1 resume condition becomes true
+→ resume the existing Stage 1 lifecycle without a new Product-priority selection
+
+OR
+
+Concrete new Product / Production evidence satisfies a selection trigger
+→ 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
 Rules:
