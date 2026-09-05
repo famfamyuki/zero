@@ -104,7 +104,7 @@ Current Draft PR:
 
 The active sequencing decision is:
 
-> Complete the current paid-access implementation through a final paid-launch candidate. Architecture Review remains paid-entitlement-only, the provisional included quota is 10 reviews per monthly billing period, and unresolved final launch values remain fail-closed until approved.
+> Complete the current paid-access implementation through a final paid-launch candidate in Stripe Test Mode. Architecture Review remains paid-entitlement-only; provisional launch configuration is USD 12/month with quota 10 and the approved request-cost/provider-budget envelope. Public Production remains disabled.
 
 This decision does **not** weaken the pricing-evidence requirements in `MONETIZATION_ARCHITECTURE.md` or ADR-0007. The quota is a provisional launch configuration explicitly authorized by 01; M0 and later recalibration still depend on real paid evidence.
 
@@ -119,9 +119,9 @@ On the isolated commercial branch, complete as far as possible without inventing
 - Stripe subscription lifecycle / webhook / entitlement / Customer Portal readiness;
 - monthly quota implementation with `includedReviews = 10` for the initial launch configuration;
 - quota reservation/consume/release/idempotency/degraded-state hardening;
-- request-cost guard and paid-review kill-switch integration readiness;
+- request-cost guard using the approved 32,768-byte / 4,096-output-token / 250,000-micro-USD envelope and paid-review kill-switch integration readiness;
 - WAF Production-verification runbook;
-- provider project budget/alerts verification runbook, without selecting an unapproved numeric monthly budget;
+- provider project budget/alerts verification runbook for USD 20 warning / USD 40 critical / USD 50 hard monthly ceiling;
 - Terms / Privacy / Support URL wiring and commercial degraded states;
 - controlled financial QA / AC-30 runbook;
 - secret-safe commercial readiness diagnostics;
@@ -136,20 +136,20 @@ Production activation=PROHIBITED
 free deterministic core remains operational
 ```
 
-## Phase B — 01 final launch configuration closure
+## Phase B — 01 final launch configuration closure — COMPLETE
 
 Owner: `01`
 
-After Phase A is complete, close only the remaining launch inputs:
+The following provisional launch inputs were supplied to C01 on 2026-09-05:
 
-- Public Price;
-- public Currency;
-- numeric request-cost envelope;
-- aggregate provider monthly budget / alert thresholds;
-- launch geography/tax approach;
-- refund/support/legal launch policy;
-- commercial-use-eligible hosting route;
-- controlled live financial QA treatment.
+- USD 12.00/month in USD;
+- quota 10 per confirmed monthly Stripe billing period;
+- `gpt-5.6-sol`, 32,768 provider-input bytes, 4,096 output tokens, 4,000,000/20,000,000 micro-USD per million input/output tokens, and 250,000 micro-USD worst-case request ceiling;
+- USD 20 warning / USD 40 critical / USD 50 hard monthly provider budget;
+- Stripe Tax-ready Checkout with jurisdiction/registration still externally approved;
+- month-to-month cancellation, no default prorated refund, support-mediated duplicate/error/material-failure refunds, and statutory rights preserved;
+- existing Vercel project retained, Hobby → Pro immediately before Live/public enablement;
+- live QA subscription cancellation and full refund with restricted metadata-only record.
 
 Included monthly quota is already selected provisionally at **10 reviews per monthly billing period** and should not be reopened unless new safety evidence makes that value unreasonable before launch.
 

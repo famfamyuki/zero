@@ -129,7 +129,7 @@ The authoritative near-term sequence is in `docs/roadmap/PROGRAM_BOARD.md`.
 
 Current decision:
 
-> Complete the existing Architecture Review commercial path through a final paid-launch candidate. Provider-backed Architecture Review is not available to unpaid users; the server must require verified active paid entitlement and remaining quota before provider invocation. The initial included quota is provisionally 10 reviews per monthly Stripe billing period.
+> Complete the existing Architecture Review commercial path through a final paid-launch candidate in Stripe Test Mode while public Production remains disabled. Provider-backed Architecture Review requires verified active paid entitlement and remaining quota. Provisional launch configuration is USD 12/month, quota 10, and the approved bounded request/provider-budget profile.
 
 The free product remains independently useful. Billing/auth/provider failure must not disable deterministic Builder, Templates, JSON Import/Export, Readiness, Execution Preview, Resource Analysis, Unified Preflight, or deterministic CrewAI Python export.
 
@@ -159,23 +159,8 @@ ARCHITECTURE_REVIEW_PAID_ENABLED
 C01
 = complete commercial readiness on Draft PR #35
 = enforce paid-entitlement-only provider access
-= wire provisional monthly quota = 10
-
-then
-
-01
-= close remaining final launch configuration
-  (Price / Currency / numeric request-cost envelope / provider budget / launch policy inputs)
-
-then
-
-02
-= only if a final Product-facing specification gap remains
-
-then
-
-C01
-= apply final approved configuration and produce final launch-candidate revision
+= wire USD 12/month, quota 10, final request-cost envelope, Stripe Tax-ready Checkout, and 20/40/50 USD provider budget readiness
+= verify the logical commercial path in Stripe Test Mode as far as connected credentials allow
 
 then
 
@@ -205,11 +190,11 @@ COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 
 Remaining prerequisites include, as applicable:
 
-- commercial-use-eligible hosting/account;
-- final approved Price / currency;
-- final approved numeric request-cost guard and provider budget controls;
-- active recurring monthly Stripe Price and bounded Customer Portal configuration;
-- Terms / Privacy / Support / refund / tax operational path;
+- Vercel Hobby → Pro immediately before public paid launch;
+- Stripe Test → Live and a real Production USD 12 monthly Price/Portal configuration;
+- merchant identity, tax registration/geography, and legal approval;
+- Production provider project with USD 20 warning, USD 40 critical, and USD 50 hard monthly ceiling;
+- public Terms / Privacy / Support URLs and approved refund/tax operational material;
 - Production Supabase Auth email delivery/redirect readiness;
 - controlled QA account and approved financial handling;
 - Production WAF configuration and verification path;
@@ -242,9 +227,10 @@ C01 must not invent the remaining unresolved launch values. W01 must not bypass 
 
 ## Unknown / evidence-dependent
 
-- final Public Price / Currency;
-- final numeric request-cost envelope and provider monthly budget;
-- final tax/refund/legal/support launch approval;
+- merchant legal identity / tax registration and final legal material approval;
+- Production Stripe Live evidence;
+- Vercel Pro commercial eligibility after upgrade;
+- Production provider budget enforcement evidence;
 - Production Auth controlled-account behavior;
 - live Stripe subscription/entitlement/quota behavior;
 - Production WAF behavior;

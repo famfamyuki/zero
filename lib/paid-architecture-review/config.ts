@@ -5,6 +5,10 @@ export interface PaidArchitectureReviewConfig {
   planKey: typeof ARCHITECTURE_REVIEW_PLAN_KEY;
   stripePriceId: string;
   portalConfigurationId: string;
+  stripeMode: 'test' | 'live';
+  priceCurrency: 'usd';
+  priceUnitAmount: number;
+  stripeTaxEnabled: boolean;
   includedReviews: number;
   modelId: string;
   costProfileModelId: string;
@@ -16,6 +20,9 @@ export interface PaidArchitectureReviewConfig {
   termsUrl: string;
   privacyUrl: string;
   supportUrl: string;
+  providerBudgetWarningMicroUsd: number;
+  providerBudgetCriticalMicroUsd: number;
+  providerBudgetHardCeilingMicroUsd: number;
 }
 
 export type PaidArchitectureReviewReadinessIssueCode =
@@ -24,6 +31,11 @@ export type PaidArchitectureReviewReadinessIssueCode =
   | 'invalid_boolean'
   | 'invalid_identifier'
   | 'invalid_https_url'
+  | 'invalid_enum'
+  | 'invalid_price_contract'
+  | 'invalid_launch_configuration'
+  | 'invalid_budget_thresholds'
+  | 'stripe_mode_mismatch'
   | 'model_cost_profile_mismatch'
   | 'approval_required';
 
@@ -113,8 +125,10 @@ const pushHttpsUrlIssue = (
 
 export function inspectPaidArchitectureReviewReadiness(
   env: Record<string, string | undefined> = process.env,
+  options: { target?: 'test' | 'production' } = {},
 ): PaidArchitectureReviewReadinessReport {
   const issues: PaidArchitectureReviewReadinessIssue[] = [];
+  const target = options.target ?? 'production';
 
   const enabledValue = configuredValue(env.ARCHITECTURE_REVIEW_PAID_ENABLED);
   if (enabledValue && enabledValue !== 'true' && enabledValue !== 'false') {
@@ -134,12 +148,43 @@ export function inspectPaidArchitectureReviewReadiness(
   pushIdentifierIssue(issues, env, 'STRIPE_ARCHITECTURE_REVIEW_PRICE_ID', 'price_');
   pushIdentifierIssue(issues, env, 'STRIPE_BILLING_PORTAL_CONFIGURATION_ID', 'bpc_');
 
+  const stripeMode = configuredValue(env.ARCHITECTURE_REVIEW_STRIPE_MODE);
+  if (stripeMode !== 'test' && stripeMode !== 'live') issues.push({ key: 'ARCHITECTURE_REVIEW_STRIPE_MODE', code: 'invalid_enum' });
+  if (target === 'test' && stripeMode !== 'test') issues.push({ key: 'ARCHITECTURE_REVIEW_STRIPE_MODE', code: 'invalid_enum' });
+  if (target === 'production' && stripeMode !== 'live') issues.push({ key: 'ARCHITECTURE_REVIEW_STRIPE_MODE', code: 'approval_required' });
+  const stripeSecretKey = configuredValue(env.STRIPE_SECRET_KEY);
+  if (stripeMode && stripeSecretKey && !stripeSecretKey.startsWith(`sk_${stripeMode}_`) && !stripeSecretKey.startsWith(`rk_${stripeMode}_`)) {
+    issues.push({ key: 'STRIPE_SECRET_KEY', code: 'stripe_mode_mismatch' });
+  }
+
+  const priceCurrency = configuredValue(env.ARCHITECTURE_REVIEW_PRICE_CURRENCY)?.toLowerCase();
+  if (priceCurrency !== 'usd') issues.push({ key: 'ARCHITECTURE_REVIEW_PRICE_CURRENCY', code: 'invalid_price_contract' });
+  const priceUnitAmount = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_PRICE_UNIT_AMOUNT');
+  if (priceUnitAmount !== null && priceUnitAmount !== 1200) issues.push({ key: 'ARCHITECTURE_REVIEW_PRICE_UNIT_AMOUNT', code: 'invalid_price_contract' });
+
+  const taxEnabled = configuredValue(env.ARCHITECTURE_REVIEW_STRIPE_TAX_ENABLED);
+  if (taxEnabled !== 'true') issues.push({ key: 'ARCHITECTURE_REVIEW_STRIPE_TAX_ENABLED', code: 'invalid_boolean' });
+
   const includedReviews = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS');
   const maxProviderInputBytes = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES');
   const maxOutputTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS');
   const maxWorstCaseCostMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD');
   const inputMicroUsdPerMillionTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS');
   const outputMicroUsdPerMillionTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS');
+  if (includedReviews !== null && includedReviews !== 10) issues.push({ key: 'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS', code: 'invalid_launch_configuration' });
+  const costEnvelope = [maxProviderInputBytes, maxOutputTokens, inputMicroUsdPerMillionTokens, outputMicroUsdPerMillionTokens, maxWorstCaseCostMicroUsd];
+  if (costEnvelope.every((value) => value !== null)
+    && !(maxProviderInputBytes === 32_768 && maxOutputTokens === 4_096 && inputMicroUsdPerMillionTokens === 4_000_000
+      && outputMicroUsdPerMillionTokens === 20_000_000 && maxWorstCaseCostMicroUsd === 250_000)) {
+    issues.push({ key: 'ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD', code: 'invalid_launch_configuration' });
+  }
+  const providerBudgetWarningMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_PROVIDER_BUDGET_WARNING_MICRO_USD');
+  const providerBudgetCriticalMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_PROVIDER_BUDGET_CRITICAL_MICRO_USD');
+  const providerBudgetHardCeilingMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_PROVIDER_BUDGET_HARD_CEILING_MICRO_USD');
+  if (providerBudgetWarningMicroUsd !== null && providerBudgetCriticalMicroUsd !== null && providerBudgetHardCeilingMicroUsd !== null
+    && !(providerBudgetWarningMicroUsd === 20_000_000 && providerBudgetCriticalMicroUsd === 40_000_000 && providerBudgetHardCeilingMicroUsd === 50_000_000)) {
+    issues.push({ key: 'ARCHITECTURE_REVIEW_PROVIDER_BUDGET_HARD_CEILING_MICRO_USD', code: 'invalid_budget_thresholds' });
+  }
   const termsUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_TERMS_URL');
   const privacyUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_PRIVACY_URL');
   const supportUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_SUPPORT_URL');
@@ -151,7 +196,7 @@ export function inspectPaidArchitectureReviewReadiness(
     issues.push({ key: 'ARCHITECTURE_REVIEW_COST_PROFILE_MODEL', code: 'model_cost_profile_mismatch' });
   }
 
-  for (const key of [
+  for (const key of target === 'production' ? [
     'ARCHITECTURE_REVIEW_STRIPE_LIVE_MODE_APPROVED',
     'ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED',
     'ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED',
@@ -160,7 +205,7 @@ export function inspectPaidArchitectureReviewReadiness(
     'ARCHITECTURE_REVIEW_WAF_APPROVED',
     'ARCHITECTURE_REVIEW_COMMERCIAL_POLICY_APPROVED',
     'ARCHITECTURE_REVIEW_FINANCIAL_QA_APPROVED',
-  ]) {
+  ] : []) {
     if (env[key] !== 'true') issues.push({ key, code: 'approval_required' });
   }
 
@@ -171,6 +216,10 @@ export function inspectPaidArchitectureReviewReadiness(
         planKey: ARCHITECTURE_REVIEW_PLAN_KEY,
         stripePriceId: configuredValue(env.STRIPE_ARCHITECTURE_REVIEW_PRICE_ID)!,
         portalConfigurationId: configuredValue(env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID)!,
+        stripeMode: stripeMode as 'test' | 'live',
+        priceCurrency: priceCurrency as 'usd',
+        priceUnitAmount: priceUnitAmount!,
+        stripeTaxEnabled: taxEnabled === 'true',
         includedReviews: includedReviews!,
         modelId: modelId!,
         costProfileModelId: costProfileModelId!,
@@ -182,6 +231,9 @@ export function inspectPaidArchitectureReviewReadiness(
         termsUrl: termsUrl!,
         privacyUrl: privacyUrl!,
         supportUrl: supportUrl!,
+        providerBudgetWarningMicroUsd: providerBudgetWarningMicroUsd!,
+        providerBudgetCriticalMicroUsd: providerBudgetCriticalMicroUsd!,
+        providerBudgetHardCeilingMicroUsd: providerBudgetHardCeilingMicroUsd!,
       }
     : null;
 
@@ -197,7 +249,8 @@ export function parsePaidArchitectureReviewConfig(
   env: Record<string, string | undefined> = process.env,
   options: { allowDisabled?: boolean } = {},
 ): PaidArchitectureReviewConfig | null {
-  const readiness = inspectPaidArchitectureReviewReadiness(env);
+  const target = env.VERCEL_ENV === 'production' ? 'production' : 'test';
+  const readiness = inspectPaidArchitectureReviewReadiness(env, { target });
   if (!options.allowDisabled && !readiness.enabledRequested) return null;
   return readiness.config;
 }

@@ -1,6 +1,7 @@
 import { inspectPaidArchitectureReviewReadiness } from '../lib/paid-architecture-review/config';
 
-const readiness = inspectPaidArchitectureReviewReadiness(process.env);
+const testMode = process.argv.includes('--test-mode');
+const readiness = inspectPaidArchitectureReviewReadiness(process.env, { target: testMode ? 'test' : 'production' });
 const requireEnabled = process.argv.includes('--require-enabled');
 const ready = readiness.configurationReady && (!requireEnabled || readiness.enabledRequested);
 

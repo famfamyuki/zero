@@ -14,7 +14,7 @@ export async function GET() {
   if (!config) return unavailable();
   try {
     const price = await getStripe().prices.retrieve(config.stripePriceId);
-    if (!isValidArchitectureReviewPrice(price)) return unavailable();
+    if (!isValidArchitectureReviewPrice(price, config)) return unavailable();
     return paidJson({ version: PAID_ARCHITECTURE_REVIEW_VERSION, planKey: config.planKey, displayName: 'Architecture Review', enabled: true, price: { currency: price.currency, unitAmount: price.unit_amount!, interval: 'month' }, includedReviews: config.includedReviews, policyUrls: { terms: config.termsUrl, privacy: config.privacyUrl, support: config.supportUrl } });
   } catch {
     return unavailable();
