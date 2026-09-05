@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "commercial:check": "node --import tsx scripts/check-commercial-readiness.ts",
     "commercial:check:enabled": "node --import tsx scripts/check-commercial-readiness.ts --require-enabled",
+    "commercial:calibrate": "node --import tsx scripts/analyze-commercial-calibration.ts",
     "eval:architecture-review": "node --import tsx scripts/eval-architecture-review.ts --mode full",
     "eval:architecture-review:diagnostic": "node --import tsx scripts/eval-architecture-review.ts --mode diagnostic --calls 3 --max-spend-usd 4"
   },
