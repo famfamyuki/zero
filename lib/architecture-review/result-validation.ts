@@ -1,0 +1,30 @@
+import { ARCHITECTURE_REVIEW_PROMPT_VERSION, ARCHITECTURE_REVIEW_RESULT_VERSION, ARCHITECTURE_REVIEWER_VERSION, type ArchitectureReviewEvidenceBundleV0, type ArchitectureReviewerDraftV0, type ArchitectureReviewLocale, type ArchitectureReviewResultV0 } from '@/types/architecture-review';
+import { architectureReviewerDraftSchema } from './schemas';
+import { createReviewerEnvelope } from './reviewer-envelope';
+
+export type InvalidReviewerOutputReason =
+  | 'draft_schema_invalid'
+  | 'duplicate_evidence_reference'
+  | 'unknown_evidence_reference'
+  | 'duplicate_target_reference'
+  | 'unknown_target_reference'
+  | 'target_not_supported_by_evidence'
+  | 'finding_class_status_mismatch';
+
+export class InvalidReviewerOutputError extends Error {
+  constructor(readonly reason: InvalidReviewerOutputReason = 'draft_schema_invalid') {
+    super('Architecture reviewer output failed domain validation.');
+    this.name='InvalidReviewerOutputError';
+  }
+}
+export function assembleArchitectureReviewResult(draftInput: unknown, evidence: ArchitectureReviewEvidenceBundleV0, metadata: { providerId:string; modelId:string; locale:ArchitectureReviewLocale; generatedAt?:string }): ArchitectureReviewResultV0 {
+  const parsed=architectureReviewerDraftSchema.safeParse(draftInput); if(!parsed.success) throw new InvalidReviewerOutputError('draft_schema_invalid'); const draft=parsed.data as ArchitectureReviewerDraftV0;
+  const { evidenceAliasToId,targetAliasToKey }=createReviewerEnvelope(evidence); const evidenceById=new Map(evidence.items.map((item)=>[item.evidenceId,item]));
+  const evidenceRefs=(refs:string[]) => { if(new Set(refs).size!==refs.length) throw new InvalidReviewerOutputError('duplicate_evidence_reference'); return refs.map((ref)=>{const id=evidenceAliasToId.get(ref); if(!id) throw new InvalidReviewerOutputError('unknown_evidence_reference'); return id;}); };
+  const targetRefs=(refs:string[], cited:string[]) => { if(new Set(refs).size!==refs.length) throw new InvalidReviewerOutputError('duplicate_target_reference'); const keys=refs.map((ref)=>{const key=targetAliasToKey.get(ref); if(!key) throw new InvalidReviewerOutputError('unknown_target_reference'); return key;}); const citedItems=cited.map((id)=>evidenceById.get(id)!); for(const key of keys) if(key.startsWith('node:') && !citedItems.some((item)=>item.targetKeys.includes(key))) throw new InvalidReviewerOutputError('target_not_supported_by_evidence'); return keys; };
+  const intentEvidence=evidenceRefs(draft.intent.evidenceRefs);
+  const strengths=draft.strengths.map((item,index)=>{const cited=evidenceRefs(item.evidenceRefs);return{...item,id:`strength-${index+1}`,evidenceRefs:cited,targetRefs:targetRefs(item.targetRefs,cited)};});
+  const findings=draft.findings.map((item,index)=>{if((item.class==='Heuristic'&&item.knowledgeStatus!=='Inferred')||(item.class==='External-dependent'&&item.knowledgeStatus!=='Unknown'))throw new InvalidReviewerOutputError('finding_class_status_mismatch');const cited=evidenceRefs(item.evidenceRefs);return{...item,id:`finding-${index+1}`,evidenceRefs:cited,targetRefs:targetRefs(item.targetRefs,cited)};});
+  const uncertainties=draft.uncertainties.map((item,index)=>{const cited=evidenceRefs(item.evidenceRefs);return{...item,id:`uncertainty-${index+1}`,evidenceRefs:cited,targetRefs:targetRefs(item.targetRefs,cited)};});
+  return { version:ARCHITECTURE_REVIEW_RESULT_VERSION,workflowFingerprint:evidence.workflowFingerprint,evidenceFingerprint:evidence.evidenceFingerprint,intent:{...draft.intent,evidenceRefs:intentEvidence},strengths,findings,recommendedDirection:draft.recommendedDirection,uncertainties,limitations:['intent_not_explicit','no_runtime_evidence','no_external_verification','heuristic_review'],reviewer:{reviewerVersion:ARCHITECTURE_REVIEWER_VERSION,promptVersion:ARCHITECTURE_REVIEW_PROMPT_VERSION,providerId:metadata.providerId,modelId:metadata.modelId,locale:metadata.locale,generatedAt:metadata.generatedAt??new Date().toISOString()} };
+}

@@ -4,7 +4,7 @@ export const translations = {
   en: {
     // Header
     appName: 'AgentGraph Studio',
-    zeroCostBadge: '100% Free Tool',
+    zeroCostBadge: 'Free Core',
     subTitle: 'Preflight Engineering for CrewAI • Visual Design • Deterministic Python Export',
     loadPreset: 'Load Presets',
     presetWorkflows: 'Preset Workflows',
@@ -44,6 +44,7 @@ export const translations = {
     unifiedPreflightCloseLabel: 'Close Preflight Review',
     unifiedPreflightTitle: 'Preflight Engineering Review',
     unifiedPreflightOverview: 'Overview',
+    unifiedPreflightArchitecture: 'Architecture',
     unifiedPreflightReadiness: 'Readiness',
     unifiedPreflightExecution: 'Execution',
     unifiedPreflightResources: 'Resources',
@@ -288,7 +289,7 @@ export const translations = {
   ja: {
     // Header
     appName: 'AgentGraph Studio',
-    zeroCostBadge: 'コスト完全ゼロ',
+    zeroCostBadge: '無料コア機能',
     subTitle: 'CrewAI向けPreflight Engineering • ビジュアル設計 • Pythonコード出力',
     loadPreset: 'プリセット読込',
     presetWorkflows: 'プリセットワークフロー',
@@ -328,6 +329,7 @@ export const translations = {
     unifiedPreflightCloseLabel: '事前レビューを閉じる',
     unifiedPreflightTitle: '事前エンジニアリングレビュー',
     unifiedPreflightOverview: '概要',
+    unifiedPreflightArchitecture: 'アーキテクチャ',
     unifiedPreflightReadiness: '準備状況',
     unifiedPreflightExecution: '実行',
     unifiedPreflightResources: 'リソース',
