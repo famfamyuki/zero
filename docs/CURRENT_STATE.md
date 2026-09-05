@@ -31,6 +31,26 @@ Authority references:
 
 # 1. Current Production baseline
 
+Latest live checks on 2026-09-05 confirm:
+
+```text
+GitHub main
+= 916151238ffa1ecbbc44347f362cd3313776d804
+
+Vercel Production
+= READY
+= target=production
+= githubCommitSha matches main
+
+Production Architecture Review offer
+= enabled=false
+= price=null
+= includedReviews=null
+
+Vercel team plan
+= Hobby
+```
+
 Current Production includes the established deterministic product foundation plus Stage 1 Architecture Review and paid-access controls in a **disabled / fail-closed** state.
 
 The deterministic free core remains operational independently of paid/provider availability, including the protected builder, templates, portability, deterministic Preflight analysis, and deterministic CrewAI export paths.
@@ -55,13 +75,21 @@ Current stage/gate/authority state:
 
 ```text
 Commercial Enablement Decision
-= ENABLE_PREP
+= PROCEED_TO_PAID_LAUNCH_CANDIDATE
+
+Paid Architecture Review access
+= ACTIVE PAID ENTITLEMENT REQUIRED
++ REMAINING SERVER-ENFORCED QUOTA REQUIRED
+
+Initial included quota
+= 10 reviews per monthly Stripe billing period
+= PROVISIONAL LAUNCH CONFIGURATION
 
 Production paid Architecture Review
-= DISABLED / FAIL-CLOSED
+= DISABLED / FAIL-CLOSED until release gates pass
 
-Public paid switch
-= NOT APPROVED
+Immediate Production paid switch
+= NOT YET
 
 W01 Pass B
 = BLOCKED
@@ -95,15 +123,17 @@ The earlier evaluator-quality/API-budget blocker is resolved. The current blocke
 
 ---
 
-# 3. Current execution decision
+# 3. Current Product / commercial decision
 
 The authoritative near-term sequence is in `docs/roadmap/PROGRAM_BOARD.md`.
 
 Current decision:
 
-> Continue existing `ENABLE_PREP` by finishing all price-independent commercial readiness first. Defer final Public Price / Currency / Included quota / numeric request-cost envelope / aggregate provider budget until the final commercial-configuration step.
+> Complete the existing Architecture Review commercial path through a final paid-launch candidate. Provider-backed Architecture Review is not available to unpaid users; the server must require verified active paid entitlement and remaining quota before provider invocation. The initial included quota is provisionally 10 reviews per monthly Stripe billing period.
 
-This is a sequencing decision only. It does not weaken or replace the pricing-evidence contract in `docs/roadmap/MONETIZATION_ARCHITECTURE.md` / ADR-0007.
+The free product remains independently useful. Billing/auth/provider failure must not disable deterministic Builder, Templates, JSON Import/Export, Readiness, Execution Preview, Resource Analysis, Unified Preflight, or deterministic CrewAI Python export.
+
+The selected quota is provisional rather than durable. It may be recalibrated after real paid usage/cost evidence. This does not weaken `MONETIZATION_ARCHITECTURE.md` / ADR-0007 or mark M0 reached.
 
 Current working isolation:
 
@@ -127,13 +157,15 @@ ARCHITECTURE_REVIEW_PAID_ENABLED
 
 ```text
 C01
-= complete price-independent commercial readiness on Draft PR #35
+= complete commercial readiness on Draft PR #35
+= enforce paid-entitlement-only provider access
+= wire provisional monthly quota = 10
 
 then
 
 01
-= decide final commercial configuration
-  (Price / Currency / quota / numeric economics / launch policy inputs)
+= close remaining final launch configuration
+  (Price / Currency / numeric request-cost envelope / provider budget / launch policy inputs)
 
 then
 
@@ -174,7 +206,7 @@ COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 Remaining prerequisites include, as applicable:
 
 - commercial-use-eligible hosting/account;
-- final approved Price / currency / included quota;
+- final approved Price / currency;
 - final approved numeric request-cost guard and provider budget controls;
 - active recurring monthly Stripe Price and bounded Customer Portal configuration;
 - Terms / Privacy / Support / refund / tax operational path;
@@ -183,7 +215,9 @@ Remaining prerequisites include, as applicable:
 - Production WAF configuration and verification path;
 - fresh independent QA for the final changed revision.
 
-C01 must not invent unresolved Product/commercial values. W01 must not bypass entitlement/quota or weaken AC-30.
+The included quota is no longer Unknown: the initial provisional value is 10 reviews per monthly billing period.
+
+C01 must not invent the remaining unresolved launch values. W01 must not bypass entitlement/quota or weaken AC-30.
 
 ---
 
@@ -192,21 +226,23 @@ C01 must not invent unresolved Product/commercial values. W01 must not bypass en
 ## Known
 
 - Stage 1 implementation is QA Complete and released.
-- Production paid Architecture Review remains intentionally disabled/fail-closed in the verified current posture.
-- deterministic free features remain operational.
-- `ENABLE_PREP` is selected; immediate public paid activation is not.
-- commercial preparation continues on an isolated Draft PR.
-- final numeric commercial values are deferred until the final configuration step.
+- latest live GitHub main and Vercel Production currently match at `916151238ffa1ecbbc44347f362cd3313776d804`.
+- Production Architecture Review offer currently remains disabled with no public price/quota exposed.
+- Vercel team is currently on Hobby and therefore remains a commercial launch blocker until hosting eligibility is changed and reverified.
+- provider-backed Architecture Review is selected as paid-entitlement-only.
+- the initial provisional included quota is 10 reviews per monthly billing period.
+- deterministic free features remain operational and must remain independent of paid/provider availability.
+- commercial preparation continues on isolated Draft PR #35; main merge and Production paid enablement are not yet authorized.
 - Gate A is not reached; Stage 1.5/Stage 2 are not selected; AI and Mutation Authority are unchanged.
 
 ## Inferred
 
-- Deferring final numeric commercial values removes an unnecessary sequencing blocker without changing the durable pricing/launch contract.
-- Completing price-independent readiness first should reduce late implementation uncertainty before final commercial configuration and independent QA.
+- A 10-review monthly quota is a conservative initial operating value relative to the current successful-review benchmark distribution, while still allowing meaningful repeated use.
+- The quota can be recalibrated later without changing the fundamental free/paid product boundary.
 
 ## Unknown / evidence-dependent
 
-- final Public Price / Currency / Included quota;
+- final Public Price / Currency;
 - final numeric request-cost envelope and provider monthly budget;
 - final tax/refund/legal/support launch approval;
 - Production Auth controlled-account behavior;
