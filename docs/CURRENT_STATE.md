@@ -58,7 +58,7 @@ The deterministic free core remains operational independently of paid/provider a
 
 | Track | Current state | Authority / packet | Next condition |
 |---|---|---|---|
-| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **QA Complete / release execution complete / Production Verification BLOCKED** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | 01 decides commercial enablement; required Production prerequisites become available; W01 performs a fresh Pass B |
+| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **QA Complete / release execution complete / Production Verification BLOCKED** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | `ENABLE_PREP` prerequisites become approved/live; W01 performs a fresh Pass B |
 | CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009` | Remains complete; no automatic source/Stage/authority expansion |
 | Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md` | Remains complete |
 
@@ -164,19 +164,33 @@ C01 must not invent these Product/commercial values. W01 must not bypass entitle
 # 5. Current coordination / next authority
 
 ```text
-Current next authority
-= 01 — Product Architecture & Roadmap
-
-Decision required
-= explicit Commercial Enablement decision
-
-Allowed high-level outcomes
+Commercial Enablement Decision
 = ENABLE_PREP
-  or HOLD_DISABLED
-  or PACKET_STATUS_REVIEW only if a real contract contradiction exists
+
+Public paid switch approval
+= NOT YET
+
+Production paid Architecture Review
+= KEEP DISABLED / FAIL-CLOSED
+
+Implementation isolation
+= commercial enablement work may proceed on a non-main branch;
+  do not merge to main until the commercial prerequisites and launch decision are ready
+
+Current next authority
+= 01 commercial input closure
+→ 02 only for unresolved Product-facing specification gaps
+→ C01 for authorized branch-only implementation/configuration
+
+Next verification
+= W01 fresh Pass B only after prerequisites are live
 ```
 
-If public paid enablement is selected, use the smallest sufficient commercial/operational prerequisite packet or authorized configuration path; do not pull future Stage 1.5/Stage 2 capabilities into the work.
+`ENABLE_PREP` means AgentGraph will complete only the minimum commercial/operational prerequisites needed to make the existing Stage 1 paid path verifiable. It does **not** approve immediate public activation and does not select Stage 1.5 or Stage 2 work.
+
+Required 01-owned inputs still include the public Price/currency/included quota, economic cost envelope, hosting route, refund/support/tax launch policy, and controlled financial QA treatment. C01 must keep any unresolved value fail-closed rather than inventing it.
+
+If Product-facing pricing/legal/support behavior remains underspecified after those values are approved, route only that gap through 02. Otherwise C01 may continue authorized configuration/implementation directly.
 
 After prerequisites are live, return to `W01` for a **fresh Pass B**. If code or behavior changes after QA Complete, re-evaluate Pass A validity before release/verification.
 
@@ -191,11 +205,13 @@ After prerequisites are live, return to `W01` for a **fresh Pass B**. If code or
 - paid Architecture Review is currently disabled/fail-closed in the verified Production state.
 - deterministic free features remain operational.
 - W01 Pass B is blocked because mandatory live paid-path evidence is unavailable.
+- 01 selected `ENABLE_PREP`, while public paid activation remains unapproved until minimum commercial prerequisites are complete.
 - Gate A is not reached; Stage 2 is not selected; AI and Mutation Authority are unchanged.
 
 ## Inferred
 
 - The current disabled state is an intentional safety posture while commercial/Production prerequisites remain unsatisfied; it is not evidence of paid-path Production correctness.
+- The completed 30-review evaluator evidence is sufficient to justify commercial enablement preparation, but not sufficient by itself to validate recurring paid value or final price/quota economics.
 
 ## Unknown / evidence-dependent
 
