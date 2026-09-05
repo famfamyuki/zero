@@ -1,8 +1,8 @@
 # AgentGraph Studio — Current State Snapshot
 
-Snapshot date: **2026-08-29**  
+Snapshot date: **2026-09-05**  
 Status: **Coordination snapshot; live repository/Production checks win**  
-Scope: Concise answer to where development is now, which lifecycle states are valid, what is blocked, and which canonical lane acts next.
+Scope: Concise answer to where development is now, which lifecycle state is valid, what is blocked, and which canonical lane acts next.
 
 This file is **not** a deployment registry, packet copy, roadmap copy, or historical archive.
 
@@ -15,7 +15,7 @@ Before any implementation, QA, release, roadmap-promotion, commercial-launch, or
 3. actual Production behavior
 4. the relevant authoritative packet under `docs/specs/`
 
-A SHA below is closure evidence only unless it has just been live-verified.
+A SHA below is evidence only unless it has just been live-verified.
 
 Authority references:
 
@@ -35,15 +35,13 @@ Authority references:
 Current Production includes:
 
 - Product journey organized around `Overview | Design | Preflight`
-- Visual Workflow Builder as the Design surface
+- Visual Workflow Builder
 - workflow templates
 - JSON import/export portability
 - deterministic CrewAI Python export
 - CrewAI Static Import v0 for the supported static subset
-- Unified Preflight:
-  - Readiness
-  - Execution Preview
-  - Resource Analysis
+- Unified Preflight with Architecture, Readiness, Execution Preview, and Resource Analysis
+- Stage 1 Architecture Review implementation and paid-access controls deployed in **fail-closed disabled** state
 - existing analytics/first-value measurement foundation
 
 Product North Star:
@@ -52,7 +50,7 @@ Product North Star:
 Understand → Evaluate → Improve → Verify → Own
 ```
 
-Production capability detail belongs in the implementation code and packet; this snapshot only records the current program-level baseline.
+The deterministic free core remains operational independently of paid/provider availability.
 
 ---
 
@@ -60,43 +58,46 @@ Production capability detail belongs in the implementation code and packet; this
 
 | Track | Current state | Authority / packet | Next condition |
 |---|---|---|---|
-| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **FAIL-BLOCKED / QA incomplete** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | Resume only when the existing evaluation-budget re-check condition in §4 becomes true |
+| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **QA Complete / release execution complete / Production Verification BLOCKED** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | 01 decides commercial enablement; required Production prerequisites become available; W01 performs a fresh Pass B |
 | CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009` | Remains complete; no automatic source/Stage/authority expansion |
-| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md`; decision class `HARDEN_FIRST` | Post-completion 01 review is complete; decision = `DEFER`; no new Sprint selected |
+| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md` | Remains complete |
 
-Current coordination state:
+Stage 1 release evidence currently reconciles as:
 
 ```text
-01 Evidence → Gate Review → Explicit Next Selection
-= COMPLETE
+QA-approved source
+= 8887a5f2b282fc55f051dbaeefda2eca7d24de5c
 
-Decision
-= DEFER
+Released main / Production revision
+= 8db0de7d66846cb92db612098162ea8e27a6c874
 
-Selected next capability
-= NONE
+Release identity
+= MATCH
 
-Newly selected work
-= NONE
+Production paid Architecture Review
+= DISABLED / FAIL-CLOSED
 
-Immediate 02 handoff
-= NONE
+W01 Pass B
+= BLOCKED
 
-Current program mode
-= wait for an explicit resume or evidence trigger
+Production Verified
+= NO
+
+Sprint Complete
+= NO
 ```
 
-`DEFER` means current evidence does not justify selecting a new Product capability or Sprint. It does not mean project stopped, Stage failed, or development was abandoned.
-
-The held Stage 1 packets remain authoritative for that blocked track. No additional packet has been selected after the completed UX-hardening Sprint.
+The earlier evaluator-quality/API-budget blocker is no longer current: the required 30-review evaluation and W01 Pass A completed before release. The remaining blocker is Production paid/commercial verification.
 
 ---
 
 # 3. Stage / gate / authority state
 
 ```text
-Stage 1 Architecture Review
-= FAIL-BLOCKED / QA incomplete
+Stage 1
+= QA COMPLETE
++ RELEASE EXECUTION COMPLETE
++ PRODUCTION VERIFICATION BLOCKED
 
 Gate A
 = NOT REACHED
@@ -119,114 +120,102 @@ Mutation Authority
 
 Why:
 
-- Stage 1 itself is not Production Verified, so Gate A is not reached.
+- Stage 1 is not Production Verified, so Gate A is not reached.
 - Gate B therefore is not reached and Stage 2 is not selected.
-- CrewAI Static Import completion and UX hardening completion are separate API-independent Sprints; neither promotes Stage 1 or expands AI/mutation authority.
-- Stage 1.5 remains an evidence-driven selection band, not an automatic backlog.
-- Commercial Validation Gate M0 is separate from AI authority/stage promotion.
+- No Stage 1.5 capability is automatically selected from the roadmap.
+- Commercial Validation Gate M0 remains separate from AI authority/stage promotion and is not reached merely by technical release readiness.
 
 ---
 
-# 4. Active blocker and existing Stage 1 resume condition
-
-Stage 1 remains held because the required provider-backed evaluation evidence is incomplete.
-
-Known blocker evidence:
-
-- W01 observed 25/30 structured schema failures in an earlier required evaluation.
-- C01 grounding hardening materially improved a later run but still produced 1/30 hard violations.
-- a subsequent confirmation run could not complete after `credit_balance_exhausted`.
-- unmerged evaluator hardening remains blocked WIP, not an approved candidate.
-
-Do not merge/release the provider-backed Architecture Review and do not lower its gates because evaluation funding is unavailable.
-
-Resume condition is unchanged:
+# 4. Active blocker
 
 ```text
-OpenAI evaluation budget available
-→ C01 completes required packet 30-run evaluation
-→ zero hard violations
-→ >= 90% semantic rubric
-→ new exact candidate revision
-→ W01 full Pass A on that exact revision
-→ normal merge/release/Production verification lifecycle
+Blocker:
+COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
+
+Observed Production state:
+- deployment READY / target=production / correct main revision
+- paid Architecture Review offer disabled
+- review endpoint fails closed with review_disabled
+- deterministic free core remains operational
+
+Why blocked:
+The active paid-access packet requires live controlled-account Production evidence for sign-in, Stripe subscription, entitlement reconciliation, quota/current-period projection, successful review consumption, non-consumption failure behavior, idempotency, billing portal/cancel-at-period-end, quota exhaustion, kill-switch isolation, and related commercial/hosting prerequisites.
 ```
 
-This is resumption of the already-held Stage 1 track, not a new Product selection.
+Required prerequisites include, as applicable:
 
-Paid-access implementation evidence may be preserved, but:
+- commercial-use-eligible hosting/account
+- explicitly approved Production Price / currency / included quota
+- approved provider cost guard and operator budget controls
+- Stripe Production Price and Customer Portal configuration
+- Terms / Privacy / Support / refund / tax operational path
+- Production Supabase Auth email delivery/redirect configuration
+- controlled QA account and approved financial handling
+- Production WAF verification path
+
+C01 must not invent these Product/commercial values. W01 must not bypass entitlement/quota or weaken AC-30.
+
+---
+
+# 5. Current coordination / next authority
 
 ```text
-Paid capability technically ready / Production Verified
-≠ subscription model commercially validated
+Current next authority
+= 01 — Product Architecture & Roadmap
+
+Decision required
+= explicit Commercial Enablement decision
+
+Allowed high-level outcomes
+= ENABLE_PREP
+  or HOLD_DISABLED
+  or PACKET_STATUS_REVIEW only if a real contract contradiction exists
 ```
 
-M0 commercial validation requires sufficient real paid Production evidence under `docs/roadmap/MONETIZATION_ARCHITECTURE.md`.
+If public paid enablement is selected, use the smallest sufficient commercial/operational prerequisite packet or authorized configuration path; do not pull future Stage 1.5/Stage 2 capabilities into the work.
+
+After prerequisites are live, return to `W01` for a **fresh Pass B**. If code or behavior changes after QA Complete, re-evaluate Pass A validity before release/verification.
 
 ---
 
-# 5. Recent completed Sprint evidence
-
-These identifiers preserve closure traceability only; live checks still supersede them.
-
-| Sprint | QA-approved revision | Production-verified implementation revision | State |
-|---|---|---|---|
-| CrewAI Static Import v0 | `634cf507ae55e60122bc59c3e20b4c5abce60bad` | `bbc200504877f1b3f48b13945a5ed925214ec572` | Sprint Complete / Production Verified |
-| Existing-Capability Product Identity & Review Journey UX Restructuring | `84eb403a7bcc9cf113f41e32b7fbddab28d8de81` | `7e4e6f92aa9ae849559252140f9e4031a3104f2b` | Sprint Complete / Production Verified |
-
-Detailed Acceptance Criteria, implementation scope, explicit deferrals, regression requirements, and Production smoke evidence remain in the relevant packet, PR, W01 evidence, and ADRs. Do not reproduce them here.
-
----
-
-# 6. Known / Unknown relevant to the next trigger
+# 6. Known / Inferred / Unknown
 
 ## Known
 
-- the current Production Product identity/review journey hardening is shipped and Production Verified;
-- CrewAI Static Import v0 is shipped and Production Verified;
-- the provider-backed Stage 1 track remains blocked by evaluator evidence/budget;
-- the post-completion 01 review is complete with `Decision = DEFER`;
-- no new capability or Sprint is selected;
-- there is no immediate 02 handoff;
-- no additional Stage 1.5 capability or Stage 2 work is currently Selected;
-- AI Authority and Mutation Authority have not expanded.
+- Stage 1 implementation is QA Complete and released on the exact approved tree.
+- GitHub main and the verified Production deployment use the released revision.
+- paid Architecture Review is currently disabled/fail-closed in Production.
+- deterministic free features remain operational.
+- W01 Pass B is blocked because mandatory live paid-path evidence is unavailable.
+- Gate A is not reached; Stage 2 is not selected; AI and Mutation Authority are unchanged.
 
-## Unknown / insufficient evidence
+## Inferred
 
-- dedicated CrewAI import success/failure/apply/repeat-use telemetry is still insufficient to infer adoption or repeat-use friction;
-- Stage 1 evaluator release quality cannot be re-confirmed until the complete required evaluation can run;
-- no remaining Stage 1.5 candidate should be treated as selected without new Product/Production evidence and an explicit 01 decision.
+- The current disabled state is an intentional safety posture while commercial/Production prerequisites remain unsatisfied; it is not evidence of paid-path Production correctness.
 
-Unknown means insufficient evidence, not evidence of absence or lack of demand.
+## Unknown / evidence-dependent
+
+- Production Auth email delivery and controlled-account sign-in.
+- live Stripe checkout/subscription and entitlement reconciliation.
+- successful provider-backed review/result rendering in Production.
+- quota consume/non-consume/idempotency/exhaustion behavior in Production.
+- billing portal/cancel behavior in Production.
+- Production WAF enforcement.
+- final approved public Price/quota/cost-guard and commercial operations readiness.
+- commercial validation / recurring paid value under M0.
+
+Unknown means insufficient evidence, not evidence of absence.
 
 ---
 
-# 7. Next program triggers
+# 7. Planning reconciliation rule
 
-No new Sprint is selected.
+Near-term planning update discipline is authoritative in `docs/roadmap/PROGRAM_BOARD.md`.
 
-The program moves again through one of two distinct routes:
+After a material lifecycle, blocker, gate, selection, authority, release, or Production-verification milestone, reconcile the current planning documents **before the next normal lane handoff** so stale snapshots do not become operating input.
 
-```text
-A. Existing held Stage 1 resume
-
-existing evaluation-budget re-check condition becomes true
-→ resume the existing Stage 1 lifecycle
-→ no new Product-priority selection required
-
-OR
-
-B. New Product / Production evidence
-
-concrete evidence satisfies a remaining selection trigger
-→ 01 Evidence
-→ Gate Review
-→ Explicit Next Selection
-```
-
-Examples of route-B evidence include a material repeat-use bottleneck from missing durable workflow identity, inability to compare prior evaluations, finding-to-target navigation friction, materially missing evaluation context, or scale/topology-driven quality/navigation degradation. These are trigger examples, not currently Selected capabilities.
-
-A candidate appearing in the roadmap is not itself selection evidence.
+Do not update planning documents for every commit or transient metric; update them when the program state materially changes.
 
 ---
 
@@ -242,12 +231,6 @@ C01 — Current Sprint Implementation
 W01 — Independent QA & Production Verification
 ```
 
-There is currently no automatic handoff to `02` or `C01`.
-
-When route A becomes true, the existing held Stage 1 track may resume through its existing lifecycle owner sequence.
-
-When route B becomes true, return to `01` for a new explicit Product/roadmap decision.
-
 Lifecycle ownership remains:
 
 ```text
@@ -261,4 +244,6 @@ Lifecycle ownership remains:
 → 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
-Authoritative role details remain in `docs/CHAT_ROLE_REGISTRY.md`; do not duplicate them further in this snapshot.
+`QA Complete ≠ Production Verified`.  
+`Release execution ≠ Production Verified`.  
+`Sprint Complete ≠ automatic Stage promotion`.
