@@ -9,6 +9,7 @@ import { assembleArchitectureReviewResult, InvalidReviewerOutputError } from '..
 import { ARCHITECTURE_REVIEW_EVAL_FIXTURES } from './architecture-review-fixtures';
 import { detectHardViolations, scoreSemanticResult, type HardViolation } from './architecture-review-evaluation';
 import { ZodError } from 'zod';
+import { renameSync, writeFileSync } from 'node:fs';
 
 const PRICES = { input: 4, cachedInput: 0.4, output: 20 } as const;
 type EvalMode = 'diagnostic' | 'full';
@@ -27,6 +28,7 @@ async function main() {
   const mode = (arg('--mode') ?? 'full') as EvalMode;
   if (mode !== 'diagnostic' && mode !== 'full') throw new Error('--mode must be diagnostic or full.');
   const maxSpendUsd = numberArg('--max-spend-usd', mode === 'diagnostic' ? 4 : 34);
+  const reportPath = arg('--report');
   const diagnosticCalls = Math.floor(numberArg('--calls', 3));
   if (mode === 'diagnostic' && (diagnosticCalls < 1 || diagnosticCalls > 3)) throw new Error('Diagnostic calls must be between 1 and 3.');
   const schedule = mode === 'full'
@@ -37,6 +39,17 @@ async function main() {
   const fixtureScores = new Map<string, { passed: number; total: number }>();
   const calls: Array<Record<string, unknown>> = [];
   let semanticPassed = 0, semanticTotal = 0, estimatedSpendUsd = 0;
+  const createReport = (status: 'running' | 'complete') => {
+    const percent = semanticTotal === 0 ? 0 : Number((semanticPassed / semanticTotal * 100).toFixed(2));
+    const byFixture = Object.fromEntries([...fixtureScores].map(([id, score]) => [id, { ...score, percent: Number((score.passed / score.total * 100).toFixed(2)) }]));
+    return { status, mode, model: reviewer.model, pricingUsdPerMillionTokens: PRICES, maxSpendUsd, estimatedSpendUsd: Number(estimatedSpendUsd.toFixed(6)), reviews: calls.length, expectedReviews: schedule.length, stoppedEarly: status === 'complete' && calls.length !== schedule.length, calls, hardViolationCount: hardViolations.length, hardViolations, semanticRubric: { passed: semanticPassed, total: semanticTotal, percent, targetPercent: 90, byFixture } };
+  };
+  const persistReport = (status: 'running' | 'complete') => {
+    if (!reportPath) return;
+    const temporaryPath = `${reportPath}.tmp`;
+    writeFileSync(temporaryPath, `${JSON.stringify(createReport(status), null, 2)}\n`, { encoding: 'utf8' });
+    renameSync(temporaryPath, reportPath);
+  };
 
   for (const { fixture, run } of schedule) {
     const graph = fixture.graph;
@@ -55,6 +68,7 @@ async function main() {
       hardViolations.push(...violations); semanticPassed += checks.filter((check) => check.passed).length; semanticTotal += checks.length;
       const score = fixtureScores.get(fixture.id) ?? { passed: 0, total: 0 }; score.passed += checks.filter((check) => check.passed).length; score.total += checks.length; fixtureScores.set(fixture.id, score);
       calls.push({ fixture: fixture.id, run, model: reviewer.model, inputTokens: reviewer.usage.inputTokens, cachedInputTokens: reviewer.usageDetails.cachedInputTokens, outputTokens: reviewer.usage.outputTokens, reasoningTokens: reviewer.usageDetails.reasoningTokens, estimatedCostUsd, result: 'valid', hardViolations: violations, semanticChecks: checks });
+      persistReport('running');
       if (violations.length > 0) break;
     } catch (error) {
       const structured = error instanceof InvalidReviewerOutputError || error instanceof ZodError || (error instanceof Error && error.message === 'invalid_reviewer_output');
@@ -62,14 +76,15 @@ async function main() {
       const violation = { fixtureId: fixture.id, run, code } satisfies HardViolation;
       hardViolations.push(violation);
       calls.push({ fixture: fixture.id, run, model: reviewer.model, inputTokens: reviewer.usage.inputTokens, cachedInputTokens: reviewer.usageDetails.cachedInputTokens, outputTokens: reviewer.usage.outputTokens, reasoningTokens: reviewer.usageDetails.reasoningTokens, estimatedCostUsd: estimateCost(reviewer.usage.inputTokens, reviewer.usageDetails.cachedInputTokens, reviewer.usage.outputTokens), result: 'invalid', hardViolations: [violation], semanticChecks: [], failureCategory: code });
+      persistReport('running');
       break;
     }
     if (estimatedSpendUsd >= maxSpendUsd) break;
   }
-  const percent = semanticTotal === 0 ? 0 : Number((semanticPassed / semanticTotal * 100).toFixed(2));
-  const byFixture = Object.fromEntries([...fixtureScores].map(([id, score]) => [id, { ...score, percent: Number((score.passed / score.total * 100).toFixed(2)) }]));
-  console.log(JSON.stringify({ mode, model: reviewer.model, pricingUsdPerMillionTokens: PRICES, maxSpendUsd, estimatedSpendUsd: Number(estimatedSpendUsd.toFixed(6)), reviews: calls.length, expectedReviews: schedule.length, stoppedEarly: calls.length !== schedule.length, calls, hardViolationCount: hardViolations.length, hardViolations, semanticRubric: { passed: semanticPassed, total: semanticTotal, percent, targetPercent: 90, byFixture } }, null, 2));
-  if (calls.length !== schedule.length || hardViolations.length > 0 || percent < 90) process.exitCode = 1;
+  const report = createReport('complete');
+  persistReport('complete');
+  console.log(JSON.stringify(report, null, 2));
+  if (calls.length !== schedule.length || hardViolations.length > 0 || report.semanticRubric.percent < 90) process.exitCode = 1;
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : 'Architecture review evaluation failed.'); process.exitCode = 1; });
