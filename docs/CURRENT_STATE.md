@@ -68,10 +68,10 @@ Stage 1 release evidence currently reconciles as:
 QA-approved source
 = 8887a5f2b282fc55f051dbaeefda2eca7d24de5c
 
-Released main / Production revision
+Released main / Production revision at W01 Pass B
 = 8db0de7d66846cb92db612098162ea8e27a6c874
 
-Release identity
+Release identity at W01 Pass B
 = MATCH
 
 Production paid Architecture Review
@@ -88,6 +88,8 @@ Sprint Complete
 ```
 
 The earlier evaluator-quality/API-budget blocker is no longer current: the required 30-review evaluation and W01 Pass A completed before release. The remaining blocker is Production paid/commercial verification.
+
+Subsequent documentation-only commits may advance `main` and Production deployment SHAs without changing Stage 1 behavior. Always re-check live repository/deployment identity before using any SHA as current state.
 
 ---
 
@@ -133,8 +135,9 @@ Why:
 Blocker:
 COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 
-Observed Production state:
-- deployment READY / target=production / correct main revision
+Observed Production state at W01 Pass B:
+- deployment READY / target=production
+- Stage 1 release identity matched the QA-approved change set
 - paid Architecture Review offer disabled
 - review endpoint fails closed with review_disabled
 - deterministic free core remains operational
@@ -184,8 +187,8 @@ After prerequisites are live, return to `W01` for a **fresh Pass B**. If code or
 ## Known
 
 - Stage 1 implementation is QA Complete and released on the exact approved tree.
-- GitHub main and the verified Production deployment use the released revision.
-- paid Architecture Review is currently disabled/fail-closed in Production.
+- W01 verified release identity matching at the Stage 1 Pass B attempt; current `main` / Production SHA must still be live-checked before each material decision.
+- paid Architecture Review is currently disabled/fail-closed in the verified Production state.
 - deterministic free features remain operational.
 - W01 Pass B is blocked because mandatory live paid-path evidence is unavailable.
 - Gate A is not reached; Stage 2 is not selected; AI and Mutation Authority are unchanged.
