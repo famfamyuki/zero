@@ -37,6 +37,12 @@ A workflow graph shows structure, but structure alone does not surface every sta
 
 AgentGraph Studio performs **static pre-execution engineering review**. It does not execute agents, simulate a live run, monitor production workflows, or predict runtime latency, token consumption, or cost.
 
+## Environment configuration
+
+Use [`.env.example`](.env.example) as the key inventory only; it intentionally contains no credentials or approved commercial values. Keep API keys, service-role credentials, and webhook secrets in the hosting provider's Secret storage, and scope Preview credentials to the intended Git branch.
+
+Paid Architecture Review is fail-closed. Keep `ARCHITECTURE_REVIEW_PAID_ENABLED=false` until every configuration and external approval is complete. Check preparation readiness with `npm run commercial:check`; use `npm run commercial:check:enabled` only for the final launch-candidate verification. Neither command prints configured values.
+
 ## Try it
 
 - [Open AgentGraph Studio](https://zero-six-khaki.vercel.app/)

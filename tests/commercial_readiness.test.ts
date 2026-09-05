@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { inspectPaidArchitectureReviewReadiness } from '../lib/paid-architecture-review/config';
 
@@ -33,6 +34,22 @@ const completeEnv: Record<string, string> = {
   ARCHITECTURE_REVIEW_COMMERCIAL_POLICY_APPROVED: 'true',
   ARCHITECTURE_REVIEW_FINANCIAL_QA_APPROVED: 'true',
 };
+
+test('environment template inventories every readiness key without commercial values or secrets', () => {
+  const template = readFileSync('.env.example', 'utf8');
+  for (const key of Object.keys(completeEnv)) assert.match(template, new RegExp(`^${key}=`, 'm'), key);
+  for (const key of [
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'STRIPE_SECRET_KEY',
+    'STRIPE_WEBHOOK_SECRET',
+    'OPENAI_API_KEY',
+    'STRIPE_ARCHITECTURE_REVIEW_PRICE_ID',
+    'STRIPE_BILLING_PORTAL_CONFIGURATION_ID',
+    'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS',
+  ]) assert.match(template, new RegExp(`^${key}=$`, 'm'), key);
+  assert.match(template, /^ARCHITECTURE_REVIEW_PAID_ENABLED=false$/m);
+  assert.doesNotMatch(template, /sk_(?:live|test)_|price_[A-Za-z0-9]|https:\/\/[^\s=]+|\b\d+\.\d+\b/);
+});
 
 test('commercial readiness is inspectable before the paid feature is enabled', () => {
   const readiness = inspectPaidArchitectureReviewReadiness(completeEnv);
