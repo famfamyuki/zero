@@ -107,8 +107,8 @@ The following are fixed by `ADR-0006`, `ADR-0007`, `MONETIZATION_ARCHITECTURE.md
 
 ## Unknown / evidence-dependent
 
-- Public launch price, currency, and included review count.
-- Representative and high-percentile successful/failed provider cost distributions for the final Production evaluator configuration.
+- Public launch price/currency is provisionally configured as USD 12.00/month and included review count as 10 per confirmed monthly Stripe billing period; these are launch configuration, not a durable Product constant.
+- Representative Production and failed-attempt provider cost distributions; the current 30-call successful benchmark remains bounded evidence for the approved evaluator configuration.
 - Paid willingness-to-pay, repeat-use, cancellation, refund/support, and quota-utilization evidence.
 - Whether the current Production Supabase project has email Auth delivery/configuration ready for public use.
 - Final legal/tax/refund-policy content and public URLs until commercial launch operations approve them.
@@ -233,9 +233,11 @@ architecture_review_individual_monthly_v0
 
 The marketing label must be `Architecture Review`; do not introduce `Pro`, Team, Enterprise, or a durable tier hierarchy in this packet.
 
-A server-only `STRIPE_ARCHITECTURE_REVIEW_PRICE_ID` selects exactly one active recurring monthly Stripe Price. C01 must not hard-code a public amount or invent the launch price. The checkout/offer code validates that the configured Price is active and recurring with interval `month`; an invalid/missing price fails closed while paid review is disabled/unavailable.
+A server-only `STRIPE_ARCHITECTURE_REVIEW_PRICE_ID` selects exactly one active recurring monthly Stripe Price. The provisional launch contract is configuration-backed as `ARCHITECTURE_REVIEW_PRICE_CURRENCY=usd` and `ARCHITECTURE_REVIEW_PRICE_UNIT_AMOUNT=1200`; the checkout/offer code validates the retrieved Price against those exact values plus active, licensed, recurring monthly, interval-count one, and no quantity transform. An invalid/missing/mismatched Price fails closed while paid review is disabled/unavailable.
 
 No free trial, quantity selection, annual interval, promotion-code flow, overage, or metered billing is enabled by this packet.
+
+Checkout enables Stripe Tax through configuration (`ARCHITECTURE_REVIEW_STRIPE_TAX_ENABLED=true`) so applicable tax may be calculated separately. Jurisdiction, registration, merchant identity, and public legal wording remain externally approved launch inputs and are never inferred by C01.
 
 ## PAUC-R07 — Checkout
 
@@ -344,11 +346,11 @@ No cron-based reset is required. A newly reconciled eligible Stripe period creat
 
 ## PAUC-R14 — Included quota configuration
 
-`ARCHITECTURE_REVIEW_INCLUDED_REVIEWS` is a required positive integer **when paid review is enabled**. There is no Production fallback/default that guesses a commercial quota.
+`ARCHITECTURE_REVIEW_INCLUDED_REVIEWS` is a required positive integer **when paid review is enabled**. The provisional initial launch configuration selected by 01 is **10 reviews per monthly Stripe billing period**. It remains configuration-backed rather than a permanent hard-coded Product constant.
 
 - test fixtures may use a small explicit value such as `3`; that number is not Product policy;
 - Production with missing/invalid quota config must keep paid review disabled/fail closed;
-- the launch value is selected by `01`/commercial release evidence, not by C01.
+- the current launch candidate uses `10`; any future change remains an explicit `01`/commercial release decision and applies only under the period-snapshot contract.
 
 ## PAUC-R15 — Atomic availability
 
@@ -847,7 +849,7 @@ This packet is implementation-ready without guessing commercial values, but **pu
 Before `ARCHITECTURE_REVIEW_PAID_ENABLED=true` on public Production, `01`/release ownership must explicitly supply/approve:
 
 1. active monthly Stripe Price ID, including amount/currency;
-2. `ARCHITECTURE_REVIEW_INCLUDED_REVIEWS`;
+2. `ARCHITECTURE_REVIEW_INCLUDED_REVIEWS=10` for the provisional initial launch configuration;
 3. provider input/output/cost-guard configuration derived from current evaluator benchmark/cost evidence;
 4. working Stripe Customer Portal configuration;
 5. Terms URL, Privacy URL, Support/contact URL;

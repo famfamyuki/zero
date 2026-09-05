@@ -5,30 +5,39 @@ import { estimateActualCostMicroUsd, estimateWorstCaseCostMicroUsd, parsePaidArc
 import { readBearerToken } from '../lib/paid-architecture-review/auth';
 import { sanitizeAnalyticsProperties } from '../lib/analytics-config';
 import { isExpectedFinalState } from '../lib/paid-architecture-review/quota';
-import { hasDuplicateActiveArchitectureReviewSubscriptions } from '../lib/paid-architecture-review/stripe-reconciliation';
+import { hasDuplicateActiveArchitectureReviewSubscriptions, isValidArchitectureReviewPrice } from '../lib/paid-architecture-review/stripe-reconciliation';
 import type Stripe from 'stripe';
 
 const completeEnv: Record<string, string | undefined> = {
-  ARCHITECTURE_REVIEW_PAID_ENABLED: 'true', STRIPE_SECRET_KEY: 'test', STRIPE_WEBHOOK_SECRET: 'test',
+  ARCHITECTURE_REVIEW_PAID_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_value', STRIPE_WEBHOOK_SECRET: 'test',
   STRIPE_ARCHITECTURE_REVIEW_PRICE_ID: 'price_test', STRIPE_BILLING_PORTAL_CONFIGURATION_ID: 'bpc_test',
+  ARCHITECTURE_REVIEW_STRIPE_MODE: 'test', ARCHITECTURE_REVIEW_PRICE_CURRENCY: 'usd', ARCHITECTURE_REVIEW_PRICE_UNIT_AMOUNT: '1200',
+  ARCHITECTURE_REVIEW_STRIPE_TAX_ENABLED: 'true',
   SUPABASE_SERVICE_ROLE_KEY: 'test', NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co', NEXT_PUBLIC_SUPABASE_ANON_KEY: 'public-test', OPENAI_API_KEY: 'test',
   ARCHITECTURE_REVIEW_MODEL: 'model-reviewed', ARCHITECTURE_REVIEW_COST_PROFILE_MODEL: 'model-reviewed',
-  ARCHITECTURE_REVIEW_INCLUDED_REVIEWS: '3', ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES: '100000',
-  ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS: '2000', ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD: '500000',
-  ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS: '2000000',
-  ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS: '8000000',
+  ARCHITECTURE_REVIEW_INCLUDED_REVIEWS: '10', ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES: '32768',
+  ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS: '4096', ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD: '250000',
+  ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS: '4000000',
+  ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS: '20000000',
+  ARCHITECTURE_REVIEW_PROVIDER_BUDGET_WARNING_MICRO_USD: '20000000', ARCHITECTURE_REVIEW_PROVIDER_BUDGET_CRITICAL_MICRO_USD: '40000000',
+  ARCHITECTURE_REVIEW_PROVIDER_BUDGET_HARD_CEILING_MICRO_USD: '50000000',
   ARCHITECTURE_REVIEW_TERMS_URL: 'https://example.com/terms', ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://example.com/privacy',
   ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://example.com/support',
+  ARCHITECTURE_REVIEW_STRIPE_LIVE_MODE_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED: 'true',
   ARCHITECTURE_REVIEW_SUPABASE_AUTH_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_PROVIDER_BUDGET_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_WAF_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_COMMERCIAL_POLICY_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_FINANCIAL_QA_APPROVED: 'true',
 };
 
 test('paid review is disabled by default and every commercial/cost dependency fails closed', () => {
   assert.equal(parsePaidArchitectureReviewConfig({}), null);
   assert.ok(parsePaidArchitectureReviewConfig(completeEnv));
   for (const key of Object.keys(completeEnv)) {
-    if (key === 'ARCHITECTURE_REVIEW_PAID_ENABLED') continue;
+    if (key === 'ARCHITECTURE_REVIEW_PAID_ENABLED' || key.endsWith('_APPROVED')) continue;
     const missing = { ...completeEnv };
     delete missing[key];
     assert.equal(parsePaidArchitectureReviewConfig(missing), null, key);
@@ -41,9 +50,11 @@ test('paid review is disabled by default and every commercial/cost dependency fa
 
 test('cost guard uses conservative byte upper bound and integer micro-USD accounting', () => {
   const config = parsePaidArchitectureReviewConfig(completeEnv)!;
-  assert.equal(estimateWorstCaseCostMicroUsd(100, config), 16_200);
-  assert.equal(estimateActualCostMicroUsd(100, 50, config), 600);
+  assert.equal(estimateWorstCaseCostMicroUsd(100, config), 82_320);
+  assert.equal(estimateActualCostMicroUsd(100, 50, config), 1_400);
   assert.equal(estimateActualCostMicroUsd(null, 50, config), null);
+  assert.equal(estimateActualCostMicroUsd(1.5, 50, config), null);
+  assert.equal(estimateActualCostMicroUsd(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, config), null);
   assert.equal(estimateWorstCaseCostMicroUsd(Number.MAX_SAFE_INTEGER, config), null);
 });
 
@@ -71,6 +82,25 @@ test('subscription inventory remains degraded across webhook replay while duplic
   assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([...duplicated].reverse(), 'price_test'), true);
   assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([subscription('sub_old', 'canceled'), subscription('sub_new', 'active')], 'price_test'), false);
   assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([subscription('sub_other', 'active', 'price_other'), subscription('sub_new', 'active')], 'price_test'), false);
+});
+
+test('the only accepted Stripe Price is positive licensed monthly recurring without quantity transforms', () => {
+  const price = (overrides: Record<string, unknown> = {}) => ({
+    active: true, type: 'recurring', currency: 'usd', unit_amount: 1200, transform_quantity: null,
+    recurring: { interval: 'month', interval_count: 1, usage_type: 'licensed' },
+    ...overrides,
+  }) as unknown as Stripe.Price;
+  assert.equal(isValidArchitectureReviewPrice(price()), true);
+  const config = parsePaidArchitectureReviewConfig(completeEnv)!;
+  assert.equal(isValidArchitectureReviewPrice(price(), config), true);
+  assert.equal(isValidArchitectureReviewPrice(price({ currency: 'jpy' }), config), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ unit_amount: 2000 }), config), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ active: false })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ unit_amount: 0 })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ unit_amount: null })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ recurring: { interval: 'year', interval_count: 1, usage_type: 'licensed' } })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ recurring: { interval: 'month', interval_count: 1, usage_type: 'metered' } })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ transform_quantity: { divide_by: 10, round: 'up' } })), false);
 });
 
 test('migration provides additive RLS tables, atomic quota, one-in-flight, stale recovery, and idempotent finalize', () => {
@@ -137,6 +167,8 @@ test('billing routes preserve subscription/template separation and webhook recon
   const webhook = readFileSync('app/api/webhook/route.ts', 'utf8');
   assert.match(checkout, /mode: 'subscription'/);
   assert.match(checkout, /quantity: 1/);
+  assert.match(checkout, /automatic_tax: \{ enabled: config\.stripeTaxEnabled \}/);
+  assert.match(checkout, /isValidArchitectureReviewPrice/);
   assert.match(checkout, /Idempotency-Key|idempotency-key/);
   assert.doesNotMatch(checkout, /trial_period_days|allow_promotion_codes: true|mode: 'payment'/);
   assert.match(template, /mode: 'payment'/);
@@ -159,6 +191,8 @@ test('paid UX is scoped to Architecture and preserves free-core, accessibility, 
   assert.match(ui,/autoComplete="email"/);
   assert.match(ui,/aria-live="polite"/);
   assert.match(ui,/min-h-11/);
+  for (const label of ['Terms','Privacy','Support']) assert.match(ui,new RegExp(label));
+  assert.match(ui,/offer\.policyUrls/);
   assert.match(translations,/zeroCostBadge: 'Free Core'/);
   assert.match(translations,/zeroCostBadge: '無料コア機能'/);
   assert.doesNotMatch(translations,/100% Free Tool/);

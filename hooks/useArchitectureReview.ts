@@ -12,7 +12,7 @@ import { trackEvent } from '@/lib/analytics';
 import { getSupabase } from '@/lib/supabase';
 
 type Preflight=ReturnType<typeof useUnifiedPreflight>;
-type Offer={version:'0.1.0';enabled:boolean;displayName:string;price:null|{currency:string;unitAmount:number;interval:'month'};includedReviews:number|null};
+type Offer={version:'0.1.0';enabled:boolean;displayName:string;price:null|{currency:string;unitAmount:number;interval:'month'};includedReviews:number|null;policyUrls:null|{terms:string;privacy:string;support:string}};
 const reason=(preflight:Preflight):'empty'|'invalid'|'partial' => preflight.review.state==='empty'?'empty':preflight.review.state==='invalid'?'invalid':'partial';
 
 export function useArchitectureReview(graph:GraphData,preflight:Preflight,lang:Language){
