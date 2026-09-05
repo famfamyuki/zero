@@ -18,6 +18,25 @@ export interface PaidArchitectureReviewConfig {
   supportUrl: string;
 }
 
+export type PaidArchitectureReviewReadinessIssueCode =
+  | 'missing_configuration'
+  | 'invalid_positive_integer'
+  | 'invalid_https_url'
+  | 'model_cost_profile_mismatch'
+  | 'approval_required';
+
+export interface PaidArchitectureReviewReadinessIssue {
+  key: string;
+  code: PaidArchitectureReviewReadinessIssueCode;
+}
+
+export interface PaidArchitectureReviewReadinessReport {
+  enabledRequested: boolean;
+  configurationReady: boolean;
+  issues: readonly PaidArchitectureReviewReadinessIssue[];
+  config: PaidArchitectureReviewConfig | null;
+}
+
 const positiveInteger = (value: string | undefined): number | null => {
   if (!value || !/^\d+$/.test(value)) return null;
   const parsed = Number(value);
@@ -34,54 +53,112 @@ const publicHttpsUrl = (value: string | undefined): string | null => {
   }
 };
 
+const pushMissing = (
+  issues: PaidArchitectureReviewReadinessIssue[],
+  env: Record<string, string | undefined>,
+  key: string,
+) => {
+  if (!env[key]) issues.push({ key, code: 'missing_configuration' });
+};
+
+const pushPositiveIntegerIssue = (
+  issues: PaidArchitectureReviewReadinessIssue[],
+  env: Record<string, string | undefined>,
+  key: string,
+): number | null => {
+  const value = positiveInteger(env[key]);
+  if (!value) issues.push({ key, code: env[key] ? 'invalid_positive_integer' : 'missing_configuration' });
+  return value;
+};
+
+const pushHttpsUrlIssue = (
+  issues: PaidArchitectureReviewReadinessIssue[],
+  env: Record<string, string | undefined>,
+  key: string,
+): string | null => {
+  const value = publicHttpsUrl(env[key]);
+  if (!value) issues.push({ key, code: env[key] ? 'invalid_https_url' : 'missing_configuration' });
+  return value;
+};
+
+export function inspectPaidArchitectureReviewReadiness(
+  env: Record<string, string | undefined> = process.env,
+): PaidArchitectureReviewReadinessReport {
+  const issues: PaidArchitectureReviewReadinessIssue[] = [];
+
+  for (const key of [
+    'STRIPE_SECRET_KEY',
+    'STRIPE_ARCHITECTURE_REVIEW_PRICE_ID',
+    'STRIPE_BILLING_PORTAL_CONFIGURATION_ID',
+    'STRIPE_WEBHOOK_SECRET',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'OPENAI_API_KEY',
+    'ARCHITECTURE_REVIEW_MODEL',
+    'ARCHITECTURE_REVIEW_COST_PROFILE_MODEL',
+  ]) pushMissing(issues, env, key);
+
+  const includedReviews = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS');
+  const maxProviderInputBytes = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES');
+  const maxOutputTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS');
+  const maxWorstCaseCostMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD');
+  const inputMicroUsdPerMillionTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS');
+  const outputMicroUsdPerMillionTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS');
+  const termsUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_TERMS_URL');
+  const privacyUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_PRIVACY_URL');
+  const supportUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_SUPPORT_URL');
+
+  const modelId = env.ARCHITECTURE_REVIEW_MODEL;
+  const costProfileModelId = env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL;
+  if (modelId && costProfileModelId && modelId !== costProfileModelId) {
+    issues.push({ key: 'ARCHITECTURE_REVIEW_COST_PROFILE_MODEL', code: 'model_cost_profile_mismatch' });
+  }
+
+  for (const key of [
+    'ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED',
+    'ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED',
+    'ARCHITECTURE_REVIEW_SUPABASE_AUTH_APPROVED',
+  ]) {
+    if (env[key] !== 'true') issues.push({ key, code: 'approval_required' });
+  }
+
+  const configurationReady = issues.length === 0;
+  const config = configurationReady
+    ? {
+        enabled: true as const,
+        planKey: ARCHITECTURE_REVIEW_PLAN_KEY,
+        stripePriceId: env.STRIPE_ARCHITECTURE_REVIEW_PRICE_ID!,
+        portalConfigurationId: env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID!,
+        includedReviews: includedReviews!,
+        modelId: modelId!,
+        costProfileModelId: costProfileModelId!,
+        maxProviderInputBytes: maxProviderInputBytes!,
+        maxOutputTokens: maxOutputTokens!,
+        maxWorstCaseCostMicroUsd: maxWorstCaseCostMicroUsd!,
+        inputMicroUsdPerMillionTokens: inputMicroUsdPerMillionTokens!,
+        outputMicroUsdPerMillionTokens: outputMicroUsdPerMillionTokens!,
+        termsUrl: termsUrl!,
+        privacyUrl: privacyUrl!,
+        supportUrl: supportUrl!,
+      }
+    : null;
+
+  return {
+    enabledRequested: env.ARCHITECTURE_REVIEW_PAID_ENABLED === 'true',
+    configurationReady,
+    issues,
+    config,
+  };
+}
+
 export function parsePaidArchitectureReviewConfig(
   env: Record<string, string | undefined> = process.env,
   options: { allowDisabled?: boolean } = {},
 ): PaidArchitectureReviewConfig | null {
-  if (!options.allowDisabled && env.ARCHITECTURE_REVIEW_PAID_ENABLED !== 'true') return null;
-
-  const includedReviews = positiveInteger(env.ARCHITECTURE_REVIEW_INCLUDED_REVIEWS);
-  const maxProviderInputBytes = positiveInteger(env.ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES);
-  const maxOutputTokens = positiveInteger(env.ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS);
-  const maxWorstCaseCostMicroUsd = positiveInteger(env.ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD);
-  const inputMicroUsdPerMillionTokens = positiveInteger(env.ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS);
-  const outputMicroUsdPerMillionTokens = positiveInteger(env.ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS);
-  const termsUrl = publicHttpsUrl(env.ARCHITECTURE_REVIEW_TERMS_URL);
-  const privacyUrl = publicHttpsUrl(env.ARCHITECTURE_REVIEW_PRIVACY_URL);
-  const supportUrl = publicHttpsUrl(env.ARCHITECTURE_REVIEW_SUPPORT_URL);
-  const modelId = env.ARCHITECTURE_REVIEW_MODEL;
-  const costProfileModelId = env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL;
-
-  if (
-    !env.STRIPE_SECRET_KEY || !env.STRIPE_ARCHITECTURE_REVIEW_PRICE_ID
-    || !env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID || !env.STRIPE_WEBHOOK_SECRET
-    || !env.SUPABASE_SERVICE_ROLE_KEY || !env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    || !env.OPENAI_API_KEY || !modelId || !costProfileModelId || modelId !== costProfileModelId
-    || !includedReviews || !maxProviderInputBytes || !maxOutputTokens
-    || !maxWorstCaseCostMicroUsd || !inputMicroUsdPerMillionTokens || !outputMicroUsdPerMillionTokens
-    || !termsUrl || !privacyUrl || !supportUrl
-    || env.ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED !== 'true'
-    || env.ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED !== 'true'
-    || env.ARCHITECTURE_REVIEW_SUPABASE_AUTH_APPROVED !== 'true'
-  ) return null;
-
-  return {
-    enabled: true,
-    planKey: ARCHITECTURE_REVIEW_PLAN_KEY,
-    stripePriceId: env.STRIPE_ARCHITECTURE_REVIEW_PRICE_ID,
-    portalConfigurationId: env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID,
-    includedReviews,
-    modelId,
-    costProfileModelId,
-    maxProviderInputBytes,
-    maxOutputTokens,
-    maxWorstCaseCostMicroUsd,
-    inputMicroUsdPerMillionTokens,
-    outputMicroUsdPerMillionTokens,
-    termsUrl,
-    privacyUrl,
-    supportUrl,
-  };
+  const readiness = inspectPaidArchitectureReviewReadiness(env);
+  if (!options.allowDisabled && !readiness.enabledRequested) return null;
+  return readiness.config;
 }
 
 export function estimateWorstCaseCostMicroUsd(
