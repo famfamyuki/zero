@@ -10,6 +10,8 @@
     "docs:check": "node scripts/check-docs.mjs",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "tsc --noEmit",
+    "commercial:check": "node --import tsx scripts/check-commercial-readiness.ts",
+    "commercial:check:enabled": "node --import tsx scripts/check-commercial-readiness.ts --require-enabled",
     "eval:architecture-review": "node --import tsx scripts/eval-architecture-review.ts --mode full",
     "eval:architecture-review:diagnostic": "node --import tsx scripts/eval-architecture-review.ts --mode diagnostic --calls 3 --max-spend-usd 4"
   },
