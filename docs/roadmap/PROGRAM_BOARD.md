@@ -38,13 +38,21 @@ Stage 1 Architecture Review / Paid Access track
 + PRODUCTION VERIFICATION BLOCKED
 
 Commercial Enablement Decision
-= ENABLE_PREP
+= PROCEED_TO_PAID_LAUNCH_CANDIDATE
 
-Public paid switch approval
-= NOT APPROVED
+Paid Architecture Review access boundary
+= AUTHENTICATED ACTIVE PAID ENTITLEMENT ONLY
++ REMAINING SERVER-ENFORCED QUOTA REQUIRED
+
+Initial included quota
+= 10 Architecture Reviews per Stripe monthly billing period
+= PROVISIONAL LAUNCH CONFIGURATION
+
+Immediate Production paid switch
+= NOT YET
 
 Production paid Architecture Review
-= DISABLED / FAIL-CLOSED
+= DISABLED / FAIL-CLOSED until release gates pass
 
 W01 Pass B
 = BLOCKED
@@ -74,6 +82,10 @@ Mutation Authority
 = UNCHANGED
 ```
 
+The provider-backed Architecture Review is intentionally not a free API surface. A user must have a server-verified active paid entitlement and remaining server-enforced quota before provider invocation. Deterministic free-core capabilities remain independently useful and must not depend on billing, entitlement, quota, or provider availability.
+
+The initial quota of 10 reviews per monthly billing period is an explicit 01 provisional launch configuration. It is not a durable Product contract and may be recalibrated after real usage/cost evidence without changing the free/paid boundary.
+
 The evaluator-quality/API-budget blocker is no longer current. The active blocker is the mandatory Production paid/commercial verification path.
 
 Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is not reached by technical readiness or launch alone.
@@ -92,22 +104,24 @@ Current Draft PR:
 
 The active sequencing decision is:
 
-> Complete every commercial-readiness task that does not require final Product pricing values first. Defer Public Price / Currency / Included quota / numeric request-cost envelope / aggregate provider budget to the final commercial-configuration step.
+> Complete the current paid-access implementation through a final paid-launch candidate. Architecture Review remains paid-entitlement-only, the provisional included quota is 10 reviews per monthly billing period, and unresolved final launch values remain fail-closed until approved.
 
-This sequencing decision does **not** weaken the pricing-evidence requirements in `MONETIZATION_ARCHITECTURE.md` or ADR-0007. It only prevents unresolved final pricing inputs from blocking price-independent implementation/readiness work.
+This decision does **not** weaken the pricing-evidence requirements in `MONETIZATION_ARCHITECTURE.md` or ADR-0007. The quota is a provisional launch configuration explicitly authorized by 01; M0 and later recalibration still depend on real paid evidence.
 
-## Phase A — C01 price-independent commercial readiness
+## Phase A — C01 commercial readiness completion
 
 Owner: `C01`
 
-On the isolated commercial branch, complete as far as possible without inventing final commercial values:
+On the isolated commercial branch, complete as far as possible without inventing unresolved launch values:
 
 - Production Auth readiness and fail-closed identity boundaries;
+- hard paid-entitlement-only enforcement for provider-backed Architecture Review;
 - Stripe subscription lifecycle / webhook / entitlement / Customer Portal readiness;
-- quota/idempotency/degraded-state hardening;
+- monthly quota implementation with `includedReviews = 10` for the initial launch configuration;
+- quota reservation/consume/release/idempotency/degraded-state hardening;
 - request-cost guard and paid-review kill-switch integration readiness;
 - WAF Production-verification runbook;
-- provider project budget/alerts verification runbook, without selecting numeric budget;
+- provider project budget/alerts verification runbook, without selecting an unapproved numeric monthly budget;
 - Terms / Privacy / Support URL wiring and commercial degraded states;
 - controlled financial QA / AC-30 runbook;
 - secret-safe commercial readiness diagnostics;
@@ -119,17 +133,17 @@ Mandatory invariant during Phase A:
 ARCHITECTURE_REVIEW_PAID_ENABLED=false
 main merge=PROHIBITED
 Production activation=PROHIBITED
+free deterministic core remains operational
 ```
 
-## Phase B — 01 final commercial configuration decision
+## Phase B — 01 final launch configuration closure
 
 Owner: `01`
 
-After Phase A is complete, decide the remaining Product/commercial inputs together:
+After Phase A is complete, close only the remaining launch inputs:
 
 - Public Price;
 - public Currency;
-- Included monthly quota;
 - numeric request-cost envelope;
 - aggregate provider monthly budget / alert thresholds;
 - launch geography/tax approach;
@@ -137,13 +151,13 @@ After Phase A is complete, decide the remaining Product/commercial inputs togeth
 - commercial-use-eligible hosting route;
 - controlled live financial QA treatment.
 
-C01 must not invent these values.
+Included monthly quota is already selected provisionally at **10 reviews per monthly billing period** and should not be reopened unless new safety evidence makes that value unreasonable before launch.
 
 ## Phase C — 02 only if a Product-facing specification gap remains
 
 Owner: `02`, conditional
 
-Use 02 only for unresolved user-visible behavior such as final price/quota/tax/legal/support presentation. Do not reopen already-specified billing/auth/quota architecture merely because final values were selected.
+Use 02 only for unresolved user-visible behavior such as final price/tax/legal/support presentation. Do not reopen already-specified billing/auth/quota architecture merely because final values were selected.
 
 ## Phase D — C01 final configuration and launch-candidate revision
 
@@ -163,7 +177,7 @@ Owner: `C01`
 
 Merge/release only the exact W01-approved revision through required CI/protection and only when commercial launch prerequisites are ready.
 
-## Phase G — final Production enable + W01 Pass B
+## Phase G — controlled Production paid enable + W01 Pass B
 
 Owners: `C01` for controlled release/config action, then `W01` for independent verification
 
@@ -171,6 +185,7 @@ Only after the correct Production revision and external prerequisites are live:
 
 ```text
 ARCHITECTURE_REVIEW_PAID_ENABLED=true
+→ paid entitlement + quota=10 enforced server-side
 → W01 Pass B / AC-30 immediately
 ```
 
@@ -203,12 +218,14 @@ Known current facts:
 - Stage 1 implementation and paid-access controls are released;
 - Production paid Architecture Review remains disabled / fail-closed;
 - deterministic free core remains operational;
-- W01 Pass B cannot complete until the real paid path and external commercial prerequisites are available.
+- W01 Pass B cannot complete until the real paid path and external commercial prerequisites are available;
+- the intended public provider-backed Architecture Review path is paid-entitlement-only;
+- the provisional initial quota is 10 reviews per monthly billing period.
 
 Remaining launch prerequisites include, as applicable:
 
 - commercial-use-eligible hosting/account;
-- approved final Price / currency / included quota;
+- approved final Price / currency;
 - approved numeric request-cost guard and provider budget controls;
 - active monthly Stripe Price and bounded Customer Portal configuration;
 - Terms / Privacy / Support / refund / tax operational path;
@@ -218,7 +235,7 @@ Remaining launch prerequisites include, as applicable:
 
 Smallest safe response:
 
-> Continue only the existing `ENABLE_PREP` scope on the isolated branch, finish price-independent readiness first, keep unresolved final values fail-closed, then close final commercial configuration before fresh W01 QA and release.
+> Continue the existing commercial branch through a complete paid-launch candidate, enforce paid entitlement + quota before provider invocation, use the provisional quota of 10/month, keep unresolved final values fail-closed, and perform fresh independent QA before merge/release.
 
 Re-check condition:
 
@@ -230,9 +247,11 @@ The exact final launch-candidate revision and all required external commercial p
 
 | Work / decision | State | Next owner/action |
 |---|---|---|
-| Stage 1 Architecture Review + Paid Access | QA Complete / released / Production Verification BLOCKED | Keep Production paid path disabled until commercial prerequisites and W01 Pass B are ready |
-| Commercial enablement implementation | **ACTIVE — ENABLE_PREP** | `C01` completes Phase A on Draft PR #35 |
-| Final Price / Currency / quota / numeric economics | **DEFERRED, NOT DECIDED** | `01` Phase B after price-independent readiness |
+| Stage 1 Architecture Review + Paid Access | QA Complete / released / Production Verification BLOCKED | Keep Production paid path disabled until final launch candidate and W01 verification are ready |
+| Commercial enablement implementation | **ACTIVE — PROCEED TO PAID LAUNCH CANDIDATE** | `C01` completes Phase A on Draft PR #35 |
+| Paid API boundary | **SELECTED** | Provider-backed review requires authenticated active paid entitlement + remaining quota |
+| Initial included quota | **SELECTED — PROVISIONAL** | 10 reviews per monthly billing period |
+| Final Price / Currency / numeric economics | **NOT YET CLOSED** | `01` Phase B after implementation readiness |
 | Product-facing final commercial UX gap | **CONDITIONAL** | `02` only if Phase B leaves an unresolved specification gap |
 | Fresh independent pre-release QA | **NOT YET** | `W01` after final configuration on exact final revision |
 | Commercial Validation Gate M0 | **NOT REACHED** | Evaluate only after Paid Access is Production Verified and sufficient real paid evidence exists |
@@ -269,9 +288,9 @@ Current canonical path:
 ```text
 Stage 1 QA Complete / released
 → W01 Pass B BLOCKED
-→ 01 ENABLE_PREP
-→ C01 price-independent commercial readiness
-→ 01 final commercial configuration
+→ 01 PROCEED_TO_PAID_LAUNCH_CANDIDATE
+→ C01 commercial readiness + paid-only + quota 10/month
+→ 01 final Price/Currency/economics/launch closure
 → 02 only if final Product-facing spec gap remains
 → C01 final launch-candidate revision
 → W01 fresh Pass A
