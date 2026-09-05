@@ -44,6 +44,12 @@ Stage 1 Architecture Review / Paid Access track
 + RELEASE EXECUTION COMPLETE
 + PRODUCTION VERIFICATION BLOCKED
 
+Commercial Enablement Decision
+= ENABLE_PREP
+
+Public paid switch approval
+= NOT YET
+
 Production paid Architecture Review
 = DISABLED / FAIL-CLOSED
 
@@ -75,10 +81,12 @@ Mutation Authority
 = UNCHANGED
 
 Current next authority
-= 01 — Product Architecture & Roadmap
+= 01 commercial input closure
+→ 02 only if a Product-facing specification gap remains
+→ C01 authorized branch-only implementation/configuration
 
 Current next action
-= explicit Commercial Enablement decision
+= complete only the minimum ENABLE_PREP prerequisites while paid review remains disabled
 ```
 
 The earlier evaluator-quality/API-credit blocker is resolved for the released candidate: the required 30-review evaluation completed, W01 Pass A completed, and the QA-approved tree was released. The current blocker is now the mandatory Production paid/commercial verification path.
@@ -91,9 +99,9 @@ Commercial Validation Gate M0 remains separate. A technically released or even P
 
 | Capability / decision | Program state | Evidence / dependency | Next action |
 |---|---|---|---|
-| Evidence-Grounded AI Architecture Review v0 | **QA Complete / released / Production Verification BLOCKED** | QA-approved source `8887a5f2...`; released main/Production `8db0de7d...`; release identity matched; paid review disabled in Production | Keep fail-closed until commercial enablement is explicitly selected and prerequisites are available; then fresh W01 Pass B |
-| Architecture Review Paid Access & Usage Control v0 | **Implemented, QA Complete, released; live paid path not Production Verified** | Active paid-access packet AC-28..31 / Pass B; current offer disabled; mandatory live Stripe/Auth/entitlement/quota evidence unavailable | 01 decides `ENABLE_PREP`, `HOLD_DISABLED`, or justified packet-status review; C01 must not invent Product/commercial values |
-| Commercial Enablement decision | **PENDING 01** | Requires hosting eligibility, approved Price/quota/cost guard, legal/support/refund/tax path, Production Auth, controlled QA handling, WAF verification | 01 selects the smallest sufficient next action; no automatic Stage 1.5/Stage 2 scope |
+| Evidence-Grounded AI Architecture Review v0 | **QA Complete / released / Production Verification BLOCKED** | QA-approved source `8887a5f2...`; release identity matched at Pass B; paid review remains disabled in Production | Keep fail-closed while ENABLE_PREP prerequisites are completed; then fresh W01 Pass B |
+| Architecture Review Paid Access & Usage Control v0 | **Implemented, QA Complete, released; live paid path not Production Verified** | Active paid-access packet AC-28..31 / Pass B; current offer disabled; mandatory live Stripe/Auth/entitlement/quota evidence unavailable | Continue only authorized commercial-enablement preparation; C01 must not invent Product/commercial values |
+| Commercial Enablement decision | **ENABLE_PREP SELECTED** | Technical evaluation completed; remaining blockers are commercial-use hosting, approved Price/quota/cost guard, legal/support/refund/tax path, Production Auth, controlled financial QA handling, and WAF verification | Close 01-owned commercial inputs; use 02 only for remaining Product-facing specification gaps; implement/configure on isolated branch without enabling Production |
 | CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009` | Remains complete; no source-boundary, Stage, AI-authority, or mutation-authority expansion |
 | Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md` | Remains complete |
 | Commercial Validation Gate M0 | **NOT REACHED / future evidence gate** | Requires Paid Access Production Verified plus sufficient real paid evidence under `MONETIZATION_ARCHITECTURE.md` | Evaluate only when enough real paid evidence exists for the scoped commercial question |
@@ -124,22 +132,23 @@ COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 R-008 / R-020 / R-021 as applicable
 
 Observed evidence:
-- latest Stage 1 release is deployed to Production on the approved tree
-- paid Architecture Review offer is disabled / fail-closed
+- Stage 1 implementation and paid-access controls are released
+- paid Architecture Review offer remains disabled / fail-closed
 - deterministic free core remains operational
 - W01 Pass B is BLOCKED because mandatory live paid-path evidence cannot yet be collected
+- 01 selected ENABLE_PREP, not immediate public activation
 
 Affected packet/gate:
 Stage 1 Production Verified / Sprint Complete / Gate A entry
 
 Smallest safe response:
-Keep paid review disabled until 01 explicitly selects commercial enablement and all required launch/QA prerequisites are supplied or approved. Do not weaken AC-30, bypass entitlement/quota, or reinterpret deployment READY as Production Verified.
+Complete only the approved commercial/Production prerequisites while keeping paid review disabled. Commercial-enablement implementation may remain isolated on a non-main branch until the commercial prerequisites and public launch decision are ready. Do not weaken AC-30, bypass entitlement/quota, or reinterpret deployment READY as Production Verified.
 
 Owner lanes:
-01 Product/commercial decision
-→ 02 only if a specification gap exists
-→ C01 for authorized configuration/implementation only
-→ W01 fresh Pass B
+01 closes Product/commercial inputs
+→ 02 only if a Product-facing specification gap remains
+→ C01 for authorized branch-only configuration/implementation
+→ W01 fresh Pass B after prerequisites are live
 → 00 Sprint closure only after Production Verified
 
 Re-check condition:
@@ -219,8 +228,12 @@ Stage 1 QA Complete
 → release execution complete
 → W01 Pass B BLOCKED
 → 00 reconciles live state and plan
-→ 01 Commercial Enablement decision
-→ authorized prerequisites/configuration as needed
+→ 01 ENABLE_PREP Selected
+→ close minimum 01-owned commercial inputs
+→ 02 only for unresolved Product-facing specification gaps
+→ C01 branch-only commercial enablement implementation/configuration
+→ W01 fresh Pass A if code/behavior changed
+→ release only when commercial launch prerequisites are ready
 → W01 fresh Pass B
 → 00 Sprint Complete only after Production Verified
 → 01 Evidence → Gate Review → Explicit Next Selection
