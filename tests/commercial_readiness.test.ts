@@ -24,9 +24,14 @@ const completeEnv: Record<string, string> = {
   ARCHITECTURE_REVIEW_TERMS_URL: 'https://example.com/terms',
   ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://example.com/privacy',
   ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://example.com/support',
+  ARCHITECTURE_REVIEW_STRIPE_LIVE_MODE_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED: 'true',
   ARCHITECTURE_REVIEW_SUPABASE_AUTH_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_PROVIDER_BUDGET_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_WAF_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_COMMERCIAL_POLICY_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_FINANCIAL_QA_APPROVED: 'true',
 };
 
 test('commercial readiness is inspectable before the paid feature is enabled', () => {
@@ -59,6 +64,39 @@ test('commercial readiness names blockers without exposing configured values', (
   }
 });
 
+test('every required commercial dependency fails closed with a key and code', () => {
+  for (const key of Object.keys(completeEnv)) {
+    if (key === 'ARCHITECTURE_REVIEW_PAID_ENABLED') continue;
+    const env = { ...completeEnv };
+    delete env[key];
+    const readiness = inspectPaidArchitectureReviewReadiness(env);
+    assert.equal(readiness.configurationReady, false, key);
+    assert.ok(readiness.issues.some((issue) => issue.key === key), key);
+    assert.equal(readiness.config, null, key);
+  }
+});
+
+test('invalid booleans, identifiers, public URLs, quota and cost bounds fail closed', () => {
+  const cases: Array<[string, string, string]> = [
+    ['ARCHITECTURE_REVIEW_PAID_ENABLED', 'yes', 'invalid_boolean'],
+    ['STRIPE_ARCHITECTURE_REVIEW_PRICE_ID', 'product_not_price', 'invalid_identifier'],
+    ['STRIPE_BILLING_PORTAL_CONFIGURATION_ID', 'portal_not_configuration', 'invalid_identifier'],
+    ['NEXT_PUBLIC_SUPABASE_URL', 'http://example.supabase.co', 'invalid_https_url'],
+    ['ARCHITECTURE_REVIEW_TERMS_URL', 'https://localhost/terms', 'invalid_https_url'],
+    ['ARCHITECTURE_REVIEW_PRIVACY_URL', 'https://user:password@example.com/privacy', 'invalid_https_url'],
+    ['ARCHITECTURE_REVIEW_INCLUDED_REVIEWS', '0', 'invalid_positive_integer'],
+    ['ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES', '1.5', 'invalid_positive_integer'],
+    ['ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS', '-1', 'invalid_positive_integer'],
+    ['ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD', '9007199254740992', 'invalid_positive_integer'],
+    ['ARCHITECTURE_REVIEW_PROVIDER_BUDGET_APPROVED', 'TRUE', 'approval_required'],
+  ];
+  for (const [key, value, code] of cases) {
+    const readiness = inspectPaidArchitectureReviewReadiness({ ...completeEnv, [key]: value });
+    assert.equal(readiness.configurationReady, false, key);
+    assert.ok(readiness.issues.some((issue) => issue.key === key && issue.code === code), key);
+  }
+});
+
 test('commercial readiness CLI supports pre-enable and enabled-production modes', () => {
   const baseEnv = { ...process.env, ...completeEnv };
   const preEnable = spawnSync(
@@ -67,9 +105,7 @@ test('commercial readiness CLI supports pre-enable and enabled-production modes'
     { env: baseEnv, encoding: 'utf8' },
   );
   assert.equal(preEnable.status, 0, preEnable.stderr);
-  assert.match(preEnable.stdout, /"status": "ready"/);
-  assert.match(preEnable.stdout, /"mode": "pre-enable"/);
-  assert.match(preEnable.stdout, /"enabledRequested": false/);
+  assert.equal(preEnable.stdout.trim(), 'READY');
 
   const disabledProduction = spawnSync(
     process.execPath,
@@ -77,7 +113,8 @@ test('commercial readiness CLI supports pre-enable and enabled-production modes'
     { env: baseEnv, encoding: 'utf8' },
   );
   assert.equal(disabledProduction.status, 1);
-  assert.match(disabledProduction.stdout, /"status": "blocked"/);
+  assert.match(disabledProduction.stdout, /^BLOCKED/m);
+  assert.match(disabledProduction.stdout, /ARCHITECTURE_REVIEW_PAID_ENABLED: enablement_required/);
 
   const enabledProduction = spawnSync(
     process.execPath,
@@ -85,6 +122,5 @@ test('commercial readiness CLI supports pre-enable and enabled-production modes'
     { env: { ...baseEnv, ARCHITECTURE_REVIEW_PAID_ENABLED: 'true' }, encoding: 'utf8' },
   );
   assert.equal(enabledProduction.status, 0, enabledProduction.stderr);
-  assert.match(enabledProduction.stdout, /"status": "ready"/);
-  assert.match(enabledProduction.stdout, /"enabledRequested": true/);
+  assert.equal(enabledProduction.stdout.trim(), 'READY');
 });

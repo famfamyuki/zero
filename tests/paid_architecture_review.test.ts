@@ -19,9 +19,14 @@ const completeEnv: Record<string, string | undefined> = {
   ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS: '8000000',
   ARCHITECTURE_REVIEW_TERMS_URL: 'https://example.com/terms', ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://example.com/privacy',
   ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://example.com/support',
+  ARCHITECTURE_REVIEW_STRIPE_LIVE_MODE_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED: 'true',
   ARCHITECTURE_REVIEW_SUPABASE_AUTH_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_PROVIDER_BUDGET_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_WAF_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_COMMERCIAL_POLICY_APPROVED: 'true',
+  ARCHITECTURE_REVIEW_FINANCIAL_QA_APPROVED: 'true',
 };
 
 test('paid review is disabled by default and every commercial/cost dependency fails closed', () => {
@@ -44,6 +49,8 @@ test('cost guard uses conservative byte upper bound and integer micro-USD accoun
   assert.equal(estimateWorstCaseCostMicroUsd(100, config), 16_200);
   assert.equal(estimateActualCostMicroUsd(100, 50, config), 600);
   assert.equal(estimateActualCostMicroUsd(null, 50, config), null);
+  assert.equal(estimateActualCostMicroUsd(1.5, 50, config), null);
+  assert.equal(estimateActualCostMicroUsd(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, config), null);
   assert.equal(estimateWorstCaseCostMicroUsd(Number.MAX_SAFE_INTEGER, config), null);
 });
 
