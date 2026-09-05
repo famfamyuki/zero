@@ -29,9 +29,9 @@ const completeEnv: Record<string, string> = {
   ARCHITECTURE_REVIEW_PROVIDER_BUDGET_WARNING_MICRO_USD: '20000000',
   ARCHITECTURE_REVIEW_PROVIDER_BUDGET_CRITICAL_MICRO_USD: '40000000',
   ARCHITECTURE_REVIEW_PROVIDER_BUDGET_HARD_CEILING_MICRO_USD: '50000000',
-  ARCHITECTURE_REVIEW_TERMS_URL: 'https://example.com/terms',
-  ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://example.com/privacy',
-  ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://example.com/support',
+  ARCHITECTURE_REVIEW_TERMS_URL: 'https://policies.agentgraph.test/terms',
+  ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://policies.agentgraph.test/privacy',
+  ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://support.agentgraph.test/',
   ARCHITECTURE_REVIEW_STRIPE_LIVE_MODE_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED: 'true',
@@ -101,6 +101,26 @@ test('Stripe Test Mode is usable before live external approvals, while Productio
   const production = inspectPaidArchitectureReviewReadiness(testEnv, { target: 'production' });
   assert.equal(production.configurationReady, false);
   assert.ok(production.issues.some((issue) => issue.key === 'ARCHITECTURE_REVIEW_STRIPE_MODE'));
+});
+
+test('Production rejects placeholder policy URLs while Test Mode may verify placeholder wiring', () => {
+  const placeholderEnv = {
+    ...completeEnv,
+    ARCHITECTURE_REVIEW_TERMS_URL: 'https://example.com/terms',
+    ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://docs.example.org/privacy',
+    ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://support.example.net/',
+  };
+  const testMode = inspectPaidArchitectureReviewReadiness(
+    { ...placeholderEnv, ARCHITECTURE_REVIEW_STRIPE_MODE: 'test', STRIPE_SECRET_KEY: 'sk_test_secret-value' },
+    { target: 'test' },
+  );
+  assert.equal(testMode.issues.some((issue) => issue.code === 'placeholder_url'), false);
+
+  const production = inspectPaidArchitectureReviewReadiness(placeholderEnv, { target: 'production' });
+  for (const key of ['ARCHITECTURE_REVIEW_TERMS_URL', 'ARCHITECTURE_REVIEW_PRIVACY_URL', 'ARCHITECTURE_REVIEW_SUPPORT_URL']) {
+    assert.ok(production.issues.some((issue) => issue.key === key && issue.code === 'placeholder_url'), key);
+  }
+  assert.equal(production.configurationReady, false);
 });
 
 test('every required commercial dependency fails closed with a key and code', () => {

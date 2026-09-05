@@ -31,6 +31,7 @@ export type PaidArchitectureReviewReadinessIssueCode =
   | 'invalid_boolean'
   | 'invalid_identifier'
   | 'invalid_https_url'
+  | 'placeholder_url'
   | 'invalid_enum'
   | 'invalid_price_contract'
   | 'invalid_launch_configuration'
@@ -82,6 +83,13 @@ const publicHttpsUrl = (value: string | undefined): string | null => {
   } catch {
     return null;
   }
+};
+
+const isPlaceholderHostname = (value: string) => {
+  const hostname = new URL(value).hostname.toLowerCase();
+  return ['example.com', 'example.net', 'example.org'].some(
+    (placeholder) => hostname === placeholder || hostname.endsWith(`.${placeholder}`),
+  ) || hostname === 'example' || hostname.endsWith('.example') || hostname.endsWith('.invalid');
 };
 
 const pushMissing = (
@@ -188,6 +196,15 @@ export function inspectPaidArchitectureReviewReadiness(
   const termsUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_TERMS_URL');
   const privacyUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_PRIVACY_URL');
   const supportUrl = pushHttpsUrlIssue(issues, env, 'ARCHITECTURE_REVIEW_SUPPORT_URL');
+  if (target === 'production') {
+    for (const [key, value] of [
+      ['ARCHITECTURE_REVIEW_TERMS_URL', termsUrl],
+      ['ARCHITECTURE_REVIEW_PRIVACY_URL', privacyUrl],
+      ['ARCHITECTURE_REVIEW_SUPPORT_URL', supportUrl],
+    ] as const) {
+      if (value && isPlaceholderHostname(value)) issues.push({ key, code: 'placeholder_url' });
+    }
+  }
   pushHttpsUrlIssue(issues, env, 'NEXT_PUBLIC_SUPABASE_URL');
 
   const modelId = configuredValue(env.ARCHITECTURE_REVIEW_MODEL);
