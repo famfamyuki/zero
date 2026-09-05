@@ -2,20 +2,18 @@
 
 Snapshot date: **2026-09-05**  
 Status: **Coordination snapshot; live repository/Production checks win**  
-Scope: Concise answer to where development is now, which lifecycle state is valid, what is blocked, and which canonical lane acts next.
+Scope: Concise answer to where development is now, what is blocked, and which canonical lane acts next.
 
-This file is **not** a deployment registry, packet copy, roadmap copy, or historical archive.
+This file is **not** a deployment registry, roadmap copy, packet copy, or historical release archive.
 
 ## 0. Live-state rule
 
-Before any implementation, QA, release, roadmap-promotion, commercial-launch, or current-state decision, re-check:
+Before implementation, QA, release, roadmap promotion, commercial launch, or current-state decisions, re-check:
 
 1. latest GitHub `main`
 2. latest Vercel Production deployment
 3. actual Production behavior
 4. the relevant authoritative packet under `docs/specs/`
-
-A SHA below is evidence only unless it has just been live-verified.
 
 Authority references:
 
@@ -25,24 +23,17 @@ Authority references:
 - roles/lifecycle ownership → `docs/CHAT_ROLE_REGISTRY.md`
 - roadmap → `docs/roadmap/MASTER_ROADMAP.md`
 - promotion / AI / mutation authority → `docs/roadmap/EXECUTION_GATES.md`
-- near-term blockers/triggers → `docs/roadmap/PROGRAM_BOARD.md`
+- near-term execution plan → `docs/roadmap/PROGRAM_BOARD.md`
 - durable risks → `docs/roadmap/RISK_REGISTER.md`
+- commercial value/pricing/launch contract → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
 
 ---
 
 # 1. Current Production baseline
 
-Current Production includes:
+Current Production includes the established deterministic product foundation plus Stage 1 Architecture Review and paid-access controls in a **disabled / fail-closed** state.
 
-- Product journey organized around `Overview | Design | Preflight`
-- Visual Workflow Builder
-- workflow templates
-- JSON import/export portability
-- deterministic CrewAI Python export
-- CrewAI Static Import v0 for the supported static subset
-- Unified Preflight with Architecture, Readiness, Execution Preview, and Resource Analysis
-- Stage 1 Architecture Review implementation and paid-access controls deployed in **fail-closed disabled** state
-- existing analytics/first-value measurement foundation
+The deterministic free core remains operational independently of paid/provider availability, including the protected builder, templates, portability, deterministic Preflight analysis, and deterministic CrewAI export paths.
 
 Product North Star:
 
@@ -50,32 +41,27 @@ Product North Star:
 Understand → Evaluate → Improve → Verify → Own
 ```
 
-The deterministic free core remains operational independently of paid/provider availability.
-
 ---
 
 # 2. Current lifecycle state
 
-| Track | Current state | Authority / packet | Next condition |
-|---|---|---|---|
-| Stage 1 — Evidence-Grounded AI Architecture Review + coupled Paid Access & Usage Control | **QA Complete / release execution complete / Production Verification BLOCKED** | `docs/specs/AGS-EGAI-AR-V0-P1.md` and `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md` | `ENABLE_PREP` prerequisites become approved/live; W01 performs a fresh Pass B |
-| CrewAI Static Import v0 — Supported Subset + Mapping Diagnostics | **Sprint Complete / Production Verified** | `docs/specs/AGS-CREWAI-STATIC-IMPORT-V0-P1.md`; `ADR-0009` | Remains complete; no automatic source/Stage/authority expansion |
-| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md` | Remains complete |
+| Track | Current state | Next condition |
+|---|---|---|
+| Stage 1 — Evidence-Grounded AI Architecture Review + Paid Access & Usage Control | **QA Complete / release execution complete / Production Verification BLOCKED** | commercial/Production prerequisites become ready; final exact revision passes fresh W01 QA; controlled Production paid path passes W01 Pass B |
+| CrewAI Static Import v0 | **Sprint Complete / Production Verified** | remains complete |
+| Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | remains complete |
 
-Stage 1 release evidence currently reconciles as:
+Current stage/gate/authority state:
 
 ```text
-QA-approved source
-= 8887a5f2b282fc55f051dbaeefda2eca7d24de5c
-
-Released main / Production revision at W01 Pass B
-= 8db0de7d66846cb92db612098162ea8e27a6c874
-
-Release identity at W01 Pass B
-= MATCH
+Commercial Enablement Decision
+= ENABLE_PREP
 
 Production paid Architecture Review
 = DISABLED / FAIL-CLOSED
+
+Public paid switch
+= NOT APPROVED
 
 W01 Pass B
 = BLOCKED
@@ -85,27 +71,12 @@ Production Verified
 
 Sprint Complete
 = NO
-```
-
-The earlier evaluator-quality/API-budget blocker is no longer current: the required 30-review evaluation and W01 Pass A completed before release. The remaining blocker is Production paid/commercial verification.
-
-Subsequent documentation-only commits may advance `main` and Production deployment SHAs without changing Stage 1 behavior. Always re-check live repository/deployment identity before using any SHA as current state.
-
----
-
-# 3. Stage / gate / authority state
-
-```text
-Stage 1
-= QA COMPLETE
-+ RELEASE EXECUTION COMPLETE
-+ PRODUCTION VERIFICATION BLOCKED
 
 Gate A
 = NOT REACHED
 
 Additional Stage 1.5 capability
-= NONE
+= NONE SELECTED
 
 Gate B
 = NOT REACHED
@@ -120,79 +91,99 @@ Mutation Authority
 = UNCHANGED
 ```
 
-Why:
-
-- Stage 1 is not Production Verified, so Gate A is not reached.
-- Gate B therefore is not reached and Stage 2 is not selected.
-- No Stage 1.5 capability is automatically selected from the roadmap.
-- Commercial Validation Gate M0 remains separate from AI authority/stage promotion and is not reached merely by technical release readiness.
+The earlier evaluator-quality/API-budget blocker is resolved. The current blocker is the Production paid/commercial verification path.
 
 ---
 
-# 4. Active blocker
+# 3. Current execution decision
+
+The authoritative near-term sequence is in `docs/roadmap/PROGRAM_BOARD.md`.
+
+Current decision:
+
+> Continue existing `ENABLE_PREP` by finishing all price-independent commercial readiness first. Defer final Public Price / Currency / Included quota / numeric request-cost envelope / aggregate provider budget until the final commercial-configuration step.
+
+This is a sequencing decision only. It does not weaken or replace the pricing-evidence contract in `docs/roadmap/MONETIZATION_ARCHITECTURE.md` / ADR-0007.
+
+Current working isolation:
+
+```text
+commercial branch
+= codex/commercial-enablement-prep-20260905
+
+Draft PR
+= #35
+
+main merge
+= NOT AUTHORIZED YET
+
+ARCHITECTURE_REVIEW_PAID_ENABLED
+= false
+```
+
+---
+
+# 4. Current next authority
+
+```text
+C01
+= complete price-independent commercial readiness on Draft PR #35
+
+then
+
+01
+= decide final commercial configuration
+  (Price / Currency / quota / numeric economics / launch policy inputs)
+
+then
+
+02
+= only if a final Product-facing specification gap remains
+
+then
+
+C01
+= apply final approved configuration and produce final launch-candidate revision
+
+then
+
+W01
+= fresh Pass A on the exact final revision
+```
+
+Release/verification afterward remains:
+
+```text
+W01 QA Complete
+→ C01 merge/release exact approved revision
+→ controlled Production paid enable
+→ W01 Pass B / AC-30
+→ 00 Sprint Complete
+→ 01 Evidence → Gate Review → Explicit Next Selection
+```
+
+---
+
+# 5. Active blocker and remaining launch prerequisites
 
 ```text
 Blocker:
 COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
-
-Observed Production state at W01 Pass B:
-- deployment READY / target=production
-- Stage 1 release identity matched the QA-approved change set
-- paid Architecture Review offer disabled
-- review endpoint fails closed with review_disabled
-- deterministic free core remains operational
-
-Why blocked:
-The active paid-access packet requires live controlled-account Production evidence for sign-in, Stripe subscription, entitlement reconciliation, quota/current-period projection, successful review consumption, non-consumption failure behavior, idempotency, billing portal/cancel-at-period-end, quota exhaustion, kill-switch isolation, and related commercial/hosting prerequisites.
 ```
 
-Required prerequisites include, as applicable:
+Remaining prerequisites include, as applicable:
 
-- commercial-use-eligible hosting/account
-- explicitly approved Production Price / currency / included quota
-- approved provider cost guard and operator budget controls
-- Stripe Production Price and Customer Portal configuration
-- Terms / Privacy / Support / refund / tax operational path
-- Production Supabase Auth email delivery/redirect configuration
-- controlled QA account and approved financial handling
-- Production WAF verification path
+- commercial-use-eligible hosting/account;
+- final approved Price / currency / included quota;
+- final approved numeric request-cost guard and provider budget controls;
+- active recurring monthly Stripe Price and bounded Customer Portal configuration;
+- Terms / Privacy / Support / refund / tax operational path;
+- Production Supabase Auth email delivery/redirect readiness;
+- controlled QA account and approved financial handling;
+- Production WAF configuration and verification path;
+- fresh independent QA for the final changed revision.
 
-C01 must not invent these Product/commercial values. W01 must not bypass entitlement/quota or weaken AC-30.
-
----
-
-# 5. Current coordination / next authority
-
-```text
-Commercial Enablement Decision
-= ENABLE_PREP
-
-Public paid switch approval
-= NOT YET
-
-Production paid Architecture Review
-= KEEP DISABLED / FAIL-CLOSED
-
-Implementation isolation
-= commercial enablement work may proceed on a non-main branch;
-  do not merge to main until the commercial prerequisites and launch decision are ready
-
-Current next authority
-= 01 commercial input closure
-→ 02 only for unresolved Product-facing specification gaps
-→ C01 for authorized branch-only implementation/configuration
-
-Next verification
-= W01 fresh Pass B only after prerequisites are live
-```
-
-`ENABLE_PREP` means AgentGraph will complete only the minimum commercial/operational prerequisites needed to make the existing Stage 1 paid path verifiable. It does **not** approve immediate public activation and does not select Stage 1.5 or Stage 2 work.
-
-Required 01-owned inputs still include the public Price/currency/included quota, economic cost envelope, hosting route, refund/support/tax launch policy, and controlled financial QA treatment. C01 must keep any unresolved value fail-closed rather than inventing it.
-
-If Product-facing pricing/legal/support behavior remains underspecified after those values are approved, route only that gap through 02. Otherwise C01 may continue authorized configuration/implementation directly.
-
-After prerequisites are live, return to `W01` for a **fresh Pass B**. If code or behavior changes after QA Complete, re-evaluate Pass A validity before release/verification.
+C01 must not invent unresolved Product/commercial values. W01 must not bypass entitlement/quota or weaken AC-30.
 
 ---
 
@@ -200,47 +191,42 @@ After prerequisites are live, return to `W01` for a **fresh Pass B**. If code or
 
 ## Known
 
-- Stage 1 implementation is QA Complete and released on the exact approved tree.
-- W01 verified release identity matching at the Stage 1 Pass B attempt; current `main` / Production SHA must still be live-checked before each material decision.
-- paid Architecture Review is currently disabled/fail-closed in the verified Production state.
+- Stage 1 implementation is QA Complete and released.
+- Production paid Architecture Review remains intentionally disabled/fail-closed in the verified current posture.
 - deterministic free features remain operational.
-- W01 Pass B is blocked because mandatory live paid-path evidence is unavailable.
-- 01 selected `ENABLE_PREP`, while public paid activation remains unapproved until minimum commercial prerequisites are complete.
-- Gate A is not reached; Stage 2 is not selected; AI and Mutation Authority are unchanged.
+- `ENABLE_PREP` is selected; immediate public paid activation is not.
+- commercial preparation continues on an isolated Draft PR.
+- final numeric commercial values are deferred until the final configuration step.
+- Gate A is not reached; Stage 1.5/Stage 2 are not selected; AI and Mutation Authority are unchanged.
 
 ## Inferred
 
-- The current disabled state is an intentional safety posture while commercial/Production prerequisites remain unsatisfied; it is not evidence of paid-path Production correctness.
-- The completed 30-review evaluator evidence is sufficient to justify commercial enablement preparation, but not sufficient by itself to validate recurring paid value or final price/quota economics.
+- Deferring final numeric commercial values removes an unnecessary sequencing blocker without changing the durable pricing/launch contract.
+- Completing price-independent readiness first should reduce late implementation uncertainty before final commercial configuration and independent QA.
 
 ## Unknown / evidence-dependent
 
-- Production Auth email delivery and controlled-account sign-in.
-- live Stripe checkout/subscription and entitlement reconciliation.
-- successful provider-backed review/result rendering in Production.
-- quota consume/non-consume/idempotency/exhaustion behavior in Production.
-- billing portal/cancel behavior in Production.
-- Production WAF enforcement.
-- final approved public Price/quota/cost-guard and commercial operations readiness.
+- final Public Price / Currency / Included quota;
+- final numeric request-cost envelope and provider monthly budget;
+- final tax/refund/legal/support launch approval;
+- Production Auth controlled-account behavior;
+- live Stripe subscription/entitlement/quota behavior;
+- Production WAF behavior;
+- controlled financial QA result;
+- paid-path Production Verification;
 - commercial validation / recurring paid value under M0.
 
 Unknown means insufficient evidence, not evidence of absence.
 
 ---
 
-# 7. Planning reconciliation rule
+# 7. Planning discipline
 
-Near-term planning update discipline is authoritative in `docs/roadmap/PROGRAM_BOARD.md`.
+`docs/roadmap/PROGRAM_BOARD.md` is the single near-term execution plan.
 
-After a material lifecycle, blocker, gate, selection, authority, release, or Production-verification milestone, reconcile the current planning documents **before the next normal lane handoff** so stale snapshots do not become operating input.
+Update planning documents only when lifecycle, blocker, gate, selection, authority, release, or Production meaning materially changes. Do not copy transient commit/deployment facts into multiple planning documents.
 
-Do not update planning documents for every commit or transient metric; update them when the program state materially changes.
-
----
-
-# 8. Operating model
-
-Canonical lanes remain exactly:
+Canonical lanes remain:
 
 ```text
 00 — Program Control & Current State
@@ -248,19 +234,6 @@ Canonical lanes remain exactly:
 02 — UX & Implementation Specification
 C01 — Current Sprint Implementation
 W01 — Independent QA & Production Verification
-```
-
-Lifecycle ownership remains:
-
-```text
-01 Selected
-→ 02 Specified
-→ C01 Implementation Started / Implementation Complete
-→ W01 QA Complete
-→ C01 release exact QA-approved revision
-→ W01 Production Verified
-→ 00 Sprint Complete
-→ 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
 `QA Complete ≠ Production Verified`.  
