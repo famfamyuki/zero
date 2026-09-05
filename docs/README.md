@@ -24,6 +24,7 @@ This directory is the shared durable development knowledge base for Chat, Work, 
 18. [`decisions/`](./decisions/) — durable Product/Architecture/operating-model ADRs
 19. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; live checks win
 20. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
+21. [`runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`](./runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md) — external WAF/provider-budget controls and controlled paid-launch financial QA procedure
 
 ## Source-of-truth hierarchy
 

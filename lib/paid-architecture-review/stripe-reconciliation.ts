@@ -14,6 +14,17 @@ function matchesArchitectureReviewPrice(subscription: Stripe.Subscription, price
   return subscription.items.data.some((item) => item.price.id === priceId);
 }
 
+export function isValidArchitectureReviewPrice(price: Stripe.Price): boolean {
+  return price.active
+    && price.type === 'recurring'
+    && price.unit_amount !== null
+    && price.unit_amount > 0
+    && price.recurring?.interval === 'month'
+    && price.recurring.interval_count === 1
+    && price.recurring.usage_type === 'licensed'
+    && price.transform_quantity === null;
+}
+
 export function hasDuplicateActiveArchitectureReviewSubscriptions(subscriptions: Stripe.Subscription[], priceId: string) {
   return subscriptions.filter((subscription) => subscription.status === 'active' && matchesArchitectureReviewPrice(subscription, priceId)).length > 1;
 }
@@ -49,7 +60,7 @@ export async function reconcileArchitectureReviewSubscription(subscriptionId: st
     throw new Error('duplicate_active_subscription');
   }
   const matchingItems = subscription.items.data.filter((item) => item.price.id === config.stripePriceId);
-  if (matchingItems.length !== 1 || subscription.items.data.length !== 1) {
+  if (matchingItems.length !== 1 || subscription.items.data.length !== 1 || !isValidArchitectureReviewPrice(matchingItems[0].price)) {
     await markEntitlementDegraded(customer.user_id, eventId);
     throw new Error('subscription_shape_invalid');
   }

@@ -2,7 +2,7 @@ import { authenticatePaidRequest } from '@/lib/paid-architecture-review/auth';
 import { parsePaidArchitectureReviewConfig } from '@/lib/paid-architecture-review/config';
 import { getApplicationOrigin, paidJson } from '@/lib/paid-architecture-review/http';
 import { readPaidArchitectureReviewAccess } from '@/lib/paid-architecture-review/access';
-import { ensureStripeCustomer } from '@/lib/paid-architecture-review/stripe-reconciliation';
+import { ensureStripeCustomer, isValidArchitectureReviewPrice } from '@/lib/paid-architecture-review/stripe-reconciliation';
 import { getStripe } from '@/lib/stripe';
 
 export const runtime = 'nodejs';
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     if (access.state === 'active' || access.state === 'active_canceling' || access.state === 'quota_exhausted') return paidJson({ error: 'subscription_exists', manageBilling: true }, { status: 409 });
     if (access.state === 'sync_degraded') return paidJson({ error: 'entitlement_unavailable' }, { status: 503 });
     const price = await getStripe().prices.retrieve(config.stripePriceId);
-    if (!price.active || price.type !== 'recurring' || price.recurring?.interval !== 'month' || price.recurring.interval_count !== 1) return paidJson({ error: 'review_disabled' }, { status: 503 });
+    if (!isValidArchitectureReviewPrice(price)) return paidJson({ error: 'review_disabled' }, { status: 503 });
     const customer = await ensureStripeCustomer(user.id);
     const origin = getApplicationOrigin();
     const metadata = { kind: 'architecture_review_subscription_v0', plan_key: config.planKey, user_id: user.id };

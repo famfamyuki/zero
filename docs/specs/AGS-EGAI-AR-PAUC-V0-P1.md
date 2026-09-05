@@ -344,11 +344,11 @@ No cron-based reset is required. A newly reconciled eligible Stripe period creat
 
 ## PAUC-R14 — Included quota configuration
 
-`ARCHITECTURE_REVIEW_INCLUDED_REVIEWS` is a required positive integer **when paid review is enabled**. There is no Production fallback/default that guesses a commercial quota.
+`ARCHITECTURE_REVIEW_INCLUDED_REVIEWS` is a required positive integer **when paid review is enabled**. The provisional initial launch configuration selected by 01 is **10 reviews per monthly Stripe billing period**. It remains configuration-backed rather than a permanent hard-coded Product constant.
 
 - test fixtures may use a small explicit value such as `3`; that number is not Product policy;
 - Production with missing/invalid quota config must keep paid review disabled/fail closed;
-- the launch value is selected by `01`/commercial release evidence, not by C01.
+- the current launch candidate uses `10`; any future change remains an explicit `01`/commercial release decision and applies only under the period-snapshot contract.
 
 ## PAUC-R15 — Atomic availability
 
@@ -847,7 +847,7 @@ This packet is implementation-ready without guessing commercial values, but **pu
 Before `ARCHITECTURE_REVIEW_PAID_ENABLED=true` on public Production, `01`/release ownership must explicitly supply/approve:
 
 1. active monthly Stripe Price ID, including amount/currency;
-2. `ARCHITECTURE_REVIEW_INCLUDED_REVIEWS`;
+2. `ARCHITECTURE_REVIEW_INCLUDED_REVIEWS=10` for the provisional initial launch configuration;
 3. provider input/output/cost-guard configuration derived from current evaluator benchmark/cost evidence;
 4. working Stripe Customer Portal configuration;
 5. Terms URL, Privacy URL, Support/contact URL;

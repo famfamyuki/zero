@@ -35,7 +35,7 @@ const completeEnv: Record<string, string> = {
   ARCHITECTURE_REVIEW_FINANCIAL_QA_APPROVED: 'true',
 };
 
-test('environment template inventories every readiness key without commercial values or secrets', () => {
+test('environment template inventories every readiness key, fixes quota at 10, and contains no secrets', () => {
   const template = readFileSync('.env.example', 'utf8');
   for (const key of Object.keys(completeEnv)) assert.match(template, new RegExp(`^${key}=`, 'm'), key);
   for (const key of [
@@ -45,8 +45,8 @@ test('environment template inventories every readiness key without commercial va
     'OPENAI_API_KEY',
     'STRIPE_ARCHITECTURE_REVIEW_PRICE_ID',
     'STRIPE_BILLING_PORTAL_CONFIGURATION_ID',
-    'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS',
   ]) assert.match(template, new RegExp(`^${key}=$`, 'm'), key);
+  assert.match(template, /^ARCHITECTURE_REVIEW_INCLUDED_REVIEWS=10$/m);
   assert.match(template, /^ARCHITECTURE_REVIEW_PAID_ENABLED=false$/m);
   assert.doesNotMatch(template, /sk_(?:live|test)_|price_[A-Za-z0-9]|https:\/\/[^\s=]+|\b\d+\.\d+\b/);
 });
@@ -132,6 +132,7 @@ test('commercial readiness CLI supports pre-enable and enabled-production modes'
   assert.equal(disabledProduction.status, 1);
   assert.match(disabledProduction.stdout, /^BLOCKED/m);
   assert.match(disabledProduction.stdout, /ARCHITECTURE_REVIEW_PAID_ENABLED: enablement_required/);
+  assert.match(disabledProduction.stdout, /\[FINAL ENABLE SWITCH\]/);
 
   const enabledProduction = spawnSync(
     process.execPath,

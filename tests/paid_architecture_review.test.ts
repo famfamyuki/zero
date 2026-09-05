@@ -5,7 +5,7 @@ import { estimateActualCostMicroUsd, estimateWorstCaseCostMicroUsd, parsePaidArc
 import { readBearerToken } from '../lib/paid-architecture-review/auth';
 import { sanitizeAnalyticsProperties } from '../lib/analytics-config';
 import { isExpectedFinalState } from '../lib/paid-architecture-review/quota';
-import { hasDuplicateActiveArchitectureReviewSubscriptions } from '../lib/paid-architecture-review/stripe-reconciliation';
+import { hasDuplicateActiveArchitectureReviewSubscriptions, isValidArchitectureReviewPrice } from '../lib/paid-architecture-review/stripe-reconciliation';
 import type Stripe from 'stripe';
 
 const completeEnv: Record<string, string | undefined> = {
@@ -80,6 +80,21 @@ test('subscription inventory remains degraded across webhook replay while duplic
   assert.equal(hasDuplicateActiveArchitectureReviewSubscriptions([subscription('sub_other', 'active', 'price_other'), subscription('sub_new', 'active')], 'price_test'), false);
 });
 
+test('the only accepted Stripe Price is positive licensed monthly recurring without quantity transforms', () => {
+  const price = (overrides: Record<string, unknown> = {}) => ({
+    active: true, type: 'recurring', unit_amount: 2000, transform_quantity: null,
+    recurring: { interval: 'month', interval_count: 1, usage_type: 'licensed' },
+    ...overrides,
+  }) as unknown as Stripe.Price;
+  assert.equal(isValidArchitectureReviewPrice(price()), true);
+  assert.equal(isValidArchitectureReviewPrice(price({ active: false })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ unit_amount: 0 })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ unit_amount: null })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ recurring: { interval: 'year', interval_count: 1, usage_type: 'licensed' } })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ recurring: { interval: 'month', interval_count: 1, usage_type: 'metered' } })), false);
+  assert.equal(isValidArchitectureReviewPrice(price({ transform_quantity: { divide_by: 10, round: 'up' } })), false);
+});
+
 test('migration provides additive RLS tables, atomic quota, one-in-flight, stale recovery, and idempotent finalize', () => {
   const sql = readFileSync('supabase/migrations/20260826190000_architecture_review_paid_access_v0.sql', 'utf8');
   for (const table of ['billing_customers','architecture_review_entitlements','architecture_review_usage_periods','architecture_review_usage_attempts','stripe_webhook_events']) assert.match(sql, new RegExp(`create table if not exists public\\.${table}`));
@@ -144,6 +159,7 @@ test('billing routes preserve subscription/template separation and webhook recon
   const webhook = readFileSync('app/api/webhook/route.ts', 'utf8');
   assert.match(checkout, /mode: 'subscription'/);
   assert.match(checkout, /quantity: 1/);
+  assert.match(checkout, /isValidArchitectureReviewPrice/);
   assert.match(checkout, /Idempotency-Key|idempotency-key/);
   assert.doesNotMatch(checkout, /trial_period_days|allow_promotion_codes: true|mode: 'payment'/);
   assert.match(template, /mode: 'payment'/);
@@ -166,6 +182,8 @@ test('paid UX is scoped to Architecture and preserves free-core, accessibility, 
   assert.match(ui,/autoComplete="email"/);
   assert.match(ui,/aria-live="polite"/);
   assert.match(ui,/min-h-11/);
+  for (const label of ['Terms','Privacy','Support']) assert.match(ui,new RegExp(label));
+  assert.match(ui,/offer\.policyUrls/);
   assert.match(translations,/zeroCostBadge: 'Free Core'/);
   assert.match(translations,/zeroCostBadge: '無料コア機能'/);
   assert.doesNotMatch(translations,/100% Free Tool/);

@@ -43,6 +43,8 @@ Use [`.env.example`](.env.example) as the key inventory only; it intentionally c
 
 Paid Architecture Review is fail-closed. Keep `ARCHITECTURE_REVIEW_PAID_ENABLED=false` until every configuration and external approval is complete. Check preparation readiness with `npm run commercial:check`; use `npm run commercial:check:enabled` only for the final launch-candidate verification. Neither command prints configured values.
 
+The external WAF, provider-budget, kill-switch, and controlled financial QA procedure is documented in [Architecture Review Paid Launch Runbook](docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md).
+
 ## Try it
 
 - [Open AgentGraph Studio](https://zero-six-khaki.vercel.app/)
