@@ -13,6 +13,8 @@ import { ExecutionPreviewStageContent } from '@/components/editor/execution-prev
 import { ResourceAnalysisStageContent } from '@/components/editor/resource-analysis/ResourceAnalysisStageContent';
 import { UnifiedPreflightOverview } from './UnifiedPreflightOverview';
 import { getUnifiedPreflightTabDestination, unifiedPreflightStages } from './unifiedPreflightTabs';
+import { ArchitectureReviewStageContent } from './ArchitectureReviewStageContent';
+import type { ReturnTypeOfUseArchitectureReview } from '@/hooks/useArchitectureReview';
 
 type Preflight = ReturnType<typeof useUnifiedPreflight>;
 interface Props {
@@ -23,6 +25,7 @@ interface Props {
   onLocateResources: (target: ResourceAnalysisTarget, context: ResourceAnalysisLocateContext) => boolean; onOpenValidation: () => void;
   onReevaluate: () => void; updatedNotice: string | null;
   focusHeadingOnOpen?: boolean;
+  architectureReview: ReturnTypeOfUseArchitectureReview; onLocateArchitecture: (targetKey: string) => void; architectureTargetKeys: ReadonlySet<string>;
 }
 
 export function UnifiedPreflightPanel(props: Props) {
@@ -32,7 +35,7 @@ export function UnifiedPreflightPanel(props: Props) {
   const [readinessFilter, setReadinessFilter] = useState<ReadinessCategory | 'all'>('all');
   const ja = lang === 'ja';
   const copy = translations[lang];
-  const labels = [copy.unifiedPreflightOverview, copy.unifiedPreflightReadiness, copy.unifiedPreflightExecution, copy.unifiedPreflightResources];
+  const labels = [copy.unifiedPreflightOverview, copy.unifiedPreflightArchitecture, copy.unifiedPreflightReadiness, copy.unifiedPreflightExecution, copy.unifiedPreflightResources];
 
   const handleTabKeyDown = (stage: UnifiedPreflightStage, event: ReactKeyboardEvent<HTMLButtonElement>) => {
     const destination = getUnifiedPreflightTabDestination(stage, event.key);
@@ -51,13 +54,14 @@ export function UnifiedPreflightPanel(props: Props) {
   }, [isOpen, onClose, props.focusHeadingOnOpen]);
 
   if (!isOpen) return null;
-  return <main id="unified-preflight-panel" aria-labelledby="unified-preflight-heading" aria-busy={preflight.isRefreshing} className="flex min-h-0 flex-1 flex-col bg-slate-950">
+  return <main id="unified-preflight-panel" aria-labelledby="unified-preflight-heading" className="flex min-h-0 flex-1 flex-col bg-slate-950">
     <header className="mx-auto w-full max-w-5xl shrink-0 border-b border-slate-800 p-4"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-teal-300">{ja ? 'Evaluate · Verify' : 'Evaluate · Verify'}</p><h2 id="unified-preflight-heading" ref={headingRef} tabIndex={-1} className="mt-1 text-2xl font-bold text-white focus:outline-none">{copy.unifiedPreflightTitle}</h2></div><button type="button" onClick={onClose} className="min-h-11 rounded-lg px-3 text-xs font-bold text-slate-300">{ja ? 'Designを開く' : 'Open Design'}</button></div>
       <div className="mt-3 flex items-center gap-2"><button type="button" onClick={props.onReevaluate} className="min-h-11 rounded-lg border border-teal-700 px-3 text-xs font-bold text-teal-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300">{copy.unifiedPreflightReevaluate}</button><div aria-live="polite">{props.updatedNotice ? <span role="status" className="text-xs text-teal-200">{props.updatedNotice}</span> : null}</div></div>
       <div role="tablist" aria-label={ja ? '事前レビューのステージ' : 'Preflight review stages'} className="mt-3 flex gap-1 overflow-x-auto pb-1">{unifiedPreflightStages.map((stage, index) => <button key={stage} ref={(element) => { tabRefs.current[stage] = element ?? undefined; }} id={`unified-preflight-tab-${stage}`} type="button" role="tab" aria-selected={activeStage === stage} aria-controls={`unified-preflight-tabpanel-${stage}`} tabIndex={activeStage === stage ? 0 : -1} onClick={() => onStageChange(stage)} onKeyDown={(event) => handleTabKeyDown(stage, event)} className="min-h-11 shrink-0 rounded-lg px-3 text-xs font-bold text-slate-300 aria-selected:bg-teal-700 aria-selected:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300">{labels[index]}</button>)}</div>
     </header>
     <div id={`unified-preflight-tabpanel-${activeStage}`} role="tabpanel" aria-labelledby={`unified-preflight-tab-${activeStage}`} className="mx-auto min-h-0 w-full max-w-5xl flex-1 overflow-y-auto p-4 pb-8">
-      {activeStage === 'overview' ? <UnifiedPreflightOverview review={preflight.review} lang={lang} onSelectStage={onStageChange} /> : null}
+      {activeStage === 'overview' ? <UnifiedPreflightOverview review={preflight.review} architectureState={props.architectureReview.state} lang={lang} onSelectStage={onStageChange} /> : null}
+      {activeStage === 'architecture' ? <ArchitectureReviewStageContent state={props.architectureReview.state} evidence={props.architectureReview.displayEvidence} eligible={Boolean(props.architectureReview.evidence)} paid={props.architectureReview.paid} lang={lang} onRun={props.architectureReview.run} onLocate={props.onLocateArchitecture} currentTargetKeys={props.architectureTargetKeys} /> : null}
       {activeStage === 'readiness' ? <ReadinessStageContent result={preflight.readiness.result} error={preflight.readiness.error} isRefreshing={preflight.readiness.isRefreshing} lang={lang} filter={readinessFilter} onFilterChange={setReadinessFilter} targetSummary={props.readinessTargetSummary} onRetry={preflight.readiness.evaluateNow} onLocate={props.onLocateReadiness} onOpenValidation={props.onOpenValidation} notice={props.readinessNotice} /> : null}
       {activeStage === 'execution' ? <><p className="mb-4 text-xs leading-relaxed text-slate-400">{copy.executionPreviewDisclaimer}</p><ExecutionPreviewStageContent state={preflight.execution.state} isRefreshing={preflight.execution.isRefreshing} lang={lang} notice={props.executionNotice} onRetry={preflight.execution.evaluateNow} onLocate={props.onLocateExecution} onOpenValidation={props.onOpenValidation} /></> : null}
       {activeStage === 'resources' ? <><p className="mb-4 text-xs leading-relaxed text-slate-400">{copy.resourceAnalysisDisclaimer}</p><ResourceAnalysisStageContent state={preflight.resources.state} isRefreshing={preflight.resources.isRefreshing} lang={lang} notice={props.resourceNotice} onRetry={preflight.resources.evaluateNow} onOpenValidation={props.onOpenValidation} onLocate={props.onLocateResources} /></> : null}

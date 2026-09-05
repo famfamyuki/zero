@@ -5,6 +5,7 @@ import { AnalyticsEvent, sanitizeAnalyticsProperties } from '@/lib/analytics-con
 import type { PreflightActivationSource } from '@/lib/preflight-activation';
 import { PREFLIGHT_ACTIVATION_VERSION } from '@/lib/preflight-activation';
 import { UNIFIED_PREFLIGHT_REVIEW_VERSION, type UnifiedPreflightStage } from '@/types/unified-preflight';
+import type { ArchitectureReviewErrorCode } from '@/types/architecture-review';
 
 type AnalyticsProperties = {
   template_selected: { template_id: string; source: 'library' | 'sidebar' };
@@ -53,6 +54,13 @@ type AnalyticsProperties = {
   preflight_review_re_evaluated: {
     stage: UnifiedPreflightStage;
   };
+  architecture_review_requested: { review_version: '0.1.0'; evidence_version: '0.1.0'; access_mode: 'paid_subscription_v0' };
+  architecture_review_completed: { review_version: '0.1.0'; evidence_version: '0.1.0'; access_mode: 'paid_subscription_v0' };
+  architecture_review_failed: { review_version: '0.1.0'; error_code: ArchitectureReviewErrorCode; access_mode: 'paid_subscription_v0' };
+  paid_review_offer_shown: { offer_version: '0.1.0'; access_state: string };
+  paid_review_checkout_started: { offer_version: '0.1.0' };
+  paid_review_quota_exhausted: { offer_version: '0.1.0' };
+  paid_review_subscription_management_opened: { offer_version: '0.1.0' };
 };
 
 export function trackEvent(event: 'code_generated'): void;
