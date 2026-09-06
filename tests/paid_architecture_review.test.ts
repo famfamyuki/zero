@@ -168,6 +168,7 @@ test('billing routes preserve subscription/template separation and webhook recon
   assert.match(checkout, /mode: 'subscription'/);
   assert.match(checkout, /quantity: 1/);
   assert.match(checkout, /automatic_tax: \{ enabled: config\.stripeTaxEnabled \}/);
+  assert.match(checkout, /customer_update: \{ address: 'auto' \}/);
   assert.match(checkout, /isValidArchitectureReviewPrice/);
   assert.match(checkout, /Idempotency-Key|idempotency-key/);
   assert.doesNotMatch(checkout, /trial_period_days|allow_promotion_codes: true|mode: 'payment'/);
