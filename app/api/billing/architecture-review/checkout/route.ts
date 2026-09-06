@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       success_url: `${origin}/?architecture_review_checkout=success`, cancel_url: `${origin}/?architecture_review_checkout=cancel`,
       metadata, subscription_data: { metadata }, allow_promotion_codes: false,
       automatic_tax: { enabled: config.stripeTaxEnabled },
+      customer_update: { address: 'auto' },
     }, { idempotencyKey });
     return paidJson({ url: session.url });
   } catch {
