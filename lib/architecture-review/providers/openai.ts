@@ -13,7 +13,7 @@ export class OpenAIArchitectureReviewer implements ArchitectureReviewer {
   constructor(private readonly client=new OpenAI({apiKey:process.env.OPENAI_API_KEY,maxRetries:0}),readonly model=process.env.ARCHITECTURE_REVIEW_MODEL||'gpt-5.6-sol',private readonly maxOutputTokens?:number){}
   async review(input:ArchitectureReviewerInputV0,options?:{signal?:AbortSignal}):Promise<ArchitectureReviewerDraftV0>{
     const {providerInput}=createReviewerEnvelope(input.evidence);
-    const response=await this.client.responses.parse({model:this.model,reasoning:{effort:'medium'},store:false,max_output_tokens:this.maxOutputTokens,input:[{role:'developer',content:ARCHITECTURE_REVIEWER_INSTRUCTION},{role:'user',content:createArchitectureReviewerDataEnvelope(providerInput,input.locale)}],text:{format:zodTextFormat(architectureReviewerDraftSchema,'architecture_review_v0')}},{signal:options?.signal});
+    const response=await this.client.responses.parse({model:this.model,reasoning:{effort:'medium'},store:false,max_output_tokens:this.maxOutputTokens,input:[{role:'developer',content:ARCHITECTURE_REVIEWER_INSTRUCTION},{role:'user',content:createArchitectureReviewerDataEnvelope(providerInput,input.locale)}],text:{format:zodTextFormat(architectureReviewerDraftSchema,'architecture_review_v0'),verbosity:'low'}},{signal:options?.signal});
     this.usage={inputTokens:response.usage?.input_tokens??null,outputTokens:response.usage?.output_tokens??null,totalTokens:response.usage?.total_tokens??null};
     this.usageDetails={cachedInputTokens:response.usage?.input_tokens_details?.cached_tokens??null,reasoningTokens:response.usage?.output_tokens_details?.reasoning_tokens??null};
     if(!response.output_parsed) throw new Error('invalid_reviewer_output');

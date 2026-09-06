@@ -1,7 +1,7 @@
 export const ARCHITECTURE_REVIEW_EVIDENCE_VERSION = '0.1.0' as const;
 export const ARCHITECTURE_REVIEW_WORKFLOW_SEMANTICS_VERSION = '0.1.0' as const;
 export const ARCHITECTURE_REVIEW_RESULT_VERSION = '0.1.0' as const;
-export const ARCHITECTURE_REVIEWER_VERSION = '0.1.0' as const;
+export const ARCHITECTURE_REVIEWER_VERSION = '0.1.1' as const;
 export const ARCHITECTURE_REVIEW_PROMPT_VERSION = '0.1.1' as const;
 export const ARCHITECTURE_REVIEW_API_VERSION = '0.1.0' as const;
 
