@@ -63,18 +63,27 @@ const configuredValue = (value: string | undefined): string | null => {
   return normalized ? normalized : null;
 };
 
+const isPrivateIpv4 = (parts: number[]) => parts.length === 4
+  && parts.every((part) => Number.isInteger(part) && part >= 0 && part <= 255)
+  && (parts[0] === 10 || parts[0] === 127 || parts[0] === 0 || parts[0] === 169 && parts[1] === 254
+    || parts[0] === 192 && parts[1] === 168 || parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31);
+
 const isPrivateHostname = (hostname: string) => {
   const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, '');
   if (normalized === 'localhost' || normalized === '::1' || normalized.endsWith('.localhost')
     || normalized.endsWith('.local') || normalized === 'host.docker.internal') return true;
+  if (normalized.startsWith('::ffff:')) {
+    const words = normalized.slice('::ffff:'.length).split(':');
+    if (words.length === 2 && words.every((word) => /^[0-9a-f]{1,4}$/.test(word))) {
+      const [high, low] = words.map((word) => Number.parseInt(word, 16));
+      return isPrivateIpv4([high >> 8, high & 0xff, low >> 8, low & 0xff]);
+    }
+  }
   if (normalized.includes(':')) {
     return normalized.startsWith('fc') || normalized.startsWith('fd')
       || ['fe8', 'fe9', 'fea', 'feb'].some((prefix) => normalized.startsWith(prefix));
   }
-  const parts = normalized.split('.').map(Number);
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return false;
-  return parts[0] === 10 || parts[0] === 127 || parts[0] === 0 || parts[0] === 169 && parts[1] === 254
-    || parts[0] === 192 && parts[1] === 168 || parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31;
+  return isPrivateIpv4(normalized.split('.').map(Number));
 };
 
 const publicHttpsUrl = (value: string | undefined): string | null => {

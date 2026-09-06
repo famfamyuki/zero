@@ -134,6 +134,11 @@ test('CPUX-T06 Production rejects reserved and obvious local or private policy d
     'https://10.0.0.1/terms',
     'https://172.16.0.1/terms',
     'https://192.168.1.1/terms',
+    'https://[::ffff:127.0.0.1]/terms',
+    'https://[::ffff:10.0.0.1]/terms',
+    'https://[::ffff:172.16.0.1]/terms',
+    'https://[::ffff:192.168.1.1]/terms',
+    'https://[::ffff:169.254.1.1]/terms',
     'https://[fd00::1]/terms',
     'https://[fe80::1]/terms',
   ];
