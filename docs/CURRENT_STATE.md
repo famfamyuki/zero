@@ -1,6 +1,6 @@
 # AgentGraph Studio — Current State Snapshot
 
-Snapshot date: **2026-09-05**  
+Snapshot date: **2026-09-06**  
 Status: **Coordination snapshot; live repository/Production checks win**  
 Scope: Concise answer to where development is now, what is blocked, and which canonical lane acts next.
 
@@ -31,13 +31,20 @@ Authority references:
 
 # 1. Current Production baseline
 
-Latest live checks on 2026-09-05 confirm:
+Latest live reconciliation on 2026-09-06 confirms:
 
 ```text
 GitHub main
-= 916151238ffa1ecbbc44347f362cd3313776d804
+= 6c026189657c8211dd1b5922119a252d3335e705
 
-Vercel Production
+PR #35
+= MERGED
+
+Released tree
+= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
+
+Vercel Production deployment
+= dpl_8we4kQoxMRXhGCdzccpNK81P2H6i
 = READY
 = target=production
 = githubCommitSha matches main
@@ -46,14 +53,15 @@ Production Architecture Review offer
 = enabled=false
 = price=null
 = includedReviews=null
+= policyUrls=null
 
 Vercel team plan
 = Hobby
 ```
 
-Current Production includes the established deterministic product foundation plus Stage 1 Architecture Review and paid-access controls in a **disabled / fail-closed** state.
+The commercial-enablement preparation release is therefore live in Production while the paid Architecture Review path remains **disabled / fail-closed**.
 
-The deterministic free core remains operational independently of paid/provider availability, including the protected builder, templates, portability, deterministic Preflight analysis, and deterministic CrewAI export paths.
+The deterministic free core remains independent of paid/provider availability, including Builder / Design, Templates, AgentGraph JSON Import/Export, CrewAI Static Import entrypoint, Readiness, Execution Preview, Resource Analysis, Unified Preflight, and deterministic CrewAI Python export.
 
 Product North Star:
 
@@ -67,7 +75,8 @@ Understand → Evaluate → Improve → Verify → Own
 
 | Track | Current state | Next condition |
 |---|---|---|
-| Stage 1 — Evidence-Grounded AI Architecture Review + Paid Access & Usage Control | **QA Complete / release execution complete / Production Verification BLOCKED** | commercial/Production prerequisites become ready; final exact revision passes fresh W01 QA; controlled Production paid path passes W01 Pass B |
+| Commercial-enablement preparation release — PR #35 | **MERGED / PAID-OFF PRODUCTION VERIFIED** | remains complete as a scoped preparation milestone |
+| Stage 1 — Architecture Review + Paid Access public launch lifecycle | **OPEN / PAID PRODUCTION NOT ENABLED / AC-30 NOT COMPLETE** | external launch prerequisites ready → controlled paid enablement → W01 live financial QA / AC-30 |
 | CrewAI Static Import v0 | **Sprint Complete / Production Verified** | remains complete |
 | Existing-Capability Product Identity & Review Journey UX Restructuring | **Sprint Complete / Production Verified** | remains complete |
 
@@ -77,28 +86,31 @@ Current stage/gate/authority state:
 Commercial Enablement Decision
 = PROCEED_TO_PAID_LAUNCH_CANDIDATE
 
-Paid Architecture Review access
-= ACTIVE PAID ENTITLEMENT REQUIRED
+Provider-backed Architecture Review access
+= AUTHENTICATED ACTIVE PAID ENTITLEMENT REQUIRED
 + REMAINING SERVER-ENFORCED QUOTA REQUIRED
 
-Initial included quota
-= 10 reviews per monthly Stripe billing period
-= PROVISIONAL LAUNCH CONFIGURATION
+Provisional launch configuration
+= USD 12.00 / month
+= 10 reviews per confirmed monthly Stripe billing period
+
+Commercial-enablement preparation release
+= PRODUCTION VERIFIED while paid-off
+
+W01 preparation-release Pass B
+= PASS_B_WITH_NOTES
 
 Production paid Architecture Review
-= DISABLED / FAIL-CLOSED until release gates pass
+= DISABLED / FAIL-CLOSED
 
-Immediate Production paid switch
-= NOT YET
-
-W01 Pass B
-= BLOCKED
-
-Production Verified
+Paid Access Production Verified under PAUC AC-30
 = NO
 
-Sprint Complete
+Current commercial Sprint Complete
 = NO
+
+Commercial Validation Gate M0
+= NOT REACHED
 
 Gate A
 = NOT REACHED
@@ -119,65 +131,74 @@ Mutation Authority
 = UNCHANGED
 ```
 
-The earlier evaluator-quality/API-budget blocker is resolved. The current blocker is the Production paid/commercial verification path.
+The scoped Production Verification above applies only to the **paid-off preparation release**. It does not satisfy `AGS-EGAI-AR-PAUC-V0-P1` AC-30, which requires the real Production Stripe subscription → entitlement → quota reservation → valid review consume path plus a non-consumption failure path using a controlled QA account.
 
 ---
 
-# 3. Current Product / commercial decision
+# 3. Commercial preparation release vs paid launch
 
-The authoritative near-term sequence is in `docs/roadmap/PROGRAM_BOARD.md`.
-
-Current decision:
-
-> Complete the existing Architecture Review commercial path through a final paid-launch candidate in Stripe Test Mode while public Production remains disabled. Provider-backed Architecture Review requires verified active paid entitlement and remaining quota. Provisional launch configuration is USD 12/month, quota 10, and the approved bounded request/provider-budget profile.
-
-The free product remains independently useful. Billing/auth/provider failure must not disable deterministic Builder, Templates, JSON Import/Export, Readiness, Execution Preview, Resource Analysis, Unified Preflight, or deterministic CrewAI Python export.
-
-The selected quota is provisional rather than durable. It may be recalibrated after real paid usage/cost evidence. This does not weaken `MONETIZATION_ARCHITECTURE.md` / ADR-0007 or mark M0 reached.
-
-Current working isolation:
+PR #35 is no longer an active Draft PR. Its W01-approved candidate and released identity are:
 
 ```text
-commercial branch
-= codex/commercial-enablement-prep-20260905
+W01 Pass A approved candidate
+= 107f2db9ac7d9b4f6c02f708ebe7a343b14b00ed
 
-Draft PR
-= #35
+Released main
+= 6c026189657c8211dd1b5922119a252d3335e705
 
-main merge
-= NOT AUTHORIZED YET
+Candidate tree
+= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
 
-ARCHITECTURE_REVIEW_PAID_ENABLED
-= false
+Released tree
+= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
+
+Candidate-to-released-main file diff
+= EMPTY
 ```
+
+00 records this as a **completed sub-release / milestone inside the already-selected commercial Sprint**, not as completion of the paid-launch packet followed by a newly selected future lifecycle.
+
+Reason: the current PAUC packet, Monetization Architecture, Program Board sequence, and paid-launch runbook already define controlled Production enablement and AC-30 as part of the selected paid-launch lifecycle. Reclassifying those required gates as unrelated future work would silently weaken the existing release contract.
+
+The free product remains independently useful. Billing/auth/provider failure must not disable deterministic Builder, Templates, JSON Import/Export, Readiness, Execution Preview, Resource Analysis, Unified Preflight, CrewAI Static Import, or deterministic CrewAI Python export.
 
 ---
 
 # 4. Current next authority
 
+The current blocker is primarily **external/commercial Production readiness**, not a missing implementation specification.
+
+Canonical routing is:
+
 ```text
+00
+= maintain blocker/current-state coordination while external prerequisites are unresolved
+
 C01
-= complete commercial readiness on Draft PR #35
-= enforce paid-entitlement-only provider access
-= wire USD 12/month, quota 10, final request-cost envelope, Stripe Tax-ready Checkout, and 20/40/50 USD provider budget readiness
-= verify the logical commercial path in Stripe Test Mode as far as connected credentials allow
+= next actionable implementation/release lane once the already-defined Production prerequisites are evidenced
+= apply only approved live configuration / controlled paid enablement actions
+= do not invent Product, merchant, legal, tax, support, or policy semantics
 
 then
 
 W01
-= fresh Pass A on the exact final revision
+= independently verify the exact live paid path
+= execute Production financial QA / AC-30
+
+then, only if W01 passes
+
+00
+= Sprint Complete review
+
+then
+
+01
+= Evidence → Gate Review → Explicit Next Selection
 ```
 
-Release/verification afterward remains:
+Use `01` before C01 only if a remaining prerequisite requires a new Product/commercial selection, scope change, or semantic decision. Use `02` only if such a decision creates an unresolved Product-facing implementation-specification gap. W01 does not act again until new independently verifiable paid-launch evidence exists.
 
-```text
-W01 QA Complete
-→ C01 merge/release exact approved revision
-→ controlled Production paid enable
-→ W01 Pass B / AC-30
-→ 00 Sprint Complete
-→ 01 Evidence → Gate Review → Explicit Next Selection
-```
+No noncanonical permanent lane is created for merchant/legal/tax/support or release operations.
 
 ---
 
@@ -186,23 +207,32 @@ W01 QA Complete
 ```text
 Blocker:
 COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
+
+Related durable risks:
+R-008 / R-020 / R-021
 ```
 
-Remaining prerequisites include, as applicable:
+The preparation release does not close the public paid-launch blocker.
 
-- Vercel Hobby → Pro immediately before public paid launch;
-- Stripe Test → Live and a real Production USD 12 monthly Price/Portal configuration;
-- merchant identity, tax registration/geography, and legal approval;
-- Production provider project with USD 20 warning, USD 40 critical, and USD 50 hard monthly ceiling;
-- public Terms / Privacy / Support URLs and approved refund/tax operational material;
-- Production Supabase Auth email delivery/redirect readiness;
-- controlled QA account and approved financial handling;
-- Production WAF configuration and verification path;
-- fresh independent QA for the final changed revision.
+Remaining prerequisites/evidence include, as applicable:
 
-The included quota is no longer Unknown: the initial provisional value is 10 reviews per monthly billing period.
+- independently verified commercial-use hosting eligibility; current Vercel team still reports Hobby;
+- final public Terms / Privacy / Support content, reachability, and merchant/legal/privacy/tax/refund/support approvals;
+- Production Supabase Auth email delivery / redirects / controlled-account readiness;
+- Stripe Live monthly Price, dedicated Customer Portal, webhook/reconciliation lifecycle, and live billing controls;
+- Production WAF configuration and effectiveness evidence;
+- Production provider budget / alert / hard-ceiling evidence for the approved bounded profile;
+- controlled entitled-user kill-switch exercise;
+- controlled live financial QA / PAUC AC-30;
+- paid-path W01 Production Verification.
 
-C01 must not invent the remaining unresolved launch values. W01 must not bypass entitlement/quota or weaken AC-30.
+The following are already Known as **provisional launch configuration**, not durable commercial validation:
+
+- base price: USD 12.00/month;
+- included quota: 10 reviews per confirmed monthly billing period;
+- approved request-cost envelope and provider budget thresholds defined by the current packet/runbook.
+
+Commercial Validation Gate M0 remains pending even after a future successful paid launch until sufficient real paid evidence exists.
 
 ---
 
@@ -210,31 +240,31 @@ C01 must not invent the remaining unresolved launch values. W01 must not bypass 
 
 ## Known
 
-- Stage 1 implementation is QA Complete and released.
-- latest live GitHub main and Vercel Production currently match at `916151238ffa1ecbbc44347f362cd3313776d804`.
-- Production Architecture Review offer currently remains disabled with no public price/quota exposed.
-- Vercel team is currently on Hobby and therefore remains a commercial launch blocker until hosting eligibility is changed and reverified.
-- provider-backed Architecture Review is selected as paid-entitlement-only.
-- the initial provisional included quota is 10 reviews per monthly billing period.
-- deterministic free features remain operational and must remain independent of paid/provider availability.
-- commercial preparation continues on isolated Draft PR #35; main merge and Production paid enablement are not yet authorized.
-- Gate A is not reached; Stage 1.5/Stage 2 are not selected; AI and Mutation Authority are unchanged.
+- GitHub `main` is `6c026189657c8211dd1b5922119a252d3335e705` at this reconciliation point.
+- PR #35 is merged and the released tree matches the W01-approved candidate tree.
+- Vercel Production deployment `dpl_8we4kQoxMRXhGCdzccpNK81P2H6i` is `READY`, `target=production`, on `main`, and reports the same GitHub SHA.
+- Production Architecture Review offer is disabled with `price=null`, `includedReviews=null`, and `policyUrls=null`.
+- the PR #35 preparation release is Production Verified **only in this paid-off scope**.
+- the real paid Production path is not enabled and PAUC AC-30 is not complete.
+- the Vercel team currently reports Hobby; commercial-use hosting eligibility therefore remains unresolved until independently approved/verified for the intended launch.
+- provider-backed Architecture Review remains paid-entitlement-only with provisional USD 12/month and quota 10.
+- Gate A and M0 are not reached; Stage 1.5/Stage 2 are not selected; AI and Mutation Authority are unchanged.
 
 ## Inferred
 
-- A 10-review monthly quota is a conservative initial operating value relative to the current successful-review benchmark distribution, while still allowing meaningful repeated use.
-- The quota can be recalibrated later without changing the fundamental free/paid product boundary.
+- Keeping the preparation code live while the public offer remains fail-closed reduces release coupling without weakening the paid-launch gate, provided future enablement still follows the runbook and fresh independent verification.
+- No new 02 packet is currently required unless external approval changes user-visible Product semantics.
 
 ## Unknown / evidence-dependent
 
-- merchant legal identity / tax registration and final legal material approval;
-- Production Stripe Live evidence;
-- Vercel Pro commercial eligibility after upgrade;
-- Production provider budget enforcement evidence;
-- Production Auth controlled-account behavior;
-- live Stripe subscription/entitlement/quota behavior;
+- commercial-use hosting eligibility for the actual public paid launch;
+- final merchant/legal/privacy/tax/refund/support approval and public-policy readiness;
+- Production Supabase Auth controlled-user behavior;
+- Stripe Live subscription/Portal/webhook lifecycle behavior;
+- Production provider budget/alert/hard-ceiling effectiveness;
 - Production WAF behavior;
-- controlled financial QA result;
+- controlled entitled-user kill-switch result;
+- controlled financial QA / AC-30 result;
 - paid-path Production Verification;
 - commercial validation / recurring paid value under M0.
 
@@ -246,7 +276,7 @@ Unknown means insufficient evidence, not evidence of absence.
 
 `docs/roadmap/PROGRAM_BOARD.md` is the single near-term execution plan.
 
-Update planning documents only when lifecycle, blocker, gate, selection, authority, release, or Production meaning materially changes. Do not copy transient commit/deployment facts into multiple planning documents.
+Update planning documents only when lifecycle, blocker, gate, selection, authority, release, or Production meaning materially changes. Do not copy transient commit/deployment facts into multiple planning documents except where a scoped release identity is necessary to disambiguate current lifecycle state.
 
 Canonical lanes remain:
 
@@ -258,6 +288,7 @@ C01 — Current Sprint Implementation
 W01 — Independent QA & Production Verification
 ```
 
+`Preparation release Production Verified ≠ Paid Access AC-30 Production Verified`.  
 `QA Complete ≠ Production Verified`.  
 `Release execution ≠ Production Verified`.  
 `Sprint Complete ≠ automatic Stage promotion`.
