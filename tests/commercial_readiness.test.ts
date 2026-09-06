@@ -29,9 +29,9 @@ const completeEnv: Record<string, string> = {
   ARCHITECTURE_REVIEW_PROVIDER_BUDGET_WARNING_MICRO_USD: '20000000',
   ARCHITECTURE_REVIEW_PROVIDER_BUDGET_CRITICAL_MICRO_USD: '40000000',
   ARCHITECTURE_REVIEW_PROVIDER_BUDGET_HARD_CEILING_MICRO_USD: '50000000',
-  ARCHITECTURE_REVIEW_TERMS_URL: 'https://policies.agentgraph.test/terms',
-  ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://policies.agentgraph.test/privacy',
-  ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://support.agentgraph.test/',
+  ARCHITECTURE_REVIEW_TERMS_URL: 'https://policies.agentgraph-studio.com/terms',
+  ARCHITECTURE_REVIEW_PRIVACY_URL: 'https://policies.agentgraph-studio.com/privacy',
+  ARCHITECTURE_REVIEW_SUPPORT_URL: 'https://support.agentgraph-studio.com/',
   ARCHITECTURE_REVIEW_STRIPE_LIVE_MODE_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED: 'true',
   ARCHITECTURE_REVIEW_COMMERCIAL_OPERATIONS_APPROVED: 'true',
@@ -121,6 +121,30 @@ test('Production rejects placeholder policy URLs while Test Mode may verify plac
     assert.ok(production.issues.some((issue) => issue.key === key && issue.code === 'placeholder_url'), key);
   }
   assert.equal(production.configurationReady, false);
+});
+
+test('CPUX-T06 Production rejects reserved and obvious local or private policy destinations', () => {
+  const invalidDestinations = [
+    'https://placeholder.example/terms',
+    'https://placeholder.invalid/terms',
+    'https://placeholder.test/terms',
+    'https://app.localhost/terms',
+    'https://host.docker.internal/terms',
+    'https://127.0.0.1/terms',
+    'https://10.0.0.1/terms',
+    'https://172.16.0.1/terms',
+    'https://192.168.1.1/terms',
+    'https://[fd00::1]/terms',
+    'https://[fe80::1]/terms',
+  ];
+  for (const destination of invalidDestinations) {
+    const readiness = inspectPaidArchitectureReviewReadiness(
+      { ...completeEnv, ARCHITECTURE_REVIEW_TERMS_URL: destination },
+      { target: 'production' },
+    );
+    assert.equal(readiness.configurationReady, false, destination);
+    assert.ok(readiness.issues.some((issue) => issue.key === 'ARCHITECTURE_REVIEW_TERMS_URL'), destination);
+  }
 });
 
 test('every required commercial dependency fails closed with a key and code', () => {

@@ -65,7 +65,12 @@ const configuredValue = (value: string | undefined): string | null => {
 
 const isPrivateHostname = (hostname: string) => {
   const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, '');
-  if (normalized === 'localhost' || normalized === '::1' || normalized.endsWith('.local')) return true;
+  if (normalized === 'localhost' || normalized === '::1' || normalized.endsWith('.localhost')
+    || normalized.endsWith('.local') || normalized === 'host.docker.internal') return true;
+  if (normalized.includes(':')) {
+    return normalized.startsWith('fc') || normalized.startsWith('fd')
+      || ['fe8', 'fe9', 'fea', 'feb'].some((prefix) => normalized.startsWith(prefix));
+  }
   const parts = normalized.split('.').map(Number);
   if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return false;
   return parts[0] === 10 || parts[0] === 127 || parts[0] === 0 || parts[0] === 169 && parts[1] === 254
@@ -89,7 +94,8 @@ const isPlaceholderHostname = (value: string) => {
   const hostname = new URL(value).hostname.toLowerCase();
   return ['example.com', 'example.net', 'example.org'].some(
     (placeholder) => hostname === placeholder || hostname.endsWith(`.${placeholder}`),
-  ) || hostname === 'example' || hostname.endsWith('.example') || hostname.endsWith('.invalid');
+  ) || hostname === 'example' || hostname.endsWith('.example') || hostname.endsWith('.invalid')
+    || hostname.endsWith('.test');
 };
 
 const pushMissing = (
