@@ -15,6 +15,8 @@ Before implementation, QA, release, roadmap promotion, commercial launch, or cur
 3. actual Production behavior
 4. the relevant authoritative packet under `docs/specs/`
 
+Do not treat a release-baseline SHA recorded below as the perpetual current `main`; documentation-only reconciliation commits may legitimately advance `main` afterward without changing the verified product behavior.
+
 Authority references:
 
 - Product → `docs/PRODUCT_MASTER.md`
@@ -29,37 +31,37 @@ Authority references:
 
 ---
 
-# 1. Current Production baseline
+# 1. PR #35 paid-off Production verification baseline
 
-Latest live reconciliation on 2026-09-06 confirms:
+The scoped W01 Pass B verification for the commercial-enablement preparation release established:
 
 ```text
-GitHub main
-= 6c026189657c8211dd1b5922119a252d3335e705
-
 PR #35
 = MERGED
+
+PR #35 released commit at W01 Pass B
+= 6c026189657c8211dd1b5922119a252d3335e705
 
 Released tree
 = b0a8dad3d05b8220025d401f6fdf9ba508b32b63
 
-Vercel Production deployment
+W01-verified Vercel Production deployment for that release
 = dpl_8we4kQoxMRXhGCdzccpNK81P2H6i
 = READY
 = target=production
-= githubCommitSha matches main
+= githubCommitSha matched the then-current released main
 
-Production Architecture Review offer
+Production Architecture Review offer at verification
 = enabled=false
 = price=null
 = includedReviews=null
 = policyUrls=null
 
-Vercel team plan
+Vercel team plan observed at verification
 = Hobby
 ```
 
-The commercial-enablement preparation release is therefore live in Production while the paid Architecture Review path remains **disabled / fail-closed**.
+The commercial-enablement preparation release was therefore Production Verified while the paid Architecture Review path remained **disabled / fail-closed**. Subsequent current-state documentation commits do not change that scoped release conclusion unless they change product behavior; always re-check live `main` and Production for the present deployment identity.
 
 The deterministic free core remains independent of paid/provider availability, including Builder / Design, Templates, AgentGraph JSON Import/Export, CrewAI Static Import entrypoint, Readiness, Execution Preview, Resource Analysis, Unified Preflight, and deterministic CrewAI Python export.
 
@@ -143,7 +145,7 @@ PR #35 is no longer an active Draft PR. Its W01-approved candidate and released 
 W01 Pass A approved candidate
 = 107f2db9ac7d9b4f6c02f708ebe7a343b14b00ed
 
-Released main
+PR #35 released commit at W01 Pass B
 = 6c026189657c8211dd1b5922119a252d3335e705
 
 Candidate tree
@@ -216,7 +218,7 @@ The preparation release does not close the public paid-launch blocker.
 
 Remaining prerequisites/evidence include, as applicable:
 
-- independently verified commercial-use hosting eligibility; current Vercel team still reports Hobby;
+- independently verified commercial-use hosting eligibility; current Vercel team still reports Hobby until live state says otherwise;
 - final public Terms / Privacy / Support content, reachability, and merchant/legal/privacy/tax/refund/support approvals;
 - Production Supabase Auth email delivery / redirects / controlled-account readiness;
 - Stripe Live monthly Price, dedicated Customer Portal, webhook/reconciliation lifecycle, and live billing controls;
@@ -240,15 +242,15 @@ Commercial Validation Gate M0 remains pending even after a future successful pai
 
 ## Known
 
-- GitHub `main` is `6c026189657c8211dd1b5922119a252d3335e705` at this reconciliation point.
 - PR #35 is merged and the released tree matches the W01-approved candidate tree.
-- Vercel Production deployment `dpl_8we4kQoxMRXhGCdzccpNK81P2H6i` is `READY`, `target=production`, on `main`, and reports the same GitHub SHA.
-- Production Architecture Review offer is disabled with `price=null`, `includedReviews=null`, and `policyUrls=null`.
+- at the scoped W01 Pass B, PR #35 released commit `6c026189657c8211dd1b5922119a252d3335e705` matched Vercel Production deployment `dpl_8we4kQoxMRXhGCdzccpNK81P2H6i` and its `githubCommitSha`.
 - the PR #35 preparation release is Production Verified **only in this paid-off scope**.
 - the real paid Production path is not enabled and PAUC AC-30 is not complete.
-- the Vercel team currently reports Hobby; commercial-use hosting eligibility therefore remains unresolved until independently approved/verified for the intended launch.
+- Production Architecture Review remains required to fail closed until the paid-launch prerequisites are satisfied.
+- the Vercel team was independently observed as Hobby during this reconciliation; commercial-use hosting eligibility remains unresolved until independently approved/verified for the intended launch.
 - provider-backed Architecture Review remains paid-entitlement-only with provisional USD 12/month and quota 10.
 - Gate A and M0 are not reached; Stage 1.5/Stage 2 are not selected; AI and Mutation Authority are unchanged.
+- current GitHub/Vercel deployment identity must be obtained from live systems, not inferred from the PR #35 release-baseline SHA in this snapshot.
 
 ## Inferred
 
