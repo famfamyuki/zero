@@ -31,12 +31,47 @@ Document ownership:
 
 # 1. Current program state
 
-```text
-Stage 1 Architecture Review / Paid Access track
-= QA COMPLETE
-+ RELEASE EXECUTION COMPLETE
-+ PRODUCTION VERIFICATION BLOCKED
+Live reconciliation on 2026-09-06 establishes two distinct statuses:
 
+```text
+Commercial-enablement preparation release — PR #35
+= MERGED
++ PAID-OFF PRODUCTION VERIFIED
+
+Stage 1 Architecture Review / Paid Access public launch lifecycle
+= OPEN
++ PAID PRODUCTION NOT ENABLED
++ PAUC AC-30 NOT COMPLETE
+```
+
+Release identity for the scoped preparation milestone:
+
+```text
+W01 Pass A approved candidate
+= 107f2db9ac7d9b4f6c02f708ebe7a343b14b00ed
+
+Released GitHub main
+= 6c026189657c8211dd1b5922119a252d3335e705
+
+Approved candidate tree
+= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
+
+Released main tree
+= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
+
+Production deployment
+= dpl_8we4kQoxMRXhGCdzccpNK81P2H6i
+= READY
+= target=production
+= githubCommitSha matches main
+
+W01 preparation-release Pass B
+= PASS_B_WITH_NOTES
+```
+
+Commercial state remains:
+
+```text
 Commercial Enablement Decision
 = PROCEED_TO_PAID_LAUNCH_CANDIDATE
 
@@ -44,24 +79,27 @@ Paid Architecture Review access boundary
 = AUTHENTICATED ACTIVE PAID ENTITLEMENT ONLY
 + REMAINING SERVER-ENFORCED QUOTA REQUIRED
 
-Initial included quota
-= 10 Architecture Reviews per Stripe monthly billing period
-= PROVISIONAL LAUNCH CONFIGURATION
-
-Immediate Production paid switch
-= NOT YET
+Provisional launch configuration
+= USD 12.00 / month
+= 10 Architecture Reviews per confirmed monthly Stripe billing period
 
 Production paid Architecture Review
-= DISABLED / FAIL-CLOSED until release gates pass
+= DISABLED / FAIL-CLOSED
 
-W01 Pass B
-= BLOCKED
+Production offer
+= enabled=false
+= price=null
+= includedReviews=null
+= policyUrls=null
 
-Production Verified
+Paid Access Production Verified under AC-30
 = NO
 
-Sprint Complete
+Current commercial Sprint Complete
 = NO
+
+Commercial Validation Gate M0
+= NOT REACHED
 
 Gate A
 = NOT REACHED
@@ -84,9 +122,7 @@ Mutation Authority
 
 The provider-backed Architecture Review is intentionally not a free API surface. A user must have a server-verified active paid entitlement and remaining server-enforced quota before provider invocation. Deterministic free-core capabilities remain independently useful and must not depend on billing, entitlement, quota, or provider availability.
 
-The initial quota of 10 reviews per monthly billing period is an explicit 01 provisional launch configuration. It is not a durable Product contract and may be recalibrated after real usage/cost evidence without changing the free/paid boundary.
-
-The evaluator-quality/API-budget blocker is no longer current. The active blocker is the mandatory Production paid/commercial verification path.
+The scoped preparation-release Production Verification does **not** satisfy PAUC AC-30. AC-30 requires the real Production Stripe subscription → entitlement → quota reservation → valid review consume path plus a non-consumption failure path with a controlled QA account.
 
 Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is not reached by technical readiness or launch alone.
 
@@ -94,53 +130,37 @@ Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is 
 
 # 2. Active execution plan
 
-Current working branch:
+The earlier branch/PR preparation sequence is complete. PR #35 is merged and is no longer the active Draft PR.
 
-`codex/commercial-enablement-prep-20260905`
+00 classifies the merged preparation release as a **completed sub-release / milestone inside the already-selected commercial Sprint**. The paid-launch lifecycle remains part of the same selected packet because the PAUC specification and launch runbook already require live paid enablement and AC-30 before Paid Access can become Production Verified and the Sprint can close.
 
-Current Draft PR:
+Reclassifying controlled paid enablement / AC-30 as an unrelated future packet would silently weaken the existing gate semantics and is therefore not done by 00.
 
-`#35 — Prepare commercial enablement without activating paid Production`
-
-The active sequencing decision is:
-
-> Complete the current paid-access implementation through a final paid-launch candidate in Stripe Test Mode. Architecture Review remains paid-entitlement-only; provisional launch configuration is USD 12/month with quota 10 and the approved request-cost/provider-budget envelope. Public Production remains disabled.
-
-This decision does **not** weaken the pricing-evidence requirements in `MONETIZATION_ARCHITECTURE.md` or ADR-0007. The quota is a provisional launch configuration explicitly authorized by 01; M0 and later recalibration still depend on real paid evidence.
-
-## Phase A — C01 commercial readiness completion
+## Phase A — Commercial readiness implementation — COMPLETE
 
 Owner: `C01`
 
-On the isolated commercial branch, complete as far as possible without inventing unresolved launch values:
+PR #35 contains the selected commercial preparation implementation, including:
 
-- Production Auth readiness and fail-closed identity boundaries;
-- hard paid-entitlement-only enforcement for provider-backed Architecture Review;
+- Production Auth / fail-closed identity boundaries;
+- hard paid-entitlement-only provider access;
 - Stripe subscription lifecycle / webhook / entitlement / Customer Portal readiness;
-- monthly quota implementation with `includedReviews = 10` for the initial launch configuration;
+- monthly quota implementation with initial `includedReviews = 10`;
 - quota reservation/consume/release/idempotency/degraded-state hardening;
-- request-cost guard using the approved 32,768-byte / 4,096-output-token / 250,000-micro-USD envelope and paid-review kill-switch integration readiness;
-- WAF Production-verification runbook;
-- provider project budget/alerts verification runbook for USD 20 warning / USD 40 critical / USD 50 hard monthly ceiling;
+- request-cost guard and paid-review kill-switch integration readiness;
+- WAF and provider-budget Production-verification runbooks;
 - Terms / Privacy / Support URL wiring and commercial degraded states;
 - controlled financial QA / AC-30 runbook;
 - secret-safe commercial readiness diagnostics;
 - required tests and regressions.
 
-Mandatory invariant during Phase A:
+The public Production switch remains false.
 
-```text
-ARCHITECTURE_REVIEW_PAID_ENABLED=false
-main merge=PROHIBITED
-Production activation=PROHIBITED
-free deterministic core remains operational
-```
-
-## Phase B — 01 final launch configuration closure — COMPLETE
+## Phase B — 01 provisional commercial configuration closure — COMPLETE
 
 Owner: `01`
 
-The following provisional launch inputs were supplied to C01 on 2026-09-05:
+The approved provisional launch inputs remain:
 
 - USD 12.00/month in USD;
 - quota 10 per confirmed monthly Stripe billing period;
@@ -148,54 +168,94 @@ The following provisional launch inputs were supplied to C01 on 2026-09-05:
 - USD 20 warning / USD 40 critical / USD 50 hard monthly provider budget;
 - Stripe Tax-ready Checkout with jurisdiction/registration still externally approved;
 - month-to-month cancellation, no default prorated refund, support-mediated duplicate/error/material-failure refunds, and statutory rights preserved;
-- existing Vercel project retained, Hobby → Pro immediately before Live/public enablement;
+- existing Vercel project retained, with commercial-use hosting eligibility required before public paid enablement;
 - live QA subscription cancellation and full refund with restricted metadata-only record.
 
-Included monthly quota is already selected provisionally at **10 reviews per monthly billing period** and should not be reopened unless new safety evidence makes that value unreasonable before launch.
+These are launch configuration, not Commercial Validation Gate M0 evidence or permanent Product constants.
 
-## Phase C — 02 only if a Product-facing specification gap remains
+## Phase C — Product-facing commercial policy UX closure — COMPLETE FOR PREPARATION CODE
 
-Owner: `02`, conditional
+Owner: `02` specification / `C01` implementation
 
-Use 02 only for unresolved user-visible behavior such as final price/tax/legal/support presentation. Do not reopen already-specified billing/auth/quota architecture merely because final values were selected.
+`AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1.md` is implemented in the preparation release. External hosted Terms / Privacy / Support content and merchant/legal/privacy/tax/support approvals remain Production prerequisites.
 
-## Phase D — C01 final configuration and launch-candidate revision
+Return to `01` only if external approval requires a Product/commercial semantic change. Return to `02` only if that decision creates a new user-visible specification gap.
 
-Owner: `C01`
-
-Apply only the approved final values/configuration and finish any resulting implementation changes on the same isolated branch. Paid Production remains disabled.
-
-## Phase E — W01 fresh Pass A
+## Phase D — W01 Pass A on final preparation candidate — COMPLETE
 
 Owner: `W01`
 
-Run independent QA on the **exact final branch revision** after all behavior/configuration changes are complete. Prior QA is not sufficient if PR #35 changed code/behavior afterward.
+Approved candidate:
 
-## Phase F — C01 merge/release exact QA-approved revision
+`107f2db9ac7d9b4f6c02f708ebe7a343b14b00ed`
+
+## Phase E — C01 preparation merge/release — COMPLETE
 
 Owner: `C01`
 
-Merge/release only the exact W01-approved revision through required CI/protection and only when commercial launch prerequisites are ready.
+The exact approved candidate tree was merged as:
 
-## Phase G — controlled Production paid enable + W01 Pass B
+`6c026189657c8211dd1b5922119a252d3335e705`
 
-Owners: `C01` for controlled release/config action, then `W01` for independent verification
+The candidate-to-released-main file diff is empty. Required main CI passed.
 
-Only after the correct Production revision and external prerequisites are live:
+## Phase F — W01 paid-off Production verification — COMPLETE
+
+Owner: `W01`
+
+Result:
+
+```text
+PASS_B_WITH_NOTES
+```
+
+Verified scope:
+
+- correct main / released tree identity;
+- correct Vercel Production deployment and SHA equality;
+- paid offer disabled/fail-closed;
+- no public price/quota/policy links or Subscribe CTA;
+- free deterministic core preserved;
+- no relevant observed runtime errors/secrets in the reviewed evidence.
+
+This completes the **preparation sub-release only**.
+
+## Phase G — External prerequisites + controlled Production paid enablement — PENDING / BLOCKED
+
+The following must be evidenced before the defined C01 enablement action is executable:
+
+- commercial-use hosting eligibility;
+- approved public Terms / Privacy / Support content and merchant/legal/privacy/tax/refund/support operations;
+- Production Supabase Auth delivery/redirect readiness and controlled QA account;
+- Stripe Live monthly Price / Portal / webhook-reconciliation lifecycle;
+- Production WAF configuration/effectiveness;
+- Production provider budget / alert / hard-ceiling evidence;
+- controlled entitled-user kill-switch evidence;
+- approved live financial QA handling.
+
+Once those prerequisites are ready and no Product semantics changed, owner is `C01` for the already-defined controlled configuration/release action:
 
 ```text
 ARCHITECTURE_REVIEW_PAID_ENABLED=true
 → paid entitlement + quota=10 enforced server-side
-→ W01 Pass B / AC-30 immediately
+→ no unrelated feature changes
 ```
 
-If the paid Production path fails or blocks, disable paid Architecture Review again. Enabling alone is not Production Verified.
+If any prerequisite changes Product/commercial semantics or launch scope, route to `01` first; use `02` only for a resulting Product-facing specification gap.
 
-## Phase H — Sprint closure and next selection
+## Phase H — W01 live paid Production verification / AC-30 — PENDING
+
+Owner: `W01`
+
+W01 must independently execute the real Production financial QA defined by `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`, including the live Stripe subscription → entitlement → quota → valid consume path, a non-consumption failure path, WAF/kill-switch checks, and free-core smoke.
+
+A failed or incomplete AC-30 means Paid Access is not Production Verified and the paid switch must return to fail-closed if safety/accounting is uncertain.
+
+## Phase I — Sprint closure and next selection
 
 ```text
-W01 Production Verified
-→ 00 Sprint Complete
+W01 Paid Access Production Verified / AC-30 PASS
+→ 00 Sprint Complete review
 → 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
@@ -215,31 +275,34 @@ R-008 / R-020 / R-021
 
 Known current facts:
 
-- Stage 1 implementation and paid-access controls are released;
+- PR #35 preparation code is merged and paid-off Production Verified;
 - Production paid Architecture Review remains disabled / fail-closed;
 - deterministic free core remains operational;
-- W01 Pass B cannot complete until the real paid path and external commercial prerequisites are available;
-- the intended public provider-backed Architecture Review path is paid-entitlement-only;
-- the provisional initial quota is 10 reviews per monthly billing period.
+- provisional price, quota, request-cost envelope, and provider-budget thresholds are selected;
+- the real paid Production entitlement/quota/financial path is not Production Verified;
+- the Vercel team currently reports Hobby, so intended public commercial-use hosting eligibility remains unresolved until independently verified/approved;
+- PAUC AC-30 has not been completed.
 
 Remaining launch prerequisites include, as applicable:
 
 - commercial-use-eligible hosting/account;
-- approved final Price / currency;
-- approved numeric request-cost guard and provider budget controls;
-- active monthly Stripe Price and bounded Customer Portal configuration;
-- Terms / Privacy / Support / refund / tax operational path;
+- public Terms / Privacy / Support reachability plus merchant/legal/privacy/tax/refund/support approval;
 - Production Supabase Auth email delivery/redirect configuration;
+- active Stripe Live monthly Price and bounded Customer Portal configuration;
+- live webhook/reconciliation lifecycle evidence;
 - controlled QA account and approved financial handling;
-- Production WAF configuration and verification path.
+- Production WAF configuration and verification path;
+- provider budget/alert/hard-ceiling evidence;
+- controlled kill-switch exercise;
+- W01 live paid financial QA / AC-30.
 
 Smallest safe response:
 
-> Continue the existing commercial branch through a complete paid-launch candidate, enforce paid entitlement + quota before provider invocation, use the provisional quota of 10/month, keep unresolved final values fail-closed, and perform fresh independent QA before merge/release.
+> Keep the preparation release live with paid review fail-closed. Do not reopen already-specified Product configuration. Close the remaining external Production prerequisites; then let C01 perform only the defined controlled paid-enable/configuration action and let W01 independently execute AC-30.
 
 Re-check condition:
 
-The exact final launch-candidate revision and all required external commercial prerequisites are ready for independent W01 verification without entitlement/quota bypasses.
+All external launch prerequisites and the exact controlled paid-enable configuration are ready for independent W01 live verification without entitlement/quota bypasses.
 
 ---
 
@@ -247,15 +310,20 @@ The exact final launch-candidate revision and all required external commercial p
 
 | Work / decision | State | Next owner/action |
 |---|---|---|
-| Stage 1 Architecture Review + Paid Access | QA Complete / released / Production Verification BLOCKED | Keep Production paid path disabled until final launch candidate and W01 verification are ready |
-| Commercial enablement implementation | **ACTIVE — PROCEED TO PAID LAUNCH CANDIDATE** | `C01` completes Phase A on Draft PR #35 |
-| Paid API boundary | **SELECTED** | Provider-backed review requires authenticated active paid entitlement + remaining quota |
-| Initial included quota | **SELECTED — PROVISIONAL** | 10 reviews per monthly billing period |
-| Final Price / Currency / numeric economics | **NOT YET CLOSED** | `01` Phase B after implementation readiness |
-| Product-facing final commercial UX gap | **CONDITIONAL** | `02` only if Phase B leaves an unresolved specification gap |
-| Fresh independent pre-release QA | **NOT YET** | `W01` after final configuration on exact final revision |
+| Commercial-enablement preparation release — PR #35 | **COMPLETE / PAID-OFF PRODUCTION VERIFIED** | Remains fail-closed; no reopening without a real change |
+| Public paid Architecture Review launch | **BLOCKED / NOT ENABLED** | Close external Production prerequisites before enablement |
+| Paid API boundary | **SELECTED** | Authenticated active paid entitlement + remaining quota required |
+| Public price / currency | **SELECTED — PROVISIONAL** | USD 12.00/month; reassess only from later evidence or new safety/commercial input |
+| Initial included quota | **SELECTED — PROVISIONAL** | 10 reviews per confirmed monthly billing period |
+| Request-cost / provider budget profile | **SELECTED — PROVISIONAL; LIVE EVIDENCE PENDING** | Verify Production provider controls before enablement |
+| Product-facing commercial policy UX | **SPECIFIED + IMPLEMENTED; EXTERNAL CONTENT/APPROVAL PENDING** | `01`/`02` only if external approval changes Product-facing semantics |
+| W01 preparation Pass A | **COMPLETE** | candidate `107f2db9…` |
+| W01 paid-off preparation Pass B | **COMPLETE — PASS_B_WITH_NOTES** | scoped preparation milestone only |
+| Controlled paid enablement | **NOT READY** | `C01` after prerequisites are evidenced |
+| Live financial QA / PAUC AC-30 | **NOT COMPLETE** | `W01` after controlled paid enablement/evidence is ready |
 | Commercial Validation Gate M0 | **NOT REACHED** | Evaluate only after Paid Access is Production Verified and sufficient real paid evidence exists |
-| Stage 1.5 / Stage 2 selection | **NONE / NOT SELECTED** | Remain unchanged until the normal post-Sprint 01 Gate/selection review |
+| Gate A | **NOT REACHED** | no promotion from preparation release alone |
+| Stage 1.5 / Stage 2 selection | **NONE / NOT SELECTED** | remain unchanged until the normal post-Sprint 01 Gate/selection review |
 
 ---
 
@@ -268,6 +336,8 @@ docs/CURRENT_STATE.md
 docs/roadmap/PROGRAM_BOARD.md
 docs/roadmap/RISK_REGISTER.md
 ```
+
+No Risk Register state change is required by the preparation release itself: R-008 and R-021 remain blocking for public paid launch, and R-020 remains applicable until the live billing/entitlement/quota lifecycle is independently verified.
 
 Do not update these files for every commit, CI run, transient metric, or Preview deployment.
 
@@ -286,25 +356,34 @@ Keep responsibilities separate:
 Current canonical path:
 
 ```text
-Stage 1 QA Complete / released
-→ W01 Pass B BLOCKED
-→ 01 PROCEED_TO_PAID_LAUNCH_CANDIDATE
-→ C01 commercial readiness + paid-only + quota 10/month
-→ 01 final Price/Currency/economics/launch closure
-→ 02 only if final Product-facing spec gap remains
-→ C01 final launch-candidate revision
-→ W01 fresh Pass A
-→ C01 merge/release exact approved revision
-→ controlled paid Production enable
-→ W01 Pass B / AC-30
+PR #35 preparation release
+= MERGED + PAID-OFF PRODUCTION VERIFIED
+
+→ external commercial / hosting / Auth / Stripe / WAF / provider-control prerequisites
+→ C01 controlled paid-enable/configuration action
+→ W01 live paid Production Verification / AC-30
 → 00 Sprint Complete
 → 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
+Conditional routing:
+
+```text
+new Product/commercial semantic decision required
+→ 01
+
+resulting Product-facing specification gap
+→ 02
+
+otherwise
+→ do not reopen 01/02 merely because external configuration evidence is pending
+```
+
 Rules:
 
+- Preparation release Production Verified is not Paid Access AC-30 Production Verified.
 - Stage order is dependency direction, not an automatic implementation queue.
-- `Gate A = NOT REACHED` while Stage 1 is not Production Verified.
+- `Gate A = NOT REACHED` while the selected Stage 1 paid-access lifecycle is not fully Production Verified and Gate A evidence review has not occurred.
 - `Gate B = NOT REACHED`; Stage 2 remains `NOT SELECTED`.
 - AI Authority and Mutation Authority remain unchanged until an applicable gate explicitly changes them.
 - M0 is separate from evaluator authority/stage promotion.
