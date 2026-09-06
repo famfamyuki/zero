@@ -14,7 +14,7 @@ const completeEnv: Record<string, string | undefined> = {
   ARCHITECTURE_REVIEW_STRIPE_MODE: 'test', ARCHITECTURE_REVIEW_PRICE_CURRENCY: 'usd', ARCHITECTURE_REVIEW_PRICE_UNIT_AMOUNT: '1200',
   ARCHITECTURE_REVIEW_STRIPE_TAX_ENABLED: 'true',
   SUPABASE_SERVICE_ROLE_KEY: 'test', NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co', NEXT_PUBLIC_SUPABASE_ANON_KEY: 'public-test', OPENAI_API_KEY: 'test',
-  ARCHITECTURE_REVIEW_MODEL: 'model-reviewed', ARCHITECTURE_REVIEW_COST_PROFILE_MODEL: 'model-reviewed',
+  ARCHITECTURE_REVIEW_MODEL: 'gpt-5.6-sol', ARCHITECTURE_REVIEW_COST_PROFILE_MODEL: 'gpt-5.6-sol',
   ARCHITECTURE_REVIEW_INCLUDED_REVIEWS: '10', ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES: '32768',
   ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS: '4096', ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD: '250000',
   ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS: '4000000',
@@ -56,6 +56,21 @@ test('cost guard uses conservative byte upper bound and integer micro-USD accoun
   assert.equal(estimateActualCostMicroUsd(1.5, 50, config), null);
   assert.equal(estimateActualCostMicroUsd(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, config), null);
   assert.equal(estimateWorstCaseCostMicroUsd(Number.MAX_SAFE_INTEGER, config), null);
+});
+
+test('approved Terra evaluator uses its exact reviewed cost profile without relaxing request guards', () => {
+  const config = parsePaidArchitectureReviewConfig({
+    ...completeEnv,
+    ARCHITECTURE_REVIEW_MODEL: 'gpt-5.6-terra',
+    ARCHITECTURE_REVIEW_COST_PROFILE_MODEL: 'gpt-5.6-terra',
+    ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS: '2000000',
+    ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS: '12000000',
+  })!;
+  assert.ok(config);
+  assert.equal(config.maxProviderInputBytes, 32_768);
+  assert.equal(config.maxOutputTokens, 4_096);
+  assert.equal(config.maxWorstCaseCostMicroUsd, 250_000);
+  assert.equal(estimateWorstCaseCostMicroUsd(32_768, config), 114_688);
 });
 
 test('bearer parsing accepts only one bounded token and never trusts body identity', () => {

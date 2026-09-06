@@ -18,8 +18,8 @@ const completeEnv: Record<string, string> = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
   NEXT_PUBLIC_SUPABASE_ANON_KEY: 'anon-test-value',
   OPENAI_API_KEY: 'provider-test-value',
-  ARCHITECTURE_REVIEW_MODEL: 'model-reviewed',
-  ARCHITECTURE_REVIEW_COST_PROFILE_MODEL: 'model-reviewed',
+  ARCHITECTURE_REVIEW_MODEL: 'gpt-5.6-sol',
+  ARCHITECTURE_REVIEW_COST_PROFILE_MODEL: 'gpt-5.6-sol',
   ARCHITECTURE_REVIEW_INCLUDED_REVIEWS: '10',
   ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES: '32768',
   ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS: '4096',
@@ -84,6 +84,7 @@ test('commercial readiness names blockers without exposing configured values', (
   assert.equal(readiness.configurationReady, false);
   assert.deepEqual(readiness.issues, [
     { key: 'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS', code: 'invalid_positive_integer' },
+    { key: 'ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD', code: 'invalid_launch_configuration' },
     { key: 'ARCHITECTURE_REVIEW_TERMS_URL', code: 'invalid_https_url' },
     { key: 'ARCHITECTURE_REVIEW_COST_PROFILE_MODEL', code: 'model_cost_profile_mismatch' },
     { key: 'ARCHITECTURE_REVIEW_COMMERCIAL_HOSTING_APPROVED', code: 'approval_required' },

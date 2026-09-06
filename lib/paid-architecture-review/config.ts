@@ -196,9 +196,17 @@ export function inspectPaidArchitectureReviewReadiness(
   const outputMicroUsdPerMillionTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS');
   if (includedReviews !== null && includedReviews !== 10) issues.push({ key: 'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS', code: 'invalid_launch_configuration' });
   const costEnvelope = [maxProviderInputBytes, maxOutputTokens, inputMicroUsdPerMillionTokens, outputMicroUsdPerMillionTokens, maxWorstCaseCostMicroUsd];
+  const approvedModelCostProfiles: Record<string, readonly [number, number]> = {
+    'gpt-5.6-sol': [4_000_000, 20_000_000],
+    'gpt-5.6-terra': [2_000_000, 12_000_000],
+  };
+  const approvedCostProfile = configuredValue(env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL)
+    ? approvedModelCostProfiles[configuredValue(env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL)!]
+    : undefined;
   if (costEnvelope.every((value) => value !== null)
-    && !(maxProviderInputBytes === 32_768 && maxOutputTokens === 4_096 && inputMicroUsdPerMillionTokens === 4_000_000
-      && outputMicroUsdPerMillionTokens === 20_000_000 && maxWorstCaseCostMicroUsd === 250_000)) {
+    && !(maxProviderInputBytes === 32_768 && maxOutputTokens === 4_096 && approvedCostProfile
+      && inputMicroUsdPerMillionTokens === approvedCostProfile[0]
+      && outputMicroUsdPerMillionTokens === approvedCostProfile[1] && maxWorstCaseCostMicroUsd === 250_000)) {
     issues.push({ key: 'ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD', code: 'invalid_launch_configuration' });
   }
   const providerBudgetWarningMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_PROVIDER_BUDGET_WARNING_MICRO_USD');
