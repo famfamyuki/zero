@@ -213,33 +213,31 @@ This completes the **preparation sub-release only**.
 
 ## Phase G — External prerequisites + controlled Production paid enablement — PENDING / BLOCKED
 
-`00` coordinates the checklist below. Owner means responsibility for obtaining evidence, not permission to approve merchant decisions or bypass independent verification. Actual account/merchant operators must be identified before an external action. Each row starts **UNVERIFIED** in this planning review: no new evidence was checked here; configuration is not necessarily absent.
+`00` coordinates the evidence matrix below. Owners obtain evidence; they do not acquire merchant approval or W01 authority. Named account/merchant operators must be recorded before external action. Rows are **UNVERIFIED** unless explicitly **BLOCKED / procedure unresolved**; this review verifies no external readiness.
 
-| Item | Evidence coordinator / approver | Next action and completion evidence | Contract |
+Evidence classes: **A** = configuration / external approval; **B** = non-Production Test Mode demonstration; **C** = Production paid-off demonstration; **D** = Live demonstration after authorized controlled enablement / AC-30. Class D is not an executable workaround for an unmet Phase G prerequisite.
+
+| Class / item | Environment and prerequisites | Owner / independent verifier | Completion evidence and authoritative procedure |
 |---|---|---|---|
-| Release identity | C01 / W01 verifies | Reconcile latest main and later changes against the exact QA-approved revision; record fresh deployment identity and required checks | Runbook §§2, 7 |
-| Hosting eligibility | 00 + account owner / W01 verifies | Obtain current account/plan eligibility evidence for intended commercial use | Runbook §2 |
-| Public policies and operations | 00 + merchant/operator / 01 for changed Product semantics | Identify approvers; obtain approved public URLs and merchant/privacy/tax/refund/support approvals | Policy UX packet §16; runbook §2 |
-| Production Auth | C01 + account operator / W01 verifies | Record controlled-account magic-link delivery and allowed-redirect results without secrets | Runbook §2 |
-| Stripe configuration | C01 + merchant/operator / W01 verifies | Verify Live Price/Portal settings and Test Mode lifecycle evidence; real paid-path proof remains Phase H | Runbook §§2, 4, 6 |
-| Provider controls | C01 + provider-account operator / W01 verifies | Record budget, notification, hard-ceiling, cost-guard and controlled kill-switch evidence | Runbook §3 |
-| WAF | C01 + hosting operator / W01 verifies | Record rule configuration and controlled effectiveness evidence | Runbook §5 |
-| Financial QA readiness | 00 + merchant/operator / W01 executes | Obtain controlled-user and charge/cancel/refund handling approval before Phase H | Policy UX EPP-07; runbook §6 |
+| A — Release identity | Exact current candidate; Preview, then paid-off Production after normal protected PR release | C01 / W01 | Required checks, exact QA-approved change set, READY/target/domain/main-to-deployment SHA evidence; runbook §§2, 7. PR #35 approval does not cover current head or later behavior changes |
+| A — Hosting eligibility | Production account; named account owner and intended commercial scope | 00 + account owner / W01 | Current plan/account commercial-use eligibility; runbook §2 |
+| A — Public policies / operations | Public HTTPS destinations; named merchant/privacy/tax/refund/support approvers | 00 + responsible external approvers / W01 | Approved content/URLs, ownership, launch geography and operational approvals; Policy UX packet §16 EPP-01–06, runbook §2 |
+| A — Stripe Live configuration | Production-linked Live account; approved monthly offer and merchant/tax inputs | C01 + merchant/operator / W01 | Active monthly Price, bounded Portal and Tax configuration evidence; runbook §2. Configuration alone proves no webhook lifecycle |
+| A — Provider controls | Dedicated Production provider project; approved cost profile and named alert recipients | C01 + provider-account operator / W01 | Budget/warning/critical/hard-ceiling configuration, matching model/cost profile, exercised notification path; runbook §3. No inferred request rejection or kill-switch proof |
+| A — Financial QA approval | Before any Live charge; controlled QA user and named operator able to cancel/refund | 00 + financial operator / W01 checks approval | Written charge/cancel/full-refund handling approval; Policy UX EPP-07, runbook §6 |
+| B — Test Mode lifecycle | Isolated local/Preview Test Mode environment; configured test Price/Portal and test identity, public Production remains paid-off | C01 + test-account operator / W01 | Test Mode Checkout, signed reconciliation, quota, consume/release, replay, cancellation/recovery outcomes; runbook §4 and PAUC §23. Command success alone is not full lifecycle evidence or AC-30 |
+| B — Cost guard / entitled kill switch | Non-Production test environment with legitimate Test Mode entitlement; enabled test path for reservation/rejection, disabled test path for kill switch | C01 / W01 | Zero provider calls, reservation release for cost rejection; `review_disabled`, zero quota change and free-core smoke for kill switch; runbook §§3–4, PAUC §§22–23. Does not resolve the first-launch prerequisite below |
+| C — Production Auth | Production paid-off; approved Auth delivery/redirect setup and controlled account | C01 + Auth operator / W01 | Magic-link delivery/session and allowed-redirect evidence without secrets; runbook §2 |
+| C — WAF / disabled baseline | Production paid-off; approved live WAF rule and controlled source | C01 + hosting operator / W01 | Rule scope/threshold and edge-block effectiveness, zero provider/reservation/consumption, disabled review/Checkout and free-core smoke; runbook §§3–5. An unentitled disabled baseline is not entitled-user or cost-guard proof |
+| C required, D path only — First Live entitlement / webhook lifecycle | First Production launch with no pre-existing legitimate Live entitlement; paid-off Checkout stops at `review_disabled` | **BLOCKED / procedure unresolved — 01 decision, 02 procedure specification; 00 tracks; W01 re-QA** | Phase G requires Live reconciliation evidence, but runbook §6 steps 3–5 obtains it only after enablement. Closure requires the approved first-launch procedure and then actual signed Live reconciliation/period/quota evidence; see runbook §1.1 |
+| Pre-enable environment unresolved — Entitled kill switch / cost guard | Production first-launch proof needs legitimate Live entitlement; paid-off cannot reach reservation/cost guard. B evidence is separate | **BLOCKED / procedure unresolved — 01 decision, 02 procedure specification; C01 implements only if specified; W01 verifies** | Safe environment/order and first entitlement source remain undefined. Required proof remains zero calls + reservation release for cost rejection, and zero calls/quota change + free-core smoke for entitled kill switch; runbook §§1.1, 3, 6 step 12 |
+| D — Live financial QA / AC-30 | Production only after Phase G blockers and prerequisites are resolved and controlled enablement is authorized; approved charge handling | W01 + authorized financial/account operators | Entire runbook §6 / PAUC §24, including real subscription → entitlement → reservation → valid consume, non-consumption failure, lifecycle/abuse/kill-switch checks, cancellation/full refund and §7 identity evidence. Not executable while first-launch procedure is unresolved |
 
-For each item, `00` records `state / named operator / evidence reference / verified-at / next action / re-check date` in the restricted release record. Use UNVERIFIED, BLOCKED (with reason), or VERIFIED; do not invent completion dates or claim verification from configuration alone. Keep secrets, personal data, and financial references out of this public board. Re-check dates are agreed with the operator. The runbook owns procedures; this table only routes work and evidence.
+For each row, `00` records `state / named operator / environment / prerequisite evidence / evidence reference / verified-at / next action / re-check date` in the restricted release record. Use UNVERIFIED, BLOCKED (with reason), or VERIFIED; keep secrets, personal data, and financial references out of this public board. The runbook owns procedures; this matrix only routes evidence and explicit gaps.
 
-Rows may be prepared independently where dependencies permit. Paid enablement still waits for all pre-enable requirements; Test Mode is not AC-30. If safe verification needs a new procedure, resolve it explicitly instead of bypassing it or marking it complete.
+**Pre-enable requirements remain mandatory:** all A approvals/configuration and release evidence; B Test Mode lifecycle/control evidence; C Production Auth, WAF/effectiveness and paid-off baseline; Production provider budget/alert/hard-ceiling evidence; and the required Live webhook-reconciliation lifecycle, controlled entitled-user kill-switch and cost-guard evidence. The two rows marked procedure unresolved cannot be marked VERIFIED from B or an unentitled C baseline. Phase G is therefore **BLOCKED**, not ready to enable and gather missing prerequisites afterward. Phase H remains mandatory after authorized enablement; Test Mode never substitutes for AC-30.
 
-The following must be evidenced before the defined C01 enablement action is executable:
-
-- commercial-use hosting eligibility;
-- approved public Terms / Privacy / Support content and merchant/legal/privacy/tax/refund/support operations;
-- Production Supabase Auth delivery/redirect readiness and controlled QA account;
-- Stripe Live monthly Price / Portal / webhook-reconciliation lifecycle;
-- Production WAF configuration/effectiveness;
-- Production provider budget / alert / hard-ceiling evidence;
-- controlled entitled-user kill-switch evidence;
-- approved live financial QA handling.
+**Decision request to 01 / 02:** resolve the circular first-launch dependency documented in runbook §1.1: identify a permitted first Live entitlement acquisition path and the environment/order for pre-enable Live lifecycle, entitled kill-switch and cost-guard proof. `01` owns any safety/sequencing/Product boundary decision; `02` must specify the resulting operational/release procedure and acceptance evidence, including containment, operator authority, abort/disable/re-enable conditions, and financial handling. If no compliant procedure is defined, retain BLOCKED and paid-off. This documentation fix neither selects such a procedure nor moves/deletes a prerequisite. W01 independently reviews the resulting exact revision before C01 can use it.
 
 Once those prerequisites are ready and no Product semantics changed, owner is `C01` for the already-defined controlled configuration/release action:
 
@@ -249,7 +247,7 @@ ARCHITECTURE_REVIEW_PAID_ENABLED=true
 → no unrelated feature changes
 ```
 
-If any prerequisite changes Product/commercial semantics or launch scope, route to `01` first; use `02` only for a resulting Product-facing specification gap.
+If any prerequisite changes Product/commercial semantics, safety boundaries, or launch sequencing/scope, route to `01` first and to `02` for the resulting specification/procedure gap. The first-launch decision request above must be resolved before the enablement action is executable.
 
 ## Phase H — W01 live paid Production verification / AC-30 — PENDING
 
@@ -306,7 +304,7 @@ Remaining launch prerequisites include, as applicable:
 
 Smallest safe response:
 
-> Keep the preparation release live with paid review fail-closed. Do not reopen already-specified Product configuration. Close the remaining external Production prerequisites; then let C01 perform only the defined controlled paid-enable/configuration action and let W01 independently execute AC-30.
+> Keep the preparation release live with paid review fail-closed. Do not reopen already-specified Product configuration. Resolve the first-launch procedure blockers through 01/02 and close the remaining external Production prerequisites; then let C01 perform only the defined controlled paid-enable/configuration action and let W01 independently execute AC-30.
 
 Re-check condition:
 
@@ -327,7 +325,7 @@ All external launch prerequisites and the exact controlled paid-enable configura
 | Product-facing commercial policy UX | **SPECIFIED + IMPLEMENTED; EXTERNAL CONTENT/APPROVAL PENDING** | `01`/`02` only if external approval changes Product-facing semantics |
 | W01 preparation Pass A | **COMPLETE** | candidate `107f2db9…` |
 | W01 paid-off preparation Pass B | **COMPLETE — PASS_B_WITH_NOTES** | scoped preparation milestone only |
-| Controlled paid enablement | **NOT READY** | `C01` after prerequisites are evidenced |
+| Controlled paid enablement | **BLOCKED / PROCEDURE UNRESOLVED** | `01`/`02` resolve Phase G first-launch dependency; `C01` only after approved procedure and prerequisite evidence |
 | Live financial QA / PAUC AC-30 | **NOT COMPLETE** | `W01` after controlled paid enablement/evidence is ready |
 | Commercial Validation Gate M0 | **NOT REACHED** | Evaluate only after Paid Access is Production Verified and sufficient real paid evidence exists |
 | Gate A | **NOT REACHED** | no promotion from preparation release alone |

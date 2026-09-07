@@ -168,7 +168,7 @@ The free product remains independently useful. Billing/auth/provider failure mus
 
 # 4. Current next authority
 
-The current blocker is primarily **external/commercial Production readiness**, not a missing implementation specification.
+The launch blocker includes **external/commercial Production readiness and an unresolved first-launch evidence procedure**. Program Board Phase G and paid-launch runbook §1.1 identify the Live entitlement/lifecycle and entitled kill-switch/cost-guard dependency that requires `01`/`02` resolution; the existing preparation implementation does not resolve that procedure.
 
 For the active packet index, item-level external-readiness ownership, and permitted evidence preparation while launch is blocked, use `docs/roadmap/PROGRAM_BOARD.md`. Evidence preparation is not formal Gate A passage, a new Sprint selection, or permission to enable paid Production. The recorded PR #35 baseline does not certify later behavior-changing revisions.
 
@@ -200,7 +200,7 @@ then
 = Evidence → Gate Review → Explicit Next Selection
 ```
 
-Use `01` before C01 only if a remaining prerequisite requires a new Product/commercial selection, scope change, or semantic decision. Use `02` only if such a decision creates an unresolved Product-facing implementation-specification gap. W01 does not act again until new independently verifiable paid-launch evidence exists.
+Use `01` before C01 for the unresolved first-launch safety/sequencing decision, and `02` for the resulting operational/release specification gap. Keep paid Production disabled until the approved procedure and prerequisite evidence are ready. W01 can re-QA documentation/procedure revisions before Live evidence exists; that review is not paid-path Production Verification or permission to enable. PR #35 approval remains limited to its recorded revision/scope.
 
 No noncanonical permanent lane is created for merchant/legal/tax/support or release operations.
 
