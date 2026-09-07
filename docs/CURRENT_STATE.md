@@ -170,6 +170,8 @@ The free product remains independently useful. Billing/auth/provider failure mus
 
 The current blocker is primarily **external/commercial Production readiness**, not a missing implementation specification.
 
+For the active packet index, item-level external-readiness ownership, and permitted evidence preparation while launch is blocked, use `docs/roadmap/PROGRAM_BOARD.md`. Evidence preparation is not formal Gate A passage, a new Sprint selection, or permission to enable paid Production. The recorded PR #35 baseline does not certify later behavior-changing revisions.
+
 Canonical routing is:
 
 ```text

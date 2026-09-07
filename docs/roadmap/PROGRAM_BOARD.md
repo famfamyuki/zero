@@ -31,7 +31,7 @@ Document ownership:
 
 # 1. Current program state
 
-Live reconciliation on 2026-09-06 establishes two distinct statuses:
+The recorded reconciliation on 2026-09-06 established two distinct statuses. These are scoped baseline claims, not a fresh verification of today's Production:
 
 ```text
 Commercial-enablement preparation release — PR #35
@@ -44,30 +44,7 @@ Stage 1 Architecture Review / Paid Access public launch lifecycle
 + PAUC AC-30 NOT COMPLETE
 ```
 
-Release identity for the scoped preparation milestone:
-
-```text
-W01 Pass A approved candidate
-= 107f2db9ac7d9b4f6c02f708ebe7a343b14b00ed
-
-Released GitHub main
-= 6c026189657c8211dd1b5922119a252d3335e705
-
-Approved candidate tree
-= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
-
-Released main tree
-= b0a8dad3d05b8220025d401f6fdf9ba508b32b63
-
-Production deployment
-= dpl_8we4kQoxMRXhGCdzccpNK81P2H6i
-= READY
-= target=production
-= githubCommitSha matches main
-
-W01 preparation-release Pass B
-= PASS_B_WITH_NOTES
-```
+The scoped PR #35 release identity and candidate/release tree comparison are retained in `docs/CURRENT_STATE.md`, sections 1 and 3. Reuse that evidence by reference rather than treating the old SHA as latest main. Later behavior-changing releases require their own QA/release evidence; PR #35 approval does not cover them automatically.
 
 Commercial state remains:
 
@@ -129,6 +106,20 @@ Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is 
 ---
 
 # 2. Active execution plan
+
+## Packet index
+
+`Specified` in packet headers describes specification maturity, not current release completion. The lifecycle below reflects the recorded coordination baseline; live repository/Production evidence wins.
+
+| Packet | Role in current plan | Recorded lifecycle / remaining work |
+|---|---|---|
+| `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 lifecycle open; paid access amendment also applies |
+| `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; external readiness and live AC-30 remain open |
+| `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation code implemented; public content/approval and launch evidence remain prerequisites |
+| `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed capability contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
+| `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` | Completed UX contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
+
+All packet paths are under `docs/specs/`. This index does not grant new QA approval or supersede packet Acceptance Criteria.
 
 The earlier branch/PR preparation sequence is complete. PR #35 is merged and is no longer the active Draft PR.
 
@@ -221,6 +212,23 @@ Verified scope:
 This completes the **preparation sub-release only**.
 
 ## Phase G — External prerequisites + controlled Production paid enablement — PENDING / BLOCKED
+
+`00` coordinates the checklist below. Owner means responsibility for obtaining evidence, not permission to approve merchant decisions or bypass independent verification. Actual account/merchant operators must be identified before an external action. Each row starts **UNVERIFIED** in this planning review: no new evidence was checked here; configuration is not necessarily absent.
+
+| Item | Evidence coordinator / approver | Next action and completion evidence | Contract |
+|---|---|---|---|
+| Release identity | C01 / W01 verifies | Reconcile latest main and later changes against the exact QA-approved revision; record fresh deployment identity and required checks | Runbook §§2, 7 |
+| Hosting eligibility | 00 + account owner / W01 verifies | Obtain current account/plan eligibility evidence for intended commercial use | Runbook §2 |
+| Public policies and operations | 00 + merchant/operator / 01 for changed Product semantics | Identify approvers; obtain approved public URLs and merchant/privacy/tax/refund/support approvals | Policy UX packet §16; runbook §2 |
+| Production Auth | C01 + account operator / W01 verifies | Record controlled-account magic-link delivery and allowed-redirect results without secrets | Runbook §2 |
+| Stripe configuration | C01 + merchant/operator / W01 verifies | Verify Live Price/Portal settings and Test Mode lifecycle evidence; real paid-path proof remains Phase H | Runbook §§2, 4, 6 |
+| Provider controls | C01 + provider-account operator / W01 verifies | Record budget, notification, hard-ceiling, cost-guard and controlled kill-switch evidence | Runbook §3 |
+| WAF | C01 + hosting operator / W01 verifies | Record rule configuration and controlled effectiveness evidence | Runbook §5 |
+| Financial QA readiness | 00 + merchant/operator / W01 executes | Obtain controlled-user and charge/cancel/refund handling approval before Phase H | Policy UX EPP-07; runbook §6 |
+
+For each item, `00` records `state / named operator / evidence reference / verified-at / next action / re-check date` in the restricted release record. Use UNVERIFIED, BLOCKED (with reason), or VERIFIED; do not invent completion dates or claim verification from configuration alone. Keep secrets, personal data, and financial references out of this public board. Re-check dates are agreed with the operator. The runbook owns procedures; this table only routes work and evidence.
+
+Rows may be prepared independently where dependencies permit. Paid enablement still waits for all pre-enable requirements; Test Mode is not AC-30. If safe verification needs a new procedure, resolve it explicitly instead of bypassing it or marking it complete.
 
 The following must be evidenced before the defined C01 enablement action is executable:
 
@@ -328,6 +336,14 @@ All external launch prerequisites and the exact controlled paid-enable configura
 ---
 
 # 5. Planning reconciliation checkpoint
+
+## Planning work while launch is blocked
+
+`01` may prepare an evidence inventory and candidate comparison under Execution Gates §2 without declaring Gate A reached. First reuse existing formal evaluation and implementation evidence, recording revision/model/rubric, coverage, limitations, and gaps. Check any claimed UX gap against the completed Product Identity & Review Journey packet; do not reselect existing Locate/return behavior as new work.
+
+The next planning output is a bounded evidence/gap summary, not an automatic feature backlog. If evidence justifies independent hardening/foundation work, `01` must explicitly select it, preserve the open commercial Sprint and AC-30 obligations, and route it through `02` before C01 implementation. Otherwise record DEFER and the evidence needed to revisit. Formal Gate A retains its Production prerequisite; M0 paid-sample collection is separate. No new feature, AI authority, mutation authority, or paid provider run is authorized here.
+
+## Reconciliation ownership
 
 At material lifecycle/blocker/gate/release/Production-verification changes, `00` re-checks live reality and updates, only where meaning changed:
 

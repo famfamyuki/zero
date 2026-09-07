@@ -4,7 +4,8 @@ Status: **Specified**
 Owner: `02 — UX & Implementation Specification`  
 Selected scope: smallest Product-facing policy / UX closure for the already-selected Commercial Enablement path  
 Coupled packet: `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md`  
-Operational contract: `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md` on the commercial-enablement branch until merged through the canonical lifecycle  
+Operational contract: current main `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`
+
 Specification date: **2026-09-06**
 
 This packet is a narrow amendment for the initial paid Architecture Review. It defines the user-visible policy summary, public policy-link contract, and support/privacy presentation needed to make the existing commercial launch candidate implementation-ready without asking C01 to invent Product, merchant, legal, tax, support, billing, quota, provider, or AI-authority decisions.
@@ -770,7 +771,7 @@ npm run build
 
 plus the existing commercial readiness/test-mode commands required by the coupled PAUC/runbook for the launch-candidate revision.
 
-12. Keep public Production paid Architecture Review disabled. Do not switch Stripe Live, merge PR #35, or treat Preview success as Production Verified.
+12. Keep public Production paid Architecture Review disabled until the coupled runbook prerequisites and canonical authorization are satisfied. The original PR #35 preparation handoff is historical: that PR has merged. Do not replay its merge instruction, infer approval of later revisions, or treat Preview success as Production Verified. Use the current Program Board for the remaining controlled enablement and W01 AC-30 handoff.
 
 If C01 discovers that this mechanical implementation requires changing a Product semantic above, stop and return the contradiction to 02/01 rather than inventing a new policy.
 
