@@ -18,6 +18,14 @@ Free deterministic core = independent of Auth, Stripe, quota DB, and provider st
 
 Keep `ARCHITECTURE_REVIEW_PAID_ENABLED=false` in Production until every checklist below is evidenced and the QA-approved revision is deployed. Never authorize from email, browser state, client user ID, checkout return URL, analytics, or Stripe metadata alone.
 
+## 1.1 First-launch procedure gap — BLOCKED
+
+The existing pre-enable requirements are not a safe executable first-launch sequence yet. With no pre-existing legitimate Live entitlement, Production paid-off Checkout returns `503 review_disabled` (`app/api/billing/architecture-review/checkout/route.ts`, `parsePaidArchitectureReviewConfig`). The review route also stops before entitlement/reservation/cost-guard execution when paid-off. Section 6 obtains a legitimate Live subscription/entitlement only after controlled enablement, while Program Board Phase G requires Live webhook-reconciliation and entitled-user control evidence beforehand. Section 1's “every checklist” rule must not be used to assume those later Live checks already passed.
+
+**Procedure unresolved / BLOCKED:** (1) first Live entitlement acquisition and pre-enable Live webhook lifecycle proof; (2) environment and ordering for the pre-enable entitled-user kill-switch and cost-guard/reservation-release proof. No existing Live user is assumed. Non-Production Test Mode evidence under §§3–4 and Production paid-off Auth/WAF/disabled/free-core evidence can be prepared independently, but neither resolves these procedure gaps or satisfies AC-30. Configuration/approval, Test Mode, paid-off, and post-enable Live evidence are separately routed in [Program Board Phase G](../roadmap/PROGRAM_BOARD.md#phase-g--external-prerequisites--controlled-production-paid-enablement--pending--blocked).
+
+`00` tracks both blockers. `01` must resolve any safety/sequence/authority decision; `02` must specify the permitted first-entitlement source, environment, containment, exact ordering, responsible operators, completion evidence, financial handling and abort/disable/re-enable conditions in the authoritative packet/runbook. W01 independently reviews that revision; C01 may implement only specified changes through the normal protected PR lifecycle. Until resolution and prerequisite evidence, keep Production paid-off and do not start §6. Do not move or waive mandatory evidence, grant manual entitlement/quota, treat test/fake webhooks as Live proof, or infer a bootstrap exception from PAUC §24's equivalent Stripe-approved mechanism wording. This gap record authorizes no new procedure.
+
 ## 2. Pre-enable evidence packet
 
 Record values in the restricted release record; do not paste secret values into tickets, chat, screenshots, logs, or this repository.

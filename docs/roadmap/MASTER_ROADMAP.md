@@ -140,6 +140,8 @@ Current authoritative packet:
 
 - `docs/specs/AGS-EGAI-AR-V0-P1.md`
 
+The selected paid-launch lifecycle also applies `AGS-EGAI-AR-PAUC-V0-P1` and its commercial-policy UX amendment. Use the Program Board packet index for current lifecycle/amendment routing; this roadmap's stage label is not a release-status record.
+
 Important scope discipline:
 
 Current v0 intentionally defers direct mutation, Semantic Patch, Apply, persisted top-level Workflow Intent, runtime tracing, framework-neutral compilation, marketplace, and large-workflow navigation/scale work not explicitly included in the packet.

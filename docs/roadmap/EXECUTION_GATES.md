@@ -7,7 +7,7 @@ This document turns the long-term roadmap into an executable development program
 
 Supporting execution documents:
 
-- `docs/roadmap/PROGRAM_BOARD.md` — current milestone/candidate/blocker coordination and Stage 1.5 trigger matrix
+- `docs/roadmap/PROGRAM_BOARD.md` — current milestone/candidate/blocker coordination
 - `docs/roadmap/RISK_REGISTER.md` — durable program risks and escalation state
 - `docs/ENGINEERING_EXECUTION_GOVERNANCE.md` — Definition of Ready, version lifecycle, traceability, operational-quality maturity, repository/docs enforcement
 - `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md` — designed-expectation and later verification contract
@@ -73,6 +73,8 @@ Material durable decisions belong in `docs/decisions/`.
 # 2. Gate A — Stage 1 Evaluation Trust & Scale
 
 Applies after **Stage 1 — Evidence-Grounded AI Architecture Review** reaches Production Verified and enough evaluation evidence exists.
+
+Preparing evidence is not passing this gate. While external launch prerequisites remain blocked, `01` may inventory existing evaluation results, identify evidence gaps, and compare candidate scopes. This does not declare Stage 1 complete, pass Gate A, select a new packet, authorize provider spending, or relax paid-access/AC-30 requirements. Independently justified safety/quality or foundation work requires explicit `01` selection and `02` specification before implementation; waiting alone is not selection evidence. Commercial sample sufficiency for M0 is not a prerequisite for evaluator hardening.
 
 Required review dimensions:
 
@@ -183,7 +185,7 @@ Choose only the smallest set that materially improves one or more of:
 - review understandability
 - explicit expected-behavior context needed for later verification
 
-Use the trigger matrix in `docs/roadmap/PROGRAM_BOARD.md`; do not select a candidate merely because it appears in the roadmap.
+Use the selection criteria above and the Sprint selection scorecard in section 9, then record the explicit selection in `docs/roadmap/PROGRAM_BOARD.md`; do not select a candidate merely because it appears in the roadmap.
 
 Stage 1.5 work may proceed even when evaluator authority is not yet ready for Stage 2, provided it does not silently expand AI authority.
 

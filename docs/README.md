@@ -216,7 +216,9 @@ Branch Protection / Rulesets should require the `test-typecheck-build` check for
 
 ## Current packet
 
-Always inspect [`specs/`](./specs/) and latest `main` before work. The active packet is authoritative for its scope even when future architecture is described elsewhere.
+Use the packet index in [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md#packet-index) to identify the open lifecycle and its amendments before opening [`specs/`](./specs/). Read latest `main`; the active packet is authoritative for its scope even when future architecture is described elsewhere.
+
+In existing packets, `Status: Specified` describes approved specification maturity, not today's implementation/release lifecycle. Specification-time baselines and handoffs are historical unless explicitly reaffirmed. Program Board owns current lifecycle routing; Current State retains scoped release evidence. Do not rewrite historical requirements merely to make a completed packet look current.
 
 ## Codex entrypoint
 
