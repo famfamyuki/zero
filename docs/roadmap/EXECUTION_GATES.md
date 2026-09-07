@@ -7,7 +7,7 @@ This document turns the long-term roadmap into an executable development program
 
 Supporting execution documents:
 
-- `docs/roadmap/PROGRAM_BOARD.md` — current milestone/candidate/blocker coordination and Stage 1.5 trigger matrix
+- `docs/roadmap/PROGRAM_BOARD.md` — current milestone/candidate/blocker coordination
 - `docs/roadmap/RISK_REGISTER.md` — durable program risks and escalation state
 - `docs/ENGINEERING_EXECUTION_GOVERNANCE.md` — Definition of Ready, version lifecycle, traceability, operational-quality maturity, repository/docs enforcement
 - `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md` — designed-expectation and later verification contract
@@ -183,7 +183,7 @@ Choose only the smallest set that materially improves one or more of:
 - review understandability
 - explicit expected-behavior context needed for later verification
 
-Use the trigger matrix in `docs/roadmap/PROGRAM_BOARD.md`; do not select a candidate merely because it appears in the roadmap.
+Use the selection criteria in this section and the Sprint selection scorecard in §9, then reconcile current selection/blockers in `docs/roadmap/PROGRAM_BOARD.md`. For a commercial-value-driven candidate, also apply `MONETIZATION_ARCHITECTURE.md` §12. Do not select a candidate merely because it appears in the roadmap.
 
 Stage 1.5 work may proceed even when evaluator authority is not yet ready for Stage 2, provided it does not silently expand AI authority.
 

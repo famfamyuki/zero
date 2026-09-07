@@ -16,6 +16,9 @@ Before implementation, QA, or release, always re-check the latest GitHub `main`,
 
 Do not add Product Architecture decisions beyond this specification. If implementation uncovers a true contradiction that cannot be resolved mechanically, report it instead of silently redefining the product contract.
 
+> **Applicability of this packet:** `Specified` records specification readiness, not current implementation/release status. Baseline observations and original handoff instructions below are historical to this packet. Read the [Program Board](../roadmap/PROGRAM_BOARD.md) and [dated Current State](../CURRENT_STATE.md) before selecting work; use latest `main` for maintenance. The [packet map](../README.md#packet-map) identifies coupled contracts. This note does not change requirements, acceptance criteria, or release gates.
+> Couple public provider access with [PAUC](AGS-EGAI-AR-PAUC-V0-P1.md) and paid presentation with [Commercial Policy UX](AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1.md). The released [identity/Review Journey packet](AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md) supplies the full-surface shell; do not restore historical overlay presentation from this packet.
+
 ---
 
 # 1. Objective

@@ -37,6 +37,28 @@ A workflow graph shows structure, but structure alone does not surface every sta
 
 AgentGraph Studio performs **static pre-execution engineering review**. It does not execute agents, simulate a live run, monitor production workflows, or predict runtime latency, token consumption, or cost.
 
+## Development
+
+Start with the [development documentation index](docs/README.md) for authority, task-specific reading paths, and the specification map. Repository agent instructions are in [AGENTS.md](AGENTS.md); current work and blockers are in the [Program Board](docs/roadmap/PROGRAM_BOARD.md).
+
+Use Node.js 22 (matching CI):
+
+```sh
+npm ci
+npm run dev
+```
+
+Open `http://localhost:3000`. Before handing off a change, run:
+
+```sh
+npm run docs:check
+npm test
+npm run typecheck
+npm run build
+```
+
+Packet-specific checks and independent QA/release requirements remain governed by [Development Rules](docs/DEVELOPMENT_RULES.md). Provider-backed evaluation requires its packet's budget and configuration; the commands above do not establish Production verification.
+
 ## Environment configuration
 
 Use [`.env.example`](.env.example) as the key inventory only; it intentionally contains no credentials or approved commercial values. Keep API keys, service-role credentials, and webhook secrets in the hosting provider's Secret storage, and scope Preview credentials to the intended Git branch.

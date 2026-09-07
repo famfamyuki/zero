@@ -2,109 +2,39 @@
 
 This repository is the implementation source for **AgentGraph Studio**.
 
-Before material Product, Architecture, Specification, Implementation, QA, or Release work, read current `main` versions of the relevant durable documents.
+<a id="source-of-truth-priority"></a>
 
-Baseline references:
+## Start from current authority
 
-1. `docs/PRODUCT_MASTER.md`
-2. `docs/ARCHITECTURE.md`
-3. `docs/DEVELOPMENT_RULES.md`
-4. `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
-5. `docs/CHAT_ROLE_REGISTRY.md`
-6. `docs/roadmap/MASTER_ROADMAP.md`
-7. `docs/roadmap/EXECUTION_GATES.md`
-8. `docs/roadmap/PROGRAM_BOARD.md`
-9. `docs/roadmap/RISK_REGISTER.md`
-10. `docs/SECURITY_RELIABILITY_BASELINE.md`
-11. `docs/DATA_AND_AI_GOVERNANCE.md`
-12. `docs/CURRENT_STATE.md`
-13. the current authoritative packet under `docs/specs/`
+Before material Product, Architecture, Specification, Implementation, QA, or Release work:
 
-Read relevant cross-stage contracts when needed:
+1. Identify latest GitHub `main`, the working branch/PR, and relevant code/tests. Check latest Vercel Production and actual behavior when the decision depends on it.
+2. Read [`docs/README.md`](docs/README.md) for the source-of-truth hierarchy, decision owners, and task-specific reading paths. Read relevant authorities, not every unrelated document on every task.
+3. Use [`docs/roadmap/PROGRAM_BOARD.md`](docs/roadmap/PROGRAM_BOARD.md) to locate selected work and its next owner, then read the complete applicable packet(s) listed in the [packet map](docs/README.md#packet-map).
+4. Before implementation, apply [`docs/ENGINEERING_EXECUTION_GOVERNANCE.md`](docs/ENGINEERING_EXECUTION_GOVERNANCE.md) Definition of Ready and [`docs/DEVELOPMENT_RULES.md`](docs/DEVELOPMENT_RULES.md).
 
-- evaluator trust/scale → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
-- product platform/commercial sequencing → `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
-- monetization/pricing/paid launch/commercial validation → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
-- semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
-- import / Workspace / revision → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
-- designed expectations / later verification → `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`
-- durable decisions → `docs/decisions/`
-
-## Source-of-truth priority
-
-When information conflicts:
-
-```text
-latest GitHub main / repository reality
-→ latest Vercel Production / actual Production behavior
-→ active docs/specs packet
-→ Product Master
-→ Architecture
-→ Development Rules / Engineering Execution Governance / cross-cutting baselines
-→ Master Roadmap
-→ Execution Gates
-→ relevant cross-stage plans/contracts
-→ Program Board / Risk Register
-→ Current State snapshot
-→ historical Chat / Work / Codex / old SHAs
-```
-
-A SHA in docs is a snapshot/baseline unless explicitly live-verified.
+A recorded SHA, deployment, packet startup instruction, or research statement describes its baseline unless live-verified. Completed packets retain scoped regression contracts; their old startup/hold instructions are not a fresh work queue. Report genuine Product contradictions rather than silently redefining behavior.
 
 ## Development operating model
 
-`docs/CHAT_ROLE_REGISTRY.md` is authoritative.
+[`docs/CHAT_ROLE_REGISTRY.md`](docs/CHAT_ROLE_REGISTRY.md) owns role meaning, lifecycle authority, handoff evidence, legacy aliases, and context replacement policy.
 
-Current development-only model uses exactly five canonical lanes:
-
-```text
-Chat:
-00  Program Control & Current State
-01  Product Architecture & Roadmap
-02  UX & Implementation Specification
-
-Codex:
-C01 Current Sprint Implementation
-
-Work:
-W01 Independent QA & Production Verification
-```
-
-Core separation:
+Canonical lanes: `00` Program Control & Current State; `01` Product Architecture & Roadmap; `02` UX & Implementation Specification; `C01` Current Sprint Implementation; `W01` Independent QA & Production Verification.
 
 ```text
-GitHub main = durable truth
-Chat        = Product / specification / coordination reasoning
-Codex       = packet-bound repository implementation
-Work        = independent verification when independence matters
+01 Selected → 02 Specified → C01 Implementation Started / Complete
+→ W01 QA Complete → C01 release exact QA-approved revision
+→ W01 Production Verified → 00 Sprint Complete
+→ 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
-There is no permanent canonical `03`, `04`, `05`, `06`, or `W00` in development-only focus mode.
+<a id="dormantnoncanonical-work"></a>
 
-Complex repository/document work may use Work mode under the existing `00`, `01`, or `02` authority; using Work does not create a W00 role.
+A short role declaration such as `ここは01として使います。` is sufficient. Recover the role from current main; do not ask for old prompts. Work mode may support 00/01/02 document tasks without creating W00. No permanent 03/04/05/06/W00 is canonical. Temporary marketing/analytics work does not acquire engineering-priority authority. Use task-specific conversations first; add a durable role only when repeated evidence establishes a genuine independent authority/context boundary.
 
-Lifecycle authority:
+<a id="context-policy"></a>
 
-```text
-Selected                → 01
-Specified               → 02
-Implementation Started  → C01
-Implementation Complete → C01
-QA Complete             → W01
-normal merge/release    → C01 after W01 QA of the same revision
-Production Verified     → W01
-Sprint Complete         → 00
-```
-
-Normal handoff:
-
-```text
-01 → 02 → C01 → W01 QA → C01 release → W01 Production verification → 00 → 01
-```
-
-If implementation/behavior changes after QA Complete, re-run independent QA before release.
-
-A short role declaration such as `ここは01として使います。` is sufficient. Resolve it from current `main`; do not ask for old prompts or stale state.
+Prefer fresh C01 tasks per packet/material PR and fresh W01 sessions per release cycle. Keep 00/01/02 while context is clean; replace stale contexts when necessary, not on a fixed schedule.
 
 ## Product North Star
 
@@ -141,33 +71,20 @@ AgentGraph Studio aims to become a portable AI workflow architecture engineering
 - do not create Graph/Workflow V2 merely to match future diagrams;
 - preserve existing features and analytics unless a current packet explicitly changes them.
 
-## Roadmap / scope discipline
+<a id="roadmap--scope-discipline"></a>
 
-Stage order is dependency direction, not an automatic queue.
+## Scope and gates
 
-After a stage use:
+The active packet controls implementation scope. Roadmap stages express dependencies, not an automatic queue. Stage 1.5 is an evidence-driven selection band; choose only the smallest coherent packet through [`EXECUTION_GATES.md`](docs/roadmap/EXECUTION_GATES.md).
 
-```text
-Evidence → Gate Review → Explicit Next Selection
-```
+Commercial Validation Gate M0 is separate from AI/mutation authority. Paid entitlement/cost control does not prove recurring value; use [`MONETIZATION_ARCHITECTURE.md`](docs/roadmap/MONETIZATION_ARCHITECTURE.md) for commercial decisions.
 
-Stage 1.5 is a selection band, not a mandatory backlog.
+Non-trivial work traces `Product / Architecture / Gate / Scenario / Risk → Packet AC → Test / Production verification`.
 
-Commercial Validation Gate M0 is likewise evidence-driven. Paid entitlement/cost control does not by itself prove recurring value, and commercial conversion must not expand AI authority. Use `docs/roadmap/MONETIZATION_ARCHITECTURE.md` for paid-value, price/quota, unit-economics, and paid-expansion decisions.
+<a id="implementation-completion-gate"></a>
+<a id="independent-qa-and-release"></a>
 
-The active packet under `docs/specs/` controls current implementation scope. Do not pull future roadmap work into a packet merely because it appears in Product/Architecture/Roadmap documents.
-
-Before implementation, apply the Definition of Ready in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
-
-Non-trivial work should trace:
-
-```text
-Product / Architecture / Gate / Scenario / Risk
-→ Packet AC
-→ Test / Production verification
-```
-
-## Implementation completion gate
+## Completion and release
 
 Before **Implementation Complete**, run and report:
 
@@ -178,37 +95,10 @@ npm run typecheck
 npm run build
 ```
 
-plus packet-defined evaluations/benchmarks where applicable.
+Also run packet-defined evaluations/benchmarks when applicable. Normal main merges must follow required CI/protection; verify live Branch Protection/Rulesets rather than infer enforcement from prose.
 
-Normal `main` merges must use the required repository CI/protection path. Live Branch Protection/Ruleset state must be checked rather than inferred from docs.
+Implementation self-test is not Independent QA. C01 releases only the W01-approved change set. Code/behavior changes after QA Complete require fresh W01 Pass A.
 
-## Independent QA and release
+Before **Production Verified**, W01 independently confirms latest main, the QA-approved released change set, Vercel `READY`, `target=production`, correct domain, actual changed-path smoke, relevant runtime errors, and `GitHub main SHA = Vercel Production githubCommitSha`.
 
-Implementation self-test is not Independent QA.
-
-`W01` performs pre-release independent QA. After QA Complete, `C01` may merge/release only the same approved revision. Any behavior-changing fix invalidates that QA approval and returns to W01.
-
-Before **Production Verified**, W01 independently confirms:
-
-- latest GitHub `main`;
-- released code corresponds to the QA-approved change set;
-- Vercel `READY`;
-- `target=production`;
-- correct alias/domain;
-- actual Production smoke for changed behavior;
-- relevant runtime errors;
-- `GitHub main SHA = Vercel Production githubCommitSha`.
-
-Do not mark QA Complete or Production Verified from implementation self-report or deployment READY alone.
-
-## Context policy
-
-- `00`, `01`, `02` may be long-lived while role context stays clean;
-- prefer a fresh `C01` Codex task per packet/material PR;
-- prefer a fresh `W01` Work session per packet/release cycle;
-- replace a long-lived chat when stale Sprints/SHAs or unrelated work interfere with GitHub-grounded reasoning;
-- do not recreate every lane on a fixed schedule.
-
-## Dormant/noncanonical work
-
-Marketing/SNS/analytics/growth are not canonical persistent development lanes during the current focus period. If temporarily needed, use task-specific conversations first. Add a durable role only when repeated evidence shows a genuine independent authority/context boundary.
+Deployment READY or an implementation self-report cannot establish QA Complete, Production Verified, or Sprint Complete. Detailed requirements and completion reporting remain in Development Rules and the Role Registry.

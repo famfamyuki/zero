@@ -191,21 +191,7 @@ Side-effect-sensitive operations involving external mutation, credentials, sensi
 
 # 6. Definition of Ready
 
-Before a Selected capability becomes an implementation-ready packet, apply the full Definition of Ready in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
-
-At minimum, applicable questions must be resolved for:
-
-- user problem / North Star value
-- upstream gate/dependency readiness
-- smallest sufficient scope / Out of Scope
-- domain ownership / identity / versioning
-- migration/backward compatibility
-- security/privacy/provider/persistence boundaries
-- loading/error/stale/degraded behavior
-- accessibility/responsive behavior
-- analytics regression/privacy
-- testable Acceptance Criteria and fixtures
-- Production verification and rollback/degraded-state direction
+Before a Selected capability becomes an implementation-ready packet, apply the complete [Definition of Ready](ENGINEERING_EXECUTION_GOVERNANCE.md#1-definition-of-ready). That contract covers Product/dependencies, domain/migration, data/security, UX/quality, and release readiness; this document does not maintain a second checklist.
 
 If an applicable answer is unknown, narrow the scope or resolve the contract before Implementation Started.
 
@@ -273,16 +259,7 @@ Do not silently reinterpret old workflow meaning.
 
 A new persisted workflow major version requires an ADR and must follow `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`.
 
-Versioned durable contracts must also follow the lifecycle in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`:
-
-- `ACTIVE`
-- `ACCEPTED_LEGACY`
-- `DEPRECATED`
-- `READ_ONLY_LEGACY`
-- `MIGRATION_REQUIRED`
-- `UNSUPPORTED`
-
-A new writer does not automatically justify deleting the old reader. Deprecation/removal must define migration, support, fixtures, and rollback implications.
+Versioned durable contracts must also follow the [contract version lifecycle](ENGINEERING_EXECUTION_GOVERNANCE.md#2-contract-version-lifecycle), including its states, transition record, reader/deprecation rules, fixtures, and rollback requirements. A new writer does not justify deleting the old reader.
 
 ---
 
@@ -447,19 +424,7 @@ Do not treat workflow-level policy evaluation as a substitute for AgentGraph pla
 
 # 17. Operational quality calibration
 
-Provider-backed and critical operational behavior follows `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`:
-
-```text
-UNMEASURED
-→ BASELINED
-→ PROVISIONAL_TARGET
-→ CALIBRATED_TARGET
-→ ENFORCED / ALERTED where justified
-```
-
-Do not invent permanent SLOs before representative evidence exists. Do not leave mature production behavior permanently without measurable targets once sufficient evidence exists.
-
-Material provider/model/architecture changes may require re-baselining.
+Provider-backed and critical operational behavior follows the [operational quality maturity contract](ENGINEERING_EXECUTION_GOVERNANCE.md#4-operational-quality-maturity). It defines measurement, provisional/calibrated targets, enforcement, and re-baselining. Do not invent permanent SLOs before representative evidence exists or leave mature Production behavior permanently without measurable targets.
 
 ---
 
@@ -547,33 +512,7 @@ If any required check was not run, say so explicitly and do not imply it passed.
 
 # 22. Documentation maintenance
 
-Permanent Product/Architecture decisions belong in:
-
-- `docs/PRODUCT_MASTER.md`
-- `docs/ARCHITECTURE.md`
-- `docs/roadmap/MASTER_ROADMAP.md`
-
-Cross-stage execution and governance belong in:
-
-- `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
-- `docs/roadmap/EXECUTION_GATES.md`
-- `docs/roadmap/PROGRAM_BOARD.md`
-- `docs/roadmap/RISK_REGISTER.md`
-- `docs/SECURITY_RELIABILITY_BASELINE.md`
-- `docs/DATA_AND_AI_GOVERNANCE.md`
-- relevant `docs/architecture/` contracts including Scenario/Acceptance
-
-Material durable decision history belongs in:
-
-- `docs/decisions/`
-
-Implementation-specific authoritative contracts belong in:
-
-- `docs/specs/`
-
-Current state snapshots belong in:
-
-- `docs/CURRENT_STATE.md`
+Use the [documentation authority index](README.md#decision-owners) to place a change in its governing document: durable Product/Architecture direction, cross-stage governance, decision history, packet contracts, or dated current-state evidence. Link to the governing definition instead of repeating a full rule or checklist in multiple documents.
 
 `AGENTS.md` should remain a compact routing/instruction document, not a duplicate of all product documentation.
 

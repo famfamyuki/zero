@@ -8,6 +8,9 @@ Coupled milestone: `docs/specs/AGS-EGAI-AR-V0-P1.md` — Stage 1 Evidence-Ground
 
 This packet is the smallest sufficient paid-access release prerequisite for provider-backed Architecture Review. It does **not** expand Stage 1 evaluator scope, AI authority, semantic mutation authority, or the deterministic product contract.
 
+> **Applicability of this packet:** `Specified` records specification readiness, not current implementation/release status. Baseline observations and original handoff instructions below are historical to this packet. Read the [Program Board](../roadmap/PROGRAM_BOARD.md) and [dated Current State](../CURRENT_STATE.md) before selecting work; use latest `main` for maintenance. The [packet map](../README.md#packet-map) identifies coupled contracts. This note does not change requirements, acceptance criteria, or release gates.
+> The paid-off preparation release does not complete live paid verification, PAUC AC-30, the commercial Sprint, or M0. Use the [Paid Launch Runbook](../runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md) for selected configuration and remaining external/live evidence.
+
 ---
 
 ## 0. Decision summary
@@ -105,9 +108,11 @@ The following are fixed by `ADR-0006`, `ADR-0007`, `MONETIZATION_ARCHITECTURE.md
 - Supabase is the smallest sufficient identity/persistence platform because it is already an application dependency and `ADR-0006` names it as the preferred entitlement store.
 - Stripe-hosted Checkout + Customer Portal is the smallest sufficient billing UX because custom card/payment-management UI would add PCI/security/product scope without user value for v0.
 
-## Unknown / evidence-dependent
+## Selected launch configuration (subsequent reconciliation)
 
-- Public launch price/currency is provisionally configured as USD 12.00/month and included review count as 10 per confirmed monthly Stripe billing period; these are launch configuration, not a durable Product constant.
+Public launch price/currency is provisionally configured as USD 12.00/month and included review count as 10 per confirmed monthly Stripe billing period; these are launch configuration, not a durable Product constant. See the [Paid Launch Runbook](../runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md) for the selected cost-guard envelope and external verification requirements. Selection is not evidence of live readiness or commercial validation.
+
+## Unknown / evidence-dependent
 - Representative Production and failed-attempt provider cost distributions; the current 30-call successful benchmark remains bounded evidence for the approved evaluator configuration.
 - Paid willingness-to-pay, repeat-use, cancellation, refund/support, and quota-utilization evidence.
 - Whether the current Production Supabase project has email Auth delivery/configuration ready for public use.
@@ -1121,7 +1126,7 @@ The packet resolves the applicable Definition of Ready dimensions:
 - **Release / rollback / Production verification:** explicit W01 Pass A/B, commercial enablement prerequisites, rollback/disable direction defined.
 - **Traceability:** compact source → requirement/AC mapping included.
 
-The remaining Unknowns — public price/currency, included quota, cost-guard numeric thresholds, final legal/tax/support launch inputs, commercial hosting upgrade, and Production Auth configuration — are **not delegated to C01**. The implementation is fail-closed/configurable; these are explicit pre-enable release inputs owned by Product/commercial/release authority and independently verified by W01.
+Price/currency, quota, and numeric cost-guard settings have since been selected as provisional launch configuration; see §3 and the Paid Launch Runbook. Remaining external approvals and live configuration/evidence — including legal/tax/support inputs, commercial hosting eligibility, and Production Auth — are **not delegated to C01** to invent. The implementation remains fail-closed/configurable. Product/commercial/release authority owns these inputs; W01 independently verifies them. A new policy or semantic gap requires the appropriate 01/02 decision, rather than treating already-selected values as undecided.
 
 Therefore this packet satisfies Definition of Ready for implementation and is **Specified**.
 

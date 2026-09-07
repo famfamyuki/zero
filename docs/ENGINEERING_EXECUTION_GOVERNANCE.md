@@ -52,7 +52,7 @@ Before a packet is implementation-ready, confirm all applicable items below.
 
 ## Release readiness
 
-- `npm test`, `npm run typecheck`, and `npm run build` are expected to remain runnable
+- `npm run docs:check`, `npm test`, `npm run typecheck`, and `npm run build` are expected to remain runnable
 - Production verification is practically possible
 - rollback/degraded-state direction is understood for material risk
 - repository/release dependencies are not silently assumed

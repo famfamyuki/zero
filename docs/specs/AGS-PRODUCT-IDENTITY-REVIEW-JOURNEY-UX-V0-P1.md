@@ -11,6 +11,9 @@ Selected packet direction:
 
 > Existing-Capability Product Identity & Review Journey UX Restructuring
 
+> **Applicability of this packet:** `Specified` records specification readiness, not current implementation/release status. Baseline observations and original handoff instructions below are historical to this packet. Read the [Program Board](../roadmap/PROGRAM_BOARD.md) and [dated Current State](../CURRENT_STATE.md) before selecting work; use latest `main` for maintenance. The [packet map](../README.md#packet-map) identifies coupled contracts. This note does not change requirements, acceptance criteria, or release gates.
+> The no-AI implementation scope belongs to this UX change. It does not prohibit the separately selected [Architecture Review](AGS-EGAI-AR-V0-P1.md) feature; preserve the released full-surface Preflight / Locate journey when maintaining that feature.
+
 ---
 
 ## 0. Authority, Current State, and non-authorities

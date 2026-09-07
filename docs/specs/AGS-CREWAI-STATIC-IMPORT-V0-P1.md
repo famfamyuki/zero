@@ -8,6 +8,9 @@ Decision class: `FOUNDATION_FIRST`
 
 This packet defines the smallest safe deterministic CrewAI static-import capability that removes manual reconstruction for a precisely supported source subset without introducing Graph/Workflow V2, Workspace persistence, arbitrary Python execution, source write-back, multi-framework import, AI interpretation, or semantic mutation authority.
 
+> **Applicability of this packet:** `Specified` records specification readiness, not current implementation/release status. Baseline observations and original handoff instructions below are historical to this packet. Read the [Program Board](../roadmap/PROGRAM_BOARD.md) and [dated Current State](../CURRENT_STATE.md) before selecting work; use latest `main` for maintenance. The [packet map](../README.md#packet-map) identifies coupled contracts. This note does not change requirements, acceptance criteria, or release gates.
+> This import packet has been released. Its selection-time Stage 1 hold is historical; preserve its supported-subset, static-only, diagnostics, provenance, and acceptance contracts for regressions.
+
 ---
 
 # 0. Decision summary

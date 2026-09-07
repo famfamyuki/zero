@@ -4,12 +4,16 @@ Status: **Specified**
 Owner: `02 — UX & Implementation Specification`  
 Selected scope: smallest Product-facing policy / UX closure for the already-selected Commercial Enablement path  
 Coupled packet: `docs/specs/AGS-EGAI-AR-PAUC-V0-P1.md`  
-Operational contract: `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md` on the commercial-enablement branch until merged through the canonical lifecycle  
+Operational contract: [Paid Launch Runbook](../runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md) on latest `main` (the original commercial-enablement branch has merged)
+
 Specification date: **2026-09-06**
 
 This packet is a narrow amendment for the initial paid Architecture Review. It defines the user-visible policy summary, public policy-link contract, and support/privacy presentation needed to make the existing commercial launch candidate implementation-ready without asking C01 to invent Product, merchant, legal, tax, support, billing, quota, provider, or AI-authority decisions.
 
 It does **not** authorize merge, Stripe Live activation, paid Production enablement, Production Verification, Sprint Complete, Gate A, Commercial Validation Gate M0, Stage 1.5, or Stage 2.
+
+> **Applicability of this packet:** `Specified` records specification readiness, not current implementation/release status. Baseline observations and original handoff instructions below are historical to this packet. Read the [Program Board](../roadmap/PROGRAM_BOARD.md) and [dated Current State](../CURRENT_STATE.md) before selecting work; use latest `main` for maintenance. The [packet map](../README.md#packet-map) identifies coupled contracts. This note does not change requirements, acceptance criteria, or release gates.
+> The paid-off preparation release does not complete live paid verification, PAUC AC-30, the commercial Sprint, or M0. Use the [Paid Launch Runbook](../runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md) for selected configuration and remaining external/live evidence.
 
 ---
 
@@ -747,7 +751,7 @@ Other non-policy launch prerequisites — commercial-use hosting, Production Sup
 
 # 17. Durable C01 handoff
 
-C01 must perform only the mechanical repository changes needed to implement this packet on top of the current PR #35 branch.
+Original implementation handoff (PR #35, now merged): C01 was to perform only the mechanical repository changes needed to implement this packet on that branch. For maintenance, start from latest `main` and the current selected work; do not reopen or reuse the historical branch instructions as a new assignment.
 
 1. In the existing Architecture Review paid-access surface, factor/reuse a small policy-navigation component rather than duplicating link markup across states.
 2. Preserve `ARCHITECTURE_REVIEW_TERMS_URL`, `ARCHITECTURE_REVIEW_PRIVACY_URL`, and `ARCHITECTURE_REVIEW_SUPPORT_URL`; do not invent final URL values.

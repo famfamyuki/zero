@@ -1,5 +1,7 @@
 # AgentGraph Studio — PostHog 計測不具合 修正完了レポート
 
+> **Historical report (2026-08-20).** Commit references and check counts below describe that repair, not the current repository. Use [Development Rules](docs/DEVELOPMENT_RULES.md) for current verification requirements and [Current State](docs/CURRENT_STATE.md) for the dated lifecycle snapshot.
+
 **作成日時**: 2026-08-20  
 **対象リポジトリ**: `famfamyuki/zero`  
 **適用ブランチ**: `main`  
