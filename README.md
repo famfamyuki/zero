@@ -37,7 +37,30 @@ A workflow graph shows structure, but structure alone does not surface every sta
 
 AgentGraph Studio performs **static pre-execution engineering review**. It does not execute agents, simulate a live run, monitor production workflows, or predict runtime latency, token consumption, or cost.
 
-## Environment configuration
+## Local development and verification
+
+Use the exact Node version in [`.node-version`](.node-version) (currently 22.23.2).
+CI reads that same file. Activate it with your Node version manager, then run:
+
+```text
+npm ci
+npm run harness:preflight
+npm run verify
+```
+
+`verify` runs secret signatures, docs integrity, all unit tests, TypeScript, and
+the production build. It writes local self-check evidence to
+`.harness/verification.json`; this is not independent QA. `npm run dev` starts
+the local app. The deterministic free core and normal checks do not require
+production credentials. Never copy production secrets into a verification shell.
+
+For browser smoke, run `npx playwright install chromium` once, then
+`npm run test:e2e` after a successful build. Tests start their own loopback-only
+server and block non-local browser requests. See the
+[harness runbook](docs/harness/README.md) for external-evaluation boundaries,
+safe permissions, Hook trust, and C01/W01 handoff.
+
+### Environment configuration
 
 Use [`.env.example`](.env.example) as the key inventory only; it intentionally contains no credentials or approved commercial values. Keep API keys, service-role credentials, and webhook secrets in the hosting provider's Secret storage, and scope Preview credentials to the intended Git branch.
 

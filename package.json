@@ -2,7 +2,14 @@
   "name": "zero",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
+    "harness:preflight": "node scripts/harness-preflight.mjs",
+    "secrets:check": "node scripts/check-secrets.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test:e2e": "playwright test",
     "dev": "next dev",
     "build": "next build",
     "docs": "npm run docs:check",
@@ -38,6 +45,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
