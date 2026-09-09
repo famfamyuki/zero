@@ -30,6 +30,9 @@ test('portable JSON roundtrip and keyboard Preflight remain available without pa
   await expect(page.getByRole('heading', { name: 'Harness roundtrip', exact: true })).toBeVisible();
   await page.getByRole('navigation').getByRole('button', { name: japanese ? 'Preflightレビュー' : 'Preflight', exact: true }).click();
   await expect(page.locator('#unified-preflight-heading')).toBeVisible();
+  // Opening the panel focuses its heading after two animation frames. Wait for
+  // that accessibility transition before testing keyboard tab navigation.
+  await expect(page.locator('#unified-preflight-heading')).toBeFocused();
   const tabs = page.getByRole('tab');
   await tabs.first().focus();
   await page.keyboard.press('ArrowRight');
