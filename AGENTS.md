@@ -2,6 +2,36 @@
 
 This repository is the implementation source for **AgentGraph Studio**.
 
+## Start, continue, and hand off
+
+Run `npm run harness:preflight` before material repository work. It is local and
+read-only: `origin/main` is explicitly cached, never proof of live main. When
+network access is authorized, verify live main and record the check time. Inspect
+the branch, HEAD, existing changes, and relevant worktree before choosing a base.
+Preserve others' changes; never automatically reset, stash, clean, or overwrite
+them. Use an isolated worktree for a separate packet/material PR.
+
+Identify the role, authorized scope, and packet using Program Board's packet
+index. Engineering maintenance explicitly requested by the user may use a bounded
+execution note under `docs/harness/`; it must not select Product work or weaken a
+release gate. Read [the harness runbook](docs/harness/README.md) for setup,
+verification, permissions, browser smoke, and subagent boundaries.
+
+Continue authorized implementation through applicable checks and a concrete
+handoff without repeatedly asking to proceed. Stop dependent actions at missing
+Product decisions, missing external authorization, or a real blocker; continue
+independent in-scope work and report the exact missing input. Do not bypass a gate
+to make a task appear complete. Read-only user requests do not authorize setup,
+generated verification artifacts, or external connections.
+
+`npm run verify` executes the required checks plus local secret signatures and
+records the actual source fingerprint in `.harness/verification.json`. Include
+packet AC coverage, command results, revision, browser/external verification still
+needed, and the next owner in the handoff. That record is implementation
+self-evidence, never W01 approval. A code-changing revision needs fresh checks and
+independent QA before release. No automatic commit, merge, deploy, or paid action
+is granted by these scripts or Skills.
+
 Before material Product, Architecture, Specification, Implementation, QA, or Release work, read current `main` versions of the relevant durable documents.
 
 Baseline references:

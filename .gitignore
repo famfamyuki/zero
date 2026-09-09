@@ -12,6 +12,12 @@
 
 # testing
 /coverage
+/.harness/
+/.worktrees/
+/artifacts/
+/supabase/.temp/
+/playwright-report/
+/test-results/
 
 # next.js
 /.next/

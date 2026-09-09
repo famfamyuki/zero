@@ -257,7 +257,7 @@ Commercial Validation Gate M0 remains pending even after a future successful pai
 ## Inferred
 
 - Keeping the preparation code live while the public offer remains fail-closed reduces release coupling without weakening the paid-launch gate, provided future enablement still follows the runbook and fresh independent verification.
-- No new 02 packet is currently required unless external approval changes user-visible Product semantics.
+- The existing Product packet need not be replaced unless external approval changes user-visible Product semantics. This does not remove the §4 requirement for 01's first-launch decision and 02's resulting operational/release procedure amendment before controlled enablement.
 
 ## Unknown / evidence-dependent
 

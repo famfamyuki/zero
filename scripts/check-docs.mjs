@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, join, relative, resolve, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -38,9 +38,14 @@ for (const relativePath of requiredPaths) {
   }
 }
 
-const docsReadmePath = join(repoRoot, 'docs/README.md');
-if (existsSync(docsReadmePath)) {
-  const docsReadme = readFileSync(docsReadmePath, 'utf8');
+function markdownFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    return entry.isDirectory() ? markdownFiles(path) : entry.name.endsWith('.md') ? [path] : [];
+  });
+}
+for (const docsReadmePath of [join(repoRoot, 'AGENTS.md'), join(repoRoot, 'README.md'), ...markdownFiles(join(repoRoot, 'docs')), ...(existsSync(join(repoRoot, '.agents/skills')) ? markdownFiles(join(repoRoot, '.agents/skills')) : [])]) {
+  const docsReadme = readFileSync(docsReadmePath, 'utf8').replace(/```[^\n]*\n[\s\S]*?```/g, '');
   const linkPattern = /\[[^\]]*\]\(([^)]+)\)/g;
   let match;
 
@@ -59,15 +64,23 @@ if (existsSync(docsReadmePath)) {
     const targetWithoutAnchor = rawTarget.split('#')[0].split('?')[0];
     if (!targetWithoutAnchor) continue;
 
-    const resolvedTarget = normalize(resolve(dirname(docsReadmePath), targetWithoutAnchor));
-    if (!resolvedTarget.startsWith(repoRoot)) {
+    const resolvedTarget = resolve(dirname(docsReadmePath), targetWithoutAnchor);
+    const fromRoot = relative(repoRoot, resolvedTarget);
+    if (fromRoot === '..' || fromRoot.startsWith('../') || fromRoot.startsWith('..\\') || isAbsolute(fromRoot)) {
       failures.push(`README link escapes repository root: ${rawTarget}`);
       continue;
     }
 
     if (!existsSync(resolvedTarget)) {
-      failures.push(`Broken docs/README.md link: ${rawTarget}`);
+      failures.push(`Broken link in ${relative(repoRoot, docsReadmePath)}: ${rawTarget}`);
     }
+  }
+}
+
+const boardPath = join(repoRoot, 'docs/roadmap/PROGRAM_BOARD.md');
+if (existsSync(boardPath)) {
+  for (const match of readFileSync(boardPath, 'utf8').matchAll(/`(AGS-[A-Z0-9-]+)`/g)) {
+    if (!existsSync(join(repoRoot, 'docs/specs', `${match[1]}.md`))) failures.push(`Program Board references missing packet: ${match[1]}`);
   }
 }
 

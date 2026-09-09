@@ -222,4 +222,8 @@ In existing packets, `Status: Specified` describes approved specification maturi
 
 ## Codex entrypoint
 
+For reproducible local setup, source-state checks, and verification evidence,
+read [Harness runbook](harness/README.md). It does not change the Product packet
+index or release authority.
+
 Root [`../AGENTS.md`](../AGENTS.md) is the compact repository contributor entrypoint. Durable detail belongs in these GitHub documents rather than duplicated prompts or memory.

@@ -233,6 +233,19 @@ Do not duplicate the entire program risk register in every packet.
 
 # 8. Change governance for these rules
 
+## Recurring execution feedback
+
+For a repeated correction or material execution failure, record the cause,
+smallest durable prevention, owner, and closure evidence in the relevant PR or
+packet. Route a reproducible failure to a test/fixture; repeated mechanics to a
+shared Skill/script; authority changes to the owning governance document/ADR.
+Do not append every conversation detail to AGENTS.md. Close the prevention only
+when the regression check or realistic workflow confirms it. Use
+`docs/templates/VERIFICATION_RECORD.md` for the handoff; local harness checks are
+not Independent QA and cannot grant release approval.
+
+Material governance changes below retain their review requirements.
+
 Material changes to any of the following require durable review and usually an ADR:
 
 - Definition of Ready semantics
