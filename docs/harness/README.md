@@ -28,7 +28,9 @@ development credentials. Browser smoke must follow a build made by `verify` in
 that clean checkout: already-built public configuration cannot be scrubbed later.
 
 The verification record under `.harness/` is overwritten to `running` before
-checks and only passes if all steps pass and source bytes remain unchanged.
+preflight or source fingerprint collection. Initialization errors record `failed`
+and exit nonzero; unavailable environment/source fields are `null` (Unknown),
+never copied from a prior run. It only passes if all steps pass and source bytes remain unchanged.
 Ignored files (including environment files), dependencies, and external systems
 are outside its fingerprint. The fingerprint is local comparison evidence, not a
 Git tree, portable cross-OS identity, signed attestation, or QA approval. For

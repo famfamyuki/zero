@@ -15,6 +15,11 @@ test('portable JSON roundtrip and keyboard Preflight remain available without pa
   await page.goto('/');
   await expect(page.locator('#overview-heading')).toBeVisible();
 
+  // Fixed source makes the expected deterministic Readiness finding explicit.
+  page.on('dialog', (dialog) => dialog.accept());
+  await page.getByLabel(japanese ? 'JSON読込' : 'Import JSON', { exact: true }).setInputFiles('tests/fixtures/graph-roundtrip-v1.json');
+  await expect(page.getByRole('heading', { name: 'Round Trip Crew', exact: true })).toBeVisible();
+
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export', exact: true }).click();
   await page.getByRole('banner').getByRole('button', { name: 'AgentGraph JSON', exact: true }).click();
@@ -25,7 +30,6 @@ test('portable JSON roundtrip and keyboard Preflight remain available without pa
   expect(original.nodes.length).toBeGreaterThan(0);
   original.crewConfig.name = 'Harness roundtrip';
 
-  page.on('dialog', (dialog) => dialog.accept());
   await page.getByLabel(japanese ? 'JSON読込' : 'Import JSON', { exact: true }).setInputFiles({ name: 'roundtrip.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(original)) });
   await expect(page.getByRole('heading', { name: 'Harness roundtrip', exact: true })).toBeVisible();
   await page.getByRole('navigation').getByRole('button', { name: japanese ? 'Preflightレビュー' : 'Preflight', exact: true }).click();
@@ -39,6 +43,11 @@ test('portable JSON roundtrip and keyboard Preflight remain available without pa
   await expect(tabs.nth(1)).toBeFocused();
   await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('tabpanel')).toBeVisible();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('tab', { name: japanese ? '準備状況' : 'Readiness', exact: true })).toHaveAttribute('aria-selected', 'true');
+  const finding = page.getByRole('tabpanel').locator('[data-review-item="RDY_HIERARCHICAL_ASSIGNMENT_IGNORED:task-research"]');
+  await expect(finding).toBeVisible();
+  await expect(finding).toContainText(japanese ? 'Hierarchicalでは明示Task割当が反映されません' : 'Explicit task ownership is ignored in hierarchical mode');
 
   const secondDownload = page.waitForEvent('download');
   await page.getByRole('banner').getByRole('button', { name: 'Export', exact: true }).click();

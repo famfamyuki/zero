@@ -108,6 +108,33 @@ test('verification rejects source changes made while checks are running', () => 
   assert.equal(record.status, 'failed');
 }));
 
+for (const failure of ['preflight', 'fingerprint', 'runtime mismatch'] as const) {
+  test(`verification replaces an old pass when initialization fails: ${failure}`, () => fixture((root) => {
+    mkdirSync(join(root, '.harness'));
+    writeFileSync(join(root, '.harness/verification.json'), JSON.stringify({ status: 'passed', environment: { head: 'old-head' }, sourceFingerprint: 'old-source' }));
+    if (failure === 'preflight') rmSync(join(root, '.node-version'));
+    if (failure === 'fingerprint') {
+      // A tracked file replaced by a directory is readable by preflight but
+      // cannot be fingerprinted. No platform-specific permission setup needed.
+      rmSync(join(root, 'source.txt'));
+      mkdirSync(join(root, 'source.txt'));
+    }
+    if (failure === 'runtime mismatch') writeFileSync(join(root, '.node-version'), '0.0.0');
+    const result = verificationFixture(root, false);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, failure === 'preflight' ? /ENOENT/ : failure === 'fingerprint' ? /Non-file Git entry/ : /exact Node version/);
+    const record = JSON.parse(readFileSync(join(root, '.harness/verification.json'), 'utf8'));
+    assert.equal(record.status, 'failed');
+    assert.deepEqual(record.checks, []);
+    assert.ok(record.finishedAt);
+    assert.equal(record.independentQA, 'not-performed');
+    if (failure === 'preflight') assert.equal(record.environment, null);
+    else assert.equal(record.environment.head, execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim());
+    if (failure !== 'runtime mismatch') assert.equal(record.sourceFingerprint, null);
+    else assert.equal(record.sourceFingerprint, fingerprint(root));
+  }));
+}
+
 test('verification never calls matching sources independent QA', () => fixture((root) => {
   const result = verificationFixture(root, false);
   assert.equal(result.status, 0);

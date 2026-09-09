@@ -14,10 +14,14 @@ const steps = [
   ['npm run build', ['node_modules/next/dist/bin/next', 'build']],
 ];
 mkdirSync(dirname(recordPath), { recursive: true });
-const record = { schemaVersion: 1, kind: 'implementation-self-check', status: 'running', startedAt: new Date().toISOString(), environment: preflight(root), sourceFingerprint: fingerprint(root), checks: [], independentQA: 'not-performed', browser: 'run npm run test:e2e separately', externalEvaluation: 'not-performed' };
+const record = { schemaVersion: 1, kind: 'implementation-self-check', status: 'running', startedAt: new Date().toISOString(), environment: null, sourceFingerprint: null, checks: [], independentQA: 'not-performed', browser: 'run npm run test:e2e separately', externalEvaluation: 'not-performed' };
 const save = () => writeFileSync(recordPath, JSON.stringify(record, null, 2) + '\n');
 save(); // Invalidate any previous successful record before starting.
 try {
+  // null means Unknown until this run successfully collects the value.
+  record.environment = preflight(root);
+  record.sourceFingerprint = fingerprint(root);
+  save();
   if (record.environment.node !== record.environment.expectedNode) throw new Error('Use the exact Node version in .node-version.');
   const env = isolatedCheckEnv(root);
   for (const [command, args] of steps) {
