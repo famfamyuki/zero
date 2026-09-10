@@ -1,38 +1,35 @@
 # AgentGraph Studio — Product Platform & Commercial Strategy
 
-Status: **Authoritative cross-stage product/business strategy**  
-Scope: Market position, product wedge, adoption path, monetization boundaries, durable moat, final workspace UX, and roadmap implications.  
-This plan refines how the Product Master becomes a large, durable business. It does **not** automatically expand an active implementation packet.
+Status: **Authoritative specialized cross-stage strategy**  
+Scope: market position, adoption wedge, durable business/moat direction, final product-shell strategy, product-led adoption, strategic decision rules, and high-level business sequencing.
 
-## 0. Source-of-truth and scope rule
+This document intentionally contains only strategy that is **not already owned by another canonical authority**. It does not duplicate Product definition, detailed roadmap stages, evaluator contracts, or monetization mechanics.
 
-Current implementation reality remains governed by:
+Canonical owners:
 
-1. latest GitHub `main`
-2. latest Vercel Production and actual Production behavior
-3. active packet under `docs/specs/`
-4. `docs/PRODUCT_MASTER.md`
-5. `docs/ARCHITECTURE.md`
-6. `docs/roadmap/MASTER_ROADMAP.md`
-7. this cross-stage strategy where market/product-positioning questions apply
+- final Product definition / North Star / durable Product boundaries → `docs/PRODUCT_MASTER.md`
+- Architecture boundaries → `docs/ARCHITECTURE.md`
+- long-term Stage/dependency sequence → `docs/roadmap/MASTER_ROADMAP.md`
+- promotion / AI Authority / Mutation Authority → `docs/roadmap/EXECUTION_GATES.md`
+- evaluator trust / scale → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
+- paid value / free-paid boundary / price-quota evidence / M0 / launch operations → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
+- active execution scope → `docs/roadmap/PROGRAM_BOARD.md` + active packet
 
-This strategy must not be used to pull long-term features into the current Stage 1 packet. Current packet scope remains explicit.
+This strategy never expands an active Sprint automatically.
 
 ---
 
-# 1. Strategic Objective
+# 1. Strategic objective
 
-AgentGraph Studio should be built to support a path toward:
+AgentGraph Studio should support a path toward:
 
-- a large global user base
-- durable recurring revenue
-- strong retention through repeated engineering value
-- increasing switching cost through trusted workflow history, policies, revisions, and team process
-- defensible product intelligence that is difficult to reproduce with a generic LLM wrapper
+- a large global user base;
+- durable recurring professional value;
+- strong retention through repeated engineering value;
+- increasing switching cost through trusted workflow/review/revision/governance history rather than source/runtime lock-in;
+- defensible semantic/evaluation/capability assets that are difficult to reproduce with a generic LLM wrapper.
 
-This objective does **not** mean optimizing engineering priorities around short-term traffic, marketing dashboards, vanity metrics, or feature-count competition.
-
-The product should compound durable value through:
+Desired value progression:
 
 ```text
 Useful Free Entry
@@ -42,17 +39,18 @@ Useful Free Entry
 → Durable Platform Moat
 ```
 
-Macroeconomic predictions or a speculative deadline for automation/machine-economy change must not determine product contracts or force rushed scope. Build assets whose value compounds regardless of the exact timing of external economic change.
+Do not optimize core engineering priority around short-term traffic, vanity metrics,
+feature-count competition, or speculative macroeconomic deadlines.
 
 ---
 
-# 2. Category Position
+# 2. Category position
 
 Internal product definition remains:
 
 > **Portable AI Workflow Architecture Engineering Toolchain**
 
-External strategic category should evolve toward:
+The external strategic category may evolve toward:
 
 > **AI Workflow Architecture Intelligence & Control Layer**
 
@@ -60,7 +58,7 @@ Long-term product promise:
 
 > Before an important AI workflow is trusted, changed, or shipped, AgentGraph Studio helps the user understand what it is, identify architecture risks, explain why they matter, compare safer improvements, verify the change, and retain ownership of the resulting system.
 
-The desired habit is analogous to an engineering quality gate:
+Desired engineering habit:
 
 ```text
 Build or Import Workflow
@@ -70,39 +68,37 @@ Build or Import Workflow
 → Build / Ship
 ```
 
-Later, for teams and CI:
+Later, where Product/roadmap evidence justifies it:
 
 ```text
 Workflow Change / Pull Request
-→ AgentGraph Continuous Review
+→ Continuous Review
 → Architecture / Policy Delta
 → Human Decision
 → Ship
 ```
 
-AgentGraph should become a place important AI workflows are **checked**, not merely another place they can be visually drawn.
+AgentGraph should become a place important AI workflows are **checked**, not merely another place they can be drawn.
 
 ---
 
-# 3. Competitive Strategy
+# 3. Competitive strategy
 
-AgentGraph should not attempt to win primarily through:
+Do not attempt to win primarily through:
 
-- the largest connector catalog
-- the broadest hosted automation runtime
-- the fastest generic natural-language workflow generation
-- the most workflow templates
-- a generic multi-framework comparison table
-- a proprietary runtime that users must adopt
+- the largest connector catalog;
+- the broadest proprietary hosted automation runtime;
+- the fastest generic natural-language workflow generation;
+- the largest template catalog;
+- a generic framework-comparison table;
+- forcing users onto an AgentGraph-only runtime.
 
-Those capabilities can be valuable elsewhere, but competing on them alone creates a resource-heavy feature race against established workflow builders, framework vendors, and agent platforms.
+AgentGraph should occupy the engineering layer **between workflow construction and production trust**.
 
-AgentGraph should instead occupy the layer **between workflow construction and production trust**.
-
-Preferred relationship with other ecosystems:
+Preferred relationship:
 
 ```text
-CrewAI / LangGraph / Dify / n8n / code / future frameworks
+CrewAI / future supported frameworks / code
                     ↓
             Import / Semantic Mapping
                     ↓
@@ -114,19 +110,15 @@ CrewAI / LangGraph / Dify / n8n / code / future frameworks
         User-owned Build / Runtime
 ```
 
-Initially, CrewAI remains the strongest supported target/import path. Framework neutrality should be earned through semantic and capability contracts, not advertised before the product can represent differences without silent loss.
+CrewAI remains the primary supported target/import path until semantic/capability evidence justifies broader framework claims. Framework neutrality must be earned without silent loss.
 
 ---
 
-# 4. Primary User Value Wedge
+# 4. Primary adoption wedge
 
-The strongest adoption wedge is not "draw a workflow from scratch."
+The strongest first-value wedge is not requiring users to redraw a system before receiving architecture value.
 
-It is:
-
-> **Bring an existing or newly designed workflow and get useful architecture insight quickly.**
-
-Target first-value flow:
+Preferred first-value flow:
 
 ```text
 Open AgentGraph
@@ -134,33 +126,29 @@ Open AgentGraph
 → Deterministic Preflight
 → Evidence-Grounded Architecture Review
 → Top Strengths / Risks / Unknowns
-→ Locate each finding in the workflow
-→ See a justified next action
+→ Locate Relevant Targets
+→ Understand a Justified Next Action
 ```
 
-This allows AgentGraph to complement existing builders rather than requiring users to abandon them before receiving value.
+Strategic entry modes, when implemented and selected through the roadmap, are:
 
-The product should progressively support three entry modes:
+1. **Import Existing Workflow** — highest migration/adoption leverage;
+2. **Describe New Workflow** — AI-assisted architecture proposal with rationale and user review;
+3. **Design Manually / Template** — direct visual authoring.
 
-1. **Import Existing Workflow** — highest strategic leverage
-2. **Describe New Workflow** — AI-assisted architecture proposal, with rationale and user review
-3. **Design Manually / Template** — direct visual authoring for users who prefer it
+This ordering is strategic direction, not automatic Sprint scope.
 
 ---
 
-# 5. Core Product Loop
+# 5. Repeated-value loop
 
-The existing North Star remains:
+The Product North Star remains canonical in Product Master:
 
 ```text
-Understand
-→ Evaluate
-→ Improve
-→ Verify
-→ Own
+Understand → Evaluate → Improve → Verify → Own
 ```
 
-For a durable business, the loop should become recurrent rather than one-shot:
+The business becomes durable when the loop recurs as workflows change:
 
 ```text
 Import / Design
@@ -175,246 +163,19 @@ Import / Design
 → Improve Again
 ```
 
-Retention should come from the fact that workflows change and must repeatedly be re-evaluated, not from artificial lock-in.
+Retention should come from useful repeated engineering work, not artificial lock-in.
+
+Stage 1.5 foundations such as Import, Project/Workspace identity, Intent/Constraints,
+Review/Locate usability, and revision/history remain evidence-driven selections in
+the Master Roadmap. This document does not select them.
 
 ---
 
-# 6. Strategic Capability Threads
+# 6. Final product-shell strategy
 
-These capability threads are cross-stage. Their exact Sprint selection remains governed by Product Architecture review and active packet discipline.
+Product Master owns the final Product workspaces. The following unique UX strategy remains durable direction and is **not current Sprint scope unless selected**.
 
-## 6.1 Existing Workflow Import
-
-Goal: remove the requirement that a user must recreate an existing system inside AgentGraph before receiving value.
-
-CrewAI-first direction:
-
-```text
-CrewAI Project / Supported Source
-→ Static Parse / Import Adapter
-→ Canonical Semantic Mapping
-→ Mapping Diagnostics
-→ Known / Inferred / Unknown
-→ AgentGraph Workflow Source
-→ Review
-```
-
-Principles:
-
-- do not pretend dynamic Python can always be reconstructed exactly
-- represent unsupported/dynamic behavior as `Unknown`
-- expose lossy or inferred mappings
-- preserve source provenance
-- never silently rewrite the original external project
-
-Long-term import adapters may expand only where product demand and semantic quality justify them.
-
-## 6.2 Project / Local Workspace
-
-The mature product must support more than one anonymous active workflow.
-
-Direction:
-
-```text
-Workspace
-├ Workflow A
-├ Workflow B
-├ Workflow C
-└ Shared local/project metadata
-```
-
-Principles:
-
-- multi-workflow value must not require cloud lock-in
-- local-first/project-file approaches should remain possible
-- optional account/cloud sync can be layered later
-- Project/Workspace is distinct from Team Collaboration
-
-The product should support a user's body of architecture work, not only a single canvas session.
-
-## 6.3 Intent & Constraint Contract
-
-Architecture quality is relative to purpose.
-
-Persisted intent should eventually include:
-
-- objective
-- success criteria
-- prototype vs production
-- reliability priority
-- cost sensitivity
-- latency sensitivity
-- privacy/local-only constraints
-- human-approval requirements
-- side-effect constraints
-- target/provider/model constraints
-- portability requirements
-
-Evaluation must distinguish declared intent from AI-inferred purpose.
-
-## 6.4 Scenario / Acceptance Contract
-
-Static architecture review alone cannot define all expected behavior.
-
-Users should eventually define critical scenarios such as:
-
-```text
-Given <input / situation>
-Expected <path / behavior / constraint / outcome>
-Must / Must Not <critical property>
-```
-
-Examples:
-
-- a consequential action must pass human approval
-- sensitive data must not reach an external tool
-- a failure path must retry or escalate
-- a particular class of input must route to a specific responsibility
-
-Scenario contracts should first be useful as design-time expectations. Later they can drive simulation, behavioral evaluation, runtime comparison, and regression testing.
-
-This creates the bridge:
-
-```text
-Designed Expectation
-→ Static Review
-→ Behavioral Test Later
-→ Runtime Evidence
-→ Expected vs Actual
-```
-
-## 6.5 Review Delta / Regression
-
-A returning user should be able to answer:
-
-- What changed since the last trusted revision?
-- Which findings were resolved?
-- Which new risks appeared?
-- Did architecture quality improve or regress?
-- Did constraints or compatibility change?
-
-This requires revision-aware evaluation history rather than isolated AI responses.
-
-## 6.6 AI Architecture Drafting
-
-Natural-language workflow creation is valuable but should follow AgentGraph safety principles.
-
-Preferred flow:
-
-```text
-Describe Intent
-→ AI Architecture Proposal
-→ Explain Responsibilities / Boundaries / Assumptions
-→ Deterministic Validation
-→ Architecture Review
-→ User Accepts / Edits
-```
-
-AI drafting must not bypass review by presenting generated architecture as automatically correct.
-
-## 6.7 Guided Improvement and Safe Transformation
-
-The existing invariant remains central:
-
-```text
-Finding
-→ Improvement Proposal
-→ Semantic Patch
-→ Validation
-→ Before / After
-→ User Apply
-→ New Revision
-→ Re-evaluate
-```
-
-This loop is strategically important because it converts diagnosis into repeated user value while preserving trust.
-
-## 6.8 Continuous Review: CLI / Git / PR / CI
-
-Long-term AgentGraph should review architecture where engineering changes already happen.
-
-Potential flow:
-
-```text
-Workflow / Code Change
-→ Headless Semantic Import
-→ Deterministic Analysis
-→ Architecture / Policy Review
-→ Semantic Delta
-→ Machine-readable Result
-→ PR / CI Feedback
-```
-
-This is a high-leverage distribution and retention mechanism because AgentGraph becomes part of the shipping process rather than a destination users must remember to visit manually.
-
-## 6.9 Framework Capability Intelligence
-
-Framework neutrality should mature into a capability engine, not a generic comparison page.
-
-Example:
-
-```text
-Workflow Requirements
-+ Architecture Semantics
-+ Target Capability Snapshot
-→ SUPPORTED
-→ SUPPORTED_WITH_MAPPING
-→ LOSSY
-→ UNSUPPORTED
-```
-
-The product should explain **why** a target is or is not a good fit for the user's specific architecture.
-
-Long-term value:
-
-- target recommendation grounded in workflow requirements
-- migration preview
-- lossiness disclosure
-- portable build direction
-
-## 6.10 Runtime Evidence
-
-Runtime observability should remain adapter-based and user-owned.
-
-Its role is to answer what static analysis cannot:
-
-- what path actually executed
-- which tools were actually invoked
-- what failed/retried
-- observed latency/resource use
-- whether approvals actually occurred
-
-Runtime evidence should confirm or falsify design-time hypotheses, not erase the value of pre-runtime architecture review.
-
-## 6.11 Team / Enterprise Governance
-
-When individual product value is proven, organization value should grow through control and repeatability:
-
-- shared workspaces
-- review history
-- comments/approval
-- policy packs
-- organization capability rules
-- Git/CI quality gates
-- role-based access
-- audit history
-- private/BYO evaluation provider
-- self-hosted/private evaluation where justified
-- enterprise support/integration boundaries
-
-Governance should build on mature evidence, revision, policy, and evaluation contracts rather than precede them.
-
----
-
-# 7. Final Information Architecture and UX
-
-The current canvas-centric editor is appropriate for the current foundation but should not define the final product shell.
-
-The mature desktop experience should become **workspace-centric**.
-
-## 7.1 Primary navigation
-
-Keep the number of primary destinations small:
+Primary desktop navigation should converge toward a small engineering workflow:
 
 ```text
 Design
@@ -423,33 +184,20 @@ Changes
 Build
 ```
 
-Secondary capabilities can live contextually or under project navigation:
+Evidence, History, Runtime, Library, and Settings/Policies remain first-class or contextual capabilities without requiring every concept to become permanent top-level chrome.
 
-- Evidence
-- History
-- Runtime
-- Library
-- Settings / Policies
-
-Evidence remains a first-class domain concept but does not need to be a permanent top-level navigation item for every user.
-
-## 7.2 Start / Project Home
-
-Preferred entry experience:
+Preferred project-home entry:
 
 ```text
-AgentGraph Studio
-
 Import Existing Workflow
 Describe New Workflow
 Start from Template
-
 Recent Projects / Workflows
 ```
 
-The primary first-value message should emphasize architecture review/trust rather than a generic free visual canvas.
+The first-value message should emphasize architecture understanding/review/trust rather than a generic canvas.
 
-## 7.3 Design Workspace
+Design workspace direction:
 
 ```text
 Left: Palette / Outline / Search
@@ -457,25 +205,7 @@ Center: Canvas
 Right: Selected-item Inspector
 ```
 
-Canvas remains powerful but is one workspace, not the whole product.
-
-## 7.4 Review Workspace
-
-Review should become the signature AgentGraph experience.
-
-Conceptual layout:
-
-```text
-Review Summary        Architecture View        Finding Detail
-- strengths           - issue overlays         - problem
-- top risks            - affected targets       - why it matters
-- unknowns             - dependency focus       - evidence
-- filters               - locate / isolate       - recommendation
-                                             - trade-offs
-                                             - assumptions
-```
-
-Required interaction:
+Review should become the signature experience, combining summary, architecture location/context, and finding detail. The required interaction direction is:
 
 ```text
 Finding
@@ -485,387 +215,197 @@ Finding
 → Explain Evidence
 ```
 
-The user should never need to manually scan a large canvas to discover where a review finding applies.
+Users should not need to scan a large canvas manually to locate a finding.
 
-## 7.5 Changes Workspace
+Changes should present semantic change and trade-offs rather than raw JSON diff as the primary mental model. Build should mature into an engineering endpoint for target compatibility, lossiness, validation, required inputs/secrets, generated artifacts, build manifest, and portable project export.
 
-The primary mental model is semantic change, not raw JSON diff.
+Mobile should prioritize review/decision work — findings, evidence, node/task detail,
+proposal comparison, approve/reject decisions, and quick safe parameter edits — rather
+than imitating the full desktop graph-authoring surface.
 
-```text
-Current vs Proposed
+Product chrome should simplify as the shell matures:
 
-Resolved Findings
-New Risks
-Trade-offs
-Semantic Operations
-Validation Results
-Before / After Review
-
-Apply Selected Changes
-```
-
-## 7.6 Build Workspace
-
-Code export should mature from a toolbar action into an engineering endpoint:
-
-```text
-Target
-Compatibility
-Lossiness
-Validation
-Required Inputs / Secrets
-Generated Artifacts
-Build Manifest
-Export / Download Project
-```
-
-## 7.7 Mobile Strategy
-
-Do not optimize mobile as a miniature desktop graph editor.
-
-Prioritize:
-
-- review findings
-- evidence inspection
-- node/task details
-- proposal comparison
-- approval/reject decisions
-- quick parameter edits
-
-Desktop remains the primary architecture-authoring environment; mobile should be strong for review and decision workflows.
+- `Save` should mean project/workspace persistence; JSON export should be explicitly named export;
+- destructive canvas clearing should not dominate primary chrome;
+- template access should converge toward Start/Library;
+- code export should converge toward Build;
+- support/donation affordances should not dominate the mature engineering workspace;
+- persistent explanatory banners should move toward onboarding/contextual education once the shell is self-explanatory.
 
 ---
 
-# 8. Product Chrome Simplification Direction
+# 7. Durable moat
 
-As the product matures, primary chrome should reflect engineering workflow rather than accumulate actions.
+The moat is not the canvas and not a generic model prompt. AgentGraph should compound:
 
-Directions:
+1. **Canonical Workflow Semantic Model** — stable workflow semantics independent of one UI/framework;
+2. **Evidence & Provenance Model** — machine-readable connection between deterministic facts, AI reasoning, policy, compatibility, and later runtime evidence;
+3. **Architecture Evaluation Engine** — versioned contracts, rubrics, evidence grounding, calibration, and failure boundaries;
+4. **Expert-Calibrated Evaluation Corpus** — curated good/flawed/ambiguous/adversarial workflows with expert annotations and disagreement awareness;
+5. **Semantic Change Safety Engine** — revision identity, domain diff, patch validation, stale detection, before/after analysis, transactional apply;
+6. **Framework Capability Knowledge** — versioned capability/lossiness knowledge tied to user requirements;
+7. **Policy & Governance Contracts** — reusable policy/capability/approval semantics and auditable review history;
+8. **Workflow Change History** — user-owned revision/evaluation context that improves the user's own engineering process.
 
-- `Save` should mean project/workspace persistence; JSON export should be explicitly named export
-- destructive `Clear Canvas` should move out of primary header emphasis
-- template access should converge into Start/Library rather than appear redundantly
-- code export should move toward Build
-- support/donation affordances should not dominate mature engineering workspace chrome
-- persistent product-explanation banners should move toward onboarding/contextual education once the product shell is self-explanatory
-
-Do not make these changes inside an unrelated active packet; they are final-state UX direction.
-
----
-
-# 9. Durable Moat
-
-The moat should not be the canvas or a generic LLM prompt.
-
-AgentGraph should deliberately compound the following assets.
-
-## 9.1 Canonical Workflow Semantic Model
-
-A stable representation of agent/task/tool/dependency/intent/policy semantics independent of a single visual surface.
-
-## 9.2 Evidence & Provenance Model
-
-A reusable machine-readable layer connecting deterministic facts, AI reasoning, policy, compatibility, and later runtime evidence.
-
-## 9.3 Architecture Evaluation Engine
-
-Versioned evaluator contracts, rubrics, evidence grounding, calibration, and failure boundaries.
-
-## 9.4 Expert-Calibrated Evaluation Corpus
-
-Curated good/flawed/ambiguous/adversarial workflows with expert annotations, acceptable alternatives, and known disagreements.
-
-This dataset and evaluation methodology are strategic product infrastructure, not merely QA fixtures.
-
-## 9.5 Semantic Change Safety Engine
-
-Revision identity, domain-level diff, patch validation, stale detection, before/after re-analysis, and transactional apply.
-
-## 9.6 Framework Capability Knowledge
-
-Versioned capability/lossiness knowledge grounded in specific target/framework versions and user requirements.
-
-## 9.7 Policy & Governance Contracts
-
-Reusable policy packs, side-effect/capability semantics, approval requirements, and auditable review history.
-
-## 9.8 Workflow Change History
-
-With user consent and appropriate privacy boundaries, repeated revisions/evaluations create increasingly useful context for the user's own engineering process.
-
-Do not use private workflow content as a hidden training asset or competitive claim without explicit policy/consent.
+Private workflow content must not become a hidden training/moat asset without explicit policy and consent.
 
 ---
 
-# 10. Monetization Architecture
+# 8. High-level commercial value ladder
 
-Pricing details remain a business decision to validate, but product boundaries should support a natural value ladder.
-
-Current provider-backed review boundary:
-
-- the initial Production Architecture Review offering is paid-entitlement only
-- AgentGraph Studio owns the provider credential; BYOK is not part of the initial offering
-- paid access has a server-enforced hard quota; unlimited review is not approved
-- exact pricing, included usage, quota period, and subscription lifecycle behavior belong to the selected implementation packet
-- deterministic Preflight, portability, and deterministic export remain useful free capabilities
-
-See `docs/decisions/ADR-0006-paid-access-for-provider-backed-architecture-review.md`.
+Detailed monetization mechanics and M0 live only in `MONETIZATION_ARCHITECTURE.md`.
+This strategy preserves only the long-term value progression:
 
 ## Free / Community
 
-Purpose: maximize useful first value and ecosystem adoption without crippling the core product.
+Deliver useful deterministic first value, portability, supported import/build, and
+basic engineering understanding. Do not make the free product a nonfunctional demo.
 
-Likely capabilities:
+## Individual paid / Pro direction
 
-- local/manual workflow design
-- supported import
-- deterministic Preflight
-- JSON portability
-- deterministic CrewAI build/export
-- basic templates
-- basic compatibility information where implemented
+Monetize repeated professional trust: evidence-grounded review, revision/history,
+Review Delta, Scenario/Acceptance, advanced improvement/compatibility/build value as
+those capabilities are selected and proven.
 
-Avoid making the free product a nonfunctional demo.
+## Team direction
 
-## Pro
+Monetize shared quality control: shared review context, approval/comments, policies,
+Git/PR/CI integration, roles, and team history only after individual value is mature.
 
-Purpose: monetize repeated individual professional value.
+## Enterprise direction
 
-Likely value boundaries:
-
-- quota-based AI Architecture Review with server-side entitlement and cost controls
-- multiple projects/workflows
-- persisted evaluation/revision history
-- Review Delta / regression
-- Scenario / Acceptance suites
-- advanced Improvement Proposals
-- advanced framework compatibility/migration analysis
-- richer export/build verification
-
-## Team
-
-Purpose: monetize shared quality control.
-
-Likely value boundaries:
-
-- shared workspace
-- review/approval flows
-- comments
-- shared policies/evaluation packs
-- Git/PR/CI integration
-- team history
-- roles/permissions appropriate to team scale
-
-## Enterprise
-
-Purpose: monetize governance, privacy, and organizational control.
-
-Likely value boundaries:
-
-- SSO / enterprise RBAC
-- audit/export controls
-- organization policy enforcement
-- private/BYO evaluation provider
-- private/self-hosted evaluation option where justified
-- organization-wide capability registries
-- compliance/security integration boundaries
-- enterprise support
+Monetize organization governance/privacy/control: RBAC/SSO, audit/export controls,
+organization policy/capability rules, private/BYO evaluation options where justified,
+and enterprise support.
 
 Principle:
 
 > Charge primarily for repeated trust, quality control, history, collaboration, governance, and advanced intelligence — not for trapping the user's source/runtime.
 
+Team/Enterprise surface area must not outrun demonstrated individual Product value.
+
 ---
 
-# 11. Product-led Adoption Loop
+# 9. Product-led adoption loop
 
-Growth analysis remains outside the center of development prioritization, but product design should create natural adoption mechanisms.
-
-Desired loop:
+Product design should create natural adoption without manipulating trust:
 
 ```text
 Free Import / Review
 → Clear Useful Finding
 → Share / Export Review
 → Return after Workflow Change
-→ Review Delta
-→ Add Scenarios / History
-→ Pro
+→ Review Delta / History / Scenarios
+→ Individual Paid Value
 → Team Review / CI
 → Team
 → Governance / Policy
 → Enterprise
 ```
 
-High-leverage distribution surfaces include:
+High-leverage distribution surfaces may include supported import adapters,
+privacy-safe shareable review artifacts, CLI, Git/PR checks, portable reports/build
+manifests, and framework/community integrations when explicitly selected.
 
-- import adapters
-- shareable review artifacts with privacy controls
-- CLI
-- GitHub/PR checks
-- portable reports/build manifests
-- framework/community integrations
-
-Do not add growth mechanics that degrade trust or manipulate review results.
+Do not distort findings, weaken the free product, or add dark-pattern growth mechanics to improve conversion.
 
 ---
 
-# 12. Product Metrics That Inform Development
+# 10. Product metrics that inform development
 
-Marketing/access analytics remain a user-side decision area, but Product Architecture should have outcome measures that indicate whether core value exists.
+Metrics are evidence inputs, not a substitute for Product judgement. Useful measures include, where implemented and privacy-safe:
 
-Useful product measures include:
+- time from first open/import to first useful review;
+- supported import success rate;
+- review finding/evidence target inspection;
+- evaluator false-positive and top-issue agreement on benchmark/gold fixtures;
+- return/re-review after semantic workflow change;
+- proposal comparison/apply behavior where safe apply exists;
+- regressions caught by Review Delta/scenarios;
+- workflows/projects per returning user;
+- CLI/CI review adoption when available;
+- paid conversion/retention associated with repeated quality-control value rather than page views alone.
 
-- time from first open/import to first useful review
-- supported import success rate
-- percentage of reviews with a user-inspected finding/evidence target
-- false-positive rate on known-good benchmark workflows
-- top-issue agreement on gold fixtures
-- review return rate after semantic workflow change
-- proposal viewed / compared / selectively applied where implemented
-- regressions caught by Review Delta / scenarios
-- workflows/projects per returning user
-- CLI/CI review adoption when available
-- conversion associated with repeated quality-control value, not only page views
-
-These metrics should inform product quality without making analytics features a core product priority.
+Exact analytics schemas belong to selected packets and Data/AI/privacy governance.
 
 ---
 
-# 13. Strategic Sequencing
+# 11. Strategic sequencing rule
 
-The current Stage 1 packet remains unchanged.
+Do not maintain a second roadmap here. Sequencing authority is `MASTER_ROADMAP.md` +
+`EXECUTION_GATES.md`.
 
-Strategic sequencing after the current evaluator work should follow evidence rather than mechanically add every capability.
+Strategic interpretation is:
 
-## Phase A — Trustworthy Architecture Review
+```text
+Trustworthy Review
+→ evidence-driven Adoption / Context foundations where needed
+→ Guided Improvement only when evaluator authority is justified
+→ Safe Change only when transformation gates are satisfied
+→ Regression / Continuous Trust
+→ larger-scale Security / Build / Runtime / Framework / Collaboration capabilities as dependencies and evidence justify
+```
 
-Continue current direction:
-
-- Evidence Contract
-- Architecture Review
-- evaluation safety
-- evaluation quality/calibration
-- large-workflow benchmark reality
-
-Exit question:
-
-> Is the reviewer useful and trustworthy enough that users should act on its recommendations?
-
-## Phase B — Adoption & Context Foundation
-
-After Stage 1/trust evidence, strongly evaluate these as near-term product-wedge candidates:
-
-- CrewAI existing-project import/static mapping
-- Project / Local Workspace
-- persisted Intent & Constraints
-- dedicated Review Workspace / finding navigation improvements
-- revision/evaluation history foundation
-
-Reason:
-
-These increase who can use AgentGraph, improve evaluator context, and turn the product from a single-canvas tool into a repeated architecture workspace without yet granting AI unsafe mutation authority.
-
-This is a **selection direction**, not an automatic current Sprint.
-
-## Phase C — Guided Improvement & Safe Change
-
-Follow existing Stage 2/3 architecture:
-
-- Improvement Proposal
-- alternatives/trade-offs
-- Semantic Patch
-- validation
-- before/after
-- user-controlled apply
-- revision history
-
-## Phase D — Regression & Continuous Trust
-
-Build on revisions and explicit intent:
-
-- Review Delta
-- Scenario / Acceptance Contract
-- regression suites
-- CLI / CI / PR review
-- team quality gates
-
-Some scenario/CI foundations may move earlier if they become necessary dependencies; select explicitly rather than by feature pressure.
-
-## Phase E — Scale, Security, Build, Runtime, Framework Expansion
-
-Continue the Master Roadmap dependency logic:
-
-- large workflow navigation/scoped evaluation
-- security/policy
-- reusable modules
-- portable build toolchain
-- runtime evidence
-- behavioral evaluation
-- framework-neutral compilation
-- collaboration/governance when individual value is mature
+Commercial evidence can influence selection only when it identifies a concrete Product dependency. It does not automatically expand AI/Mutation Authority.
 
 ---
 
-# 14. Strategic Decision Rules
+# 12. Strategic decision rules
 
-When considering a feature, ask whether it materially improves at least one of:
+When considering a capability, ask whether it materially improves one or more of:
 
-1. **Trust** — makes evaluation/verification more reliable
-2. **Access** — lets more existing workflows reach first value with less rework
-3. **Understanding** — makes architecture/evidence easier to comprehend
-4. **Improvement Loop** — closes the gap from finding to safe better design
-5. **Repeat Use** — creates legitimate value when the workflow changes later
-6. **Ownership** — strengthens portability and user control
-7. **Scale** — supports larger/more complex workflows without hiding uncertainty
-8. **Governance** — creates organization-grade quality/security control
-9. **Defensibility** — compounds semantic/evaluation/capability assets competitors cannot cheaply copy
-10. **Monetizable Value** — supports recurring professional/team value without weakening the free first-value wedge
+1. **Trust** — evaluation/verification reliability;
+2. **Access** — existing workflows reach value with less rework;
+3. **Understanding** — architecture/evidence comprehension;
+4. **Improvement Loop** — justified path from finding to safer design;
+5. **Repeat Use** — legitimate value after workflow change;
+6. **Ownership** — portability and user control;
+7. **Scale** — larger/complex workflows without hidden uncertainty;
+8. **Governance** — organization-grade quality/security control;
+9. **Defensibility** — compounding semantic/evaluation/capability assets;
+10. **Monetizable Value** — recurring professional/team value without weakening the free first-value wedge.
 
-A feature should not be prioritized merely because a competitor has it.
+A feature is not prioritized merely because a competitor has it or because it appears monetizable in theory.
 
----
+Use the canonical roadmap discipline:
 
-# 15. Durable Strategic Non-goals
-
-Unless explicitly revisited:
-
-- do not become a generic automation platform by chasing every connector
-- do not make hosted execution the center of the business model
-- do not position generic framework comparison as the primary moat
-- do not promise "best architecture" without calibrated evidence
-- do not create public architecture scores before scoring is meaningful and validated
-- do not hide uncertainty to make AI output look more impressive
-- do not auto-apply semantic changes without review
-- do not force source/runtime lock-in as the primary monetization mechanism
-- do not let Team/Enterprise surface area outrun individual product value
-- do not make marketplace economics a dependency of core product completion
+```text
+Observed constraint / Evidence
+→ Product & Architecture interpretation
+→ Gate Review
+→ Smallest coherent packet
+→ Explicit Next Selection
+```
 
 ---
 
-# 16. Long-term Success Condition
+# 13. Durable strategic non-goals
 
-AgentGraph reaches the intended strategic position when users can reasonably adopt the habit:
+Unless explicitly revisited through Product Architecture decision:
+
+- do not become a generic automation platform by chasing every connector;
+- do not make hosted execution the center of Product/business value;
+- do not position generic framework comparison as the primary moat;
+- do not promise "best architecture" without calibrated evidence;
+- do not create public architecture scores before scoring is meaningful and validated;
+- do not hide uncertainty to make AI output look stronger;
+- do not auto-apply semantic change without the canonical safe-change path;
+- do not force source/runtime lock-in as monetization;
+- do not let Team/Enterprise surface area outrun individual Product value;
+- do not make marketplace economics a dependency of core Product completion.
+
+---
+
+# 14. Long-term strategic success condition
+
+AgentGraph reaches the intended strategic position when users reasonably adopt the habit:
 
 > **If an AI workflow matters, review it with AgentGraph before trusting the change.**
 
-A mature loop is:
+The business moat emerges from trusted semantic contracts, evaluation calibration,
+revision history, safe-change controls, policy/capability intelligence, and
+engineering integrations — not from having more visual nodes or raw model calls.
 
-```text
-Existing or New Workflow
-→ Import / Design
-→ Understand Intent & Architecture
-→ Deterministic Evidence
-→ Architecture Review
-→ Locate / Explain Findings
-→ Compare Improvement Options
-→ Safe Semantic Change
-→ Re-evaluate
-→ Scenario / Regression Verification
-→ Target Compatibility / Build
-→ User-owned Runtime
-→ Runtime Evidence
-→ Continuous Review
-```
-
-The business moat emerges when this loop is backed by trusted semantic contracts, evaluation calibration, revision history, policy/capability intelligence, and engineering integrations — not when the product merely has more visual nodes than competitors.
+All detailed Product definition, roadmap stage content, commercial mechanics, Gate
+semantics, and active Sprint scope remain owned by their canonical documents and
+must not be reconstructed here.
