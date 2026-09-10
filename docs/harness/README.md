@@ -60,13 +60,20 @@ runbook and W01 for those approved scenarios.
 
 ## Codex settings and Hooks
 
-`.codex/config.toml` requests workspace-write, on-request approvals, shell network
-off, and default filtering of KEY/SECRET/TOKEN environment variables. It also
-pins approval review to the user, uses concise reasoning summaries, disables
-multi-agent execution by default, and disables automatic Skill MCP dependency
-installation. These are repository cost/safety defaults, not a restriction on an
-explicitly authorized session override. Inspect effective settings at session
-start; managed policy or explicit session flags can take precedence.
+`.codex/config.toml` pins the repository default to GPT-6 Astra with `low`
+reasoning effort and concise reasoning summaries. It also requests workspace-write,
+on-request approvals, shell network off, default filtering of KEY/SECRET/TOKEN
+environment variables, user approval review, solo execution, and no automatic
+Skill MCP dependency installation. These are repository cost/safety defaults, not
+a restriction on an explicitly authorized session override. Inspect effective
+settings at session start; managed policy or explicit session flags can take
+precedence.
+
+`low` is the normal Astra reasoning default for this repository. Raise reasoning
+for a bounded difficult task only when complexity or observed failure justifies the
+extra cost, then return to `low`; do not make medium/high a standing project default
+without measured evidence. This changes reasoning budget, not Product/Architecture,
+AI Authority, Mutation Authority, or QA/release authority.
 
 The user-review setting avoids routing approval work through automatic review
 subagents. Solo execution is the default because Astra can complete normal
@@ -103,10 +110,11 @@ not establish that a Desktop session actually loaded/trusted the Hook.
 Sources checked 2026-09-09: [configuration](https://learn.chatgpt.com/docs/config-file/config-basic),
 [Hooks](https://learn.chatgpt.com/docs/hooks), and
 [Skills](https://learn.chatgpt.com/docs/skills).
-The current Codex configuration schema was also reviewed on 2026-09-10 for
-`approvals_reviewer`, `[agents]`, `multi_agent_v2`,
-`skill_mcp_dependency_install`, and `model_reasoning_summary` semantics. Local CLI
-0.153.4 labels hooks/multi_agent/plugins Stable; Desktop package is 26.901.6511.0.
+The current Codex configuration/model schema was also reviewed on 2026-09-10 for
+`model`, `model_reasoning_effort`, `model_reasoning_summary`,
+`approvals_reviewer`, `[agents]`, `multi_agent_v2`, and
+`skill_mcp_dependency_install` semantics. Local CLI 0.153.4 labels
+hooks/multi_agent/plugins Stable; Desktop package is 26.901.6511.0.
 No Experimental/Beta feature or Deprecated/Removed flag is required by this
 harness. Native Computer Use being unavailable in a session does not prevent CLI
 browser smoke. Do not infer Desktop engine identity from a separately installed CLI.
