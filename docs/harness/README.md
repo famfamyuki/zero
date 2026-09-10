@@ -61,27 +61,53 @@ runbook and W01 for those approved scenarios.
 ## Codex settings and Hooks
 
 `.codex/config.toml` requests workspace-write, on-request approvals, shell network
-off, and default filtering of KEY/SECRET/TOKEN environment variables. This avoids
-unrestricted host access as the project default. Explicit session flags or managed
-policy can override defaults; inspect effective permissions at session start.
-Changing this file does not retroactively sandbox an already-running Full Access
-task. Account-connected tools have separate service permissions. Do not broaden
-them because a command was denied; approve the narrowly required action.
+off, and default filtering of KEY/SECRET/TOKEN environment variables. It also
+pins approval review to the user, uses concise reasoning summaries, disables
+multi-agent execution by default, and disables automatic Skill MCP dependency
+installation. These are repository cost/safety defaults, not a restriction on an
+explicitly authorized session override. Inspect effective settings at session
+start; managed policy or explicit session flags can take precedence.
+
+The user-review setting avoids routing approval work through automatic review
+subagents. Solo execution is the default because Astra can complete normal
+repository packets directly without paying parent/child context-transfer cost.
+Enable delegation only for a bounded task with a concrete expected benefit; never
+treat an implementation subagent as W01 independent QA. The project Skills do not
+currently require automatic MCP dependency installation; a future Skill that does
+must declare that dependency and justify enabling it for that task.
+
+Changing `.codex/config.toml` does not retroactively sandbox an already-running
+Full Access task. Account-connected tools have separate service permissions. Do
+not broaden them because a command was denied; approve the narrowly required
+action.
 
 The SessionStart Hook resolves from the Git root and only returns bounded local
 state. It does not inspect transcripts, invoke services, alter files, or grant
-permission. Codex requires review/trust of new or changed non-managed Hook hashes;
-use `/hooks` in the CLI to review the concrete definition. Do not bypass trust or
-edit Codex trust databases. Until trusted, run preflight explicitly. Hook payload
-tests do not establish that a Desktop session actually loaded/trusted the Hook.
+permission. Its injected context is intentionally compact: local HEAD/branch,
+cached-main relation, dirty state, and derived warning flags. Mutable live GitHub
+or Vercel identity still comes from live checks when the task requires it.
+
+Do not add UserPromptSubmit/PostToolUse advisory hooks or per-tool receipt/checklist
+hooks merely for reassurance. Avoid rereading unchanged files or rerunning a
+successful check unless source/evidence changed, a previous result failed, or a
+new unresolved concern makes the repeat relevant. Keep one durable verification
+record at the implementation boundary rather than creating phase-by-phase receipt
+artifacts. For long or tool-heavy work, prefer repository/packet state plus a
+compact handoff over making an old conversation transcript the source of truth.
+
+Codex requires review/trust of new or changed non-managed Hook hashes; use `/hooks`
+in the CLI to review the concrete definition. Do not bypass trust or edit Codex
+trust databases. Until trusted, run preflight explicitly. Hook payload tests do
+not establish that a Desktop session actually loaded/trusted the Hook.
 
 Sources checked 2026-09-09: [configuration](https://learn.chatgpt.com/docs/config-file/config-basic),
 [Hooks](https://learn.chatgpt.com/docs/hooks), and
 [Skills](https://learn.chatgpt.com/docs/skills).
-Local CLI 0.153.4 labels hooks/multi_agent/plugins Stable; Desktop package is
-26.901.6511.0. No Experimental/Beta feature or Deprecated/Removed flag is required.
-Native Computer Use being unavailable in a session does not prevent CLI browser
-smoke. Do not infer Desktop engine identity from a separately installed CLI.
+The current Codex configuration schema was also reviewed on 2026-09-10 for
+`approvals_reviewer`, `[agents]`, `multi_agent_v2`,
+`skill_mcp_dependency_install`, and `model_reasoning_summary` semantics. Local CLI
+0.153.4 labels hooks/multi_agent/plugins Stable; Desktop package is 26.901.6511.0.
+Do not infer Desktop engine identity from a separately installed CLI.
 
 ## Handoff, parallel work, and feedback
 
