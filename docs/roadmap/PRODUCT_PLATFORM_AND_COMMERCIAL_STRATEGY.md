@@ -1,13 +1,13 @@
 # AgentGraph Studio — Product Platform & Commercial Strategy
 
 Status: **Authoritative specialized cross-stage strategy**  
-Scope: market position, adoption wedge, durable business/moat direction, product-led adoption, strategic decision rules, and high-level business sequencing.
+Scope: market position, adoption wedge, durable business/moat direction, final product-shell strategy, product-led adoption, strategic decision rules, and high-level business sequencing.
 
 This document intentionally contains only strategy that is **not already owned by another canonical authority**. It does not duplicate Product definition, detailed roadmap stages, evaluator contracts, or monetization mechanics.
 
 Canonical owners:
 
-- final Product definition / North Star / durable UX and Product boundaries → `docs/PRODUCT_MASTER.md`
+- final Product definition / North Star / durable Product boundaries → `docs/PRODUCT_MASTER.md`
 - Architecture boundaries → `docs/ARCHITECTURE.md`
 - long-term Stage/dependency sequence → `docs/roadmap/MASTER_ROADMAP.md`
 - promotion / AI Authority / Mutation Authority → `docs/roadmap/EXECUTION_GATES.md`
@@ -171,7 +171,70 @@ the Master Roadmap. This document does not select them.
 
 ---
 
-# 6. Durable moat
+# 6. Final product-shell strategy
+
+Product Master owns the final Product workspaces. The following unique UX strategy remains durable direction and is **not current Sprint scope unless selected**.
+
+Primary desktop navigation should converge toward a small engineering workflow:
+
+```text
+Design
+Review
+Changes
+Build
+```
+
+Evidence, History, Runtime, Library, and Settings/Policies remain first-class or contextual capabilities without requiring every concept to become permanent top-level chrome.
+
+Preferred project-home entry:
+
+```text
+Import Existing Workflow
+Describe New Workflow
+Start from Template
+Recent Projects / Workflows
+```
+
+The first-value message should emphasize architecture understanding/review/trust rather than a generic canvas.
+
+Design workspace direction:
+
+```text
+Left: Palette / Outline / Search
+Center: Canvas
+Right: Selected-item Inspector
+```
+
+Review should become the signature experience, combining summary, architecture location/context, and finding detail. The required interaction direction is:
+
+```text
+Finding
+→ Locate Target
+→ Expand Context
+→ Focus / Highlight
+→ Explain Evidence
+```
+
+Users should not need to scan a large canvas manually to locate a finding.
+
+Changes should present semantic change and trade-offs rather than raw JSON diff as the primary mental model. Build should mature into an engineering endpoint for target compatibility, lossiness, validation, required inputs/secrets, generated artifacts, build manifest, and portable project export.
+
+Mobile should prioritize review/decision work — findings, evidence, node/task detail,
+proposal comparison, approve/reject decisions, and quick safe parameter edits — rather
+than imitating the full desktop graph-authoring surface.
+
+Product chrome should simplify as the shell matures:
+
+- `Save` should mean project/workspace persistence; JSON export should be explicitly named export;
+- destructive canvas clearing should not dominate primary chrome;
+- template access should converge toward Start/Library;
+- code export should converge toward Build;
+- support/donation affordances should not dominate the mature engineering workspace;
+- persistent explanatory banners should move toward onboarding/contextual education once the shell is self-explanatory.
+
+---
+
+# 7. Durable moat
 
 The moat is not the canvas and not a generic model prompt. AgentGraph should compound:
 
@@ -188,7 +251,7 @@ Private workflow content must not become a hidden training/moat asset without ex
 
 ---
 
-# 7. High-level commercial value ladder
+# 8. High-level commercial value ladder
 
 Detailed monetization mechanics and M0 live only in `MONETIZATION_ARCHITECTURE.md`.
 This strategy preserves only the long-term value progression:
@@ -223,7 +286,7 @@ Team/Enterprise surface area must not outrun demonstrated individual Product val
 
 ---
 
-# 8. Product-led adoption loop
+# 9. Product-led adoption loop
 
 Product design should create natural adoption without manipulating trust:
 
@@ -248,7 +311,7 @@ Do not distort findings, weaken the free product, or add dark-pattern growth mec
 
 ---
 
-# 9. Product metrics that inform development
+# 10. Product metrics that inform development
 
 Metrics are evidence inputs, not a substitute for Product judgement. Useful measures include, where implemented and privacy-safe:
 
@@ -267,7 +330,7 @@ Exact analytics schemas belong to selected packets and Data/AI/privacy governanc
 
 ---
 
-# 10. Strategic sequencing rule
+# 11. Strategic sequencing rule
 
 Do not maintain a second roadmap here. Sequencing authority is `MASTER_ROADMAP.md` +
 `EXECUTION_GATES.md`.
@@ -287,7 +350,7 @@ Commercial evidence can influence selection only when it identifies a concrete P
 
 ---
 
-# 11. Strategic decision rules
+# 12. Strategic decision rules
 
 When considering a capability, ask whether it materially improves one or more of:
 
@@ -316,7 +379,7 @@ Observed constraint / Evidence
 
 ---
 
-# 12. Durable strategic non-goals
+# 13. Durable strategic non-goals
 
 Unless explicitly revisited through Product Architecture decision:
 
@@ -333,7 +396,7 @@ Unless explicitly revisited through Product Architecture decision:
 
 ---
 
-# 13. Long-term strategic success condition
+# 14. Long-term strategic success condition
 
 AgentGraph reaches the intended strategic position when users reasonably adopt the habit:
 
@@ -343,6 +406,6 @@ The business moat emerges from trusted semantic contracts, evaluation calibratio
 revision history, safe-change controls, policy/capability intelligence, and
 engineering integrations — not from having more visual nodes or raw model calls.
 
-All detailed Product UX, roadmap stage content, commercial mechanics, Gate semantics,
-and active Sprint scope remain owned by their canonical documents and must not be
-reconstructed here.
+All detailed Product definition, roadmap stage content, commercial mechanics, Gate
+semantics, and active Sprint scope remain owned by their canonical documents and
+must not be reconstructed here.
