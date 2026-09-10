@@ -125,15 +125,18 @@ if (existsSync(developmentRulesPath)) {
     }
   }
 
-  for (const semantic of [
-    'Known / Inferred / Unknown',
-    'Proposal → Semantic Patch → Validation',
-    'Stage 1.5',
-    'Commercial Validation',
-    'Pure documentation maintenance fast path',
-  ]) {
-    if (!developmentRules.includes(semantic)) {
-      failures.push(`Development Rules missing preserved governance semantic: ${semantic}`);
+  const preservedSemanticGroups = [
+    ['Known / Inferred / Unknown'],
+    ['Proposal', 'Semantic Patch', 'Validation', 'Preview', 'User Apply'],
+    ['Stage 1.5'],
+    ['Commercial Validation'],
+    ['Pure documentation maintenance fast path'],
+  ];
+
+  for (const group of preservedSemanticGroups) {
+    const missing = group.filter((term) => !developmentRules.includes(term));
+    if (missing.length > 0) {
+      failures.push(`Development Rules missing preserved governance semantic terms: ${missing.join(', ')}`);
     }
   }
 }
