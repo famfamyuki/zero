@@ -1,8 +1,10 @@
 # Trusted-project defaults; explicit session/administrator settings take precedence.
+model = "gpt-6-astra"
+model_reasoning_effort = "low"
+model_reasoning_summary = "concise"
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 approvals_reviewer = "user"
-model_reasoning_summary = "concise"
 
 # Astra is the default single executor for repository work. Multi-agent execution
 # is opt-in only when a bounded task has evidence that delegation is worth the
