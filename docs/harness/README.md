@@ -84,6 +84,31 @@ smoke. Do not infer Desktop engine identity from a separately installed CLI.
 
 ## Handoff, parallel work, and feedback
 
+### Instruction clarity and proportionate verification
+
+Apply Skills within the user's authorized scope. Explicit user instructions take
+precedence over Skill guidelines; this does not grant an exception to existing
+security, Product, independent-QA, or release gates. If a Skill causes a pause or
+scope change, link its exact `SKILL.md`, quote the relevant instruction, and
+explain whether the constraint is explicit or an interpretation. Resolve routine
+choices from available evidence; ask for missing input that changes the outcome.
+
+Keep follow-up corrections and side questions attached to the ongoing objective
+unless the user changes it. Preserve completed work when resuming. Report the
+result, evidence, remaining uncertainty, and next owner in concise prose; use
+lists or tables when comparison or sequence benefits from them.
+
+Calibrate additional tests to the changed behavior. Avoid tests that merely
+restate implementation and repeating successful checks without a changed source,
+failure, or unresolved concern. This does not reduce the required `verify` checks,
+packet evaluations, or W01's independent verification of the candidate.
+
+These clarifications adapt the official
+[GPT-6 Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices),
+checked 2026-09-10. The existing conditional delegation policy below still applies;
+model guidance does not authorize subagents or change tool permissions. See the
+[bounded maintenance record](ASTRA_GUIDANCE_REVIEW.md) for scope and acceptance.
+
 Use [Verification record](../templates/VERIFICATION_RECORD.md). Continue the
 authorized packet through self-checks and W01 handoff. Missing Product decisions
 or external authorization block only their dependent actions, not unrelated
