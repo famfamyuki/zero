@@ -107,7 +107,9 @@ The current Codex configuration schema was also reviewed on 2026-09-10 for
 `approvals_reviewer`, `[agents]`, `multi_agent_v2`,
 `skill_mcp_dependency_install`, and `model_reasoning_summary` semantics. Local CLI
 0.153.4 labels hooks/multi_agent/plugins Stable; Desktop package is 26.901.6511.0.
-Do not infer Desktop engine identity from a separately installed CLI.
+No Experimental/Beta feature or Deprecated/Removed flag is required by this
+harness. Native Computer Use being unavailable in a session does not prevent CLI
+browser smoke. Do not infer Desktop engine identity from a separately installed CLI.
 
 ## Handoff, parallel work, and feedback
 
