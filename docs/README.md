@@ -1,30 +1,70 @@
 # AgentGraph Studio Development Documentation
 
-This directory is the shared durable development knowledge base for Chat, Work, Codex, and human contributors.
+This directory is the durable development knowledge base for AgentGraph Studio.
+Use progressive disclosure: start from the task, open the smallest relevant
+canonical set, then add specialized contracts only when their concern is involved.
+Do not treat every file in `docs/` as required startup context.
 
-## Read first
+## Canonical authority map
 
-1. [`PRODUCT_MASTER.md`](./PRODUCT_MASTER.md) — final product definition, North Star, durable product principles
-2. [`ARCHITECTURE.md`](./ARCHITECTURE.md) — long-term architecture boundaries and evolution
-3. [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) — implementation, QA, Git, regression, and release gates
-4. [`ENGINEERING_EXECUTION_GOVERNANCE.md`](./ENGINEERING_EXECUTION_GOVERNANCE.md) — Definition of Ready, version lifecycle, traceability, operational-quality maturity, repository/docs enforcement
-5. [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) — authoritative development operating model for Chat / Work / Codex
-6. [`roadmap/MASTER_ROADMAP.md`](./roadmap/MASTER_ROADMAP.md) — authoritative stage sequencing and dependency logic
-7. [`roadmap/EXECUTION_GATES.md`](./roadmap/EXECUTION_GATES.md) — stage promotion, evaluator authority, Stage 1.5 selection, safe-transformation/mutation gates
-8. [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md) — near-term capability/gate/blocker coordination
-9. [`roadmap/RISK_REGISTER.md`](./roadmap/RISK_REGISTER.md) — durable cross-stage risks
-10. [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md) — evaluator trust, benchmark quality, scale, Search/Locate/Scoped Evaluation
-11. [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md) — product platform/commercial sequencing
-12. [`roadmap/MONETIZATION_ARCHITECTURE.md`](./roadmap/MONETIZATION_ARCHITECTURE.md) — paid value contract, unit economics, pricing evidence, Commercial Validation Gate M0, and paid-launch readiness
-13. [`SECURITY_RELIABILITY_BASELINE.md`](./SECURITY_RELIABILITY_BASELINE.md) — platform security/reliability baseline
-14. [`DATA_AND_AI_GOVERNANCE.md`](./DATA_AND_AI_GOVERNANCE.md) — data classification, persistence/provider boundaries, evaluator/model governance
-15. [`architecture/SEMANTIC_MODEL_EVOLUTION.md`](./architecture/SEMANTIC_MODEL_EVOLUTION.md) — semantic-model migration runway
-16. [`architecture/IMPORT_WORKSPACE_CONTRACT.md`](./architecture/IMPORT_WORKSPACE_CONTRACT.md) — import, mapping, Workspace/Project, revision/local-first contract
-17. [`architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`](./architecture/SCENARIO_ACCEPTANCE_CONTRACT.md) — designed expectations and static-to-runtime verification bridge
-18. [`decisions/`](./decisions/) — durable Product/Architecture/operating-model ADRs
-19. [`CURRENT_STATE.md`](./CURRENT_STATE.md) — coordination snapshot; live checks win
-20. [`specs/`](./specs/) — authoritative implementation packets for selected/current Sprints
-21. [`runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`](./runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md) — external WAF/provider-budget controls and controlled paid-launch financial QA procedure
+| Concern | Canonical authority |
+|---|---|
+| Product definition / North Star / durable Product principles | [`PRODUCT_MASTER.md`](./PRODUCT_MASTER.md) |
+| Architecture boundaries / long-term evolution | [`ARCHITECTURE.md`](./ARCHITECTURE.md) |
+| Engineering / Definition of Ready / implementation / QA / release / repository enforcement | [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) |
+| Chat / Codex / Work roles and lifecycle ownership | [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) |
+| Stage sequence and dependency logic | [`roadmap/MASTER_ROADMAP.md`](./roadmap/MASTER_ROADMAP.md) |
+| Promotion / Stage 1.5 / AI Authority / Mutation Authority | [`roadmap/EXECUTION_GATES.md`](./roadmap/EXECUTION_GATES.md) |
+| Current execution order / packet index / blocker ownership | [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md) |
+| Durable cross-stage risks | [`roadmap/RISK_REGISTER.md`](./roadmap/RISK_REGISTER.md) |
+| Concise current-state / scoped release evidence snapshot | [`CURRENT_STATE.md`](./CURRENT_STATE.md) |
+| Reproducible execution harness | [`harness/README.md`](./harness/README.md) |
+
+`ENGINEERING_EXECUTION_GOVERNANCE.md` is retained only as a compatibility pointer
+for older ADR/spec links. Its durable rules are consolidated into
+[`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md).
+
+## Read by task
+
+A normal task should usually begin from roughly 3–6 directly relevant documents.
+The active packet is always scoped by the Program Board; long-term documents do
+not grant permission to implement future work.
+
+| Work | Initial read set | Add only when needed |
+|---|---|---|
+| Product / next capability / Roadmap | Product Master + Master Roadmap + Execution Gates + Program Board | Risk Register; Evaluation Trust & Scale; Monetization Architecture |
+| Architecture | Architecture + Program Board + active packet | Semantic Model Evolution; Import Workspace; Scenario Acceptance; Data/Security |
+| 02 Specification | Product/Architecture authority + Development Rules + Program Board + active packet | relevant specialized contract |
+| C01 Implementation | Harness + Program Board + active packet + Development Rules | specialized contract triggered by the packet |
+| W01 QA / Release | Role Registry + Harness + active packet + Development Rules | Security/Data, commercial runbook, or other relevant release contract |
+| Commercial / pricing / paid access | Monetization Architecture + Program Board + active commercial packet | Product strategy, paid-launch runbook, Risk Register |
+| Security / persistence / provider / evaluator | Security baseline and/or Data & AI Governance + active packet | relevant Architecture / Gate contract |
+
+## Specialized contracts
+
+Load these conditionally, not by default:
+
+- evaluator trust, benchmarks, Search/Locate/Scoped Evaluation → [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md)
+- product platform / adoption / commercial sequencing → [`roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`](./roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md)
+- paid value, price/quota, unit economics, Commercial Validation Gate M0 → [`roadmap/MONETIZATION_ARCHITECTURE.md`](./roadmap/MONETIZATION_ARCHITECTURE.md)
+- platform security / reliability → [`SECURITY_RELIABILITY_BASELINE.md`](./SECURITY_RELIABILITY_BASELINE.md)
+- data classification, persistence/provider boundaries, model/evaluator governance → [`DATA_AND_AI_GOVERNANCE.md`](./DATA_AND_AI_GOVERNANCE.md)
+- semantic-model migration/version runway → [`architecture/SEMANTIC_MODEL_EVOLUTION.md`](./architecture/SEMANTIC_MODEL_EVOLUTION.md)
+- import, mapping, Workspace/Project, revision/local-first → [`architecture/IMPORT_WORKSPACE_CONTRACT.md`](./architecture/IMPORT_WORKSPACE_CONTRACT.md)
+- designed expectations and static-to-runtime verification bridge → [`architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`](./architecture/SCENARIO_ACCEPTANCE_CONTRACT.md)
+- controlled paid-launch financial QA → [`runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`](./runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md)
+
+## Current packet and history
+
+Use the [Program Board packet index](./roadmap/PROGRAM_BOARD.md#packet-index) to
+identify the current/open packet and amendments before opening [`specs/`](./specs/).
+A packet header such as `Status: Specified` describes specification maturity; it
+does not override current lifecycle/release evidence in the Program Board and live
+repository/Production state.
+
+Completed packets remain regression/history references, not automatic new scope.
+Durable decisions live under [`decisions/`](./decisions/). Research/evidence files
+and old SHAs are retained for provenance but are not default context.
 
 ## Source-of-truth hierarchy
 
@@ -34,121 +74,45 @@ latest GitHub main / repository reality
 → active docs/specs packet
 → Product Master
 → Architecture
-→ Development Rules / Engineering Execution Governance / cross-cutting baselines
+→ Development Rules / applicable Security & Data baselines
 → Master Roadmap
 → Execution Gates
-→ relevant cross-stage plans/contracts
+→ relevant specialized plans/contracts
 → Program Board / Risk Register
 → Current State snapshot
-→ historical Chat / Work / Codex / old SHAs
+→ ADR / historical Chat / Work / Codex / old SHAs
 ```
 
-Durable Product/Architecture/Roadmap documents do not automatically expand an active packet.
+A documented SHA is a snapshot unless it was explicitly live-verified for the
+current decision. Durable Product/Architecture/Roadmap content never expands an
+active Sprint by itself.
 
----
+## Non-lossy documentation rule
 
-# Development operating model
+Documentation optimization may delete duplicate prose, move information, combine
+or split documents, change canonical ownership, and retain compatibility pointers.
+It must preserve the underlying Product meaning, Architecture boundaries,
+Stage/dependency relations, Gate semantics, AI/Mutation authority, Security/Data
+boundaries, migration/compatibility, Acceptance Criteria, regression constraints,
+QA/Production verification requirements, and Included/Deferred/Conditional/Out of
+Scope meaning.
 
-The canonical model is defined in [`CHAT_ROLE_REGISTRY.md`](./CHAT_ROLE_REGISTRY.md) and `ADR-0005-minimal-development-only-operating-model.md` under [`decisions/`](./decisions/).
-
-The current project is in **development-only focus mode**. The permanent operating model is intentionally limited to five lanes.
-
-## Canonical lanes
+The goal is:
 
 ```text
-Chat:
-00  Program Control & Current State
-01  Product Architecture & Roadmap
-02  UX & Implementation Specification
-
-Codex:
-C01 Current Sprint Implementation
-
-Work:
-W01 Independent QA & Production Verification
+Same Product Meaning
++ Fewer Duplicate Authorities
++ Lower Reading Cost
++ Lower Synchronization Cost
 ```
 
-Core separation:
+## Core execution reminders
 
-```text
-GitHub main = durable truth
-Chat        = Product / specification / coordination reasoning
-Codex       = packet-bound repository implementation
-Work        = independent verification when independence matters
-```
+The complete operating model is in the Role Registry. The complete engineering
+contract is in Development Rules. The complete execution mechanics are in the
+Harness. Do not duplicate those documents here.
 
-There is no permanent canonical `03`, `04`, `05`, `06`, or `W00` during development-only focus mode.
-
-This does **not** remove those activities from possibility. It means they do not justify permanent independent lanes now.
-
-- release execution is a C01 lifecycle step after W01 pre-release QA;
-- pure release/current-state coordination is handled by 00;
-- Production verification remains independently owned by W01;
-- cross-document Work tasks may be performed under 00/01/02 authority without creating W00;
-- Marketing/SNS/Analytics/Growth tasks are temporary/noncanonical until explicitly reintroduced.
-
-## Lifecycle / handoff
-
-```text
-01 Selected
-→ 02 Specified
-→ C01 Implementation Started / Implementation Complete
-→ W01 independent QA / QA Complete
-→ C01 merge + release exact QA-approved revision
-→ W01 Production Verified
-→ 00 Sprint Complete
-→ 01 Evidence → Gate Review → Explicit Next Selection
-```
-
-Important boundaries:
-
-- implementation self-test is not Independent QA;
-- release execution is not Production Verified;
-- if code/behavior changes after QA Complete, return to W01 before release;
-- a completed Sprint does not automatically promote the roadmap.
-
-## Why W00 is not permanent
-
-Work is a surface/capability, not automatically an authority.
-
-When 00/01/02 need broad repository/document work, they may use Work mode while retaining the same role authority. GitHub docs are the durable Development Master, so a permanent W00 role is redundant.
-
-## Context-length / replacement policy
-
-Do not recreate every surface on a fixed schedule.
-
-- `00`, `01`, `02`: may remain long-lived while role boundaries stay clean;
-- `C01`: prefer a fresh Codex task per packet or materially separate PR;
-- `W01`: prefer a fresh independent Work session per packet/release cycle.
-
-Replace a long-lived chat when stale Sprints/SHAs, unrelated work, or repeated instruction overrides interfere with GitHub-grounded reasoning.
-
-A new/replacement role needs only:
-
-```text
-ここは00として使います。
-ここは01として使います。
-ここは02として使います。
-ここはC01として使います。
-ここはW01として使います。
-```
-
-The assistant must recover role meaning from current GitHub `main`, not old prompts.
-
----
-
-# Roadmap execution / promotion
-
-For stage/gate decisions read:
-
-- [`roadmap/MASTER_ROADMAP.md`](./roadmap/MASTER_ROADMAP.md)
-- [`roadmap/EXECUTION_GATES.md`](./roadmap/EXECUTION_GATES.md)
-- [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md)
-- [`roadmap/RISK_REGISTER.md`](./roadmap/RISK_REGISTER.md)
-- [`roadmap/EVALUATION_TRUST_AND_SCALE.md`](./roadmap/EVALUATION_TRUST_AND_SCALE.md) when evaluator quality/scale is involved
-- [`roadmap/MONETIZATION_ARCHITECTURE.md`](./roadmap/MONETIZATION_ARCHITECTURE.md) when paid value, pricing/quota, unit economics, commercial launch, or commercial-validation evidence is involved
-
-Use:
+Roadmap progression remains:
 
 ```text
 Evidence
@@ -156,74 +120,21 @@ Evidence
 → Explicit Next Selection
 ```
 
-Stage 1.5 is a selection band, not a mandatory backlog. AI authority is capability-scoped; mutation scope is separately gated. Commercial Validation Gate M0 is likewise evidence-driven and does not automatically select a paid-expansion feature.
+Stage 1.5 is a selection band, not a mandatory backlog. Commercial Validation Gate
+M0 is separate from AI Authority. `Configured expectation ≠ Static evidence ≠
+Observed runtime behavior`, and `Visual Group ≠ Semantic Module ≠ Runtime
+Orchestration` remain durable semantic boundaries.
 
----
-
-# Definition of Ready / traceability / versioning
-
-Before a Selected capability becomes implementation-ready, apply [`ENGINEERING_EXECUTION_GOVERNANCE.md`](./ENGINEERING_EXECUTION_GOVERNANCE.md).
-
-Non-trivial packets should trace:
+Normal implementation verification remains:
 
 ```text
-Product / Architecture / Gate / Scenario / Risk
-→ Packet requirement / AC
-→ test / fixture / Production verification
+npm run docs:check
+npm test
+npm run typecheck
+npm run build
 ```
 
-Durable contract versions use the lifecycle defined there. Do not silently reinterpret legacy semantics or remove readers merely because a new writer exists.
-
----
-
-# Architecture migration / Scenario / Security / Data
-
-For persisted workflow changes, import/Workspace/revision, or declared Intent/Constraints read:
-
-- [`architecture/SEMANTIC_MODEL_EVOLUTION.md`](./architecture/SEMANTIC_MODEL_EVOLUTION.md)
-- [`architecture/IMPORT_WORKSPACE_CONTRACT.md`](./architecture/IMPORT_WORKSPACE_CONTRACT.md)
-
-For designed expectations preserve:
-
-```text
-Configured expectation
-≠ Static evidence of support
-≠ Observed runtime behavior
-```
-
-and read [`architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`](./architecture/SCENARIO_ACCEPTANCE_CONTRACT.md).
-
-Security/data-sensitive work must preserve:
-
-- [`SECURITY_RELIABILITY_BASELINE.md`](./SECURITY_RELIABILITY_BASELINE.md)
-- [`DATA_AND_AI_GOVERNANCE.md`](./DATA_AND_AI_GOVERNANCE.md)
-
----
-
-# Repository enforcement
-
-Normal PR/main verification is:
-
-```text
-npm ci
-→ npm run docs:check
-→ npm test
-→ npm run typecheck
-→ npm run build
-```
-
-Branch Protection / Rulesets should require the `test-typecheck-build` check for normal merges. Live repository settings must be verified rather than inferred from docs.
-
-## Current packet
-
-Use the packet index in [`roadmap/PROGRAM_BOARD.md`](./roadmap/PROGRAM_BOARD.md#packet-index) to identify the open lifecycle and its amendments before opening [`specs/`](./specs/). Read latest `main`; the active packet is authoritative for its scope even when future architecture is described elsewhere.
-
-In existing packets, `Status: Specified` describes approved specification maturity, not today's implementation/release lifecycle. Specification-time baselines and handoffs are historical unless explicitly reaffirmed. Program Board owns current lifecycle routing; Current State retains scoped release evidence. Do not rewrite historical requirements merely to make a completed packet look current.
-
-## Codex entrypoint
-
-For reproducible local setup, source-state checks, and verification evidence,
-read [Harness runbook](harness/README.md). It does not change the Product packet
-index or release authority.
-
-Root [`../AGENTS.md`](../AGENTS.md) is the compact repository contributor entrypoint. Durable detail belongs in these GitHub documents rather than duplicated prompts or memory.
+plus packet-defined evaluations/benchmarks where applicable. Implementation
+self-test is not Independent QA; deployment READY is not Production Verified.
+Pure documentation maintenance has the bounded exception defined in Development
+Rules and the Harness.

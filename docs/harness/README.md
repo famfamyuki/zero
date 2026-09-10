@@ -2,8 +2,9 @@
 
 This runbook implements existing engineering rules. Product scope still comes
 from [Program Board](../roadmap/PROGRAM_BOARD.md#packet-index); authority comes
-from [Role Registry](../CHAT_ROLE_REGISTRY.md). Maintenance acceptance criteria
-are in [Execution scope](EXECUTION_SCOPE.md).
+from [Role Registry](../CHAT_ROLE_REGISTRY.md). Development Governance is
+[Development Rules](../DEVELOPMENT_RULES.md). Maintenance acceptance criteria are
+in [Execution scope](EXECUTION_SCOPE.md).
 
 ## Start and resume
 
@@ -88,10 +89,12 @@ smoke. Do not infer Desktop engine identity from a separately installed CLI.
 
 Apply Skills within the user's authorized scope. Explicit user instructions take
 precedence over Skill guidelines; this does not grant an exception to existing
-security, Product, independent-QA, or release gates. If a Skill causes a pause or
-scope change, link its exact `SKILL.md`, quote the relevant instruction, and
-explain whether the constraint is explicit or an interpretation. Resolve routine
-choices from available evidence; ask for missing input that changes the outcome.
+security, Product, independent-QA, or release gates unless the user explicitly
+authorizes a bounded exception permitted by current Development Governance. If a
+Skill causes a pause or scope change, link its exact `SKILL.md`, quote the relevant
+instruction, and explain whether the constraint is explicit or an interpretation.
+Resolve routine choices from available evidence; ask for missing input that changes
+the outcome.
 
 Keep follow-up corrections and side questions attached to the ongoing objective
 unless the user changes it. Preserve completed work when resuming. Report the
@@ -101,7 +104,8 @@ lists or tables when comparison or sequence benefits from them.
 Calibrate additional tests to the changed behavior. Avoid tests that merely
 restate implementation and repeating successful checks without a changed source,
 failure, or unresolved concern. This does not reduce the required `verify` checks,
-packet evaluations, or W01's independent verification of the candidate.
+packet evaluations, or W01's independent verification of normal behavior-changing
+candidates.
 
 These clarifications adapt the official
 [GPT-6 Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices),
@@ -109,10 +113,36 @@ checked 2026-09-10. The existing conditional delegation policy below still appli
 model guidance does not authorize subagents or change tool permissions. See the
 [bounded maintenance record](ASTRA_GUIDANCE_REVIEW.md) for scope and acceptance.
 
-Use [Verification record](../templates/VERIFICATION_RECORD.md). Continue the
-authorized packet through self-checks and W01 handoff. Missing Product decisions
-or external authorization block only their dependent actions, not unrelated
-authorized work. Do not ask repeatedly for permission already granted.
+### Pure documentation maintenance fast path
+
+For user-authorized development-documentation maintenance, follow
+[Development Rules §15.1](../DEVELOPMENT_RULES.md). W01 Independent QA is not
+required when the change only reorganizes, deduplicates, indexes, archives, or
+clarifies documentation while preserving Product/Architecture/Roadmap/Gate,
+AI/Mutation authority, Security/Data, migration, Acceptance, regression, normal
+QA/release, and application/runtime semantics.
+
+Canonical-owner consolidation is allowed when the full meaning remains available
+at the new authority and old current/historical links either move in the same
+change or resolve through an explicit compatibility pointer. Deterministic
+`docs:check` maintenance may accompany the documentation change when it does not
+weaken required repository/application checks.
+
+If documentation changes one of those semantics, executable application/runtime
+behavior, Hooks, shared Skills, sandbox/permission configuration, or CI/protection
+policy, leave the fast path and use normal governance/QA. A user may explicitly
+authorize a bounded exception; record it and do not generalize it.
+
+Fast-path documentation work still uses current-main awareness, existing-change
+protection, applicable deterministic checks/CI, and the protected PR/merge path.
+Do not label it `QA Complete`; instead record that independent QA was not required
+under the documentation-maintenance fast path or explicit user exception.
+
+Use [Verification record](../templates/VERIFICATION_RECORD.md) when a full
+implementation/QA handoff is applicable. Continue the authorized packet through
+self-checks and W01 handoff where required. Missing Product decisions or external
+authorization block only their dependent actions, not unrelated authorized work.
+Do not ask repeatedly for permission already granted.
 
 When the user or applicable instructions authorize subagents, split bounded
 read-only research/review by artifact. Assign exclusive file ownership for any

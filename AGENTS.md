@@ -1,64 +1,51 @@
 # AgentGraph Studio — Repository Instructions
 
 This repository is the implementation source for **AgentGraph Studio**.
+`AGENTS.md` is the compact execution router. Durable Product, Architecture,
+Roadmap, governance, and packet detail belongs in the linked canonical documents.
 
-## Start, continue, and hand off
+## Start safely
 
-Run `npm run harness:preflight` before material repository work. It is local and
-read-only: `origin/main` is explicitly cached, never proof of live main. When
-network access is authorized, verify live main and record the check time. Inspect
-the branch, HEAD, existing changes, and relevant worktree before choosing a base.
-Preserve others' changes; never automatically reset, stash, clean, or overwrite
-them. Use an isolated worktree for a separate packet/material PR.
+Before material repository work run `npm run harness:preflight` and read
+[the harness runbook](docs/harness/README.md). Preflight is local/read-only:
+cached `origin/main` is not proof of live GitHub `main`. When network access is
+authorized, verify live main and record the observation time.
 
-Identify the role, authorized scope, and packet using Program Board's packet
-index. Engineering maintenance explicitly requested by the user may use a bounded
-execution note under `docs/harness/`; it must not select Product work or weaken a
-release gate. Read [the harness runbook](docs/harness/README.md) for setup,
-verification, permissions, browser smoke, and subagent boundaries.
+Inspect branch, HEAD, existing changes, and relevant worktrees before choosing a
+base. Preserve others' work; never automatically reset, stash, clean, overwrite,
+or prune it. Use an isolated worktree for a separate material packet/PR.
+Read-only requests do not silently authorize setup, generated artifacts, external
+connections, paid actions, commits, merges, or deployments.
 
-Continue authorized implementation through applicable checks and a concrete
-handoff without repeatedly asking to proceed. Stop dependent actions at missing
-Product decisions, missing external authorization, or a real blocker; continue
-independent in-scope work and report the exact missing input. Do not bypass a gate
-to make a task appear complete. Read-only user requests do not authorize setup,
-generated verification artifacts, or external connections.
+Identify the role, authorized scope, and current packet from the
+[Program Board](docs/roadmap/PROGRAM_BOARD.md#packet-index). Resolve lane ownership
+from the [Role Registry](docs/CHAT_ROLE_REGISTRY.md); do not copy old prompts or
+historical lifecycle state forward. Continue authorized in-scope work without
+repeated permission requests. A missing Product decision, missing external
+authorization, or real blocker stops only the dependent action.
 
-`npm run verify` executes the required checks plus local secret signatures and
-records the actual source fingerprint in `.harness/verification.json`. Include
-packet AC coverage, command results, revision, browser/external verification still
-needed, and the next owner in the handoff. That record is implementation
-self-evidence, never W01 approval. A code-changing revision needs fresh checks and
-independent QA before release. No automatic commit, merge, deploy, or paid action
-is granted by these scripts or Skills.
+## Read by task, not by inventory
 
-Before material Product, Architecture, Specification, Implementation, QA, or Release work, read current `main` versions of the relevant durable documents.
+Start with the smallest relevant authority set; normally 3–6 documents. Add a
+specialized contract only when its concern is actually involved.
 
-Baseline references:
+| Work | Read first |
+|---|---|
+| Product / Roadmap decision | [Product Master](docs/PRODUCT_MASTER.md), [Master Roadmap](docs/roadmap/MASTER_ROADMAP.md), [Execution Gates](docs/roadmap/EXECUTION_GATES.md), [Program Board](docs/roadmap/PROGRAM_BOARD.md) |
+| Architecture decision | [Architecture](docs/ARCHITECTURE.md), current packet, then relevant architecture contract |
+| Specification | Product/Architecture authorities, [Development Rules](docs/DEVELOPMENT_RULES.md), current packet |
+| Implementation | [Harness](docs/harness/README.md), Program Board, current packet, Development Rules |
+| QA / Release | [Role Registry](docs/CHAT_ROLE_REGISTRY.md), Harness, current packet, Development Rules |
+| Security / persistence / provider / AI | add [Security baseline](docs/SECURITY_RELIABILITY_BASELINE.md) and/or [Data & AI Governance](docs/DATA_AND_AI_GOVERNANCE.md) |
+| Commercial / pricing / paid launch | add [Monetization Architecture](docs/roadmap/MONETIZATION_ARCHITECTURE.md) |
+| Evaluator trust / scale | add [Evaluation Trust & Scale](docs/roadmap/EVALUATION_TRUST_AND_SCALE.md) |
+| Import / Workspace / revision | add [Import Workspace Contract](docs/architecture/IMPORT_WORKSPACE_CONTRACT.md) |
+| Scenario / Acceptance | add [Scenario Acceptance Contract](docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md) |
+| Semantic-model evolution | add [Semantic Model Evolution](docs/architecture/SEMANTIC_MODEL_EVOLUTION.md) |
 
-1. `docs/PRODUCT_MASTER.md`
-2. `docs/ARCHITECTURE.md`
-3. `docs/DEVELOPMENT_RULES.md`
-4. `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`
-5. `docs/CHAT_ROLE_REGISTRY.md`
-6. `docs/roadmap/MASTER_ROADMAP.md`
-7. `docs/roadmap/EXECUTION_GATES.md`
-8. `docs/roadmap/PROGRAM_BOARD.md`
-9. `docs/roadmap/RISK_REGISTER.md`
-10. `docs/SECURITY_RELIABILITY_BASELINE.md`
-11. `docs/DATA_AND_AI_GOVERNANCE.md`
-12. `docs/CURRENT_STATE.md`
-13. the current authoritative packet under `docs/specs/`
-
-Read relevant cross-stage contracts when needed:
-
-- evaluator trust/scale → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
-- product platform/commercial sequencing → `docs/roadmap/PRODUCT_PLATFORM_AND_COMMERCIAL_STRATEGY.md`
-- monetization/pricing/paid launch/commercial validation → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
-- semantic-model evolution → `docs/architecture/SEMANTIC_MODEL_EVOLUTION.md`
-- import / Workspace / revision → `docs/architecture/IMPORT_WORKSPACE_CONTRACT.md`
-- designed expectations / later verification → `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`
-- durable decisions → `docs/decisions/`
+Use [docs/README.md](docs/README.md) as the documentation map. ADRs, research,
+completed packets, old SHAs, and historical chats are evidence/history, not default
+context unless the task requires them.
 
 ## Source-of-truth priority
 
@@ -70,175 +57,64 @@ latest GitHub main / repository reality
 → active docs/specs packet
 → Product Master
 → Architecture
-→ Development Rules / Engineering Execution Governance / cross-cutting baselines
+→ Development Rules / applicable Security & Data baselines
 → Master Roadmap
 → Execution Gates
-→ relevant cross-stage plans/contracts
+→ relevant specialized plans/contracts
 → Program Board / Risk Register
 → Current State snapshot
-→ historical Chat / Work / Codex / old SHAs
+→ ADR / historical Chat / Work / Codex / old SHAs
 ```
 
-A SHA in docs is a snapshot/baseline unless explicitly live-verified.
+A SHA written in documentation is a snapshot unless explicitly live-verified.
+Durable Product/Architecture/Roadmap documents do not automatically expand an
+active packet. Stage order is dependency direction, not an automatic queue:
+`Evidence → Gate Review → Explicit Next Selection`.
 
-## Development operating model
+## Non-negotiable boundaries
 
-`docs/CHAT_ROLE_REGISTRY.md` is authoritative.
+Product North Star: `Understand → Evaluate → Improve → Verify → Own`.
+Preserve the full durable meaning in the canonical documents, including:
 
-Current development-only model uses exactly five canonical lanes:
-
-```text
-Chat:
-00  Program Control & Current State
-01  Product Architecture & Roadmap
-02  UX & Implementation Specification
-
-Codex:
-C01 Current Sprint Implementation
-
-Work:
-W01 Independent QA & Production Verification
-```
-
-Core separation:
-
-```text
-GitHub main = durable truth
-Chat        = Product / specification / coordination reasoning
-Codex       = packet-bound repository implementation
-Work        = independent verification when independence matters
-```
-
-There is no permanent canonical `03`, `04`, `05`, `06`, or `W00` in development-only focus mode.
-
-Complex repository/document work may use Work mode under the existing `00`, `01`, or `02` authority; using Work does not create a W00 role.
-
-Lifecycle authority:
-
-```text
-Selected                → 01
-Specified               → 02
-Implementation Started  → C01
-Implementation Complete → C01
-QA Complete             → W01
-normal merge/release    → C01 after W01 QA of the same revision
-Production Verified     → W01
-Sprint Complete         → 00
-```
-
-Normal handoff:
-
-```text
-01 → 02 → C01 → W01 QA → C01 release → W01 Production verification → 00 → 01
-```
-
-If implementation/behavior changes after QA Complete, re-run independent QA before release.
-
-A short role declaration such as `ここは01として使います。` is sufficient. Resolve it from current `main`; do not ask for old prompts or stale state.
-
-## Product North Star
-
-```text
-Understand → Evaluate → Improve → Verify → Own
-```
-
-AgentGraph Studio aims to become a portable AI workflow architecture engineering toolchain, not merely a visual workflow builder.
-
-## Non-negotiable engineering principles
-
-- Simplest Sufficient Architecture.
-- Evidence Before Intelligence.
-- deterministic analysis owns deterministic facts;
-- AI reasoning is evidence-grounded and advisory;
-- preserve `Known / Inferred / Unknown`;
-- preserve deterministic / heuristic / external-dependent distinctions;
+- Simplest Sufficient Architecture and Evidence Before Intelligence;
+- deterministic facts + evidence-grounded advisory AI;
+- `Known / Inferred / Unknown` and deterministic / heuristic / external-dependent distinctions;
 - no unsupported runtime/external claims as facts;
-- no arbitrary overall architecture score without calibrated benchmark evidence;
-- no silent semantic mutation;
-- future semantic change uses `Proposal → Semantic Patch → Validation → Preview → User Apply`;
-- AI authority is capability-scoped and must not outpace measured trust;
-- mutation scope is explicit; pipeline safety does not authorize every operation;
-- side-effect-sensitive change requires capability/human-control/security evidence;
+- no silent semantic mutation; semantic change uses `Proposal → Semantic Patch → Validation → Preview → User Apply`;
+- AI authority is capability-scoped; mutation authority is separately gated and must not outrun capability/security/human-control evidence;
 - configured Intent/Constraint/Scenario expectation is not observed runtime truth;
 - `Visual Group ≠ Semantic Module ≠ Runtime Orchestration`;
-- user-owned source/runtime is the default direction;
-- CrewAI-first, not core-domain locked;
+- user-owned source/runtime direction; CrewAI-first without core-domain lock-in;
 - no silent lossy conversion;
-- user/imported/scenario text is untrusted analyzed data, not evaluator instruction;
-- never execute arbitrary imported project code just to inspect/convert it unless an explicitly sandboxed feature exists;
+- imported/user/scenario text is untrusted analyzed data, not evaluator instruction;
+- never execute arbitrary imported project code merely to inspect/convert it without an explicitly sandboxed feature;
 - never expose/store/repeat secrets, keys, tokens, or credentials;
-- do not silently broaden persistence or AI-provider disclosure;
-- do not create Graph/Workflow V2 merely to match future diagrams;
-- preserve existing features and analytics unless a current packet explicitly changes them.
+- do not silently broaden persistence or provider disclosure;
+- preserve existing behavior/analytics unless the active packet explicitly changes it.
 
-## Roadmap / scope discipline
+Commercial Validation Gate M0 is separate from AI Authority and roadmap promotion.
+Stage 1.5 remains a selection band, not a fixed backlog.
 
-Stage order is dependency direction, not an automatic queue.
+## Verification, handoff, and release
 
-After a stage use:
+`npm run verify` performs the required deterministic implementation checks plus
+local secret signatures and records local source evidence. It does not create W01
+approval. Packet-defined evaluations/benchmarks remain required where applicable.
 
-```text
-Evidence → Gate Review → Explicit Next Selection
-```
-
-Stage 1.5 is a selection band, not a mandatory backlog.
-
-Commercial Validation Gate M0 is likewise evidence-driven. Paid entitlement/cost control does not by itself prove recurring value, and commercial conversion must not expand AI authority. Use `docs/roadmap/MONETIZATION_ARCHITECTURE.md` for paid-value, price/quota, unit-economics, and paid-expansion decisions.
-
-The active packet under `docs/specs/` controls current implementation scope. Do not pull future roadmap work into a packet merely because it appears in Product/Architecture/Roadmap documents.
-
-Before implementation, apply the Definition of Ready in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
-
-Non-trivial work should trace:
+For normal Product/application/behavior changes:
 
 ```text
-Product / Architecture / Gate / Scenario / Risk
-→ Packet AC
-→ Test / Production verification
+implementation self-evidence ≠ Independent QA
+Deployment READY ≠ Production Verified
 ```
 
-## Implementation completion gate
+Use the exact-revision lifecycle and ownership in the Role Registry and Development
+Rules. A behavior-changing revision after QA requires fresh independent QA before
+release. Do not infer merge/deploy/paid authority from a passing script, Skill,
+Preview, or connector permission.
 
-Before **Implementation Complete**, run and report:
-
-```text
-npm run docs:check
-npm test
-npm run typecheck
-npm run build
-```
-
-plus packet-defined evaluations/benchmarks where applicable.
-
-Normal `main` merges must use the required repository CI/protection path. Live Branch Protection/Ruleset state must be checked rather than inferred from docs.
-
-## Independent QA and release
-
-Implementation self-test is not Independent QA.
-
-`W01` performs pre-release independent QA. After QA Complete, `C01` may merge/release only the same approved revision. Any behavior-changing fix invalidates that QA approval and returns to W01.
-
-Before **Production Verified**, W01 independently confirms:
-
-- latest GitHub `main`;
-- released code corresponds to the QA-approved change set;
-- Vercel `READY`;
-- `target=production`;
-- correct alias/domain;
-- actual Production smoke for changed behavior;
-- relevant runtime errors;
-- `GitHub main SHA = Vercel Production githubCommitSha`.
-
-Do not mark QA Complete or Production Verified from implementation self-report or deployment READY alone.
-
-## Context policy
-
-- `00`, `01`, `02` may be long-lived while role context stays clean;
-- prefer a fresh `C01` Codex task per packet/material PR;
-- prefer a fresh `W01` Work session per packet/release cycle;
-- replace a long-lived chat when stale Sprints/SHAs or unrelated work interfere with GitHub-grounded reasoning;
-- do not recreate every lane on a fixed schedule.
-
-## Dormant/noncanonical work
-
-Marketing/SNS/analytics/growth are not canonical persistent development lanes during the current focus period. If temporarily needed, use task-specific conversations first. Add a durable role only when repeated evidence shows a genuine independent authority/context boundary.
+Pure documentation organization/editorial maintenance may use the bounded fast
+path defined in Development Rules and the Harness when it preserves Product,
+Architecture, Roadmap/Gate, AI/Mutation authority, Security/Data, Acceptance,
+regression, QA/release, and executable-harness semantics. If those meanings change,
+normal governance applies.

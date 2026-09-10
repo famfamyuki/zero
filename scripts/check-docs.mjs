@@ -44,12 +44,18 @@ function markdownFiles(directory) {
     return entry.isDirectory() ? markdownFiles(path) : entry.name.endsWith('.md') ? [path] : [];
   });
 }
-for (const docsReadmePath of [join(repoRoot, 'AGENTS.md'), join(repoRoot, 'README.md'), ...markdownFiles(join(repoRoot, 'docs')), ...(existsSync(join(repoRoot, '.agents/skills')) ? markdownFiles(join(repoRoot, '.agents/skills')) : [])]) {
-  const docsReadme = readFileSync(docsReadmePath, 'utf8').replace(/```[^\n]*\n[\s\S]*?```/g, '');
+
+for (const markdownPath of [
+  join(repoRoot, 'AGENTS.md'),
+  join(repoRoot, 'README.md'),
+  ...markdownFiles(join(repoRoot, 'docs')),
+  ...(existsSync(join(repoRoot, '.agents/skills')) ? markdownFiles(join(repoRoot, '.agents/skills')) : []),
+]) {
+  const markdown = readFileSync(markdownPath, 'utf8').replace(/```[^\n]*\n[\s\S]*?```/g, '');
   const linkPattern = /\[[^\]]*\]\(([^)]+)\)/g;
   let match;
 
-  while ((match = linkPattern.exec(docsReadme)) !== null) {
+  while ((match = linkPattern.exec(markdown)) !== null) {
     const rawTarget = match[1].trim();
     if (
       !rawTarget ||
@@ -64,15 +70,15 @@ for (const docsReadmePath of [join(repoRoot, 'AGENTS.md'), join(repoRoot, 'READM
     const targetWithoutAnchor = rawTarget.split('#')[0].split('?')[0];
     if (!targetWithoutAnchor) continue;
 
-    const resolvedTarget = resolve(dirname(docsReadmePath), targetWithoutAnchor);
+    const resolvedTarget = resolve(dirname(markdownPath), targetWithoutAnchor);
     const fromRoot = relative(repoRoot, resolvedTarget);
     if (fromRoot === '..' || fromRoot.startsWith('../') || fromRoot.startsWith('..\\') || isAbsolute(fromRoot)) {
-      failures.push(`README link escapes repository root: ${rawTarget}`);
+      failures.push(`Markdown link escapes repository root in ${relative(repoRoot, markdownPath)}: ${rawTarget}`);
       continue;
     }
 
     if (!existsSync(resolvedTarget)) {
-      failures.push(`Broken link in ${relative(repoRoot, docsReadmePath)}: ${rawTarget}`);
+      failures.push(`Broken link in ${relative(repoRoot, markdownPath)}: ${rawTarget}`);
     }
   }
 }
@@ -80,7 +86,9 @@ for (const docsReadmePath of [join(repoRoot, 'AGENTS.md'), join(repoRoot, 'READM
 const boardPath = join(repoRoot, 'docs/roadmap/PROGRAM_BOARD.md');
 if (existsSync(boardPath)) {
   for (const match of readFileSync(boardPath, 'utf8').matchAll(/`(AGS-[A-Z0-9-]+)`/g)) {
-    if (!existsSync(join(repoRoot, 'docs/specs', `${match[1]}.md`))) failures.push(`Program Board references missing packet: ${match[1]}`);
+    if (!existsSync(join(repoRoot, 'docs/specs', `${match[1]}.md`))) {
+      failures.push(`Program Board references missing packet: ${match[1]}`);
+    }
   }
 }
 
@@ -88,7 +96,7 @@ const specsDir = join(repoRoot, 'docs/specs');
 if (existsSync(specsDir) && statSync(specsDir).isDirectory()) {
   const packets = readdirSync(specsDir).filter((name) => name.endsWith('.md'));
   if (packets.length === 0) {
-    failures.push('docs/specs must contain at least one authoritative packet while CURRENT_STATE declares a current packet.');
+    failures.push('docs/specs must contain at least one authoritative packet while Program Board declares packet routing.');
   }
 }
 
@@ -115,6 +123,34 @@ if (existsSync(developmentRulesPath)) {
     if (!developmentRules.includes(command)) {
       failures.push(`Development Rules missing required verification command: ${command}`);
     }
+  }
+
+  for (const semantic of [
+    'Known / Inferred / Unknown',
+    'Proposal → Semantic Patch → Validation',
+    'Stage 1.5',
+    'Commercial Validation',
+    'Pure documentation maintenance fast path',
+  ]) {
+    if (!developmentRules.includes(semantic)) {
+      failures.push(`Development Rules missing preserved governance semantic: ${semantic}`);
+    }
+  }
+}
+
+const governancePointerPath = join(repoRoot, 'docs/ENGINEERING_EXECUTION_GOVERNANCE.md');
+if (existsSync(governancePointerPath)) {
+  const pointer = readFileSync(governancePointerPath, 'utf8');
+  if (!pointer.includes('Compatibility pointer') || !pointer.includes('DEVELOPMENT_RULES.md')) {
+    failures.push('Engineering Execution Governance must remain an explicit compatibility pointer to Development Rules.');
+  }
+}
+
+const agentsPath = join(repoRoot, 'AGENTS.md');
+if (existsSync(agentsPath)) {
+  const agentLines = readFileSync(agentsPath, 'utf8').split(/\r?\n/).length;
+  if (agentLines > 180) {
+    console.warn(`AGENTS.md has ${agentLines} lines; review whether router detail has started duplicating durable authorities.`);
   }
 }
 
