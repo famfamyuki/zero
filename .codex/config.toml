@@ -1,6 +1,18 @@
 # Trusted-project defaults; explicit session/administrator settings take precedence.
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
+approvals_reviewer = "user"
+model_reasoning_summary = "concise"
+
+# Astra is the default single executor for repository work. Multi-agent execution
+# is opt-in only when a bounded task has evidence that delegation is worth the
+# extra context/tool cost.
+[agents]
+enabled = false
+
+[features]
+multi_agent_v2 = false
+skill_mcp_dependency_install = false
 
 [sandbox_workspace_write]
 network_access = false
