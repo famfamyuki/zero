@@ -2,11 +2,12 @@
 
 Snapshot date: **2026-09-10**  
 Status: **Coordination snapshot; live repository/Production checks win**  
-Scope: A concise answer to what is live now, which lifecycle is open, what is blocked, and where authoritative detail lives.
+Scope: Concise top-level lifecycle, blocker, authority state, and scoped evidence needed to understand where development stands.
 
-This file is intentionally **not** the near-term execution plan, roadmap, packet copy,
-risk register, or release-history archive. `docs/roadmap/PROGRAM_BOARD.md` owns the
-active execution sequence and blocker routing.
+This file is intentionally **not** a deployment registry, near-term execution plan,
+roadmap, packet copy, risk register, or release-history archive.
+`docs/roadmap/PROGRAM_BOARD.md` owns the active execution sequence and blocker
+routing.
 
 ## 0. Live-state rule
 
@@ -21,7 +22,11 @@ decisions, re-check as applicable:
 6. this snapshot;
 7. ADRs / historical chats / old SHAs.
 
-A SHA below is an observed snapshot, not a permanent current-state claim.
+**Do not persist a mutable GitHub-main or latest-deployment identity here as a
+current claim.** Updating this documentation can advance `main` and immediately
+make such a claim stale. Obtain live identity from GitHub/Vercel when the decision
+requires it. Scoped historical release identities may remain below when they are
+necessary evidence for a specific lifecycle distinction.
 
 Canonical owners:
 
@@ -37,27 +42,13 @@ Canonical owners:
 
 ---
 
-# 1. Current live identity
+# 1. Stable current-state facts
 
-Observed on **2026-09-10** after documentation consolidation PR #43:
-
-```text
-GitHub main
-= a0c07978c5b8211ea16e68f9145a41845aaf9f28
-
-Vercel Production
-= dpl_6QoivWN2993H8NTu5tzGbrCFaQCi
-= READY
-= target=production
-= githubCommitSha a0c07978c5b8211ea16e68f9145a41845aaf9f28
-
-Production domain includes
-= zero-six-khaki.vercel.app
-```
-
-PR #43 changed documentation/context routing only. It did not change application,
-evaluator, provider, billing, entitlement, quota, or runtime behavior. This snapshot
-does not substitute for feature-specific Production smoke when behavior changes.
+The documentation/context consolidation series beginning with PR #43 changes
+routing/authority organization only. It does not change application, evaluator,
+provider, billing, entitlement, quota, or runtime behavior. Exact current main and
+Production deployment identity must still be live-checked rather than inferred
+from this statement.
 
 The deterministic free core remains protected independently of paid/provider
 availability, including Builder/Design, Templates, AgentGraph JSON Import/Export,
@@ -122,18 +113,17 @@ COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 Related durable risks: R-008 / R-020 / R-021
 ```
 
-The authoritative item-level prerequisites, first-launch procedure gaps, owner
-routing, Phase G/H sequencing, and next handoff are maintained only in
-`docs/roadmap/PROGRAM_BOARD.md` and the paid-launch runbook. Do not copy them back
-into this snapshot.
+Item-level prerequisites, first-launch procedure gaps, owner routing, Phase G/H
+sequencing, and next handoff live only in `docs/roadmap/PROGRAM_BOARD.md` and the
+paid-launch runbook. Do not copy them back into this snapshot.
 
 ---
 
 # 3. PR #35 scoped release evidence baseline
 
-This section is retained because Program Board and historical decisions may need to
-disambiguate the already-verified paid-off preparation release from the still-open
-paid launch. It is historical scoped evidence, **not** today's main identity.
+This section is retained because current coordination must distinguish the
+already-verified paid-off preparation release from the still-open paid launch. It is
+historical scoped evidence, **not** today's main or deployment identity.
 
 ```text
 PR #35
@@ -202,12 +192,12 @@ Do not infer an automatic next Stage from Sprint completion.
 
 ## Known
 
-- live main and Vercel Production matched at the observation in §1;
-- PR #43 is documentation-only and does not change Product/runtime behavior;
+- the documentation/context consolidation does not change Product/runtime behavior;
 - the paid-off preparation sub-release remains scoped Production Verified;
 - the real paid Production path remains outside that scoped verification and AC-30 remains open;
 - Gate A / M0 are not reached; Stage 1.5/Stage 2 are not selected;
-- AI Authority and Mutation Authority are unchanged.
+- AI Authority and Mutation Authority are unchanged;
+- exact live GitHub/Vercel identity is deliberately obtained from live systems rather than this snapshot.
 
 ## Inferred
 
@@ -226,12 +216,13 @@ runbook. Unknown means insufficient evidence, not evidence of absence.
 
 # 6. Snapshot discipline
 
-Update this file only when a **small number of current-state facts** materially
-change: live release identity, top-level lifecycle, blocker, authority state, or
-scoped release evidence needed to disambiguate current coordination.
+Update this file only when a **small number of stable coordination facts**
+materially change: top-level lifecycle, blocker, authority state, or scoped release
+evidence needed to disambiguate current coordination.
 
 Do not duplicate:
 
+- latest mutable main/deployment identity;
 - Phase-by-phase execution plans;
 - item-level prerequisite/evidence matrices;
 - full risk definitions;
@@ -241,5 +232,6 @@ Do not duplicate:
 - transient Preview deployments;
 - historical chat narratives.
 
-Those belong to their canonical owners. This keeps current-state lookup cheap for
-Astra/Codex while preserving the full development plan elsewhere.
+Those belong to live systems or their canonical owners. This keeps current-state
+lookup cheap and resistant to stale-context errors for Astra/Codex while preserving
+the full development plan elsewhere.
