@@ -20,14 +20,26 @@ connections, paid actions, commits, merges, or deployments.
 Identify the role, authorized scope, and current packet from the
 [Program Board](docs/roadmap/PROGRAM_BOARD.md#packet-index). Resolve lane ownership
 from the [Role Registry](docs/CHAT_ROLE_REGISTRY.md); do not copy old prompts or
-historical lifecycle state forward. Continue authorized in-scope work without
-repeated permission requests. A missing Product decision, missing external
-authorization, or real blocker stops only the dependent action.
+historical lifecycle state forward.
+
+Treat an action request as authorization to complete reversible, in-scope work up
+to the role-owned handoff point. Do not stop at a plan or first working pass when
+the requested outcome includes implementation, inspection, fixes, or verification.
+Inspect the result, fix in-scope failures caused by the change, run applicable
+required checks, and continue until the intended role-owned outcome is complete.
+Ask only when a missing Product decision, external/irreversible authorization, or
+real blocker can change the safe outcome; a blocker stops only its dependent
+action. Do not ask repeatedly for permission already granted.
 
 ## Read by task, not by inventory
 
 Start with the smallest relevant authority set; normally 3–6 documents. Add a
-specialized contract only when its concern is actually involved.
+specialized contract only when its concern is actually involved. Reuse unchanged
+authority already read in the current work instead of rereading it from habit.
+Load a repository Skill only when its narrow workflow matches the task; touching an
+adjacent domain is not by itself a reason to load that Skill. Skills guide workflow
+inside existing authority; they do not expand Product, security, mutation, release,
+or external-action authority.
 
 | Work | Read first |
 |---|---|
@@ -101,6 +113,9 @@ Stage 1.5 remains a selection band, not a fixed backlog.
 `npm run verify` performs the required deterministic implementation checks plus
 local secret signatures and records local source evidence. It does not create W01
 approval. Packet-defined evaluations/benchmarks remain required where applicable.
+Run additional or repeated checks only when changed source, a failure, or a new
+unresolved concern justifies them; a successful unchanged check is not improved by
+repetition.
 
 For normal Product/application/behavior changes:
 

@@ -63,3 +63,51 @@ The fetch emitted a permission warning for an unrelated worktree metadata entry;
 the requested ref and live main matched. No worktree pruning or permission changes
 were used. This warning is a local maintenance note, not proof of isolation.
 Rollback: reverse only this scoped documentation diff.
+
+## 2026-09-12 follow-up — skills, prompts, and follow-through
+
+Authority: the user explicitly requested improvement and authorized repository
+reflection on 2026-09-12. Base: live GitHub `main`
+`4d134f706ec4cfdabba75762f0925b4b79fc0cd5`, observed before editing. This is a
+user-authorized documentation-maintenance follow-up under Development Rules §15.1;
+it does not change Product/runtime semantics, shared Skills, Hooks, Codex sandbox
+or permission configuration, CI/protection policy, or release authority.
+
+Source: the current official
+[GPT-6 Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices),
+checked again 2026-09-12, plus the official OpenAI guidance supplied by the user on
+rethinking Skills, `AGENTS.md`, decision boundaries, testing, and persistence.
+
+Audit result:
+
+- the three repository Skill descriptions are already narrow and workflow-specific,
+  so no shared Skill change is justified;
+- `AGENTS.md` and `docs/README.md` already use progressive disclosure and task-based
+  document routing;
+- the remaining useful gap is explicit follow-through: Astra should continue past
+  a first working implementation when the requested outcome includes inspection,
+  fixes, verification, or handoff;
+- repeated successful checks and rereading unchanged authority should remain
+  proportional rather than habitual;
+- stronger Astra initiative must not weaken Product, Security/Data, semantic
+  mutation, W01, release, paid-action, or external/irreversible-action boundaries.
+
+This follow-up therefore changes only `AGENTS.md`, this review record, and the
+harness runbook. Acceptance is:
+
+| AC | Decision | Evidence required |
+|---|---|---|
+| F-01 | Action requests authorize reversible in-scope progress to the role-owned handoff point | AGENTS and Harness use the same completion boundary |
+| F-02 | Do not stop merely at a plan or first working pass | Harness requires inspection, in-scope fixes, and applicable verification before the role-owned completion point |
+| F-03 | Keep Skill loading narrow | AGENTS says adjacent-domain contact alone does not justify loading a Skill; no Skill files change |
+| F-04 | Keep verification proportional | Existing required checks remain intact; extra/repeated checks require changed source, failure, or unresolved concern |
+| F-05 | Preserve governance meaning | No Product/Architecture/Roadmap/Gate, AI/Mutation authority, Security/Data, normal QA/release, Hook/config, application, or CI semantics change |
+
+The local execution environment used for this follow-up could not reach GitHub from
+its shell checkout, so local `npm run verify` could not be established from a fresh
+repository checkout there. The protected PR CI is therefore the executable evidence
+for this change and must pass before merge. This limitation does not convert an
+unrun local check into a pass. Because this is eligible documentation maintenance,
+W01 Independent QA is not required if the final diff remains within F-01 through
+F-05. Merge is allowed by the user's 2026-09-12 authorization only after the
+required protected checks pass on the exact candidate.

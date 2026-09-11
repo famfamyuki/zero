@@ -132,6 +132,14 @@ instruction, and explain whether the constraint is explicit or an interpretation
 Resolve routine choices from available evidence; ask for missing input that changes
 the outcome.
 
+When the requested outcome includes implementation plus inspection, fixes, or
+verification, continue past the first working implementation to the role-owned
+handoff/completion point. Inspect the actual result, fix in-scope failures caused
+by the change, run applicable required checks, and rerun affected checks after
+those fixes. Do not pause merely to ask whether to continue work already authorized.
+A missing Product decision, unapproved irreversible/external action, or genuine
+blocker stops only the dependent action.
+
 Keep follow-up corrections and side questions attached to the ongoing objective
 unless the user changes it. Preserve completed work when resuming. Report the
 result, evidence, remaining uncertainty, and next owner in concise prose; use
@@ -145,9 +153,10 @@ candidates.
 
 These clarifications adapt the official
 [GPT-6 Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices),
-checked 2026-09-10. The existing conditional delegation policy below still applies;
-model guidance does not authorize subagents or change tool permissions. See the
-[bounded maintenance record](ASTRA_GUIDANCE_REVIEW.md) for scope and acceptance.
+checked again 2026-09-12. The existing conditional delegation policy below still
+applies; model guidance does not authorize subagents or change tool permissions.
+See the [bounded maintenance record](ASTRA_GUIDANCE_REVIEW.md) for scope and
+acceptance.
 
 ### Pure documentation maintenance fast path
 
