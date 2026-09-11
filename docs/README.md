@@ -33,12 +33,12 @@ not grant permission to implement future work.
 | Work | Initial read set | Add only when needed |
 |---|---|---|
 | Product / next capability / Roadmap | Product Master + Master Roadmap + Execution Gates + Program Board | Risk Register; Evaluation Trust & Scale; Monetization Architecture |
-| Architecture | Architecture + Program Board + active packet | Semantic Model Evolution; Import Workspace; Scenario Acceptance; Data/Security |
+| Architecture | Architecture + Program Board + active packet | Semantic Model Evolution; Import Workspace; Scenario Acceptance; Data/Security; Agentic Verification Workspace when managed-agent/sandbox execution is involved |
 | 02 Specification | Product/Architecture authority + Development Rules + Program Board + active packet | relevant specialized contract |
 | C01 Implementation | Harness + Program Board + active packet + Development Rules | specialized contract triggered by the packet |
 | W01 QA / Release | Role Registry + Harness + active packet + Development Rules | Security/Data, commercial runbook, or other relevant release contract |
 | Commercial / pricing / paid access | Monetization Architecture + Program Board + active commercial packet | Product strategy, paid-launch runbook, Risk Register |
-| Security / persistence / provider / evaluator | Security baseline and/or Data & AI Governance + active packet | relevant Architecture / Gate contract |
+| Security / persistence / provider / evaluator | Security baseline and/or Data & AI Governance + active packet | relevant Architecture / Gate contract; Agentic Verification Workspace for managed sessions/sandboxes |
 
 ## Specialized contracts
 
@@ -52,6 +52,7 @@ Load these conditionally, not by default:
 - semantic-model migration/version runway → [`architecture/SEMANTIC_MODEL_EVOLUTION.md`](./architecture/SEMANTIC_MODEL_EVOLUTION.md)
 - import, mapping, Workspace/Project, revision/local-first → [`architecture/IMPORT_WORKSPACE_CONTRACT.md`](./architecture/IMPORT_WORKSPACE_CONTRACT.md)
 - designed expectations and static-to-runtime verification bridge → [`architecture/SCENARIO_ACCEPTANCE_CONTRACT.md`](./architecture/SCENARIO_ACCEPTANCE_CONTRACT.md)
+- managed-agent / sandbox-assisted future verification, including the OpenAI Agents API candidate → [`architecture/AGENTIC_VERIFICATION_WORKSPACE.md`](./architecture/AGENTIC_VERIFICATION_WORKSPACE.md)
 - controlled paid-launch financial QA → [`runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`](./runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md)
 
 ## Current packet and history
