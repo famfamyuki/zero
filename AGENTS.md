@@ -37,6 +37,7 @@ specialized contract only when its concern is actually involved.
 | Implementation | [Harness](docs/harness/README.md), Program Board, current packet, Development Rules |
 | QA / Release | [Role Registry](docs/CHAT_ROLE_REGISTRY.md), Harness, current packet, Development Rules |
 | Security / persistence / provider / AI | add [Security baseline](docs/SECURITY_RELIABILITY_BASELINE.md) and/or [Data & AI Governance](docs/DATA_AND_AI_GOVERNANCE.md) |
+| Managed agent / sandbox-assisted verification | add [Agentic Verification Workspace](docs/architecture/AGENTIC_VERIFICATION_WORKSPACE.md), Data & AI Governance, Security baseline, and [Execution Gates](docs/roadmap/EXECUTION_GATES.md) |
 | Commercial / pricing / paid launch | add [Monetization Architecture](docs/roadmap/MONETIZATION_ARCHITECTURE.md) |
 | Evaluator trust / scale | add [Evaluation Trust & Scale](docs/roadmap/EVALUATION_TRUST_AND_SCALE.md) |
 | Import / Workspace / revision | add [Import Workspace Contract](docs/architecture/IMPORT_WORKSPACE_CONTRACT.md) |
