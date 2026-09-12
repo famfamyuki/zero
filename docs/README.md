@@ -19,6 +19,7 @@ Do not treat every file in `docs/` as required startup context.
 | Durable cross-stage risks | [`roadmap/RISK_REGISTER.md`](./roadmap/RISK_REGISTER.md) |
 | Concise current-state / scoped release evidence snapshot | [`CURRENT_STATE.md`](./CURRENT_STATE.md) |
 | Reproducible execution harness | [`harness/README.md`](./harness/README.md) |
+| Development prompt composition / cross-surface task briefs | [`harness/DEVELOPMENT_PROMPT_AUTHORING.md`](./harness/DEVELOPMENT_PROMPT_AUTHORING.md) |
 
 `ENGINEERING_EXECUTION_GOVERNANCE.md` is retained only as a compatibility pointer
 for older ADR/spec links. Its durable rules are consolidated into
@@ -37,6 +38,7 @@ not grant permission to implement future work.
 | 02 Specification | Product/Architecture authority + Development Rules + Program Board + active packet | relevant specialized contract |
 | C01 Implementation | Harness + Program Board + active packet + Development Rules | specialized contract triggered by the packet |
 | W01 QA / Release | Role Registry + Harness + active packet + Development Rules | Security/Data, commercial runbook, or other relevant release contract |
+| Development prompt / handoff brief | Prompt Authoring + Role Registry + Program Board/current packet | only the canonical authorities needed by the receiving role |
 | Commercial / pricing / paid access | Monetization Architecture + Program Board + active commercial packet | Product strategy, paid-launch runbook, Risk Register |
 | Security / persistence / provider / evaluator | Security baseline and/or Data & AI Governance + active packet | relevant Architecture / Gate contract; Agentic Verification Workspace for managed sessions/sandboxes |
 
@@ -111,7 +113,8 @@ Same Product Meaning
 
 The complete operating model is in the Role Registry. The complete engineering
 contract is in Development Rules. The complete execution mechanics are in the
-Harness. Do not duplicate those documents here.
+Harness. Prompt Authoring defines how to compose task briefs from those authorities;
+it does not expand them. Do not duplicate those documents here.
 
 Roadmap progression remains:
 
