@@ -59,7 +59,7 @@ owned by another lane.
 Examples:
 
 - `C01` may prepare the `W01` Pass A brief, but must not imply QA is already passed or steer the independent verdict.
-- `W01` may return findings and required correction evidence to `C01`, but should not take over implementation design beyond what the packet/AC requires.
+- `W01` may return findings and release/correction conditions to `C01`, but must not take over implementation design or release execution.
 - `C01` may prepare Production-verification context for `W01` Pass B, but must not claim Production Verified.
 - `W01` may prepare closure evidence for `00`, but must not claim Sprint Complete.
 - `00` may prepare evidence for `01`, but must not select Product priority on `01`'s behalf.
@@ -83,7 +83,7 @@ Examples:
 | `01 → 02` | Selected scope, rationale, dependencies/gate context, explicit deferrals | whether the packet satisfies Definition of Ready and can become `Specified` |
 | `02 → C01` | authoritative packet, AC/tests/traceability, explicit Out of Scope and boundaries | implementation mechanics within the packet and `Implementation Complete` evidence |
 | `C01 → W01` Pass A | exact branch/PR/head revision, implementation summary, self-check results, known notes | independent QA verdict and exact approved revision |
-| `W01` Pass A → `C01` | verdict, Blocker/Non-blocker/Known Note findings, reproduction/evidence, affected AC | correction implementation and, after a new candidate, implementation-complete evidence |
+| `W01` Pass A → `C01` | QA verdict, exact approved revision when passed, release conditions, or Blocker/Non-blocker/Known Note findings with reproduction/evidence when correction is required | release of the exact approved revision when passed, or correction implementation and a fresh candidate when failed/changed |
 | `C01` release → `W01` Pass B | exact QA-approved revision, resulting main SHA, deployment identity/state and release facts | independent `Production Verified` verdict |
 | `W01 → 00` | QA and Production-verification evidence, remaining notes/blockers | `Sprint Complete` decision |
 | `00 → 01` | Sprint closure/current evidence, unresolved risks and gate-relevant observations | Gate Review and explicit Next Selection |
