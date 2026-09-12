@@ -97,6 +97,22 @@ Mutation Authority
 = UNCHANGED
 ```
 
+A separate bounded launch-hardening packet is now selected for the GPT-6 Astra Challenge:
+
+```text
+GPT-6 Astra Challenge Launch Hardening
+= SELECTED
+= SPECIFICATION PENDING
+= target Product Hunt launch 2026-09-18
+= free-core / first-value / presentation hardening only
+= no paid-launch bypass
+= no Stage/Gate promotion
+= AI Authority UNCHANGED
+= Mutation Authority UNCHANGED
+```
+
+This selection does not reclassify the still-open commercial Sprint, satisfy PAUC AC-30, reach Gate A or M0, or select Stage 1.5/Stage 2. It is a time-boxed parallel packet whose purpose is to make current implemented value easier to understand and verify for the launch deadline.
+
 The provider-backed Architecture Review is intentionally not a free API surface. A user must have a server-verified active paid entitlement and remaining server-enforced quota before provider invocation. Deterministic free-core capabilities remain independently useful and must not depend on billing, entitlement, quota, or provider availability.
 
 The scoped preparation-release Production Verification does **not** satisfy PAUC AC-30. AC-30 requires the real Production Stripe subscription → entitlement → quota reservation → valid review consume path plus a non-consumption failure path with a controlled QA account.
@@ -116,6 +132,7 @@ Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is 
 | `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 lifecycle open; paid access amendment also applies |
 | `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; external readiness and live AC-30 remain open |
 | `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation code implemented; public content/approval and launch evidence remain prerequisites |
+| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Time-boxed free-core launch hardening for the September 18 GPT-6 Astra Challenge | **Selected** by `01`; next owner `02` for implementation-ready specification; no behavior-changing implementation before `Specified` |
 | `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed capability contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
 | `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` | Completed UX contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
 
@@ -126,6 +143,30 @@ The earlier branch/PR preparation sequence is complete. PR #35 is merged and is 
 00 classifies the merged preparation release as a **completed sub-release / milestone inside the already-selected commercial Sprint**. The paid-launch lifecycle remains part of the same selected packet because the PAUC specification and launch runbook already require live paid enablement and AC-30 before Paid Access can become Production Verified and the Sprint can close.
 
 Reclassifying controlled paid enablement / AC-30 as an unrelated future packet would silently weaken the existing gate semantics and is therefore not done by 00.
+
+## Parallel bounded packet — GPT-6 Astra Challenge Launch Hardening — SELECTED
+
+Owner flow:
+
+```text
+01 Selected
+→ 02 specification
+→ C01 implementation only after Specified
+→ W01 independent QA for behavior changes
+→ C01 exact approved release
+→ W01 Production verification
+→ 00 bounded packet Sprint Complete
+```
+
+Authoritative selection packet:
+
+- `docs/specs/AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1.md`
+
+The packet is intentionally narrower than a roadmap-stage promotion. It may harden the current free-core first-value path, representative demo continuity, truthful launch attribution/metadata, responsive/accessibility behavior, and changed-path Production confidence. It must not add Astra as a contest-driven runtime dependency, enable paid Architecture Review, pull Stage 1.5/Stage 2 forward, expand AI/Mutation authority, add persistence/runtime verification, or bypass the open commercial blocker.
+
+`02` is the next owner for this packet and must inspect the actual Production first-value path before fixing exact UX behavior. The current `Competitor Catalog Review Crew` is only a representative-demo candidate until `02` specifies the flow.
+
+This parallel packet is permitted without closing the commercial Sprint because Program Board planning already allows explicitly selected independent hardening/foundation work while launch is blocked, provided the paid Sprint and AC-30 obligations remain explicit and unchanged.
 
 ## Phase A — Commercial readiness implementation — COMPLETE
 
@@ -318,6 +359,7 @@ All external launch prerequisites and the exact controlled paid-enable configura
 |---|---|---|
 | Commercial-enablement preparation release — PR #35 | **COMPLETE / PAID-OFF PRODUCTION VERIFIED** | Remains fail-closed; no reopening without a real change |
 | Public paid Architecture Review launch | **BLOCKED / NOT ENABLED** | Close external Production prerequisites before enablement |
+| GPT-6 Astra Challenge launch hardening | **SELECTED / SPECIFICATION PENDING** | `02` inspects the actual Production first-value path and produces an implementation-ready bounded specification; no paid/Stage/authority expansion |
 | Paid API boundary | **SELECTED** | Authenticated active paid entitlement + remaining quota required |
 | Public price / currency | **SELECTED — PROVISIONAL** | USD 12.00/month; reassess only from later evidence or new safety/commercial input |
 | Initial included quota | **SELECTED — PROVISIONAL** | 10 reviews per confirmed monthly billing period |
@@ -328,7 +370,7 @@ All external launch prerequisites and the exact controlled paid-enable configura
 | Controlled paid enablement | **BLOCKED / PROCEDURE UNRESOLVED** | `01`/`02` resolve Phase G first-launch dependency; `C01` only after approved procedure and prerequisite evidence |
 | Live financial QA / PAUC AC-30 | **NOT COMPLETE** | `W01` after controlled paid enablement/evidence is ready |
 | Commercial Validation Gate M0 | **NOT REACHED** | Evaluate only after Paid Access is Production Verified and sufficient real paid evidence exists |
-| Gate A | **NOT REACHED** | no promotion from preparation release alone |
+| Gate A | **NOT REACHED** | no promotion from preparation release or challenge launch alone |
 | Stage 1.5 / Stage 2 selection | **NONE / NOT SELECTED** | remain unchanged until the normal post-Sprint 01 Gate/selection review |
 
 ---
@@ -341,6 +383,8 @@ All external launch prerequisites and the exact controlled paid-enable configura
 
 The next planning output is a bounded evidence/gap summary, not an automatic feature backlog. If evidence justifies independent hardening/foundation work, `01` must explicitly select it, preserve the open commercial Sprint and AC-30 obligations, and route it through `02` before C01 implementation. Otherwise record DEFER and the evidence needed to revisit. Formal Gate A retains its Production prerequisite; M0 paid-sample collection is separate. No new feature, AI authority, mutation authority, or paid provider run is authorized here.
 
+The GPT-6 Astra Challenge launch-hardening selection is one such explicitly selected bounded hardening packet. Its external September 18 deadline does not broaden its Product authority: `02` still owns specification, `C01` must not invent future capability, and behavior-changing work still requires normal independent QA and Production verification.
+
 ## Reconciliation ownership
 
 At material lifecycle/blocker/gate/release/Production-verification changes, `00` re-checks live reality and updates, only where meaning changed:
@@ -351,7 +395,7 @@ docs/roadmap/PROGRAM_BOARD.md
 docs/roadmap/RISK_REGISTER.md
 ```
 
-No Risk Register state change is required by the preparation release itself: R-008 and R-021 remain blocking for public paid launch, and R-020 remains applicable until the live billing/entitlement/quota lifecycle is independently verified.
+No Risk Register state change is required by the launch-hardening selection itself: it introduces no durable new risk class and does not change R-008, R-020, or R-021. Revisit the Risk Register only if specification/implementation introduces a material durable risk not already covered.
 
 Do not update these files for every commit, CI run, transient metric, or Preview deployment.
 
@@ -367,7 +411,7 @@ Keep responsibilities separate:
 
 # 6. Coordination discipline
 
-Current canonical path:
+Current canonical paid-launch path:
 
 ```text
 PR #35 preparation release
@@ -379,6 +423,22 @@ PR #35 preparation release
 → 00 Sprint Complete
 → 01 Evidence → Gate Review → Explicit Next Selection
 ```
+
+Parallel bounded launch-hardening path:
+
+```text
+AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1
+= SELECTED
+
+→ 02 Specified
+→ C01 behavior-changing implementation + required checks
+→ W01 independent QA
+→ C01 exact approved release
+→ W01 Production Verified
+→ 00 bounded packet Sprint Complete
+```
+
+The parallel path must not merge with, bypass, or weaken the paid-launch prerequisites. Success at the Product Hunt challenge is not Stage promotion, Gate evidence by itself, Commercial Validation, or authority expansion.
 
 Conditional routing:
 
