@@ -3,7 +3,7 @@
 Status: **Specified**  
 Selection owner: `01 — Product Architecture & Roadmap`  
 Specification owner: `02 — UX & Implementation Specification`  
-Next owner: `C01 — Current Sprint Implementation`  
+Next owner: `W01 — Independent QA / Pass A`
 Selected: **2026-09-12**  
 Specified: **2026-09-12**  
 Timebox: **Product Hunt GPT-6 Astra Challenge launch on 2026-09-18**  
@@ -556,8 +556,8 @@ No unresolved Product decision blocks implementation.
 ```text
 01 Selected
 → 02 Specified
-→ C01 Implementation Started   ← next
-→ C01 Implementation Complete
+→ C01 Implementation Started
+→ C01 Implementation Complete   ← current (2026-09-12)
 → W01 QA Complete
 → C01 merge/release exact QA-approved revision
 → W01 Production Verified
@@ -567,3 +567,5 @@ No unresolved Product decision blocks implementation.
 `Specified` is specification maturity only. It does not mean implemented, QA-approved, released, Production Verified, paid-ready, M0/Gate reached, or authority-expanded.
 
 The open paid Architecture Review lifecycle remains separate and unchanged.
+
+C01 completed required self-verification. See [implementation evidence](../harness/ASTRA_LAUNCH_IMPLEMENTATION.md). Independent QA and Production verification of the exact candidate remain pending.

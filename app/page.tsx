@@ -50,7 +50,7 @@ import {
 } from '@/lib/preflight-activation';
 
 const STORAGE_KEY = 'agentgraph_active_flow';
-const initialDefaultPreset = PRESET_TEMPLATES[0];
+const initialDefaultPreset = PRESET_TEMPLATES.find((preset) => preset.id === 'competitor-price-monitor')!;
 
 export default function EditorPage() {
   const { lang, t } = useLanguage();
@@ -746,7 +746,7 @@ export default function EditorPage() {
       setIsInspectorOpen(true);
       requestAnimationFrame(() => {
         window.dispatchEvent(new CustomEvent('focus-flow-node', { detail: { nodeId: target.nodeId } }));
-        window.dispatchEvent(new Event('focus-inspector-heading'));
+        requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-inspector-field', { detail: { field: target.field, nodeId: target.nodeId } })));
       });
       return;
     }
@@ -772,7 +772,7 @@ export default function EditorPage() {
     setSurface('design');
     setReviewReturnContext({ stage: 'readiness', label: translateReadinessKey(lang, finding.titleKey, finding.params), itemKey: `${finding.ruleId}:${target.field ?? 'graph'}` });
     setNavigationAnnouncement(lang === 'ja' ? 'Crew設定をDesignで表示しました。指摘に戻れます。' : 'Located Crew configuration in Design. Back to finding is available.');
-    requestAnimationFrame(() => window.dispatchEvent(new Event('focus-inspector-heading')));
+    requestAnimationFrame(() => requestAnimationFrame(() => window.dispatchEvent(new CustomEvent('focus-inspector-field', { detail: { field: target.field, nodeId: target.nodeId } }))));
   }, [lang, readiness, setEdges, setNodes]);
 
   const readinessTargetSummary = useCallback((finding: ReadinessFinding) => {
@@ -939,6 +939,9 @@ export default function EditorPage() {
 
   const handleBackToReview = useCallback(() => {
     if (!reviewReturnContext) return;
+    // A quick return can precede the debounced edit analysis. Resolve against
+    // current deterministic evidence before choosing the exact return focus.
+    if (reviewReturnContext.stage === 'readiness') readiness.evaluateNow();
     setActivePreflightStage(reviewReturnContext.stage);
     setFocusPreflightHeadingOnOpen(false);
     setIsPreflightReviewOpen(true);
@@ -952,7 +955,7 @@ export default function EditorPage() {
         setNavigationAnnouncement(lang === 'ja' ? 'ワークフロー変更後、以前のレビュー項目は存在しません。該当ステージを表示しました。' : 'The previous review item is no longer present after the workflow changed. The review stage is open.');
       }
     }));
-  }, [lang, reviewReturnContext]);
+  }, [lang, readiness, reviewReturnContext]);
 
   const counts = useMemo(() => ({
     agents: nodes.filter((node) => node.type === 'agent').length,

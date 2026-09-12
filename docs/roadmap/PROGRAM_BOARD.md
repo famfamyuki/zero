@@ -102,7 +102,7 @@ A separate bounded launch-hardening packet is now selected for the GPT-6 Astra C
 ```text
 GPT-6 Astra Challenge Launch Hardening
 = SELECTED
-= SPECIFICATION PENDING
+= Implementation Complete (C01 self-verification, 2026-09-12)
 = target Product Hunt launch 2026-09-18
 = free-core / first-value / presentation hardening only
 = no paid-launch bypass
@@ -132,7 +132,7 @@ Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is 
 | `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 lifecycle open; paid access amendment also applies |
 | `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; external readiness and live AC-30 remain open |
 | `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation code implemented; public content/approval and launch evidence remain prerequisites |
-| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Time-boxed free-core launch hardening for the September 18 GPT-6 Astra Challenge | **Selected** by `01`; next owner `02` for implementation-ready specification; no behavior-changing implementation before `Specified` |
+| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Time-boxed free-core launch hardening for the September 18 GPT-6 Astra Challenge | **Implementation Complete** by `C01` on 2026-09-12; next owner `W01` Pass A for independent QA of the exact candidate; not QA-approved or released |
 | `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed capability contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
 | `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` | Completed UX contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
 
@@ -144,7 +144,7 @@ The earlier branch/PR preparation sequence is complete. PR #35 is merged and is 
 
 Reclassifying controlled paid enablement / AC-30 as an unrelated future packet would silently weaken the existing gate semantics and is therefore not done by 00.
 
-## Parallel bounded packet — GPT-6 Astra Challenge Launch Hardening — SELECTED
+## Parallel bounded packet — GPT-6 Astra Challenge Launch Hardening — Implementation Complete
 
 Owner flow:
 
@@ -164,7 +164,7 @@ Authoritative selection packet:
 
 The packet is intentionally narrower than a roadmap-stage promotion. It may harden the current free-core first-value path, representative demo continuity, truthful launch attribution/metadata, responsive/accessibility behavior, and changed-path Production confidence. It must not add Astra as a contest-driven runtime dependency, enable paid Architecture Review, pull Stage 1.5/Stage 2 forward, expand AI/Mutation authority, add persistence/runtime verification, or bypass the open commercial blocker.
 
-`02` is the next owner for this packet and must inspect the actual Production first-value path before fixing exact UX behavior. The current `Competitor Catalog Review Crew` is only a representative-demo candidate until `02` specifies the flow.
+`02` specified the packet; `C01` completed implementation and required self-verification. The exact candidate goes to `W01` Pass A. See [C01 implementation evidence](../harness/ASTRA_LAUNCH_IMPLEMENTATION.md). Independent QA and candidate Production verification remain pending.
 
 This parallel packet is permitted without closing the commercial Sprint because Program Board planning already allows explicitly selected independent hardening/foundation work while launch is blocked, provided the paid Sprint and AC-30 obligations remain explicit and unchanged.
 
@@ -359,7 +359,7 @@ All external launch prerequisites and the exact controlled paid-enable configura
 |---|---|---|
 | Commercial-enablement preparation release — PR #35 | **COMPLETE / PAID-OFF PRODUCTION VERIFIED** | Remains fail-closed; no reopening without a real change |
 | Public paid Architecture Review launch | **BLOCKED / NOT ENABLED** | Close external Production prerequisites before enablement |
-| GPT-6 Astra Challenge launch hardening | **SELECTED / SPECIFICATION PENDING** | `02` inspects the actual Production first-value path and produces an implementation-ready bounded specification; no paid/Stage/authority expansion |
+| GPT-6 Astra Challenge launch hardening | **Implementation Complete / INDEPENDENT QA PENDING** | `W01` Pass A independently verifies the exact C01 candidate; no paid/Stage/authority expansion |
 | Paid API boundary | **SELECTED** | Authenticated active paid entitlement + remaining quota required |
 | Public price / currency | **SELECTED — PROVISIONAL** | USD 12.00/month; reassess only from later evidence or new safety/commercial input |
 | Initial included quota | **SELECTED — PROVISIONAL** | 10 reviews per confirmed monthly billing period |
