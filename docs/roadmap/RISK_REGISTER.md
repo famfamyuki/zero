@@ -66,4 +66,6 @@ Re-check this register after material lifecycle, blocker, gate, release, or Prod
 
 Promote a risk to `BLOCKING` when its trigger is observed and the selected packet/gate cannot safely satisfy Acceptance Criteria without resolving or narrowing scope. A blocking risk must be routed through Program Board or the active packet with observed evidence, affected packet/gate, smallest safe response, owner lane, and re-check condition.
 
+For commercial work, a risk may block public paid launch or paid expansion without blocking unrelated deterministic Product operation or independently justified evaluator-quality work. Do not accept a Critical risk merely to preserve a launch date or stage sequence.
+
 A risk is `CLOSED` only when the durable risk no longer applies. A successful control usually moves a recurring risk to `MITIGATED`, not permanently closed. One safe evaluator release, one branch-protection check, one documentation reconciliation, one import adapter, one commercially successful month, or one correct billing lifecycle test does not eliminate the corresponding recurring risk.
