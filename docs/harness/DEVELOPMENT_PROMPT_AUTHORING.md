@@ -2,9 +2,10 @@
 
 Status: **Canonical execution-support guidance for development task briefs**
 
-This file defines how to compose development prompts across Chat, Work, and Codex.
-It does not create Product, Architecture, lifecycle, QA, release, or security
-authority; those remain in their canonical documents and the active packet.
+This file defines how to compose development prompts across Chat, Work, Codex, and
+Astra-backed repository tasks. It does not create Product, Architecture, lifecycle,
+QA, release, or security authority; those remain in their canonical documents and
+the active packet.
 
 ## Build from current authority
 
