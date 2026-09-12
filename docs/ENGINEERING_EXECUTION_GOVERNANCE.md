@@ -9,7 +9,8 @@ Roadmap/Gate, AI/Mutation authority, Security/Data, migration, Acceptance,
 regression, QA, or release semantics.
 
 Use [`DEVELOPMENT_RULES.md`](./DEVELOPMENT_RULES.md) as the single current
-Development Governance authority.
+Development Governance authority. Current canonical documents should cite
+`DEVELOPMENT_RULES.md` directly rather than routing through this compatibility path.
 
 This file remains so historical ADRs, specs, and old links continue to resolve.
 Those historical references do not create a second source of truth.

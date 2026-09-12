@@ -14,7 +14,7 @@
     "build": "next build",
     "docs": "npm run docs:check",
     "start": "next start",
-    "docs:check": "node scripts/check-docs.mjs",
+    "docs:check": "node scripts/check-docs.mjs && node scripts/check-current-authority-references.mjs",
     "test": "node scripts/run-tests.mjs",
     "typecheck": "tsc --noEmit",
     "commercial:check": "node --import tsx scripts/check-commercial-readiness.ts",

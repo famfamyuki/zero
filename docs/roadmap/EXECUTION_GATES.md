@@ -1,147 +1,68 @@
 # AgentGraph Studio — Execution & Promotion Gates
 
 Status: **Authoritative cross-stage execution governance**  
-Scope: Stage entry/exit criteria, promotion decisions, evaluator authority expansion, evidence requirements, safe-transformation scope, and roadmap execution discipline.
+Scope: stage entry/exit, promotion, AI authority, mutation authority, evidence requirements, and roadmap execution discipline.
 
-This document turns the long-term roadmap into an executable development program. It does **not** expand an active implementation packet.
+This document makes the roadmap executable. It does **not** expand an active packet.
 
-Supporting execution documents:
+Supporting authorities:
 
-- `docs/roadmap/PROGRAM_BOARD.md` — current milestone/candidate/blocker coordination
-- `docs/roadmap/RISK_REGISTER.md` — durable program risks and escalation state
-- `docs/ENGINEERING_EXECUTION_GOVERNANCE.md` — Definition of Ready, version lifecycle, traceability, operational-quality maturity, repository/docs enforcement
-- `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md` — designed-expectation and later verification contract
+- `docs/roadmap/PROGRAM_BOARD.md` — current execution/blocker coordination
+- `docs/roadmap/RISK_REGISTER.md` — durable program risks
+- `docs/DEVELOPMENT_RULES.md` — Definition of Ready, version lifecycle, traceability, operational-quality maturity, repository/docs enforcement
+- `docs/architecture/SCENARIO_ACCEPTANCE_CONTRACT.md` — designed expectation vs verification
 
-## 0. Source-of-truth rule
+## 0. Source-of-truth and execution rule
 
-Priority remains:
+When information conflicts, use:
 
-1. latest GitHub `main` / repository reality
-2. latest Vercel Production / actual Production behavior
-3. active packet under `docs/specs/`
-4. `docs/PRODUCT_MASTER.md`
-5. `docs/ARCHITECTURE.md`
-6. `docs/roadmap/MASTER_ROADMAP.md`
-7. this document for stage promotion / execution-gate decisions
-8. relevant cross-stage plans/contracts
-9. `docs/roadmap/PROGRAM_BOARD.md` for near-term coordination
-10. historical plans/chats
+```text
+latest GitHub main / repository reality
+→ latest Vercel Production / actual Production behavior
+→ active docs/specs packet
+→ Product Master
+→ Architecture
+→ Development Rules / applicable Security & Data baselines
+→ Master Roadmap
+→ Execution Gates
+→ relevant specialized plans/contracts
+→ Program Board / Risk Register
+→ Current State snapshot
+→ ADR / historical Chat / Work / Codex / old SHAs
+```
 
-A roadmap stage is not implementation scope until work is explicitly **Selected** and **Specified**.
+Historical chats, old SHAs, and compatibility paths are evidence/history, not current authority.
 
-Before a packet advances to implementation, apply the Definition of Ready in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
-
----
-
-# 1. Why gates exist
-
-AgentGraph Studio contains capabilities whose authority and migration cost increase over time. A stage must therefore advance because prerequisites are demonstrated, not because the previous stage number was completed.
-
-Use this model:
+A roadmap stage becomes implementation scope only after explicit **Selected → Specified**. Stage order is dependency direction, not an automatic queue:
 
 ```text
 Stage work
-→ measurable evidence
-→ gate review
-→ explicit decision
-→ next Selected packet
+→ Evidence
+→ Gate Review
+→ Explicit decision
+→ Selected packet
 ```
 
-Possible gate outcomes:
+Gate outcomes may be `PROCEED`, `PROCEED_WITH_CONDITIONS`, `HARDEN_FIRST`, `FOUNDATION_FIRST`, or `DEFER`. Material durable promotion decisions belong in `docs/decisions/`.
 
-- `PROCEED`
-- `PROCEED_WITH_CONDITIONS`
-- `HARDEN_FIRST`
-- `FOUNDATION_FIRST`
-- `DEFER`
-
-Every non-trivial promotion decision should record:
-
-- evidence reviewed
-- known limitations
-- decision
-- rationale
-- dependency impact
-- approved AI authority envelope where applicable
-- approved mutation scope where applicable
-- follow-up requirement
-
-Material durable decisions belong in `docs/decisions/`.
+Before implementation, apply the Definition of Ready in `docs/DEVELOPMENT_RULES.md`.
 
 ---
 
-# 2. Gate A — Stage 1 Evaluation Trust & Scale
+# 1. Gate A — Evaluation Trust & Scale
 
-Applies after **Stage 1 — Evidence-Grounded AI Architecture Review** reaches Production Verified and enough evaluation evidence exists.
+Applies after Stage 1 Architecture Review reaches Production Verified and enough evaluation evidence exists. Evidence preparation does not pass the gate, close Stage 1, relax paid-access/AC-30 requirements, or select future work. While launch prerequisites are blocked, `01` may inventory existing evaluation evidence and identify gaps; that does not itself authorize provider spending, a new packet, or stronger authority.
 
-Preparing evidence is not passing this gate. While external launch prerequisites remain blocked, `01` may inventory existing evaluation results, identify evidence gaps, and compare candidate scopes. This does not declare Stage 1 complete, pass Gate A, select a new packet, authorize provider spending, or relax paid-access/AC-30 requirements. Independently justified safety/quality or foundation work requires explicit `01` selection and `02` specification before implementation; waiting alone is not selection evidence. Commercial sample sufficiency for M0 is not a prerequisite for evaluator hardening.
+Review at minimum:
 
-Required review dimensions:
+- **Structural safety:** zero accepted hard contract violations in the defined release benchmark; invalid Evidence/targets, Known/Inferred/Unknown violations, prompt-injection obedience, silent mutation, failure isolation, and schema/runtime validation.
+- **Semantic quality:** versioned expert-annotated evidence where available; issue precision/recall, good-workflow false positives, flawed-workflow false negatives, top-1/top-k priority agreement, severity calibration, recommendation usefulness/safety, strength recognition, uncertainty preservation.
+- **Stability:** repeated runs and semantics-preserving variants, including layout-only and irrelevant ordering/renaming invariance where appropriate.
+- **Scale/reliability:** representative topology/size tiers around 10/50/100/250/500+ nodes as benchmark sizes, not product limits; Evidence/input size, latency, timeout/error rate, structured-output failure rate, semantic degradation, and full/scoped-review behavior. Silent truncation is prohibited.
 
-## Structural safety
+Permanent promotion thresholds must not be invented before the dataset/rubric is mature. Thresholds are versioned, tied to a named dataset/rubric, based on decision-useful samples, reviewed after material evaluator change, and labeled `Provisional` or `Calibrated`. A packet-specific live-evaluation target is a release signal for that packet, not automatically the permanent threshold for stronger AI authority.
 
-- hard contract violations
-- invalid Evidence/target acceptance
-- Known/Inferred/Unknown violations
-- prompt-injection obedience
-- silent mutation behavior
-- provider-failure isolation
-- schema/runtime validation failures
-
-Direction: accepted hard violations in the defined release benchmark must remain **zero**.
-
-## Semantic quality
-
-Track with a versioned expert-annotated dataset where available:
-
-- issue precision
-- issue recall
-- false-positive rate on intentionally good workflows
-- false-negative rate on intentionally flawed workflows
-- top-1 and top-k priority agreement with expert judgement
-- severity/priority calibration
-- recommendation usefulness/safety
-- strength recognition
-- uncertainty preservation
-
-## Stability
-
-Measure repeated runs and semantics-preserving variants:
-
-- material finding stability
-- priority stability
-- layout-only invariance
-- irrelevant ordering/renaming invariance where semantically appropriate
-
-## Scale / reliability
-
-Benchmark multiple topology and size tiers, including approximately 10 / 50 / 100 / 250 / 500+ nodes as benchmark sizes rather than hard limits:
-
-- Evidence bytes/items
-- provider input size
-- latency
-- timeout/error rate
-- structured-output failure rate
-- semantic quality degradation
-- partial/scoped/full-review behavior
-
-No silent truncation is permitted.
-
-## Threshold policy
-
-Do **not** invent permanent numeric promotion thresholds before the gold dataset and expert process are sufficiently mature.
-
-Thresholds must be:
-
-- versioned
-- tied to a named dataset/rubric
-- based on enough samples to be decision-useful
-- reviewed when model/prompt/rubric changes materially
-- recorded as `Provisional` or `Calibrated`
-
-The current packet's live-eval target is a release signal for that packet, not automatically the permanent Stage 2 authority threshold.
-
-Operational latency/failure targets follow the maturity model in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`:
+Operational quality follows `docs/DEVELOPMENT_RULES.md`:
 
 ```text
 UNMEASURED
@@ -151,124 +72,73 @@ UNMEASURED
 → ENFORCED / ALERTED where justified
 ```
 
-Gate A may select:
-
-- direct quality hardening
-- scale foundation
-- Search / Locate / Scoped Evidence foundation
-- Adoption & Context work that increases first value without expanding AI mutation authority
-- a combined minimal dependency Sprint
+Gate A may select quality hardening, scale foundation, Search/Locate/Scoped Evidence, Adoption & Context foundation, or the smallest coherent combined dependency packet. Commercial sample sufficiency for M0 is not a prerequisite for independently justified evaluator hardening.
 
 ---
 
-# 3. Stage 1.5 — Adoption & Context Foundation selection band
+# 2. Stage 1.5 — Adoption & Context Foundation selection band
 
-Stage 1.5 is a **planned selection band**, not one mandatory monolithic Sprint.
-
-Candidate capabilities:
+Stage 1.5 is a **selection band**, not one mandatory Sprint. Candidate threads include:
 
 - CrewAI existing-project static import / semantic mapping
 - Project / Local Workspace foundation
 - persisted Intent & Constraints
-- Scenario / Acceptance foundation when explicit designed expectations are a measured dependency
-- dedicated Review Workspace / finding navigation
+- Scenario / Acceptance foundation when measured evidence shows it is required
+- Review Workspace / finding navigation
 - revision/evaluation-history foundation
 
-Selection rule:
+Select only the smallest set that materially improves first value, evaluator context, repeat use, migration leverage, review understandability, or explicit expected-behavior context. Record an explicit selection in `docs/roadmap/PROGRAM_BOARD.md`; appearing in the roadmap is not selection.
 
-Choose only the smallest set that materially improves one or more of:
+Required boundaries remain: no speculative Graph V2, hidden cloud lock-in, direct semantic AI apply, or fabricated dynamic/imported facts. Unsupported/dynamic import behavior remains Unknown or explicitly lossy. Configured expectations are not observed runtime behavior. Prefer revision-compatible identity where it reduces later migration cost.
 
-- Access to first value
-- evaluator context
-- repeat use after workflow change
-- migration leverage for later safe transformation
-- review understandability
-- explicit expected-behavior context needed for later verification
-
-Use the selection criteria above and the Sprint selection scorecard in section 9, then record the explicit selection in `docs/roadmap/PROGRAM_BOARD.md`; do not select a candidate merely because it appears in the roadmap.
-
-Stage 1.5 work may proceed even when evaluator authority is not yet ready for Stage 2, provided it does not silently expand AI authority.
-
-Required boundaries:
-
-- no speculative Graph V2 rewrite
-- no hidden cloud lock-in
-- no direct semantic AI apply
-- imported dynamic/unsupported behavior remains Unknown or explicitly lossy
-- revision-compatible identity should be preferred where it reduces later migration cost
-- configured Scenario/Acceptance expectations must not be represented as observed runtime truth
+Stage 1.5 may proceed before stronger evaluator authority if the selected packet does not silently expand that authority.
 
 ---
 
-# 4. Gate B — Evaluator Authority Expansion
+# 3. Gate B — Evaluator Authority Expansion
 
-Required before Stage 2 materially increases automated recommendation authority.
-
-Gate B reviews:
-
-- Gate A quality evidence and current limitations
-- false-positive control on known-good workflows
-- top-issue prioritization quality
-- stability under repeated runs
-- whether intent/context/scenario quality is sufficient for the planned proposal scope
-- whether proposal claims can be evidence-grounded
-- whether revision/provenance foundations are sufficient for traceability
-- whether large-workflow scope limitations are disclosed
+Before Stage 2 materially increases recommendation authority, review Gate A evidence plus false-positive control, prioritization quality, repeated-run stability, intent/context sufficiency, evidence-groundability, revision/provenance, and disclosed large-workflow limitations.
 
 Decision question:
 
-> Is the reviewer reliable enough that users should reasonably act on its structured improvement proposals **inside the proposed authority scope**?
+> Is the evaluator reliable enough that users should reasonably act on structured proposals inside the proposed authority scope?
 
-If not, select evaluator/context hardening instead of mechanically entering Stage 2.
+If not, select evaluator/context hardening instead of Stage 2.
 
-## 4.1 AI Authority Envelope
+## 3.1 AI Authority Envelope
 
-AI authority must be approved by capability class, not treated as one global on/off switch.
+Authority is capability-scoped:
 
-Use the following durable authority levels as a planning vocabulary:
+- `AE0 — Explain`: explain existing deterministic Evidence/limitations.
+- `AE1 — Review`: advisory evidence-grounded strengths/findings/priorities.
+- `AE2 — Architecture Proposal`: propose agent/task/dependency/output architecture changes; no executable patch.
+- `AE3 — Resource/Tool/Model Proposal`: recommendations whose external properties require suitable evidence.
+- `AE4 — Security/Control Proposal`: permission/approval/data/policy/control recommendations requiring appropriate capability evidence.
+- `AE5 — Architecture Patch`: architecture-only semantic patch scope after Gate C and explicit mutation approval.
+- `AE6 — Side-effect-sensitive Patch`: stronger scope affecting consequential capabilities; requires Gate C plus stronger control evidence.
 
-- `AE0 — Explain`: explain existing deterministic Evidence / limitations; no new architecture judgement required
-- `AE1 — Review`: evidence-grounded strengths/findings/priorities; advisory only
-- `AE2 — Architecture Proposal`: propose changes to agent/task/dependency/output architecture; no executable patch
-- `AE3 — Resource/Tool/Model Proposal`: recommend tool/model/resource changes whose external properties may require structured/external evidence
-- `AE4 — Security/Control Proposal`: recommend permission, approval, sensitive-data, policy, or side-effect controls; requires appropriate capability/policy evidence
-- `AE5 — Architecture Patch`: generate/apply-approved semantic patches limited to an explicitly approved architecture-only mutation scope under Gate C
-- `AE6 — Side-effect-sensitive Patch`: semantic patches that can change external mutation, credentials, sensitive data, approval/policy, or consequential tool behavior; requires stronger capability/control prerequisites in addition to Gate C
+A higher level for one capability class does not authorize unrelated classes. Stage 2 normally begins with a defined `AE2` scope, not automatic AE3/AE4. AE5/AE6 require Gate C. Benchmark evidence must match the authority granted. Unknown external/runtime/provider properties remain Unknown without suitable evidence.
 
-Rules:
-
-1. Approval of a higher level for one capability class does not automatically approve unrelated classes.
-2. Stage 2 normally begins with `AE2` inside a defined scope; it does not automatically authorize `AE3` or `AE4`.
-3. `AE5`/`AE6` require Gate C and an explicit mutation-scope decision.
-4. Benchmark evidence must match the authority being granted. Good architecture-review quality alone is not evidence that security/tool recommendations are reliable.
-5. Unknown external/runtime/provider properties remain Unknown unless supported by appropriate evidence.
-6. A gate record must state the approved envelope, e.g. `AE2: agent/task/dependency architecture only`.
-
-This envelope prevents evaluator authority from expanding faster than measured trust in the specific type of decision.
+Every material gate record states the approved envelope.
 
 ---
 
-# 5. Gate C — Safe Transformation Readiness
+# 4. Gate C — Safe Transformation Readiness
 
-Required before Stage 3 allows semantic workflow mutation.
+Required before semantic workflow mutation. Mandatory prerequisites:
 
-Mandatory prerequisites:
-
-- trustworthy upstream finding/proposal contract
-- immutable revision identity or deterministic stale-detection equivalent
-- versioned Semantic Patch contract
-- patch schema validation
-- base-revision validation
-- structural/semantic validation
+- trustworthy upstream finding/proposal
+- immutable revision identity or deterministic stale detection
+- versioned Semantic Patch
+- patch/base-revision/structural/semantic validation
 - before/after deterministic analysis
-- policy/compatibility validation where relevant
+- policy/compatibility validation when applicable
 - semantic diff preview
-- transactional apply
-- failure leaves source unchanged
-- user selection/approval
+- transactional apply; failure leaves source unchanged
+- explicit user selection/approval
 - rollback/undo direction
 
-Required invariant:
+Invariant:
 
 ```text
 Finding
@@ -280,100 +150,37 @@ Finding
 → New Revision
 ```
 
-Patch safety does not compensate for poor upstream evaluation quality.
+Patch safety does not compensate for poor upstream evaluation.
 
-## 5.1 Mutation scope is separate from pipeline safety
+## 4.1 Mutation scope is separate from pipeline safety
 
-Passing the generic patch pipeline does **not** authorize every semantic operation.
+Gate C records the allowed mutation scope. Passing the patch pipeline does not authorize every operation.
 
-Gate C must record an explicit allowed mutation scope.
+**Architecture-only scope** may include agent/task responsibility, dependency/context, assignment, and output-contract changes that do not themselves introduce consequential external capabilities. These changes remain user-controlled and still require revision, validation, before/after, and apply safeguards.
 
-### Architecture-only mutation scope
+**Side-effect-sensitive scope** includes changes that can alter consequential external actions, sensitive access/disclosure, approval/policy boundaries, insufficiently known tool capabilities, or irreversible/high-impact effects. Do not authorize this scope from architecture-patch mechanics alone. Introduce the minimum structured capability/human-control/policy evidence first; Unknown custom-tool capability is not assumed safe.
 
-This may be selected first when its upstream evaluation/proposal evidence is sufficient. Typical examples include, subject to the active packet:
-
-- agent/task architecture changes
-- responsibility boundary changes
-- dependency/context relationship changes
-- assignment changes
-- output-contract changes
-- other semantic operations that do not themselves introduce or change consequential external capabilities
-
-Even architecture-only changes remain user-controlled and must pass revision/validation/before-after requirements.
-
-### Side-effect-sensitive mutation scope
-
-Treat as a stronger boundary when a patch can change or introduce, for example:
-
-- external mutation capability
-- credential access
-- sensitive-data access/disclosure
-- filesystem/network authority where consequential
-- human-approval requirements
-- policy/security boundaries
-- tool bindings whose capabilities are not sufficiently Known
-- irreversible or high-impact effects
-
-Do not authorize this scope solely because architecture patch mechanics are safe.
-
-Before side-effect-sensitive mutation, the selected packet must define sufficient structured capability/human-control/policy evidence and enforcement/validation boundaries. A minimal capability/control foundation may therefore be pulled forward before the full later Security & Policy Engineering stage when required as a prerequisite.
-
-Unknown/custom tool capability must not be optimistically treated as safe.
-
-## 5.2 Recommended Stage 3 sequencing
-
-Preferred default:
+Preferred sequencing:
 
 ```text
 Gate C pipeline readiness
 → AE5 Architecture-only Safe Transformation
-→ measure transformation quality/safety
-→ introduce capability/human-control foundation as required
-→ explicit approval for AE6 Side-effect-sensitive Transformation
+→ measure quality/safety
+→ capability/human-control foundation as required
+→ explicit AE6 decision
 ```
-
-This is a safety/dependency boundary, not a requirement to split the public roadmap into new numbered stages.
 
 ---
 
-# 6. Gate D — Large Workflow claim readiness
+# 5. Later promotion gates
 
-Do not claim generic "large workflow support" from payload acceptance alone.
+## Gate D — Large Workflow claim readiness
 
-Before such a claim, document:
+Do not claim generic large-workflow support from payload acceptance. Document tested size/topology, full vs scoped review limits, semantic quality, navigation usability, latency/failure behavior, unsupported tiers, and no-silent-truncation behavior. If monolithic review is insufficient, prefer deterministic global scan → relevant region selection → local evaluation → cross-region analysis → global synthesis. Scoped review must disclose scope.
 
-- tested size/topology tiers
-- full vs scoped review limits
-- semantic quality by tier
-- navigation usability
-- latency/failure behavior
-- any unsupported tier
-- no-silent-truncation behavior
+## Gate E — Framework expansion
 
-If monolithic evaluation is insufficient, prefer:
-
-```text
-Deterministic Global Scan
-→ Relevant Region/Subgraph Selection
-→ Local Evaluation
-→ Cross-region Analysis
-→ Global Synthesis
-```
-
-Scoped review must disclose scope.
-
----
-
-# 7. Gate E — Framework expansion
-
-Before a second major target framework:
-
-- Target Capability Contract exists
-- Lossiness Contract exists
-- current CrewAI behavior remains strong
-- canonical semantic boundaries are sufficient
-- unsupported semantics are explicit
-- migration does not rely on scattered framework-name conditionals
+Before a second major target: Target Capability and Lossiness contracts exist, CrewAI remains strong, canonical boundaries are sufficient, unsupported semantics are explicit, and implementation does not devolve into scattered framework-name conditionals.
 
 Preferred sequence:
 
@@ -386,58 +193,23 @@ Target Capability
 → second target
 ```
 
----
+## Gate F — Collaboration / Enterprise expansion
 
-# 8. Gate F — Collaboration / Enterprise expansion
-
-Substantial collaboration/governance should not outrun individual engineering value.
-
-Before major Team/Enterprise scope, verify that the underlying individual contracts are mature enough:
-
-- workflow/project identity
-- revision/history
-- evaluation provenance
-- policy/capability contracts where relevant
-- privacy/data governance
-- access-control model
-- auditability
-
-Collaboration is not a prerequisite for local/user-owned value.
+Substantial collaboration must not outrun individual engineering value. Verify workflow/project identity, revision/history, evaluation provenance, applicable policy/capability contracts, privacy/data governance, access-control model, and auditability. Collaboration is not a prerequisite for local/user-owned value.
 
 ---
 
-# 9. Sprint selection scorecard
+# 6. Sprint selection scorecard
 
-For each candidate Sprint, evaluate:
+For each candidate Sprint evaluate: North Star value; dependency criticality; architectural leverage; migration cost avoided; simplest sufficient solution; evidence-groundability; human control/safety; portability/ownership; Production regression risk; evaluation-trust impact; first-value access; repeat-use value; scale relevance; governance/defensibility relevance; demand dependence; whether evidence supports the requested AI authority envelope; whether mutation depends on missing capability/security foundations; and whether Scenario/Acceptance context is required.
 
-1. North Star user value
-2. dependency criticality
-3. architectural leverage
-4. migration cost avoided by doing it now
-5. simplest sufficient solution
-6. evidence-groundability
-7. human control/safety
-8. portability/user ownership
-9. Production regression risk
-10. evaluation trust impact
-11. access to first value
-12. repeat-use value
-13. scale relevance
-14. governance/defensibility relevance
-15. demand dependence
-16. whether the required AI authority envelope is actually supported by evidence
-17. whether the proposed mutation scope depends on capability/security foundations not yet present
-18. whether Scenario/Acceptance context is required to judge correctness
-
-Marketing novelty and feature count must not dominate this scorecard.
-
-Before specification, also pass the Definition of Ready in `docs/ENGINEERING_EXECUTION_GOVERNANCE.md`.
+Marketing novelty and feature count must not dominate. Before specification, apply `docs/DEVELOPMENT_RULES.md` Definition of Ready.
 
 ---
 
-# 10. Promotion record template
+# 7. Promotion record
 
-For a gate decision, record at minimum:
+Every non-trivial gate decision records at minimum:
 
 ```text
 Gate:
@@ -455,6 +227,4 @@ Conditions / follow-ups:
 Risk IDs affected:
 ```
 
-Do not treat a historical promotion record as current repository state; live GitHub/Vercel reality always wins.
-
-Update `docs/roadmap/PROGRAM_BOARD.md` and `docs/roadmap/RISK_REGISTER.md` when a material gate decision changes near-term sequencing or risk state.
+Update Program Board and Risk Register when a material gate decision changes near-term sequencing or risk state. A historical promotion record never replaces live GitHub/Vercel evidence.
