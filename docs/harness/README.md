@@ -6,6 +6,11 @@ from [Role Registry](../CHAT_ROLE_REGISTRY.md). Development Governance is
 [Development Rules](../DEVELOPMENT_RULES.md). Maintenance acceptance criteria are
 in [Execution scope](EXECUTION_SCOPE.md).
 
+When a Chat, Work, Codex, or Astra task needs a development prompt or handoff brief,
+compose it from current repository authority using the
+[Development Prompt Authoring contract](DEVELOPMENT_PROMPT_AUTHORING.md) rather
+than copying a historical prompt.
+
 ## Start and resume
 
 Run `npm run harness:preflight`. It reads local Git/Node state without fetching,
