@@ -51,7 +51,7 @@ Before implementation, apply the Definition of Ready in `docs/DEVELOPMENT_RULES.
 
 # 1. Gate A — Evaluation Trust & Scale
 
-Applies after Stage 1 Architecture Review reaches Production Verified and enough evaluation evidence exists. Evidence preparation does not pass the gate, close Stage 1, relax paid-access/AC-30 requirements, or select future work.
+Applies after Stage 1 Architecture Review reaches Production Verified and enough evaluation evidence exists. Evidence preparation does not pass the gate, close Stage 1, relax paid-access/AC-30 requirements, or select future work. While launch prerequisites are blocked, `01` may inventory existing evaluation evidence and identify gaps; that does not itself authorize provider spending, a new packet, or stronger authority.
 
 Review at minimum:
 
@@ -60,7 +60,7 @@ Review at minimum:
 - **Stability:** repeated runs and semantics-preserving variants, including layout-only and irrelevant ordering/renaming invariance where appropriate.
 - **Scale/reliability:** representative topology/size tiers around 10/50/100/250/500+ nodes as benchmark sizes, not product limits; Evidence/input size, latency, timeout/error rate, structured-output failure rate, semantic degradation, and full/scoped-review behavior. Silent truncation is prohibited.
 
-Permanent promotion thresholds must not be invented before the dataset/rubric is mature. Thresholds are versioned, tied to a named dataset/rubric, based on decision-useful samples, reviewed after material evaluator change, and labeled `Provisional` or `Calibrated`.
+Permanent promotion thresholds must not be invented before the dataset/rubric is mature. Thresholds are versioned, tied to a named dataset/rubric, based on decision-useful samples, reviewed after material evaluator change, and labeled `Provisional` or `Calibrated`. A packet-specific live-evaluation target is a release signal for that packet, not automatically the permanent threshold for stronger AI authority.
 
 Operational quality follows `docs/DEVELOPMENT_RULES.md`:
 
@@ -89,7 +89,7 @@ Stage 1.5 is a **selection band**, not one mandatory Sprint. Candidate threads i
 
 Select only the smallest set that materially improves first value, evaluator context, repeat use, migration leverage, review understandability, or explicit expected-behavior context. Record an explicit selection in `docs/roadmap/PROGRAM_BOARD.md`; appearing in the roadmap is not selection.
 
-Required boundaries remain: no speculative Graph V2, hidden cloud lock-in, direct semantic AI apply, or fabricated dynamic/imported facts. Unsupported/dynamic import behavior remains Unknown or explicitly lossy. Configured expectations are not observed runtime behavior.
+Required boundaries remain: no speculative Graph V2, hidden cloud lock-in, direct semantic AI apply, or fabricated dynamic/imported facts. Unsupported/dynamic import behavior remains Unknown or explicitly lossy. Configured expectations are not observed runtime behavior. Prefer revision-compatible identity where it reduces later migration cost.
 
 Stage 1.5 may proceed before stronger evaluator authority if the selected packet does not silently expand that authority.
 
@@ -156,7 +156,7 @@ Patch safety does not compensate for poor upstream evaluation.
 
 Gate C records the allowed mutation scope. Passing the patch pipeline does not authorize every operation.
 
-**Architecture-only scope** may include agent/task responsibility, dependency/context, assignment, and output-contract changes that do not themselves introduce consequential external capabilities. These remain user-controlled.
+**Architecture-only scope** may include agent/task responsibility, dependency/context, assignment, and output-contract changes that do not themselves introduce consequential external capabilities. These changes remain user-controlled and still require revision, validation, before/after, and apply safeguards.
 
 **Side-effect-sensitive scope** includes changes that can alter consequential external actions, sensitive access/disclosure, approval/policy boundaries, insufficiently known tool capabilities, or irreversible/high-impact effects. Do not authorize this scope from architecture-patch mechanics alone. Introduce the minimum structured capability/human-control/policy evidence first; Unknown custom-tool capability is not assumed safe.
 
