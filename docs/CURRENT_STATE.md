@@ -1,6 +1,6 @@
 # AgentGraph Studio — Current State Snapshot
 
-Snapshot date: **2026-09-10**  
+Snapshot date: **2026-09-12**  
 Status: **Coordination snapshot; live repository/Production checks win**  
 Scope: Concise top-level lifecycle, blocker, authority state, and scoped evidence needed to understand where development stands.
 
@@ -61,6 +61,12 @@ Product North Star:
 Understand → Evaluate → Improve → Verify → Own
 ```
 
+A bounded `GPT-6 Astra Challenge Launch Hardening` packet is now **Selected** for
+the September 18 Product Hunt launch. The selection is limited to current free-core
+first-value clarity, coherent demonstration, truthful launch presentation, and
+changed-path release confidence. It does not change the durable Product definition,
+commercial blocker, roadmap stage status, AI Authority, or Mutation Authority.
+
 ---
 
 # 2. Current lifecycle summary
@@ -77,6 +83,12 @@ Stage 1 Architecture Review + Paid Access public-launch lifecycle
 = Production paid Architecture Review DISABLED / FAIL-CLOSED
 = PAUC AC-30 NOT COMPLETE
 = current commercial Sprint NOT COMPLETE
+
+GPT-6 Astra Challenge Launch Hardening
+= SELECTED
+= SPECIFICATION PENDING
+= target Product Hunt launch 2026-09-18
+= bounded free-core / first-value hardening only
 
 Commercial Validation Gate M0
 = NOT REACHED
@@ -106,14 +118,15 @@ The provisional launch configuration remains USD 12/month and 10 reviews per
 confirmed monthly Stripe billing period. These are launch configuration, not M0
 commercial-validation evidence or permanent Product constants.
 
-The active blocker remains:
+The active commercial blocker remains:
 
 ```text
 COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 Related durable risks: R-008 / R-020 / R-021
 ```
 
-Item-level prerequisites, first-launch procedure gaps, owner routing, Phase G/H
+The launch-hardening selection does not resolve or bypass that blocker. Item-level
+paid prerequisites, first-launch procedure gaps, owner routing, Phase G/H
 sequencing, and next handoff live only in `docs/roadmap/PROGRAM_BOARD.md` and the
 paid-launch runbook. Do not copy them back into this snapshot.
 
@@ -169,12 +182,24 @@ Authority.
 # 4. Current next authority
 
 Use `docs/roadmap/PROGRAM_BOARD.md` for the exact current next action and evidence
-matrix. At this snapshot, the selected paid-launch lifecycle remains blocked on
+matrix.
+
+For the bounded Astra Challenge launch-hardening packet, the next owner is:
+
+```text
+02 — UX & Implementation Specification
+```
+
+`02` must inspect the actual Production first-value path and turn the Selected
+scope into an implementation-ready packet before `C01` changes behavior. Missing
+Product decisions return to `01`; implementation must not invent future capability.
+
+In parallel, the selected paid-launch lifecycle remains blocked on
 external/commercial Production readiness plus the documented first-launch procedure
 gap. Keep Production paid Architecture Review fail-closed until the authoritative
 procedure/prerequisite evidence permits controlled enablement.
 
-The durable handoff remains conceptually:
+The durable paid-path handoff remains conceptually:
 
 ```text
 01 / 02 resolve any required first-launch decision/specification gap
@@ -184,7 +209,20 @@ The durable handoff remains conceptually:
 → 01 performs Evidence → Gate Review → Explicit Next Selection
 ```
 
-Do not infer an automatic next Stage from Sprint completion.
+The bounded launch-hardening path follows the normal lifecycle independently:
+
+```text
+01 Selected
+→ 02 Specified
+→ C01 Implementation Complete
+→ W01 QA Complete
+→ C01 exact approved release
+→ W01 Production Verified
+→ 00 bounded packet Sprint Complete
+```
+
+Do not infer an automatic next Stage from either Sprint completion or challenge
+results.
 
 ---
 
@@ -195,6 +233,8 @@ Do not infer an automatic next Stage from Sprint completion.
 - the documentation/context consolidation does not change Product/runtime behavior;
 - the paid-off preparation sub-release remains scoped Production Verified;
 - the real paid Production path remains outside that scoped verification and AC-30 remains open;
+- the GPT-6 Astra Challenge launch-hardening packet is Selected and awaits `02` specification;
+- the launch-hardening selection does not select Stage 1.5/Stage 2 or change paid-launch requirements;
 - Gate A / M0 are not reached; Stage 1.5/Stage 2 are not selected;
 - AI Authority and Mutation Authority are unchanged;
 - exact live GitHub/Vercel identity is deliberately obtained from live systems rather than this snapshot.
@@ -204,11 +244,16 @@ Do not infer an automatic next Stage from Sprint completion.
 - keeping the preparation code deployed while the paid offer stays fail-closed can
   reduce release coupling without weakening the launch gate, provided later
 enablement still follows the authoritative runbook, Program Board, and fresh
-verification requirements.
+verification requirements;
+- a narrowly specified first-value/launch-hardening packet can proceed in parallel
+with the blocked paid lifecycle without weakening it, provided the packet remains
+inside its explicit free-core boundaries and normal QA/release path.
 
 ## Unknown / evidence-dependent
 
-The unresolved external/prerequisite and live paid-path evidence is owned by
+The exact launch-hardening UX changes remain unknown until `02` inspects the actual
+Production first-value path and records observed friction. The unresolved
+external/prerequisite and live paid-path evidence remains owned by
 `PROGRAM_BOARD.md`, `RISK_REGISTER.md`, the active packets, and the paid-launch
 runbook. Unknown means insufficient evidence, not evidence of absence.
 
