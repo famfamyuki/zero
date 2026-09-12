@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <rect width="1600" height="1000" fill="#020617"/>
+  <rect x="16" y="16" width="1568" height="968" rx="22" fill="#050b18" stroke="#1e293b" stroke-width="2"/>
+  <rect x="16" y="16" width="1568" height="54" rx="22" fill="#0b1220" stroke="#1e293b"/>
+  <circle cx="42" cy="43" r="6" fill="#ef4444"/><circle cx="63" cy="43" r="6" fill="#f59e0b"/><circle cx="84" cy="43" r="6" fill="#22c55e"/>
+  <text x="118" y="49" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="15">AgentGraph Studio — long-term UI target</text>
+
+  <rect x="34" y="82" width="42" height="42" rx="12" fill="#6366f1"/>
+  <text x="96" y="103" fill="#f8fafc" font-family="system-ui,sans-serif" font-weight="700" font-size="23">AgentGraph Studio</text>
+  <text x="96" y="124" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Portable AI Workflow Architecture Engineering Toolchain</text>
+
+  <g font-family="system-ui,sans-serif" font-size="14" font-weight="700">
+    <rect x="390" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="442" y="108" text-anchor="middle" fill="#cbd5e1">Design</text>
+    <rect x="503" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="555" y="108" text-anchor="middle" fill="#cbd5e1">Review</text>
+    <rect x="616" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="668" y="108" text-anchor="middle" fill="#cbd5e1">Changes</text>
+    <rect x="729" y="82" width="105" height="42" rx="10" fill="#6366f1"/><text x="781" y="108" text-anchor="middle" fill="#fff">Evidence</text>
+    <rect x="842" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="894" y="108" text-anchor="middle" fill="#cbd5e1">Build</text>
+    <rect x="955" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="1007" y="108" text-anchor="middle" fill="#cbd5e1">History</text>
+    <rect x="1068" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="1120" y="108" text-anchor="middle" fill="#cbd5e1">Runtime</text>
+    <rect x="1181" y="82" width="105" height="42" rx="10" fill="#0f172a" stroke="#334155"/><text x="1233" y="108" text-anchor="middle" fill="#cbd5e1">Library</text>
+  </g>
+  <text x="1550" y="108" text-anchor="end" fill="#a5b4fc" font-family="system-ui,sans-serif" font-size="13" font-weight="700">Understand → Evaluate → Improve → Verify → Own</text>
+
+  <!-- Left outline -->
+  <rect x="34" y="148" width="260" height="810" rx="18" fill="#0b1220" stroke="#334155"/>
+  <text x="58" y="185" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="19" font-weight="700">Workflow outline</text>
+  <g font-family="system-ui,sans-serif" font-size="14" fill="#cbd5e1">
+    <circle cx="62" cy="230" r="7" fill="#8b5cf6"/><text x="82" y="235">Research Pipeline</text>
+    <circle cx="86" cy="282" r="7" fill="#6366f1"/><text x="106" y="287">Researcher</text>
+    <circle cx="110" cy="334" r="7" fill="#10b981"/><text x="130" y="339">Search Web</text>
+    <circle cx="86" cy="386" r="7" fill="#f59e0b"/><text x="106" y="391">Synthesize</text>
+    <circle cx="86" cy="438" r="7" fill="#8b5cf6"/><text x="106" y="443">Approval</text>
+    <circle cx="86" cy="490" r="7" fill="#38bdf8"/><text x="106" y="495">Publish</text>
+  </g>
+  <text x="58" y="590" fill="#a5b4fc" font-family="system-ui,sans-serif" font-size="14" font-weight="700">Search / Locate / Focus</text>
+  <rect x="58" y="612" width="212" height="46" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="74" y="641" fill="#64748b" font-family="system-ui,sans-serif" font-size="12">Find node, finding, evidence…</text>
+  <rect x="58" y="846" width="212" height="80" rx="12" fill="#0f172a" stroke="#334155"/>
+  <text x="74" y="875" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="13" font-weight="700">Portable ownership</text>
+  <text x="74" y="900" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Source · evidence · manifest</text>
+
+  <!-- Main evidence workspace -->
+  <rect x="316" y="148" width="870" height="810" rx="18" fill="#07101f" stroke="#334155"/>
+  <text x="350" y="188" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="28" font-weight="700">Evidence Workspace</text>
+  <text x="350" y="214" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="13">Engineering evidence before AI judgement. Deterministic facts stay deterministic.</text>
+
+  <line x1="380" y1="268" x2="380" y2="678" stroke="#334155" stroke-width="4"/>
+  <g font-family="system-ui,sans-serif">
+    <circle cx="380" cy="292" r="12" fill="#14b8a6"/>
+    <rect x="415" y="250" width="730" height="82" rx="14" fill="#0f172a" stroke="#14b8a6"/>
+    <text x="442" y="276" fill="#5eead4" font-size="12" font-weight="700">STATIC ANALYSIS</text>
+    <text x="442" y="304" fill="#f8fafc" font-size="17" font-weight="700">Deterministic Preflight</text>
+    <text x="442" y="326" fill="#94a3b8" font-size="12">Readiness · execution structure · resource implications</text>
+
+    <circle cx="380" cy="388" r="12" fill="#8b5cf6"/>
+    <rect x="415" y="346" width="730" height="82" rx="14" fill="#0f172a" stroke="#8b5cf6"/>
+    <text x="442" y="372" fill="#c4b5fd" font-size="12" font-weight="700">REVIEW</text>
+    <text x="442" y="400" fill="#f8fafc" font-size="17" font-weight="700">Architecture Findings</text>
+    <text x="442" y="422" fill="#94a3b8" font-size="12">Strengths · weaknesses · Known / Inferred / Unknown</text>
+
+    <circle cx="380" cy="484" r="12" fill="#6366f1"/>
+    <rect x="415" y="442" width="730" height="82" rx="14" fill="#0f172a" stroke="#6366f1"/>
+    <text x="442" y="468" fill="#a5b4fc" font-size="12" font-weight="700">CHANGE</text>
+    <text x="442" y="496" fill="#f8fafc" font-size="17" font-weight="700">Semantic Patch + Preview</text>
+    <text x="442" y="518" fill="#94a3b8" font-size="12">Proposal → validation → before/after → user-controlled apply</text>
+
+    <circle cx="380" cy="580" r="12" fill="#10b981"/>
+    <rect x="415" y="538" width="730" height="82" rx="14" fill="#0f172a" stroke="#10b981"/>
+    <text x="442" y="564" fill="#6ee7b7" font-size="12" font-weight="700">BUILD</text>
+    <text x="442" y="592" fill="#f8fafc" font-size="17" font-weight="700">Compatibility Check + Manifest</text>
+    <text x="442" y="614" fill="#94a3b8" font-size="12">Capability · lossiness · portable project · artifact provenance</text>
+
+    <circle cx="380" cy="676" r="12" fill="#f59e0b"/>
+    <rect x="415" y="634" width="730" height="82" rx="14" fill="#0f172a" stroke="#f59e0b"/>
+    <text x="442" y="660" fill="#fbbf24" font-size="12" font-weight="700">RUNTIME</text>
+    <text x="442" y="688" fill="#f8fafc" font-size="17" font-weight="700">Imported Runtime Evidence</text>
+    <text x="442" y="710" fill="#94a3b8" font-size="12">Observed behavior remains distinct from configured expectation</text>
+  </g>
+
+  <!-- Before/After -->
+  <rect x="350" y="756" width="796" height="168" rx="14" fill="#0f172a" stroke="#334155"/>
+  <text x="376" y="786" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="17" font-weight="700">Before / After Preview</text>
+  <rect x="378" y="812" width="340" height="76" rx="12" fill="#111827" stroke="#475569"/>
+  <text x="398" y="838" fill="#fbbf24" font-family="system-ui,sans-serif" font-size="12" font-weight="700">BEFORE</text>
+  <text x="398" y="868" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="13">Research → Synthesize → Publish</text>
+  <text x="742" y="858" fill="#8b5cf6" font-family="system-ui,sans-serif" font-size="28">→</text>
+  <rect x="788" y="812" width="330" height="76" rx="12" fill="#111827" stroke="#14b8a6"/>
+  <text x="808" y="838" fill="#5eead4" font-family="system-ui,sans-serif" font-size="12" font-weight="700">AFTER</text>
+  <text x="808" y="868" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="13">Research → Synthesize → Approval → Publish</text>
+
+  <!-- Right rail -->
+  <rect x="1208" y="148" width="342" height="810" rx="18" fill="#0b1220" stroke="#334155"/>
+  <rect x="1230" y="172" width="298" height="86" rx="12" fill="#052e2b" stroke="#14b8a6"/>
+  <text x="1250" y="202" fill="#5eead4" font-family="system-ui,sans-serif" font-size="14" font-weight="700">AI advisory · no silent mutation</text>
+  <text x="1250" y="226" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="12">AI interprets evidence and proposes options.</text>
+  <text x="1250" y="244" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="11">Authority remains capability-scoped.</text>
+
+  <rect x="1230" y="278" width="298" height="216" rx="12" fill="#0f172a" stroke="#334155"/>
+  <text x="1250" y="308" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="17" font-weight="700">Build & compatibility</text>
+  <text x="1250" y="346" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="13">Primary target</text>
+  <rect x="1392" y="327" width="112" height="30" rx="9" fill="#10b981"/><text x="1448" y="347" text-anchor="middle" fill="#020617" font-family="system-ui,sans-serif" font-size="11" font-weight="700">SUPPORTED</text>
+  <text x="1250" y="390" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="13">Future target</text>
+  <rect x="1392" y="371" width="112" height="30" rx="9" fill="#f59e0b"/><text x="1448" y="391" text-anchor="middle" fill="#020617" font-family="system-ui,sans-serif" font-size="11" font-weight="700">LOSSY</text>
+  <text x="1250" y="438" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">No silent lossy conversion.</text>
+  <text x="1250" y="466" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Portable project + manifest.</text>
+
+  <rect x="1230" y="514" width="298" height="190" rx="12" fill="#0f172a" stroke="#334155"/>
+  <text x="1250" y="544" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="17" font-weight="700">Design vs Actual</text>
+  <text x="1250" y="578" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Expected path</text>
+  <text x="1250" y="602" fill="#cbd5e1" font-family="system-ui,sans-serif" font-size="12">Research → Synthesize → Approval → Publish</text>
+  <text x="1250" y="640" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Observed runtime evidence</text>
+  <text x="1250" y="664" fill="#fbbf24" font-family="system-ui,sans-serif" font-size="12">Research → Retry → Approval → Publish</text>
+  <text x="1250" y="690" fill="#a5b4fc" font-family="system-ui,sans-serif" font-size="11">Configured ≠ observed</text>
+
+  <rect x="1230" y="724" width="298" height="202" rx="12" fill="#0f172a" stroke="#334155"/>
+  <text x="1250" y="754" fill="#f8fafc" font-family="system-ui,sans-serif" font-size="17" font-weight="700">Evidence Summary</text>
+  <rect x="1250" y="782" width="78" height="54" rx="10" fill="#052e2b"/><text x="1289" y="804" text-anchor="middle" fill="#5eead4" font-family="system-ui,sans-serif" font-size="11" font-weight="700">KNOWN</text><text x="1289" y="824" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="14">—</text>
+  <rect x="1338" y="782" width="78" height="54" rx="10" fill="#1e1b4b"/><text x="1377" y="804" text-anchor="middle" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="11" font-weight="700">INFERRED</text><text x="1377" y="824" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="14">—</text>
+  <rect x="1426" y="782" width="78" height="54" rx="10" fill="#422006"/><text x="1465" y="804" text-anchor="middle" fill="#fbbf24" font-family="system-ui,sans-serif" font-size="11" font-weight="700">UNKNOWN</text><text x="1465" y="824" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="14">—</text>
+  <text x="1250" y="872" fill="#c4b5fd" font-family="system-ui,sans-serif" font-size="13" font-weight="700">Own your source. Own your evidence.</text>
+  <text x="1250" y="896" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="12">Own your runtime.</text>
+
+  <text x="800" y="978" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="11">CONCEPTUAL LONG-TERM VISUAL REFERENCE — NOT CURRENT SPRINT SCOPE OR IMPLEMENTATION SPECIFICATION</text>
+</svg>
