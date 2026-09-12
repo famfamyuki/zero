@@ -7,313 +7,245 @@ Next owner: `C01 — Current Sprint Implementation`
 Selected: **2026-09-12**  
 Specified: **2026-09-12**  
 Timebox: **Product Hunt GPT-6 Astra Challenge launch on 2026-09-18**  
-Decision class: **Bounded launch hardening; no roadmap promotion or authority expansion**  
-Specification baseline: GitHub `main` observed at `d10a5f5aa135fe1aee7bab12dc820c34168fc46c`; Vercel Production deployment `dpl_AaxbN2ESePg8XFbYDV6Re6P6iV44` was `READY`, `target=production`, and reported the same `githubCommitSha`.
+Decision class: **Bounded free-core launch hardening; no roadmap or authority promotion**  
+Specification evidence baseline: GitHub `main` `d10a5f5aa135fe1aee7bab12dc820c34168fc46c`; Vercel Production deployment `dpl_AaxbN2ESePg8XFbYDV6Re6P6iV44`, `READY`, `target=production`, same `githubCommitSha`.
 
-The baseline SHA/deployment above is evidence for this specification, not a permanent current-state claim. `C01` and `W01` must re-check live `main` / candidate / Production identity at their own handoff points.
+The baseline identity is evidence, not a permanent current-state claim. `C01` and `W01` must re-check live repository/deployment state at their own handoffs.
 
 ---
 
 # 0. Authority and evidence method
 
-This packet is the implementation authority for the bounded launch-hardening scope selected by `01`. It must be read under:
+Apply this packet under:
 
-- `docs/PRODUCT_MASTER.md`;
-- `docs/ARCHITECTURE.md`;
-- `docs/DEVELOPMENT_RULES.md`;
-- `docs/CHAT_ROLE_REGISTRY.md`;
-- `docs/roadmap/PROGRAM_BOARD.md`;
-- the completed `docs/specs/AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1.md` as a regression/continuity reference only.
+- `docs/PRODUCT_MASTER.md`
+- `docs/ARCHITECTURE.md`
+- `docs/DEVELOPMENT_RULES.md`
+- `docs/CHAT_ROLE_REGISTRY.md`
+- `docs/roadmap/PROGRAM_BOARD.md`
+- completed `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` as regression/continuity evidence only
 
-No historical chat, old SHA, contest deadline, or launch asset expands this packet.
+Production `/` was directly retrieved and returned HTTP 200. Its rendered first view/metadata matched the live deployment identity above. The specification environment could retrieve Production but scripted public-site navigation was blocked with `ERR_BLOCKED_BY_ADMINISTRATOR`. Therefore:
 
-Production was inspected from the public Production URL. The rendered root document returned HTTP 200 and matched the live `main` deployment identity above. The execution environment used for specification could retrieve Production through the Vercel connection but blocked scripted public-site browser navigation with `ERR_BLOCKED_BY_ADMINISTRATOR`. Therefore:
+- first-view Production evidence below is directly observed;
+- interactive contracts are grounded in the exact same deployed source revision and existing tests;
+- `02` does not claim to have clicked every Production transition;
+- `W01` must execute the changed-path browser smoke before Production Verified.
 
-- actual Production first-view HTML/metadata are **directly observed**;
-- interactive behavior below is grounded in the **same exact revision** deployed to Production plus its existing tests/components;
-- no claim is made that `02` directly clicked every interactive step in Production;
-- `W01` must independently execute the specified changed-path browser smoke before Production Verified.
-
-This limitation is a Known Note, not a missing Product decision.
+This is a Known Note, not an unresolved Product decision.
 
 ---
 
 # 1. Exact launch user goal
 
-For a first-time visitor with no prior saved browser workflow, the shortest credible launch path is:
+For a first-time visitor with no prior saved browser workflow:
 
 ```text
-Understand the representative workflow
-→ run deterministic Preflight
-→ inspect one concrete Readiness finding and its deterministic basis
-→ Locate the editable target in Design
-→ make a manual user-controlled improvement
+Understand representative workflow
+→ deterministic Preflight
+→ concrete Readiness finding + evidence
+→ Locate editable target
+→ manual user-controlled improvement
 → re-evaluate
-→ export the resulting artifact/source
+→ portable export
 ```
 
-The path demonstrates the implemented Product North Star without adding a new Product capability:
+This is the current North Star expressed through existing behavior:
 
-```text
-Understand
-→ Evaluate
-→ Improve manually
-→ Verify again
-→ Own / export
-```
+`Understand → Evaluate → Improve manually → Verify again → Own / export`
 
-Success means the visitor can understand and complete that loop without needing paid Architecture Review, provider availability, billing, entitlement, quota, runtime execution, runtime observation, AI-generated improvement, or semantic mutation.
+The path must not require paid Architecture Review, provider availability, auth, billing, entitlement, quota, runtime execution/observation, AI-generated improvement, or semantic mutation.
 
 ---
 
-# 2. Observed Production evidence and launch-critical friction
+# 2. Production evidence and launch-critical friction
 
-## 2.1 Directly observed Production first view
+## 2.1 Directly observed first view
 
-At the specification baseline, the public root page presents:
+Production already provides:
 
-- Product title: `AgentGraph Studio | Workflow Architecture Preflight & Portable Export`;
-- the three peer surfaces `Overview | Design | Preflight`;
-- global `Export` and `More` actions;
-- heading `Understand the workflow before you run it.`;
-- copy that already explains deterministic readiness, manual improvement, re-verification, and export;
-- current default example `X Content Planning Crew` with 2 Agents, 2 Tasks, 2 Tools, sequential process;
-- primary `Run Preflight` and secondary `Open Design`;
+- title `AgentGraph Studio | Workflow Architecture Preflight & Portable Export`;
+- `Overview | Design | Preflight`;
+- global `Export` / `More`;
+- `Understand the workflow before you run it.`;
+- current default `X Content Planning Crew` (2 Agents / 2 Tasks / 2 Tools / sequential);
+- `Run Preflight` + `Open Design`;
 - `Deterministic · Static · available`;
-- explicit disclaimer that Preflight does not execute/simulate the workflow and does not observe runtime behavior;
-- entry cards for CrewAI Python, AgentGraph JSON, Example / Template, and Manual Design.
+- explicit no-execution/no-runtime-observation disclaimer;
+- CrewAI Python, AgentGraph JSON, Example / Template, Manual Design entry paths.
 
-These are already aligned with the completed Product Identity / Review Journey packet and are protected.
+Protect these established Product-identity decisions.
 
 ## 2.2 Same-revision implemented interaction evidence
 
-The deployed revision already contains:
+The deployed revision already has:
 
-- Unified Preflight with Overview / Architecture / Readiness / Execution / Resources;
-- a `Re-evaluate` control and refresh/status announcements;
-- Readiness cards with `What / Where / Why / Next`, deterministic basis/details, and `Locate`;
-- `Locate` routing from a Readiness finding to Design + Inspector;
-- session-only `ReviewReturnBar` with `Back to finding`;
-- global AgentGraph JSON and deterministic CrewAI Python export;
-- keyboard tab behavior and heading focus in Unified Preflight;
-- existing desktop/mobile Playwright free-core coverage.
+- Unified Preflight Overview / Architecture / Readiness / Execution / Resources;
+- explicit `Re-evaluate`;
+- Readiness `What / Where / Why / Next`, deterministic basis/details, `Locate`;
+- Locate → Design + Inspector;
+- `ReviewReturnBar` + `Back to finding`;
+- AgentGraph JSON + deterministic CrewAI Python export;
+- keyboard Preflight behavior;
+- existing Playwright desktop/mobile free-core coverage.
 
-These must be reused, not rebuilt.
+Reuse these; do not rebuild them.
 
-## 2.3 Launch-critical friction
+## 2.3 Friction in scope
 
-Only the following gaps are in scope:
+**F1 — Representative demo:** current default `X Content Planning Crew` does not intentionally surface one clear, editable deterministic finding, so the full value loop is easy to miss.
 
-### F1 — The current default example does not reliably demonstrate a useful improvement loop
+**F2 — Journey discovery:** the loop exists but Overview does not tell a first visitor which finding to use or how Locate → edit → re-evaluate → export connects.
 
-`X Content Planning Crew` is a valid current example, but its current graph does not intentionally surface a clear, actionable deterministic Readiness finding. A first-time visitor can see Preflight but may not understand the value of finding → Locate → manual edit → verify.
+**F3 — Locate precision:** Readiness Locate uses `target.nodeId` but currently ignores `target.field`; a field-level finding opens Inspector at its heading rather than the editable field.
 
-### F2 — The full loop is implemented but not discoverable as one coherent launch path
+**F4 — Social preview:** root metadata has title/description but lacks a complete repository-owned canonical/Open Graph/Twitter large-preview contract.
 
-The Overview explains the Product at a high level, but a first-time visitor is not told which deterministic finding to open or how the existing `Locate`, Design edit, return context, re-evaluation, and export fit together.
-
-### F3 — Readiness Locate opens the correct node/Inspector but does not use `finding.target.field`
-
-For a field-level finding, current navigation selects the node and opens the Inspector, then focuses the Inspector heading. For the representative `outputSchema` finding, the user must still find the exact editable field. The launch path should land directly on that field when it is currently representable in the Inspector.
-
-### F4 — Repository-owned social preview metadata is incomplete
-
-Current page metadata has title/description, but no complete Open Graph/Twitter large-preview contract or repository-owned launch social image is present. Product Hunt/social sharing should render the same truthful Product positioning as Production.
-
-## 2.4 Explicitly not friction / no redesign required
-
-Do not redesign or duplicate:
-
-- top-level Overview / Design / Preflight IA;
-- current Product positioning heading/body;
-- Unified Preflight information architecture;
-- Readiness finding anatomy;
-- return-to-finding session context;
-- explicit Re-evaluate;
-- Export ownership actions;
-- imports/templates/manual design entry hierarchy;
-- current deterministic/static/runtime disclaimers.
+Not in scope: redesigning the three-surface IA, finding anatomy, return bar, Re-evaluate, export, entry hierarchy, or deterministic/runtime disclaimers.
 
 ---
 
-# 3. Representative first-value workflow
+# 3. Representative demo contract
 
-## 3.1 Selected representative demo
-
-The launch representative workflow is the existing preset:
+Use existing preset:
 
 ```text
 template id: competitor-price-monitor
 crew name: Competitor Catalog Review Crew
 ```
 
-Reason: it already contains an existing deterministic, user-editable improvement opportunity without introducing fake runtime evidence or new Product semantics.
-
-The `Capture Normalized Catalog Snapshot` task requests JSON output but does not provide an explicit `outputSchema`. Existing Readiness therefore produces:
+It already contains the launch walkthrough finding:
 
 ```text
 Rule: RDY_JSON_OUTPUT_SCHEMA_IMPLICIT
 Impact: medium
 Target: task-5.outputSchema
+Task: Capture Normalized Catalog Snapshot
 Title: JSON output schema is implicit
-Next: Add a valid JSON schema in the Task output settings.
 ```
 
-This is the canonical launch walkthrough finding.
+The task requests JSON but has no explicit schema. Keep that current medium-impact finding; do not pre-fix it or fabricate a blocking/runtime/AI error.
 
-## 3.2 Initial-example behavior
-
-For a browser session with **no valid rehydratable workflow**, the loaded initial example must be `Competitor Catalog Review Crew`.
-
-For a browser session with an existing valid `agentgraph_active_flow`:
-
-- preserve and rehydrate the user's current browser workflow;
-- do not replace it with the representative demo;
-- label provenance according to the existing current-browser-workflow rules;
-- do not claim that the saved workflow came from the representative demo.
-
-For an intentionally empty graph, do not silently repopulate it merely to force the demo.
-
-For corrupt/unsupported saved state, preserve the existing fail-safe/atomic import-storage behavior; a fallback example may load only through the already-approved fallback path.
-
-Changing the launch representative example must not reorder, remove, or semantically rewrite the template library unless mechanically necessary to select the initial example.
-
-## 3.3 The finding is intentional demonstration evidence, not an error fabrication
-
-Do not pre-fill `task-5.outputSchema` in the representative preset as part of this packet. The current medium-impact finding is the intended deterministic improvement opportunity.
-
-The task remains valid for the current scaffold path. The launch hardening must not manufacture a blocking validation error, fake runtime failure, or AI finding.
-
-A valid example schema used by tests/documentation may be:
+For deterministic tests and the walkthrough, use this schema because it preserves the task's existing expected-output meaning at the current flat schema-contract level:
 
 ```json
-{"sku":"string","price":"number","currency":"string","availability":"string"}
+{"snapshot_metadata":"object","products":"array[object]"}
 ```
 
-Equivalent valid schemas are acceptable for manual use; C01/W01 tests should use one fixed schema for deterministic assertions.
+## Initial artifact behavior
+
+- no valid saved workflow → load `Competitor Catalog Review Crew` as the initial Example workflow;
+- valid `agentgraph_active_flow` → preserve/rehydrate it; never replace it with the demo;
+- user-created empty graph → preserve it; do not silently repopulate it;
+- corrupt/unsupported saved state → preserve existing atomic/fail-safe recovery behavior;
+- do not reorder/remove/rewrite the template library merely to choose the initial example.
 
 ---
 
-# 4. Exact first-value user flow
+# 4. Exact first-value flow
 
-For a clean browser context with no saved workflow:
+Clean browser context:
 
-1. Open `/`.
-2. Overview identifies the loaded artifact as an **Example workflow** named `Competitor Catalog Review Crew`.
-3. The existing Product orientation remains visible.
-4. A compact launch guide presents the implemented loop:
-   `Preflight → Readiness finding → Locate → manual Design edit → Re-evaluate → Export`.
-5. User selects the existing primary `Run Preflight`.
-6. Unified Preflight opens with the existing deterministic/static boundary intact.
-7. User opens `Readiness`.
-8. The `JSON output schema is implicit` finding is visible for `Capture Normalized Catalog Snapshot`.
-9. User selects `Locate`.
-10. Design opens, the target task is selected, Inspector opens, and the `Output schema` textarea receives focus when available.
-11. The session-only return context remains visible.
-12. User manually enters the fixed valid schema from §3.3.
-13. Existing deterministic analysis refreshes after the edit. The UI must never claim runtime verification.
-14. User chooses `Back to finding` or returns to Preflight. If that exact finding no longer exists, return to the Readiness stage heading and announce that the previous finding is no longer present.
-15. User may select the existing explicit `Re-evaluate` control; after evaluation the implicit-schema finding must remain absent.
-16. User opens `Export`.
-17. AgentGraph JSON remains downloadable.
-18. Deterministic CrewAI Python export remains reachable through the existing validation/code-generation path.
+1. `/` loads `Competitor Catalog Review Crew` as Example workflow.
+2. Overview keeps existing Product orientation and shows the bounded launch guide in §5.1.
+3. User selects existing `Run Preflight`.
+4. User opens `Readiness`.
+5. `JSON output schema is implicit` is visible for `Capture Normalized Catalog Snapshot`.
+6. User selects `Locate`.
+7. Design opens; task is selected; Inspector opens; `Output schema` receives focus.
+8. Existing `ReviewReturnBar` remains available.
+9. User manually enters `{"snapshot_metadata":"object","products":"array[object]"}`.
+10. Deterministic analysis refreshes; no runtime claim is made.
+11. User selects `Back to finding` or returns to Preflight.
+12. If the exact finding is gone, focus a stable Readiness location and announce that the prior item is no longer present; never fuzzy-select another finding.
+13. User may explicitly `Re-evaluate`; the same implicit-schema finding remains absent.
+14. User exports AgentGraph JSON and can reach deterministic CrewAI Python export.
 
-The flow must remain usable without Architecture Review, authentication, Stripe, entitlement, quota, provider calls, or external runtime execution.
+The entire flow remains provider/billing-independent.
 
 ---
 
-# 5. Exact UX / presentation changes
+# 5. UX / presentation contract
 
-## 5.1 Overview launch guide
+## 5.1 Representative-example launch guide
 
-When and only when the currently loaded artifact is the launch representative example, Overview shows a compact guidance block near the example card.
+Only when the current artifact is the launch representative example under existing presentation-origin semantics, show a compact guide near the Overview example card.
 
 English:
 
-**Heading:** `Try the full review loop`  
-**Body:** `Run deterministic Preflight, open the JSON schema finding, Locate it in Design, improve it manually, re-evaluate, then export the workflow you own.`
-
-Ordered steps:
-
-```text
-1. Run Preflight
-2. Open Readiness
-3. Locate the JSON schema finding
-4. Edit in Design and re-evaluate
-5. Export
-```
+- heading: `Try the full review loop`
+- body: `Run deterministic Preflight, open the JSON schema finding, Locate it in Design, improve it manually, re-evaluate, then export the workflow you own.`
+- steps:
+  1. `Run Preflight`
+  2. `Open Readiness`
+  3. `Locate the JSON schema finding`
+  4. `Edit in Design and re-evaluate`
+  5. `Export`
 
 Japanese:
 
-**Heading:** `レビューの一連の流れを試す`  
-**Body:** `決定論的Preflightを実行し、JSON schemaの指摘を開き、Designで場所を表示して手動修正し、再評価して、所有できる形式でエクスポートします。`
-
-Ordered steps:
-
-```text
-1. Preflightを実行
-2. Readinessを開く
-3. JSON schemaの指摘をLocate
-4. Designで編集して再評価
-5. Export
-```
+- heading: `レビューの一連の流れを試す`
+- body: `決定論的Preflightを実行し、JSON schemaの指摘を開き、Designで場所を表示して手動修正し、再評価して、所有できる形式でエクスポートします。`
+- steps:
+  1. `Preflightを実行`
+  2. `Readinessを開く`
+  3. `JSON schemaの指摘をLocate`
+  4. `Designで編集して再評価`
+  5. `Export`
 
 Rules:
 
-- this guide is orientation, not a wizard and not persisted state;
-- do not add a separate walkthrough modal, tour framework, checklist persistence, completion badge, or account state;
-- do not duplicate the existing `Run Preflight` CTA; the existing primary CTA remains the action;
-- hide demo-specific guidance for arbitrary imported/saved/manual workflows rather than promising a finding that may not exist;
-- do not say the workflow was executed, simulated, runtime-verified, or improved by AI.
+- orientation only; no wizard/tour/checklist persistence/completion state;
+- do not duplicate `Run Preflight`;
+- hide demo-specific guidance for arbitrary imported/saved/manual workflows;
+- never say executed, simulated, runtime-verified, or AI-improved.
 
-## 5.2 Field-aware Locate
+## 5.2 Field-aware Readiness Locate
 
-For Readiness findings with a current `target.nodeId` and a currently editable `target.field`:
+For a current finding with `target.nodeId` + editable `target.field`:
 
-- preserve existing node selection, Design transition, Inspector open, review-return context, and announcement;
-- after the target Inspector is mounted, move keyboard focus to the corresponding editable control;
-- for `task-5.outputSchema`, focus the `Output schema` textarea;
-- the focused control must have a stable accessible name from its visible label;
-- if a field cannot be mapped to a current editable control, fall back to the existing Inspector-heading focus and keep navigation successful;
-- if the target node is stale/missing, preserve existing refresh-in-place behavior and do not navigate to an unrelated field;
-- no fuzzy identity recovery and no new persistent target identity.
+- retain current node selection, Design transition, Inspector open, return context, and announcement;
+- after Inspector mounts, focus the matching editable control;
+- `task-5.outputSchema` must focus the `Output schema` textarea;
+- control needs a stable accessible name tied to its visible label;
+- unsupported field → existing Inspector-heading fallback;
+- stale/missing target → existing refresh-in-place behavior;
+- no fuzzy target recovery and no new persistent identity.
 
-C01 may choose the smallest presentation-level implementation mechanism. This packet specifies behavior, not a required component/event architecture.
+Implementation mechanism is C01-owned; behavior is authoritative.
 
 ## 5.3 Challenge attribution
 
-A small secondary, non-interactive launch attribution may appear in Overview and in the social preview:
+A small secondary, non-interactive Overview attribution **must** appear:
 
-```text
-GPT-6 Astra Challenge · September 18, 2026
-```
+`GPT-6 Astra Challenge · September 18, 2026`
 
-Japanese may use the same proper-noun label/date.
+It may also appear in the social preview.
 
-It must not use or imply:
+Forbidden unless separately proven by runtime evidence:
 
-- `Powered by GPT-6 Astra`;
-- `Astra-powered`;
-- `runs on Astra`;
-- runtime/model claims not proven by current Production evidence.
+- `Powered by GPT-6 Astra`
+- `Astra-powered`
+- `runs on Astra`
+- equivalent model/runtime claims
 
-The challenge label is launch attribution only. It does not change evaluator/provider configuration and must not outrank Product identity or deterministic evidence messaging.
+This is launch attribution only; it does not change Product/provider/evaluator authority.
 
-## 5.4 Social preview metadata
+## 5.4 Social metadata / preview
 
-Repository-owned metadata for `/` must provide:
+Production `/` must provide:
 
-- canonical Production URL for the current public Product domain already in use;
-- Open Graph type `website`;
+- canonical current Production URL;
+- Open Graph `website`;
 - site name `AgentGraph Studio`;
-- Product title consistent with `AgentGraph Studio | Workflow Architecture Preflight & Portable Export`;
-- the existing truthful meta description or a semantically equivalent bounded version;
+- Product title consistent with the existing title;
+- existing truthful description or semantically equivalent bounded copy;
 - Twitter/X large-image preview metadata;
-- a repository-owned 1200×630 launch image (static or framework-native generated);
-- meaningful image alt text;
-- no dependency on a paid provider, authentication, user workflow data, or runtime execution.
+- repository-owned 1200×630 image, static or framework-native;
+- meaningful image alt;
+- no auth/provider/user-workflow/runtime dependency.
 
-The launch image must communicate only current Product truth. Required content:
+Required preview content:
 
 ```text
 AgentGraph Studio
@@ -321,249 +253,175 @@ Understand → Evaluate → Improve → Verify → Own
 Deterministic Preflight · Portable Export
 ```
 
-It may additionally contain the challenge attribution from §5.3.
-
-It must not display workflow secrets, imported content, provider output, future-stage features, paid-offer claims, or unsupported Astra runtime claims.
+Challenge attribution from §5.3 may be included. No imported content, secrets, provider output, paid claim, future-stage claim, or unsupported Astra runtime claim.
 
 ---
 
 # 6. Included scope
 
-This Specified packet includes exactly:
+Exactly:
 
-1. selecting `Competitor Catalog Review Crew` as the clean-session representative example;
-2. a compact representative-demo first-value guide on Overview;
-3. field-aware Readiness Locate sufficient to land on `outputSchema` for the canonical demo finding, with safe fallback;
-4. truthful challenge attribution as bounded secondary presentation;
-5. Open Graph/Twitter/canonical metadata and repository-owned launch preview image;
-6. focused regression/Playwright coverage for the complete representative first-value loop;
-7. accessibility/responsive hardening required by the changed surfaces;
-8. Production smoke requirements for the changed path.
-
-No other visual redesign or Product capability is included.
+1. clean-session representative example = `Competitor Catalog Review Crew`;
+2. Overview launch guide;
+3. field-aware Readiness Locate with safe fallback;
+4. bounded challenge attribution;
+5. canonical/OG/Twitter metadata + repository-owned launch image;
+6. focused deterministic/Playwright regression coverage;
+7. accessibility/responsive behavior for changed surfaces;
+8. exact Production smoke in §16.
 
 ---
 
-# 7. Explicit Out of Scope / Deferred
+# 7. Out of Scope / Deferred
 
-This packet does **not** authorize:
+No:
 
-- adding GPT-6 Astra or any other model as a Production runtime dependency for the contest;
-- changing Architecture Review provider/model/prompt/rubric/evaluator behavior;
-- enabling paid Architecture Review, Stripe, subscription, entitlement, quota, or PAUC AC-30;
-- any paid-launch bypass or Commercial Validation Gate M0 conclusion;
-- Stage/Gate promotion or Stage 1.5/Stage 2 selection;
-- Project / Workspace persistence;
-- persisted Intent / Constraints;
-- workflow/revision/history/evaluation history;
-- Guided Improvement;
-- AI-generated improvement proposals;
-- Semantic Patch generation;
-- automatic Apply or silent semantic mutation;
-- runtime execution, runtime observation, managed agents, or sandbox verification;
-- account/cloud persistence expansion;
-- collaboration / RBAC / Team capability;
-- second-framework or generic-framework expansion;
-- arbitrary imported code execution;
+- contest-driven Production Astra/model dependency;
+- Architecture Review model/provider/prompt/rubric/evaluator change;
+- paid Architecture Review enablement;
+- Stripe/entitlement/quota/PAUC AC-30 bypass;
+- Stage/Gate promotion or M0 conclusion;
+- Stage 1.5/Stage 2 capability;
+- Project/Workspace persistence;
+- persisted Intent/Constraints;
+- revision/history/evaluation history;
+- Guided Improvement / AI proposals;
+- Semantic Patch / automatic Apply / silent mutation;
+- runtime execution/observation/managed agents/sandbox verification;
+- account/cloud/collaboration/RBAC/Team expansion;
+- framework expansion;
+- arbitrary imported-code execution;
 - source write-back;
 - provider/data disclosure expansion;
-- new API surface;
-- broad visual redesign;
-- a new onboarding/tour subsystem;
-- persisted launch checklist/progress;
-- changing the meaning of existing analytics events.
+- new API;
+- broad redesign;
+- persistent onboarding/tour/checklist;
+- analytics-event semantic change.
 
-`Configured expectation ≠ Static evidence ≠ Observed runtime behavior` and  
-`Visual Group ≠ Semantic Module ≠ Runtime Orchestration` remain fixed.
+Preserve:
+
+`Configured expectation ≠ Static evidence ≠ Observed runtime behavior`  
+`Visual Group ≠ Semantic Module ≠ Runtime Orchestration`
 
 AI Authority: **UNCHANGED**.  
-Mutation Authority: **UNCHANGED / no semantic mutation capability added**.
+Mutation Authority: **UNCHANGED / none added**.
 
 ---
 
-# 8. State contracts
+# 8. State contract
 
 | State | Required behavior |
 |---|---|
-| Clean first session / no valid saved workflow | Load `Competitor Catalog Review Crew` as Example workflow and show the launch guide. |
-| Existing valid browser workflow | Rehydrate unchanged; never replace with the demo; hide demo-specific guide unless the current artifact is exactly the launch example under existing presentation-origin semantics. |
-| Empty workflow chosen by user | Preserve empty state; entry actions remain primary; do not invent a demo finding. |
-| Corrupt/unsupported saved workflow | Preserve existing atomic/fail-safe recovery behavior; do not partially mutate graph state. |
-| Preflight loading/refreshing | Preserve existing refreshing state/status; guidance does not claim final results until evaluation completes. |
-| Representative finding available | Show existing deterministic finding anatomy and Locate action. |
-| Locate target stale/missing | Refresh current Readiness in place and announce the stale target; do not focus an unrelated field. |
-| Locate target field supported | Design + Inspector open and the matching editable field receives focus. |
-| Locate target field unsupported | Existing Inspector-heading fallback; no failure of navigation. |
-| Finding resolved after edit | Return to Readiness stage; if exact item disappeared, announce resolution/not-present and focus a stable stage location rather than fuzzy-match another item. |
-| Paid Architecture Review disabled/unavailable | Free Overview/Design/Readiness/Execution/Resources/export path remains usable and unchanged. |
-| External/provider failure | No effect on deterministic representative path except existing independently-scoped provider UI; no new provider call is introduced. |
-| Social preview image unavailable during build | Treat as implementation/build failure for this packet rather than adding a runtime provider fallback; title/description must never depend on an external service. |
+| Clean/no valid saved workflow | Representative example + launch guide. |
+| Valid saved workflow | Rehydrate unchanged; no demo overwrite; no false demo guide. |
+| User empty graph | Preserve empty state and existing entry actions. |
+| Corrupt/unsupported saved workflow | Existing atomic/fail-safe recovery; no partial graph mutation. |
+| Preflight refreshing | Existing status/refresh behavior; no premature result claim. |
+| Finding available | Existing finding anatomy + Locate. |
+| Locate stale/missing | Refresh in place; announce; no wrong target. |
+| Editable field supported | Design + Inspector + exact field focus. |
+| Field unsupported | Inspector-heading fallback. |
+| Finding resolved | Stable Readiness focus + resolution/not-present announcement; no fuzzy rematch. |
+| Paid/provider unavailable | Deterministic Overview/Design/Readiness/Execution/Resources/export remains usable. |
+| Social image build failure | Build failure for packet; do not add runtime provider fallback. |
 
-No new stale/persistence semantics are introduced.
-
----
-
-# 9. Domain / API / data / persistence / security contract
-
-## Domain
-
-- `GraphDocumentV1` unchanged.
-- Readiness rule IDs, rule meaning, evidence model, and result semantics unchanged.
-- Existing `EditorSurface`, presentation-origin, and session-only review-return semantics may be reused but are not persisted workflow meaning.
-- No new Product identity/revision object.
-
-## API
-
-- No new public/private application API is required.
-- No API request is allowed merely to render the launch guide, social metadata, or representative demo.
-
-## Data / persistence
-
-- Existing browser workflow storage key/meaning remains unchanged.
-- No new localStorage/sessionStorage/database record is required for walkthrough state.
-- No cloud persistence or account state.
-- No migration.
-
-## Security / privacy
-
-- No new credential, secret, imported source, Evidence payload, workflow text, provider response, or personal data flow.
-- Social metadata is static Product presentation only.
-- Imported/user-authored text remains untrusted analyzed data.
-- Arbitrary imported code remains non-executed.
-
-## Provider boundary
-
-- No new provider call.
-- Deterministic free core remains provider-independent.
-- Architecture Review paid/provider boundary remains fail-closed and is outside this packet.
+No new persistent/loading/stale semantics.
 
 ---
 
-# 10. Accessibility and responsive contract
+# 9. Domain / API / persistence / security
 
-All changed UI must preserve or improve:
-
-- semantic heading order;
-- keyboard-only completion of the representative path;
-- visible focus;
-- focus movement only when caused by the user's navigation action;
-- an accessible name for the `Output schema` control and all existing actions;
-- status/refresh/resolution announcements through existing polite status mechanisms where appropriate;
-- non-color-only communication for step/order/state;
-- minimum existing interactive target sizing conventions;
-- no horizontal page overflow at the existing `mobile-ja` 320×740 viewport;
-- readable/wrapping launch guide at desktop 1280×900 and mobile 320×740;
-- no demo guidance that obscures Product nav, Export, or Preflight content;
-- Japanese/English parity for new user-visible copy.
-
-The launch guide should use semantic list/step structure, not color or connector graphics alone.
-
-Field-aware Locate must make the focused field visibly identifiable and must not trap focus.
+- `GraphDocumentV1`: unchanged.
+- Readiness rules/evidence/result meaning: unchanged.
+- API: no new endpoint.
+- browser storage key/meaning: unchanged.
+- walkthrough state: not persisted.
+- cloud/account persistence: none.
+- migration: none.
+- provider call: none.
+- credential/secret/imported source/Evidence/provider-response data flow: none.
+- imported code remains unexecuted.
+- paid Architecture Review remains fail-closed/separate.
 
 ---
 
-# 11. Analytics contract
+# 10. Accessibility / responsive
 
-No new analytics event is required for this packet.
+Changed UI must provide:
 
-Reason: existing instrumentation already covers the launch-critical funnel sufficiently for this bounded release, including Preflight open/first value, stage selection, Readiness open/finding selection, re-evaluation, template selection where applicable, and export/code-download actions.
+- semantic heading/list structure;
+- full keyboard path;
+- visible focus and no focus trap;
+- focus moves only from user navigation actions;
+- `Output schema` accessible name tied to visible label;
+- polite refresh/resolution announcement;
+- non-color-only order/status;
+- existing target-size conventions;
+- no horizontal page overflow at existing `mobile-ja` 320×740;
+- readable guide at 1280×900 and 320×740;
+- EN/JA parity.
 
-Requirements:
+---
 
-- preserve current event names, property meaning, and activation semantics;
-- do not emit workflow semantic content, imported source, task text, schema contents, full Evidence, prompts, secrets, credentials, or provider responses;
-- changing the default example must not fabricate `template_selected` as if the user manually selected it;
-- no `launch_*`, challenge-tracking, or demo-progress event is added without a separately identified measurement question.
+# 11. Analytics
+
+**No additive analytics event.**
+
+Preserve current event names/meaning/activation behavior. Do not emit workflow/task/schema text, imported source, full Evidence, prompts, secrets, credentials, or provider responses.
+
+Auto-loading the representative example must not emit `template_selected` as though the user manually chose it.
 
 ---
 
 # 12. Acceptance Criteria
 
-## First-value / representative demo
+**AC-01 Saved work:** valid existing browser workflow is not replaced.
 
-**AC-01 — Preserve existing user work**  
-Given a valid existing browser workflow, loading `/` does not replace it with the launch demo.
+**AC-02 Clean example:** no valid saved workflow loads `Competitor Catalog Review Crew` as Example workflow.
 
-**AC-02 — Clean-session representative example**  
-Given no valid saved browser workflow, `/` loads `Competitor Catalog Review Crew` and identifies it as an Example workflow.
+**AC-03 Canonical finding:** clean example yields `RDY_JSON_OUTPUT_SCHEMA_IMPLICIT` at `task-5.outputSchema`.
 
-**AC-03 — Canonical deterministic finding**  
-On the clean representative example, Readiness contains `RDY_JSON_OUTPUT_SCHEMA_IMPLICIT` for `task-5` / `outputSchema`, with no new fabricated blocking error required.
+**AC-04 Guide:** §5.1 guide appears EN/JA only for the representative example.
 
-**AC-04 — Demo guidance**  
-The exact representative-example guide from §5.1 is visible in English/Japanese for the launch example and is not falsely shown for arbitrary imported/saved/manual workflows.
+**AC-05 Preflight:** existing `Run Preflight` remains primary and provider-independent.
 
-**AC-05 — Existing Preflight entry retained**  
-`Run Preflight` remains the primary CTA and opens Unified Preflight without provider/billing dependency.
+**AC-06 Readiness discovery:** canonical finding reachable by keyboard and pointer.
 
-## Finding → manual improvement → verify
+**AC-07 Field-aware Locate:** Locate selects `Capture Normalized Catalog Snapshot`, opens Inspector/return context, and focuses `Output schema`.
 
-**AC-06 — Readiness discovery**  
-The user can reach Readiness and the canonical finding using keyboard or pointer input.
+**AC-08 Fallback:** unsupported field uses stable Inspector fallback; stale target refreshes in place.
 
-**AC-07 — Field-aware Locate**  
-Selecting Locate on the canonical finding opens Design, selects `Capture Normalized Catalog Snapshot`, opens Inspector, preserves review-return context, and focuses the `Output schema` textarea.
+**AC-09 Manual fix:** after entering `{"snapshot_metadata":"object","products":"array[object]"}`, deterministic re-evaluation no longer reports that target's implicit-schema finding.
 
-**AC-08 — Safe focus fallback**  
-A field-level finding without a mapped editable control still completes existing Locate behavior and focuses a stable Inspector location; stale/missing targets refresh in place rather than navigating incorrectly.
+**AC-10 Resolution continuity:** returning after fix reaches stable Readiness context and never fuzzy-selects another finding.
 
-**AC-09 — Manual fix changes deterministic evidence**  
-After entering the fixed valid schema `{"sku":"string","price":"number","currency":"string","availability":"string"}`, deterministic re-evaluation no longer reports `RDY_JSON_OUTPUT_SCHEMA_IMPLICIT` for that target.
+**AC-11 JSON ownership:** AgentGraph JSON downloads valid artifact and round-trips.
 
-**AC-10 — Return / resolution continuity**  
-After the edit, `Back to finding`/Preflight return reaches Readiness. If the item no longer exists, the UI focuses a stable Readiness location and announces that the previous item is no longer present; it never fuzzy-selects another finding.
+**AC-12 CrewAI ownership:** deterministic CrewAI Python export remains reachable.
 
-## Ownership / regression
+**AC-13 Protected regression:** Builder, Templates, JSON import/export, CrewAI Static Import, Readiness, Execution Preview, Resource Analysis, Unified Preflight, activation, analytics, language, accessibility, responsive behavior remain operational.
 
-**AC-11 — JSON ownership**  
-AgentGraph JSON export remains available after the manual fix, downloads a valid artifact, and round-trips through the existing contract.
+**AC-14 Evidence truth:** no runtime execution/observation/simulation/verification claim is introduced.
 
-**AC-12 — CrewAI ownership**  
-Deterministic CrewAI Python export remains reachable after the manual fix through the existing validation/code-generation path.
+**AC-15 Provider isolation:** representative loop completes with paid Architecture Review/provider unavailable.
 
-**AC-13 — Protected free-core regression**  
-Templates, JSON import/export, CrewAI Static Import, Visual Workflow Builder, Readiness, Execution Preview, Resource Analysis, Unified Preflight, first-value activation, language, accessibility, responsive behavior, and existing analytics remain operational.
+**AC-16 Authority:** no AI proposal, Semantic Patch, Apply, hidden mutation, provider/model, persistence, or runtime-verification expansion.
 
-## Evidence / authority / degraded behavior
+**AC-17 Challenge attribution:** Overview shows §5.3 wording; Product/social surfaces do not imply Astra runtime use.
 
-**AC-14 — Evidence language remains truthful**  
-The changed path continues to identify Preflight as deterministic/static and does not claim runtime execution, runtime observation, simulation, or runtime verification.
+**AC-18 Social metadata:** Production HTTP fetch exposes canonical/OG/Twitter metadata pointing to repository-owned 1200×630 image with meaningful alt.
 
-**AC-15 — Paid/provider isolation**  
-With paid Architecture Review disabled/unavailable, the representative path through Readiness, manual Design improvement, re-evaluation, and export still completes without an Architecture Review/provider call.
+**AC-19 Social independence:** metadata/image need no auth, entitlement, provider, user workflow data, or request-time AI generation.
 
-**AC-16 — No authority expansion**  
-No AI-generated improvement, Semantic Patch, automatic Apply, hidden semantic mutation, new provider/model behavior, persistence, or runtime-verification capability is introduced.
+**AC-20 Keyboard:** `Overview → Preflight → Readiness → Locate → schema edit → return/re-evaluate → Export` works keyboard-only with visible focus.
 
-## Launch presentation
+**AC-21 Mobile:** at 320×740 no page-level horizontal overflow/action loss.
 
-**AC-17 — Challenge attribution**  
-Any Product-visible or social-preview challenge label uses the bounded attribution from §5.3 and does not say or imply that current runtime/Preflight is powered by Astra.
+**AC-22 Non-color:** guide/finding/focus/resolution remains understandable without color.
 
-**AC-18 — Social metadata**  
-A direct HTTP fetch of Production `/` after release exposes current title/description plus canonical/Open Graph/Twitter metadata referencing a repository-owned 1200×630 image with meaningful alt text and current Product claims only.
+**AC-23 Analytics:** existing event contracts preserved; no semantic payload addition; auto-default is not manual template selection.
 
-**AC-19 — Social asset independence**  
-The social image/metadata renders without auth, paid entitlement, provider credentials, user workflow data, or external AI generation at request time.
-
-## Accessibility / responsive / analytics
-
-**AC-20 — Keyboard path**  
-Keyboard-only interaction can complete `Overview → Preflight → Readiness → Locate → Output schema edit → return/re-evaluate → Export`, with visible focus and no focus trap.
-
-**AC-21 — Mobile path**  
-At 320×740, the new guide and changed flow produce no page-level horizontal overflow and primary actions remain reachable.
-
-**AC-22 — Non-color status**  
-Guide step order, finding state, focus, and resolution are understandable without color alone.
-
-**AC-23 — Analytics preservation**  
-Existing event contracts still fire at their current semantic points; no workflow/schema content is added to analytics and the auto-loaded default example does not emit a false manual-template-selection event.
-
-## Contract / migration
-
-**AC-24 — No domain/API/persistence migration**  
-`GraphDocumentV1`, API surface, browser storage meaning, provider/data scope, and persistence architecture are unchanged.
+**AC-24 Contract:** GraphDocumentV1, APIs, storage meaning, provider/data/persistence scope unchanged.
 
 ---
 
@@ -571,168 +429,121 @@ Existing event contracts still fire at their current semantic points; no workflo
 
 | Area | Required verification |
 |---|---|
-| Representative preset | Deterministic test proves `competitor-price-monitor` / `Competitor Catalog Review Crew` produces `RDY_JSON_OUTPUT_SCHEMA_IMPLICIT` at `task-5.outputSchema` before the fix. |
-| Deterministic improvement | Apply the fixed test schema and prove that finding disappears while scaffold validation remains valid. |
-| Saved workflow protection | Test existing valid browser storage is rehydrated and not overwritten by the launch demo. |
-| Overview guide | UI/source/component test covers EN/JA exact intent, representative-only visibility, and no duplicate Preflight CTA. |
-| Field-aware Locate | Integration test covers supported `outputSchema` field focus, fallback for unsupported field, and stale/missing target behavior. |
-| Return/re-evaluate | Integration/E2E proves return context survives the edit and resolved-item behavior is stable/announced. |
-| Export | Existing JSON roundtrip + CrewAI export tests remain green after the fix. |
-| Metadata | Test title/description/canonical/OG/Twitter/image dimensions/alt and absence of unsupported Astra runtime wording. |
-| Analytics | Existing analytics-contract tests remain green; no semantic content is added and default auto-load does not emit manual selection. |
-| Accessibility | Keyboard focus assertions for Preflight heading/tabs, Locate destination field, return/re-evaluate, and Export. |
-| Responsive | Existing Playwright `desktop-en` 1280×900 and `mobile-ja` 320×740 both execute the changed representative path or an equivalent focused launch-hardening E2E. |
-| Failure isolation | Browser test blocks non-local/external requests and still completes deterministic free-core path, matching existing free-core harness policy. |
-| Regression | `npm test`, `npm run typecheck`, `npm run build`, `npm run docs:check`, plus `npm run test:e2e` and `npm run verify` as applicable. |
+| Representative preset | Prove `competitor-price-monitor` produces `RDY_JSON_OUTPUT_SCHEMA_IMPLICIT` at `task-5.outputSchema`. |
+| Deterministic fix | Apply fixed schema and prove finding disappears while scaffold validation remains valid. |
+| Saved workflow | Browser storage rehydrates and is not overwritten. |
+| Guide | EN/JA copy intent, representative-only visibility, no duplicate Preflight CTA. |
+| Locate | `outputSchema` focus, unsupported-field fallback, stale-target refresh. |
+| Return/re-evaluate | Review context survives edit; resolved-item fallback is stable/announced. |
+| Export | Existing JSON roundtrip + CrewAI export remain green. |
+| Metadata | canonical/OG/Twitter/image dimensions/alt; no unsupported Astra runtime wording. |
+| Analytics | Existing contracts green; no semantic payload/new false selection event. |
+| Accessibility | Preflight, Locate field, return/re-evaluate, Export keyboard focus. |
+| Responsive | existing Playwright `desktop-en` 1280×900 + `mobile-ja` 320×740 changed path. |
+| Failure isolation | existing external-request-blocking browser policy still permits deterministic free core. |
+| Required checks | `npm run docs:check`, `npm test`, `npm run typecheck`, `npm run build`, `npm run test:e2e`, `npm run verify` as applicable. |
 
-C01 may add focused tests to existing files or a bounded new launch-hardening test file. Test organization is an engineering choice; the behavioral assertions above are authoritative.
+C01 chooses test-file organization; assertions are authoritative.
 
 ---
 
-# 14. Requirement traceability
+# 14. Traceability
 
-| Requirement | Upstream authority / evidence | AC | Verification |
+| Requirement | Authority/evidence | AC | Verification |
 |---|---|---|---|
-| Current implemented value, not feature breadth | Product Master + selected packet | AC-02–05 | representative-path E2E |
-| Evidence Before Intelligence | Product/Architecture/Development Rules | AC-03, AC-09, AC-14 | Readiness deterministic tests + UI |
-| Manual user-controlled improvement | Product Master + existing review journey | AC-07–10 | Locate/edit/re-evaluate E2E |
-| Own / portable export | Product Master + completed review journey | AC-11–13 | JSON roundtrip + code export |
-| No provider dependency in free core | Architecture + Development Rules + Program Board | AC-05, AC-15, AC-19 | external-request-blocked browser test |
-| No AI/Mutation authority expansion | Execution Gate state + selected packet | AC-16 | diff review + QA |
-| Existing user workflow protection | completed review journey + regression contract | AC-01, AC-24 | storage rehydration test |
-| Launch first-view clarity | Production evidence F1/F2 | AC-02–04 | Overview UI + E2E |
-| Finding-to-edit friction removal | Production revision evidence F3 | AC-07–10 | focus/navigation tests |
-| Product Hunt/social presentation | selected packet + Production evidence F4 | AC-17–19 | metadata HTTP/build tests |
-| Accessibility/responsive | Development Rules | AC-20–22 | Playwright desktop/mobile + keyboard |
-| Analytics regression/privacy | Development Rules | AC-23 | analytics tests / source review |
+| Existing value, not feature breadth | Product Master + selection | 02–05 | representative E2E |
+| Evidence Before Intelligence | Product/Architecture/Dev Rules | 03,09,14 | readiness tests/UI |
+| Manual improvement | Product Master + completed journey | 07–10 | Locate/edit/re-evaluate |
+| Own/export | Product Master + completed journey | 11–13 | roundtrip/code export |
+| Provider-independent core | Architecture/Dev Rules/Board | 05,15,19 | blocked-external-request browser test |
+| No AI/Mutation expansion | Gate state + packet | 16 | diff/QA |
+| Existing work protected | completed journey | 01,24 | storage test |
+| Launch clarity | F1/F2 | 02–04 | Overview/E2E |
+| Finding→edit precision | F3 | 07–10 | focus/navigation |
+| Social launch presentation | F4 + selection | 17–19 | metadata HTTP/build |
+| A11y/responsive | Dev Rules | 20–22 | Playwright |
+| Analytics/privacy | Dev Rules | 23 | analytics tests/review |
 
 ---
 
-# 15. C01 implementation boundaries
+# 15. C01 / W01 boundaries
 
-`C01` owns engineering decomposition. It does **not** need a new Product decision for this packet.
+## C01
 
-C01 must:
+C01 owns engineering decomposition, not Product semantics. It must re-check live `main`, implement only §§3–6, preserve regressions, and add tests.
 
-- re-check live `main` before implementation;
-- keep changes bounded to the behaviors in §§3–5;
-- reuse current Product surfaces/read models/navigation rather than introducing new domain architecture;
-- preserve all protected regressions;
-- add/update required tests;
-- report any repository reality that makes an AC impossible without Product expansion.
+Return to `02`/`01` rather than expanding scope if implementation would require new persisted identity/state, provider/model call, Readiness-rule meaning, Product capability, broad onboarding infrastructure, paid enablement, AI/mutation authority, or runtime verification.
 
-C01 must return to `02` / `01` rather than silently expanding scope if implementation appears to require:
+No such Product blocker is known.
 
-- a new persisted identity/state;
-- a new provider/model call;
-- changing Readiness rule meaning;
-- a new Product workflow capability;
-- broad onboarding infrastructure;
-- paid-path enablement;
-- AI proposal/mutation authority;
-- runtime execution/verification.
+## W01 Pass A
 
-No such Product blocker is known at specification time.
+Independently verify AC-01–24, required checks/Playwright, finding before/fixed-after, keyboard/mobile, metadata truth, no unsupported Astra claim, paid/provider isolation, regression surfaces, analytics privacy, and no mutation/persistence expansion.
+
+Record exact approved revision and `PASS`, `PASS WITH NOTES`, or `FAIL / BLOCKED`.
 
 ---
 
-# 16. Independent QA scope (`W01` Pass A)
+# 16. Exact Production verification smoke
 
-W01 must independently verify the exact candidate revision against at least:
+After release of the exact QA-approved revision, W01:
 
-1. AC-01–24;
-2. required deterministic checks and Playwright changed-path coverage;
-3. the representative finding before/fixed-after behavior;
-4. keyboard and 320×740 responsive path;
-5. social metadata and preview asset truthfulness;
-6. no unsupported Astra/runtime claim;
-7. no paid Architecture Review enablement or provider dependency;
-8. no regression in imports/templates/exports/Preflight;
-9. analytics privacy/semantic preservation;
-10. no silent semantic mutation or persistence expansion.
+1. verifies live GitHub `main`;
+2. verifies Vercel `READY`, `target=production`, correct domain, and `main SHA = githubCommitSha`;
+3. HTTP-fetches `/` and verifies title/description/canonical/OG/Twitter/image;
+4. clean browser context: representative example + launch guide;
+5. `Run Preflight` → Readiness;
+6. confirms `JSON output schema is implicit` on `Capture Normalized Catalog Snapshot`;
+7. Locate → Design/Inspector → visible focus on `Output schema`;
+8. enter `{"snapshot_metadata":"object","products":"array[object]"}`;
+9. return/re-evaluate; exact finding absent;
+10. export valid AgentGraph JSON;
+11. open deterministic CrewAI Python export;
+12. mobile focused smoke near repository mobile viewport;
+13. saved-workflow context is not overwritten;
+14. paid Architecture Review remains fail-closed unless independently changed through its own lifecycle;
+15. inspect relevant browser/runtime errors.
 
-Verdict remains `PASS`, `PASS WITH NOTES`, or `FAIL / BLOCKED`, with exact approved revision recorded.
-
----
-
-# 17. Exact Production verification smoke (`W01` Pass B)
-
-After C01 releases the exact QA-approved revision, W01 must:
-
-1. verify latest GitHub `main`;
-2. verify Vercel deployment is `READY`, `target=production`, correct Production domain, and:
-   `GitHub main SHA = Vercel Production githubCommitSha`;
-3. fetch `/` and verify title/description/canonical/OG/Twitter/image metadata;
-4. use a clean browser context with no `agentgraph_active_flow`;
-5. confirm `Competitor Catalog Review Crew` is the Example workflow and the launch guide is visible;
-6. run Preflight and open Readiness;
-7. confirm `JSON output schema is implicit` targets `Capture Normalized Catalog Snapshot`;
-8. select Locate and confirm Design/Inspector opens with visible focus on `Output schema`;
-9. enter the fixed valid schema;
-10. return/re-evaluate and confirm that exact implicit-schema finding is absent;
-11. export AgentGraph JSON and verify a valid artifact download;
-12. open deterministic CrewAI Python export and verify it remains available under current validation;
-13. repeat a focused mobile smoke at approximately the repository mobile harness viewport and confirm no horizontal overflow/action loss;
-14. verify a saved-workflow context is not overwritten by the demo;
-15. verify paid Architecture Review remains fail-closed unless its separate contract independently changed through its own lifecycle;
-16. check relevant runtime/browser errors on the changed path.
-
-Production verification must not infer runtime workflow behavior from static Preflight.
+Do not infer runtime workflow behavior from static Preflight.
 
 ---
 
-# 18. Non-repository launch assets / video dependency
+# 17. Non-repository launch assets
 
-Product Hunt listing copy, launch screenshots, and launch video are non-repository deliverables.
+Product Hunt listing, screenshots, and video are external deliverables.
 
-They are **not** permission for C01 to invent Product behavior. Their content must be captured/written from the Production-Verified behavior above.
+Rule:
 
-Required launch-asset rule:
+`Production-verified behavior → screenshots/video/copy`
 
-```text
-Production-verified Product behavior
-→ screenshots/video/copy
-```
+Never reverse this into implementation pressure.
 
-not:
+They may state launch participation in the GPT-6 Astra Challenge, but must not claim Astra runtime dependency, runtime execution/verification, automatic improvement, paid availability, or future-stage behavior unless separately true and verified.
 
-```text
-planned marketing claim
-→ Product implementation or unsupported claim
-```
-
-External launch assets may say that AgentGraph Studio is launching for the GPT-6 Astra Challenge. They must not claim Astra runtime dependency, workflow execution, runtime verification, automatic improvement, paid availability, or future-stage capability unless separately true and verified at capture time.
-
-Preferred owner after Production Verified: `00` / authorized launch operator. These assets are not C01 implementation AC beyond providing truthful repository-owned metadata/social image.
+Preferred owner after Production Verified: `00` / authorized launch operator.
 
 ---
 
-# 19. Definition of Ready resolution
+# 18. Definition of Ready
 
-| DoR item | Resolution |
+| DoR | Resolution |
 |---|---|
-| Exact launch user goal | Resolved in §1 |
-| Representative first-value path | Resolved in §§3–4 |
-| Production friction/evidence | Resolved in §2 with direct first-view Production evidence + same-revision interaction evidence; scripted public navigation limitation recorded |
-| Included / Out of Scope | Resolved in §§6–7 |
-| Exact UX/UI behavior | Resolved in §§4–5 |
-| Primary/loading/error/empty/stale/degraded | Resolved in §8 |
-| Domain/data/API impact | No domain/API expansion; §9 |
-| Persistence impact | None; existing browser storage semantics preserved; §9 |
-| Security/privacy/provider impact | No new flow/provider; §9 |
-| AI Authority | Unchanged |
-| Mutation Authority | Unchanged / none added |
-| Migration/backward compatibility | No schema migration; saved browser workflow protected |
-| Accessibility | Resolved in §10 |
-| Responsive | Resolved in §10 |
-| Analytics | No additive events; preservation contract in §11 |
-| Acceptance Criteria | AC-01–24 |
-| Test Matrix | §13 |
-| Browser coverage | Existing desktop-en/mobile-ja Playwright harness + W01 Production smoke |
-| Requirement traceability | §14 |
-| Independent QA scope | §16 |
-| Production verification smoke | §17 |
-| External launch asset/video dependency | §18 |
+| exact goal/path | §§1,3,4 |
+| Production friction/evidence | §2; browser-navigation limitation explicit |
+| Included / Out of Scope | §§6,7 |
+| UX/states | §§4,5,8 |
+| domain/data/API/persistence | §9 |
+| security/privacy/provider | §9 |
+| AI/Mutation Authority | unchanged |
+| migration/backward compatibility | no migration; saved work protected |
+| accessibility/responsive | §10 |
+| analytics | §11 |
+| AC | §12 |
+| tests/browser coverage | §13 |
+| traceability | §14 |
+| independent QA | §15 |
+| Production smoke | §16 |
+| external assets/video | §17 |
 
 **Definition of Ready: SATISFIED.**
 
@@ -740,9 +551,7 @@ No unresolved Product decision blocks implementation.
 
 ---
 
-# 20. Lifecycle / handoff
-
-This packet is now:
+# 19. Lifecycle / handoff
 
 ```text
 01 Selected
@@ -755,6 +564,6 @@ This packet is now:
 → 00 Sprint Complete
 ```
 
-`Specified` is specification maturity, not implementation, QA, release, Production verification, launch success, Stage/Gate promotion, paid readiness, Commercial Validation Gate M0, or authority expansion.
+`Specified` is specification maturity only. It does not mean implemented, QA-approved, released, Production Verified, paid-ready, M0/Gate reached, or authority-expanded.
 
-The still-open paid Architecture Review lifecycle remains separate and unchanged.
+The open paid Architecture Review lifecycle remains separate and unchanged.
