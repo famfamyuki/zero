@@ -22,6 +22,10 @@ Identify the role, authorized scope, and current packet from the
 from the [Role Registry](docs/CHAT_ROLE_REGISTRY.md); do not copy old prompts or
 historical lifecycle state forward.
 
+When composing a development prompt or handoff brief for another Chat, Work, Codex,
+or Astra task, use the [Development Prompt Authoring contract](docs/harness/DEVELOPMENT_PROMPT_AUTHORING.md).
+Build the brief from current repository authority rather than copying an old prompt.
+
 Treat an action request as authorization to complete reversible, in-scope work up
 to the role-owned handoff point. Do not stop at a plan or first working pass when
 the requested outcome includes implementation, inspection, fixes, or verification.
