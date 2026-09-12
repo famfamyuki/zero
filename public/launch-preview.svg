@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#020617"/><stop offset="1" stop-color="#172554"/></linearGradient></defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M80 100H1120" stroke="#818cf8" stroke-width="4"/>
+  <text x="80" y="200" fill="#ffffff" font-family="Arial, sans-serif" font-size="64" font-weight="700">AgentGraph Studio</text>
+  <text x="80" y="270" fill="#a5b4fc" font-family="Arial, sans-serif" font-size="29">Deterministic Preflight · Portable Export</text>
+  <rect x="80" y="330" width="1040" height="104" rx="20" fill="#0f172a" stroke="#475569"/>
+  <text x="116" y="394" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="32">Understand → Evaluate → Improve → Verify → Own</text>
+  <text x="80" y="532" fill="#94a3b8" font-family="Arial, sans-serif" font-size="24">GPT-6 Astra Challenge · September 18, 2026</text>
+</svg>
