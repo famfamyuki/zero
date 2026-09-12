@@ -14,7 +14,24 @@ Supporting authorities:
 
 ## 0. Source-of-truth and execution rule
 
-When facts conflict, use current repository/Production reality first, then the active packet and applicable durable authorities. Historical chats, old SHAs, and old compatibility paths are evidence/history, not current authority.
+When information conflicts, use:
+
+```text
+latest GitHub main / repository reality
+→ latest Vercel Production / actual Production behavior
+→ active docs/specs packet
+→ Product Master
+→ Architecture
+→ Development Rules / applicable Security & Data baselines
+→ Master Roadmap
+→ Execution Gates
+→ relevant specialized plans/contracts
+→ Program Board / Risk Register
+→ Current State snapshot
+→ ADR / historical Chat / Work / Codex / old SHAs
+```
+
+Historical chats, old SHAs, and compatibility paths are evidence/history, not current authority.
 
 A roadmap stage becomes implementation scope only after explicit **Selected → Specified**. Stage order is dependency direction, not an automatic queue:
 
@@ -26,7 +43,7 @@ Stage work
 → Selected packet
 ```
 
-Gate outcomes may be `PROCEED`, `PROCEED_WITH_CONDITIONS`, `HARDEN_FIRST`, `FOUNDATION_FIRST`, or `DEFER`.
+Gate outcomes may be `PROCEED`, `PROCEED_WITH_CONDITIONS`, `HARDEN_FIRST`, `FOUNDATION_FIRST`, or `DEFER`. Material durable promotion decisions belong in `docs/decisions/`.
 
 Before implementation, apply the Definition of Ready in `docs/DEVELOPMENT_RULES.md`.
 
@@ -70,7 +87,7 @@ Stage 1.5 is a **selection band**, not one mandatory Sprint. Candidate threads i
 - Review Workspace / finding navigation
 - revision/evaluation-history foundation
 
-Select only the smallest set that materially improves first value, evaluator context, repeat use, migration leverage, review understandability, or explicit expected-behavior context.
+Select only the smallest set that materially improves first value, evaluator context, repeat use, migration leverage, review understandability, or explicit expected-behavior context. Record an explicit selection in `docs/roadmap/PROGRAM_BOARD.md`; appearing in the roadmap is not selection.
 
 Required boundaries remain: no speculative Graph V2, hidden cloud lock-in, direct semantic AI apply, or fabricated dynamic/imported facts. Unsupported/dynamic import behavior remains Unknown or explicitly lossy. Configured expectations are not observed runtime behavior.
 
