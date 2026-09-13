@@ -196,17 +196,10 @@ export function inspectPaidArchitectureReviewReadiness(
   const outputMicroUsdPerMillionTokens = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS');
   if (includedReviews !== null && includedReviews !== 10) issues.push({ key: 'ARCHITECTURE_REVIEW_INCLUDED_REVIEWS', code: 'invalid_launch_configuration' });
   const costEnvelope = [maxProviderInputBytes, maxOutputTokens, inputMicroUsdPerMillionTokens, outputMicroUsdPerMillionTokens, maxWorstCaseCostMicroUsd];
-  const approvedModelCostProfiles: Record<string, readonly [number, number]> = {
-    'gpt-5.6-sol': [4_000_000, 20_000_000],
-    'gpt-5.6-terra': [2_000_000, 12_000_000],
-  };
-  const approvedCostProfile = configuredValue(env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL)
-    ? approvedModelCostProfiles[configuredValue(env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL)!]
-    : undefined;
   if (costEnvelope.every((value) => value !== null)
-    && !(maxProviderInputBytes === 32_768 && maxOutputTokens === 4_096 && approvedCostProfile
-      && inputMicroUsdPerMillionTokens === approvedCostProfile[0]
-      && outputMicroUsdPerMillionTokens === approvedCostProfile[1] && maxWorstCaseCostMicroUsd === 250_000)) {
+    && !isApprovedProviderEnvelope({ maxProviderInputBytes: maxProviderInputBytes!, maxOutputTokens: maxOutputTokens!,
+      inputMicroUsdPerMillionTokens: inputMicroUsdPerMillionTokens!, outputMicroUsdPerMillionTokens: outputMicroUsdPerMillionTokens!,
+      maxWorstCaseCostMicroUsd: maxWorstCaseCostMicroUsd!, costProfileModelId: configuredValue(env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL) ?? '' })) {
     issues.push({ key: 'ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD', code: 'invalid_launch_configuration' });
   }
   const providerBudgetWarningMicroUsd = pushPositiveIntegerIssue(issues, env, 'ARCHITECTURE_REVIEW_PROVIDER_BUDGET_WARNING_MICRO_USD');
@@ -319,4 +312,38 @@ export function estimateActualCostMicroUsd(
     + BigInt(outputTokens) * BigInt(config.outputMicroUsdPerMillionTokens);
   const total = (numerator + BigInt(999_999)) / BigInt(1_000_000);
   return total <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(total) : null;
+}
+
+// Billing-independent safety configuration; credentials are checked but never returned.
+export type ArchitectureReviewProviderConfig = Pick<PaidArchitectureReviewConfig,
+  'modelId' | 'costProfileModelId' | 'maxProviderInputBytes' | 'maxOutputTokens' |
+  'maxWorstCaseCostMicroUsd' | 'inputMicroUsdPerMillionTokens' | 'outputMicroUsdPerMillionTokens'>;
+
+function isApprovedProviderEnvelope(config: Omit<ArchitectureReviewProviderConfig, 'modelId'>): boolean {
+  const approvedModelCostProfiles: Record<string, readonly [number, number]> = {
+    'gpt-5.6-sol': [4_000_000, 20_000_000],
+    'gpt-5.6-terra': [2_000_000, 12_000_000],
+  };
+  const profile = approvedModelCostProfiles[config.costProfileModelId];
+  return config.maxProviderInputBytes === 32_768 && config.maxOutputTokens === 4_096
+    && Boolean(profile) && config.inputMicroUsdPerMillionTokens === profile[0]
+    && config.outputMicroUsdPerMillionTokens === profile[1] && config.maxWorstCaseCostMicroUsd === 250_000;
+}
+
+export function parseArchitectureReviewProviderConfig(env: Record<string, string | undefined> = process.env): ArchitectureReviewProviderConfig | null {
+  if (!configuredValue(env.OPENAI_API_KEY)) return null;
+  const modelId = configuredValue(env.ARCHITECTURE_REVIEW_MODEL);
+  const costProfileModelId = configuredValue(env.ARCHITECTURE_REVIEW_COST_PROFILE_MODEL);
+  if (!modelId || modelId !== costProfileModelId) return null;
+  const config = {
+    modelId, costProfileModelId,
+    maxProviderInputBytes: positiveInteger(env.ARCHITECTURE_REVIEW_MAX_PROVIDER_INPUT_BYTES),
+    maxOutputTokens: positiveInteger(env.ARCHITECTURE_REVIEW_MAX_OUTPUT_TOKENS),
+    maxWorstCaseCostMicroUsd: positiveInteger(env.ARCHITECTURE_REVIEW_MAX_WORST_CASE_COST_MICRO_USD),
+    inputMicroUsdPerMillionTokens: positiveInteger(env.ARCHITECTURE_REVIEW_INPUT_MICRO_USD_PER_MILLION_TOKENS),
+    outputMicroUsdPerMillionTokens: positiveInteger(env.ARCHITECTURE_REVIEW_OUTPUT_MICRO_USD_PER_MILLION_TOKENS),
+  };
+  if (Object.values(config).some((value) => value === null)) return null;
+  const validated = config as ArchitectureReviewProviderConfig;
+  return isApprovedProviderEnvelope(validated) ? validated : null;
 }

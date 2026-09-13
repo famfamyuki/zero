@@ -1,3 +1,4 @@
+import { isArchitectureReviewPreviewTester, parseArchitectureReviewPreviewConfig } from '@/lib/architecture-review/preview-test';
 import OpenAI from 'openai';
 import { architectureReviewRequestSchema } from '@/lib/architecture-review/schemas';
 import { validateArchitectureEvidence } from '@/lib/architecture-review/evidence-validation';
@@ -27,11 +28,15 @@ export async function POST(request: Request) {
   try { text = await request.text(); } catch { return failure(400, 'invalid_request'); }
   if (new TextEncoder().encode(text).byteLength > MAX_BYTES) return failure(413, 'input_too_large');
 
-  const config = parsePaidArchitectureReviewConfig();
-  if (!config) return failure(503, 'review_disabled');
+  const paidConfig = parsePaidArchitectureReviewConfig();
+  const previewConfig = parseArchitectureReviewPreviewConfig();
+  if (!paidConfig && !previewConfig) return failure(503, 'review_disabled');
   let user;
   try { user = await authenticatePaidRequest(request); } catch { return failure(503, 'entitlement_unavailable'); }
   if (!user) return failure(401, 'authentication_required');
+  const previewTester = Boolean(previewConfig && isArchitectureReviewPreviewTester(user.id));
+  const config = previewTester ? previewConfig! : paidConfig;
+  if (!config) return failure(503, 'review_disabled');
   const requestId = request.headers.get('idempotency-key');
   if (!requestId) return failure(400, 'idempotency_key_required');
   if (!UUID.test(requestId)) return failure(400, 'invalid_idempotency_key');
@@ -44,12 +49,14 @@ export async function POST(request: Request) {
   const evidence = validateArchitectureEvidence(parsed.data.evidence);
   if (!evidence) return failure(422, 'invalid_evidence');
 
-  const access = await readPaidArchitectureReviewAccess(user.id, config);
-  if (access.state === 'no_entitlement') return failure(403, 'paid_entitlement_required');
-  if (access.state === 'billing_blocked') return failure(403, 'billing_inactive');
-  if (access.state === 'sync_degraded') return failure(503, 'entitlement_unavailable');
-  if (access.state === 'quota_exhausted') return failure(429, 'quota_exhausted');
-  if (access.state === 'review_disabled') return failure(503, 'review_disabled');
+  if (!previewTester && paidConfig) {
+    const access = await readPaidArchitectureReviewAccess(user.id, paidConfig);
+    if (access.state === 'no_entitlement') return failure(403, 'paid_entitlement_required');
+    if (access.state === 'billing_blocked') return failure(403, 'billing_inactive');
+    if (access.state === 'sync_degraded') return failure(503, 'entitlement_unavailable');
+    if (access.state === 'quota_exhausted') return failure(429, 'quota_exhausted');
+    if (access.state === 'review_disabled') return failure(503, 'review_disabled');
+  }
 
   const { providerInput } = createReviewerEnvelope(evidence);
   const providerEnvelopeBytes = new TextEncoder().encode(JSON.stringify({ instruction: ARCHITECTURE_REVIEWER_INSTRUCTION, data: createArchitectureReviewerDataEnvelope(providerInput, parsed.data.locale) })).byteLength;
@@ -61,23 +68,25 @@ export async function POST(request: Request) {
     try { await finalizePaidReview({ userId: user.id, requestId, state: 'released', outcome, failureCategory: category }); } catch { /* stale recovery safely releases credit */ }
   };
 
-  try {
-    const outcome = await reservePaidReview({
-      userId: user.id, requestId, quotaLimit: config.includedReviews,
-      reviewVersion: ARCHITECTURE_REVIEW_RESULT_VERSION, evidenceVersion: ARCHITECTURE_REVIEW_EVIDENCE_VERSION,
-      reviewerVersion: ARCHITECTURE_REVIEWER_VERSION, providerId: 'openai', modelId: config.modelId,
-      preflightCostMicroUsd: worstCaseCost, costProfileVersion: `micro-usd-per-million:${config.costProfileModelId}`,
-    });
-    if (outcome === 'reserved') return failure(409, 'review_in_progress');
-    if (outcome === 'consumed') return failure(409, 'review_already_completed');
-    if (outcome === 'released') return failure(409, 'review_attempt_closed');
-    if (outcome === 'quota_exhausted') return failure(429, 'quota_exhausted');
-    if (outcome === 'billing_inactive') return failure(403, 'billing_inactive');
-    if (outcome === 'entitlement_unavailable') return failure(503, 'entitlement_unavailable');
-    if (outcome !== 'new') return failure(503, 'accounting_unavailable');
-    reserved = true;
-  } catch {
-    return failure(503, 'accounting_unavailable');
+  if (!previewTester && paidConfig) {
+    try {
+      const outcome = await reservePaidReview({
+        userId: user.id, requestId, quotaLimit: paidConfig.includedReviews,
+        reviewVersion: ARCHITECTURE_REVIEW_RESULT_VERSION, evidenceVersion: ARCHITECTURE_REVIEW_EVIDENCE_VERSION,
+        reviewerVersion: ARCHITECTURE_REVIEWER_VERSION, providerId: 'openai', modelId: config.modelId,
+        preflightCostMicroUsd: worstCaseCost, costProfileVersion: `micro-usd-per-million:${config.costProfileModelId}`,
+      });
+      if (outcome === 'reserved') return failure(409, 'review_in_progress');
+      if (outcome === 'consumed') return failure(409, 'review_already_completed');
+      if (outcome === 'released') return failure(409, 'review_attempt_closed');
+      if (outcome === 'quota_exhausted') return failure(429, 'quota_exhausted');
+      if (outcome === 'billing_inactive') return failure(403, 'billing_inactive');
+      if (outcome === 'entitlement_unavailable') return failure(503, 'entitlement_unavailable');
+      if (outcome !== 'new') return failure(503, 'accounting_unavailable');
+      reserved = true;
+    } catch {
+      return failure(503, 'accounting_unavailable');
+    }
   }
 
   if (providerEnvelopeBytes > config.maxProviderInputBytes || worstCaseCost > config.maxWorstCaseCostMicroUsd) {
@@ -89,14 +98,16 @@ export async function POST(request: Request) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    await markPaidReviewProviderStarted(user.id, requestId);
+    if (!previewTester) await markPaidReviewProviderStarted(user.id, requestId);
     const draft = await reviewer.review({ evidence, locale: parsed.data.locale }, { signal: controller.signal });
     const result = assembleArchitectureReviewResult(draft, evidence, { providerId: reviewer.providerId, modelId: reviewer.model, locale: parsed.data.locale });
-    const actualCost = estimateActualCostMicroUsd(reviewer.usage.inputTokens, reviewer.usage.outputTokens, config);
-    try {
-      await finalizePaidReview({ userId: user.id, requestId, state: 'consumed', outcome: 'valid_result', failureCategory: null, usage: reviewer.usage, postCallCostMicroUsd: actualCost, costEstimateStatus: actualCost === null ? 'unknown' : 'estimated' });
-    } catch {
-      return failure(503, 'accounting_unavailable');
+    if (!previewTester) {
+      const actualCost = estimateActualCostMicroUsd(reviewer.usage.inputTokens, reviewer.usage.outputTokens, config);
+      try {
+        await finalizePaidReview({ userId: user.id, requestId, state: 'consumed', outcome: 'valid_result', failureCategory: null, usage: reviewer.usage, postCallCostMicroUsd: actualCost, costEstimateStatus: actualCost === null ? 'unknown' : 'estimated' });
+      } catch {
+        return failure(503, 'accounting_unavailable');
+      }
     }
     return paidJson({ version: '0.1.0', result });
   } catch (error) {

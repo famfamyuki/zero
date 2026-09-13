@@ -54,9 +54,9 @@ type AnalyticsProperties = {
   preflight_review_re_evaluated: {
     stage: UnifiedPreflightStage;
   };
-  architecture_review_requested: { review_version: '0.1.0'; evidence_version: '0.1.0'; access_mode: 'paid_subscription_v0' };
-  architecture_review_completed: { review_version: '0.1.0'; evidence_version: '0.1.0'; access_mode: 'paid_subscription_v0' };
-  architecture_review_failed: { review_version: '0.1.0'; error_code: ArchitectureReviewErrorCode; access_mode: 'paid_subscription_v0' };
+  architecture_review_requested: { review_version: '0.1.0'; evidence_version: '0.1.0'; access_mode: 'paid_subscription_v0' | 'preview_tester_v0' };
+  architecture_review_completed: { review_version: '0.1.0'; evidence_version: '0.1.0'; access_mode: 'paid_subscription_v0' | 'preview_tester_v0' };
+  architecture_review_failed: { review_version: '0.1.0'; error_code: ArchitectureReviewErrorCode; access_mode: 'paid_subscription_v0' | 'preview_tester_v0' };
   paid_review_offer_shown: { offer_version: '0.1.0'; access_state: string };
   paid_review_checkout_started: { offer_version: '0.1.0' };
   paid_review_quota_exhausted: { offer_version: '0.1.0' };
