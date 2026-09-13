@@ -104,20 +104,45 @@ AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1
 Capability
 = Architecture Review Evaluation Trust Foundation v0
 = Gold Dataset + Quality Metrics
-
-Next owner
-= 02 — UX & Implementation Specification
 ```
 
 Decision authority:
 
 `docs/decisions/ADR-0012-select-architecture-review-evaluation-trust-foundation.md`
 
-This is a **pre-Gate-A Product foundation selection**, not Gate A passage, Stage promotion, Stage 2 selection, or AI/Mutation authority expansion.
+This remains a **pre-Gate-A Product foundation selection**, not Gate A passage, Stage promotion, Stage 2 selection, or AI/Mutation authority expansion.
 
 The Product reason is evaluator trust. Existing formal evidence demonstrates a useful release-safety baseline—30 successful synthetic reviews, 210/210 current semantic rubric checks, and zero hard violations—but the current harness does not yet measure issue precision/recall, good-workflow false positives, flawed-workflow false negatives, top-issue agreement, or semantics-preserving stability against a versioned gold dataset. The current A–J fixtures are also small; the largest has eight nodes.
 
 Therefore the smallest current dependency is to make semantic evaluation quality measurable before stronger improvement authority is considered.
+
+## Specification completion — 2026-09-13
+
+`02` inspected live GitHub `main` at `7a6783d6037759243e17680d024b6b4e6e642894`, the current A–J fixture/evaluation runner, current Architecture Review result/Evidence contracts, Evaluation Trust/Gate authority, Development Rules, and Data & AI Governance, then closed the packet Definition of Ready.
+
+Current lifecycle:
+
+```text
+AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1
+= SPECIFIED
+
+Next owner
+= C01 — Current Sprint Implementation
+```
+
+The implementation-ready packet now fixes:
+
+- dataset/rubric/scorer/report version semantics;
+- candidate vs human-approved-gold annotation provenance and eligibility;
+- exact deterministic text/target/Evidence/recommendation matching;
+- one-to-one matching, duplicates, partials, adjudication candidates, and acceptable alternatives;
+- precision/recall, good-workflow FP, flawed-workflow miss/zero-coverage, top-1/top-3, strength, Unknown, and stability denominator behavior;
+- exact layout-shift and collection-order representation variants;
+- provider-independent scorer/report tests;
+- an optional explicit-spend live quality runner that does not replace the current release-safety command;
+- privacy, migration, Acceptance Criteria, Test Matrix, and traceability.
+
+A–J remain synthetic fixtures. Their seed annotations must remain `candidate` until real human review provenance exists; specification completion does not relabel them as expert gold.
 
 ---
 
@@ -127,7 +152,7 @@ Therefore the smallest current dependency is to make semantic evaluation quality
 
 | Packet | Role in current plan | Recorded lifecycle / remaining work |
 |---|---|---|
-| `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` | **Current selected Product Sprint** — versioned gold dataset + semantic quality metrics | **Selected**; next owner `02`; not implementation-ready until `Specified` |
+| `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` | **Current Product Sprint** — versioned gold/candidate dataset + semantic quality metrics | **Specified**; next owner `C01`; implementation not started/complete until C01 records it |
 | `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 commercial/public-launch lifecycle remains open; current AI review authority unchanged |
 | `AGS-EGAI-AR-PAUC-V0-P1` | Paid access/control contract | Preparation released; first-Live procedure Specified/released/release-verified; activation deferred; Phase 0/containment/Live proofs/AC-30 remain open |
 | `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation implemented; eventual public launch still requires its existing approvals/evidence |
@@ -137,7 +162,7 @@ Therefore the smallest current dependency is to make semantic evaluation quality
 
 ---
 
-# 3. Selected Sprint — Evaluation Trust Foundation
+# 3. Current Sprint — Evaluation Trust Foundation
 
 ## 3.1 Product problem
 
@@ -152,31 +177,34 @@ Known current harness characteristics:
 - formal recovered run: 210/210 current semantic checks and zero hard violations;
 - largest current fixture: eight nodes.
 
-Missing Product evidence:
+Missing Product evidence remains:
 
-- issue precision / recall;
+- issue precision / recall on reviewed annotations;
 - good-workflow false-positive rate;
 - flawed-workflow false-negative / issue-coverage behavior;
 - top-1 / top-k priority agreement;
-- strength recognition against annotated expectations;
+- strength recognition against reviewed expectations;
 - acceptable-alternative handling;
 - repeated-run material-finding stability;
 - semantics-preserving representation stability.
 
-## 3.2 Included selection scope
+Specification makes those measurable; it does not claim the measurements are already favorable.
 
-`02` is authorized to specify the smallest coherent implementation around:
+## 3.2 Specified implementation scope
 
-- versioned benchmark dataset/rubric;
-- reviewable gold annotation model for expected strengths/issues/priority/Evidence/Unknowns/acceptable alternatives and recommendation direction;
-- minimum good/flawed/ambiguous/multiple-valid/adversarial benchmark classes;
-- deterministic scoring/reporting for precision/recall, false positives/negatives, priority agreement, strength recognition, uncertainty preservation, stability, and existing hard violations where annotations support the metric;
-- semantics-preserving stability foundation;
-- reproducible benchmark report metadata;
-- provider-independent dataset/scorer/report tests;
-- explicit bounded provider-backed evaluation only where separately allowed by existing provider/budget governance.
+C01 is authorized to implement the packet-defined smallest coherent foundation:
 
-Existing A–J fixtures may be reused with preserved provenance, but must not be silently renamed as expert gold without the required annotation/review evidence.
+- retain existing A–J graph fixtures and release-safety hard/semantic checks;
+- add a strict versioned benchmark dataset with fixture fingerprint pins;
+- add candidate/human-approved/disputed/retired annotation provenance states and deterministic gold eligibility;
+- add deterministic matcher/scorer/report modules that require no provider;
+- add issue precision/recall, good FP, flawed FN/coverage, top-1/top-3, strength, Unknown, and repeated-run/representation-stability measurement;
+- support exactly two v0 non-semantic variants: layout-only position changes and node/edge collection-order changes, guarded by workflow fingerprint equality;
+- add an offline quality command suitable for normal implementation verification;
+- add an optional live quality command requiring an explicit spend ceiling and preserving current provider/data governance;
+- keep the current `npm run eval:architecture-review` release-safety behavior available.
+
+No permanent quality promotion threshold is selected.
 
 ## 3.3 Deferred / Out of Scope
 
@@ -186,6 +214,7 @@ Not selected now:
 - scoped/hierarchical evaluation implementation;
 - broad large-workflow Search/Filter/Outline;
 - dedicated Architecture Review Workspace redesign;
+- expanded Locate/Focus beyond separately selected evidence;
 - Project / Local Workspace identity;
 - persisted Intent & Constraints;
 - revision / evaluation history;
@@ -200,16 +229,6 @@ Not selected now:
 - commercial activation or Production paid configuration changes.
 
 The packet may carry topology/size metadata for later evidence reuse, but must not claim large-workflow support or silently select a scale architecture.
-
-## 3.4 Why the other candidates were not selected
-
-**Adoption & Context Foundation:** Project/Workspace, Intent, and history add persistence/identity/governance scope. Current evidence does not yet show missing context/history is the dominant review-quality bottleneck.
-
-**Review Workspace / Locate:** strategically valuable, but there is no current Production evidence that provider-backed finding navigation is the main limiting problem. Astra already improved deterministic Locate in the free-core journey.
-
-**Combined quality + context/UX/scale packet:** rejected as larger than necessary. Quality measurement should first reveal which dependency is actually limiting trust.
-
-**No new Product selection:** rejected under the new stakeholder priority because commercial activation can remain fail-closed while independently justified evaluator-quality work advances the core Product.
 
 ---
 
@@ -242,41 +261,9 @@ all Phase 0 non-circular prerequisites VERIFIED
 → later separately verified public-enable transition
 ```
 
-None of these steps is authorized merely because the procedure exists or this Product Sprint was selected.
+None of these steps is authorized by this specification.
 
-## 4.1 Deferred activation evidence state
-
-The following remain unresolved and must be re-checked fresh when commercial activation is explicitly resumed:
-
-- commercial-use hosting/account/contract eligibility;
-- public policy / merchant / privacy / tax / refund / support approvals;
-- Stripe Live Price / Portal / Tax configuration;
-- provider Production project/key/budget/alerts/hard ceiling;
-- financial QA approval;
-- required Test Mode lifecycle evidence;
-- Production Auth delivery/session/redirect evidence;
-- current Firewall rule inventory/capacity/operator authority;
-- stable exclusive QA egress source and independent containment proof;
-- first-Live entitlement/webhook lifecycle;
-- entitled-user kill switch;
-- cost guard before provider invocation;
-- PAUC AC-30 real subscription/entitlement/quota/cancellation/refund sequence.
-
-Do not promote any of these to `VERIFIED` from stale documentation or previous plan labels.
-
-## 4.2 Resumption rule
-
-Commercial activation may resume only through a later explicit priority decision after Product development has advanced further.
-
-At minimum:
-
-```text
-current Selected Product Sprint completes its normal lifecycle
-→ 00 reconciles current evidence/priority
-→ 01 explicitly decides whether commercial activation resumes or another Product dependency is selected
-```
-
-Completion of the Evaluation Trust Foundation does **not** automatically authorize Stripe Live, containment, first-Live, AC-30, or public paid enablement.
+Commercial activation may resume only through a later explicit priority decision after Product development has advanced further. Completion of the Evaluation Trust Foundation does **not** automatically authorize Stripe Live, containment, first-Live, AC-30, or public paid enablement.
 
 ---
 
@@ -286,8 +273,8 @@ Current Product execution priority:
 
 ```text
 AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1
-= SELECTED
-→ 02 Specification
+= SPECIFIED
+→ C01 Implementation
 ```
 
 Commercial exposure blocker remains real but is currently a **deferred commercial-activation blocker**, not a blocker to this independently justified Product-quality Sprint:
@@ -305,15 +292,15 @@ Evaluator trust risk remains active as a Product evidence gap:
 ```text
 R-001
 = Critical / WATCH
-= selected Sprint gathers the missing calibration foundation
-= risk is not considered resolved merely because work is selected
+= current Sprint implements the missing calibration foundation
+= risk is not considered resolved merely because the packet is Specified
 ```
 
 | Work / decision | State | Next owner/action |
 |---|---|---|
-| Evaluation Trust Foundation | **SELECTED** | `02` completes implementation-ready specification and only then may mark `Specified` |
+| Evaluation Trust Foundation | **SPECIFIED** | `C01` implements the packet exactly; no Product threshold/authority invention |
 | Commercial activation / first-Live / AC-30 | **OPEN / FAIL-CLOSED / DEFERRED** | no Production config/Stripe/WAF/Live action now; re-open only by explicit later priority decision |
-| Gate A | **NOT REACHED** | selected packet prepares evidence only; no promotion |
+| Gate A | **NOT REACHED** | packet prepares evidence only; no promotion |
 | Gate B | **NOT REACHED** | no stronger evaluator authority |
 | Stage 2 | **NOT SELECTED** | no Guided Improvement |
 | AI Authority | **UNCHANGED** | existing capability-scoped review authority only |
@@ -321,7 +308,7 @@ R-001
 
 ---
 
-# 6. Known / Inferred / Unknown for current selection
+# 6. Known / Inferred / Unknown for current Sprint
 
 ## Known
 
@@ -331,20 +318,22 @@ R-001
 - the formal recovered evaluator run contains 30 successful reviews, 210/210 current semantic checks, and zero hard violations;
 - the current A–J fixture set is synthetic and small, with a largest fixture of eight nodes;
 - the current scorer does not compute gold-set issue precision/recall, good-workflow false positives, flawed-workflow false negatives, or top-issue agreement;
+- `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` now contains an implementation-ready deterministic benchmark/scorer/report contract;
+- A–J seed annotations are not human-approved gold merely because the packet is Specified;
 - durable Product/Roadmap authority requires measured evaluator trust before stronger authority expansion;
 - `R-001` remains Critical / WATCH.
 
 ## Inferred
 
-- a versioned gold-dataset/quality-metric foundation is the smallest current dependency for learning whether evaluator quality, context, navigation, or scale should be the next limiting concern;
+- implementing this bounded versioned benchmark foundation is the smallest current dependency for learning whether evaluator quality, context, navigation, or scale should be the next limiting concern;
 - deferring commercial activation creates no new core architecture dependency because the free deterministic core and benchmark/scorer foundation can remain independent of paid/provider availability.
 
 ## Unknown
 
-- actual issue precision/recall on a curated gold set;
+- actual issue precision/recall on human-approved annotations;
 - good-workflow false-positive rate;
 - flawed-workflow false-negative behavior;
-- top-issue priority agreement with human Product/Architecture judgement;
+- top-issue priority agreement with reviewed Product/Architecture judgement;
 - material finding stability across repeated runs and semantics-preserving variants;
 - large-workflow semantic degradation and the size at which monolithic evaluation becomes insufficient;
 - whether persisted Intent/Constraints materially improves evaluator correctness;
@@ -363,7 +352,7 @@ Current canonical near-term path:
 01 Explicit Next Selection
 = AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1 Selected
 
-→ 02 Specification
+→ 02 Specified
 → C01 Implementation
 → W01 Independent QA
 → C01 exact approved release
@@ -398,7 +387,7 @@ lifecycle/current-state coordination → 00
 Rules:
 
 - Stage order is dependency direction, not an automatic queue.
-- The selected benchmark foundation does not pass Gate A.
+- The benchmark foundation does not pass Gate A.
 - M0 remains separate from evaluator authority and roadmap promotion.
 - Gate B is required before stronger Guided Improvement authority.
 - Stage 2 remains not selected.
