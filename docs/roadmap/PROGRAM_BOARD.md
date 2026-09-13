@@ -21,6 +21,7 @@ Document ownership:
 - Architecture → `docs/ARCHITECTURE.md`
 - long-term stage sequence → `docs/roadmap/MASTER_ROADMAP.md`
 - promotion / AI authority / mutation authority → `docs/roadmap/EXECUTION_GATES.md`
+- evaluation trust / scale direction → `docs/roadmap/EVALUATION_TRUST_AND_SCALE.md`
 - commercial value/pricing evidence/launch contract → `docs/roadmap/MONETIZATION_ARCHITECTURE.md`
 - packet scope / AC / implementation contract → `docs/specs/`
 - durable risks → `docs/roadmap/RISK_REGISTER.md`
@@ -31,40 +32,44 @@ Document ownership:
 
 # 1. Current program state
 
-Two commercial statuses remain distinct:
+The bounded Astra packet is complete:
 
 ```text
-Commercial-enablement preparation release — PR #35
-= MERGED
-+ PAID-OFF PRODUCTION VERIFIED
-
-Stage 1 Architecture Review / Paid Access public-launch lifecycle
-= OPEN
-+ PAID PRODUCTION NOT ENABLED
-+ PAUC AC-30 NOT COMPLETE
+AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1
+= SPRINT COMPLETE / PRODUCTION VERIFIED
+= W01 PASS WITH NOTES
 ```
 
-Commercial state remains:
+The Stage 1 Architecture Review / Paid Access commercial lifecycle remains open, but commercial activation is no longer the current Product-development priority.
+
+Stakeholder priority accepted by `01` on 2026-09-13:
 
 ```text
-Commercial Enablement Decision
-= PROCEED_TO_PAID_LAUNCH_CANDIDATE
+Stage 1 Paid Access lifecycle
+= OPEN
 
-Paid Architecture Review access boundary
-= AUTHENTICATED ACTIVE PAID ENTITLEMENT ONLY
-+ REMAINING SERVER-ENFORCED QUOTA REQUIRED
-
-Provisional launch configuration
-= USD 12.00 / month
-= 10 Architecture Reviews per confirmed monthly Stripe billing period
+Commercial activation
+= DEFERRED
 
 Production paid Architecture Review
 = DISABLED / FAIL-CLOSED
 
-Paid Access Production Verified under AC-30
+Activation safety contract
+= PRESERVED / NOT RELAXED
+```
+
+This means Stripe Live, commercial hosting eligibility, QA containment, first-Live windows, and PAUC AC-30 are not executed now. It does **not** cancel them, mark them complete, or weaken their prerequisites.
+
+Current authority state:
+
+```text
+PAUC AC-30
+= NOT COMPLETE
+
+Paid Access Production Verified
 = NO
 
-Current commercial Sprint Complete
+Commercial Sprint Complete
 = NO
 
 Commercial Validation Gate M0
@@ -72,9 +77,6 @@ Commercial Validation Gate M0
 
 Gate A
 = NOT REACHED
-
-Additional Stage 1.5 capability
-= NONE SELECTED
 
 Gate B
 = NOT REACHED
@@ -89,284 +91,317 @@ Mutation Authority
 = UNCHANGED
 ```
 
-The bounded Astra packet is complete:
+## Explicit Next Selection — 2026-09-13
+
+`01` reviewed current Product value, architecture dependencies, evaluator evidence, Gate requirements, and durable risks under the new commercial-priority direction.
+
+Decision:
 
 ```text
-AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1
-= SPRINT COMPLETE / PRODUCTION VERIFIED
-= W01 PASS WITH NOTES
-= free-core / first-value / presentation hardening only
-= no paid-launch bypass
-= no Stage/Gate promotion
-= AI Authority UNCHANGED
-= Mutation Authority UNCHANGED
+AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1
+= SELECTED
+
+Capability
+= Architecture Review Evaluation Trust Foundation v0
+= Gold Dataset + Quality Metrics
+
+Next owner
+= 02 — UX & Implementation Specification
 ```
 
-Its verified release materially strengthens confidence in the existing deterministic/manual first-value loop, representative launch path, export continuity, responsive path, saved-work preservation, and fail-closed paid regression. It does **not** prove paid entitlement/billing/quota/provider behavior, PAUC AC-30, commercial willingness-to-pay, Gate A evaluator quality, Stage 1.5 need, Gate B readiness, Stage 2 readiness, AI-authority expansion, or mutation authority.
+Decision authority:
 
-Post-Sprint `01` review on 2026-09-13 records:
+`docs/decisions/ADR-0012-select-architecture-review-evaluation-trust-foundation.md`
 
-```text
-Evidence → Gate Review → Explicit Next Selection
+This is a **pre-Gate-A Product foundation selection**, not Gate A passage, Stage promotion, Stage 2 selection, or AI/Mutation authority expansion.
 
-Gate result
-= DEFER PROMOTION / CONTINUE EXISTING STAGE 1 PAID LIFECYCLE
+The Product reason is evaluator trust. Existing formal evidence demonstrates a useful release-safety baseline—30 successful synthetic reviews, 210/210 current semantic rubric checks, and zero hard violations—but the current harness does not yet measure issue precision/recall, good-workflow false positives, flawed-workflow false negatives, top-issue agreement, or semantics-preserving stability against a versioned gold dataset. The current A–J fixtures are also small; the largest has eight nodes.
 
-Explicit Next Selection
-= NO NEW CAPABILITY / NO NEW ROADMAP PACKET
-```
-
-No new Product Sprint is manufactured while the already-selected commercial lifecycle remains open. The smallest sufficient next work is closure of the existing `COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER`. The first-Live sequencing decision is accepted in ADR-0011 and the operational amendment/runbook are **Specified and released** by PR #59; W01 independently verified that specification release **PASS WITH NOTES**. Execution remains blocked on the remaining Phase 0 evidence plus independent W01 containment/Live verification.
-
-Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is not reached by technical readiness, Astra launch hardening, or launch participation alone.
+Therefore the smallest current dependency is to make semantic evaluation quality measurable before stronger improvement authority is considered.
 
 ---
 
 # 2. Packet index
 
-`Specified` in packet headers describes specification maturity, not release completion or execution readiness. Live repository/Production evidence wins.
+`Selected` and `Specified` describe lifecycle authority, not release completion. Live repository/Production evidence wins.
 
 | Packet | Role in current plan | Recorded lifecycle / remaining work |
 |---|---|---|
-| `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 lifecycle open; paid-access amendment applies |
-| `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; first-Live amendment **Specified/released/release-verified**; Phase 0 external readiness, W01 containment verification, controlled Live proofs, and AC-30 remain open |
-| `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation code implemented; public content/approval and launch evidence remain prerequisites |
-| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Completed bounded free-core launch hardening | **Sprint Complete / Production Verified** on 2026-09-13; regression/history reference only |
-| `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed capability contract / regression reference | Sprint Complete / Production Verified |
-| `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` | Completed UX contract / regression reference | Sprint Complete / Production Verified |
-
-The paid-launch lifecycle remains part of the same already-selected Stage 1 work because the PAUC specification and launch runbook require live paid enablement and AC-30 before Paid Access can become Production Verified and the commercial Sprint can close. Reclassifying controlled paid enablement / AC-30 as an unrelated future packet would weaken existing gate semantics.
-
-## Completed bounded packet — Astra Challenge Launch Hardening
-
-Completed lifecycle:
-
-```text
-01 Selected
-→ 02 Specified
-→ C01 Implementation Complete
-→ W01 QA Complete
-→ C01 exact approved release
-→ W01 Production Verified
-→ 00 Sprint Complete
-```
-
-Scoped completion evidence:
-
-- W01-approved candidate: `5c3d6784d8b12bea48539ef1e8cd62c5000b9699`;
-- released `main` at W01 verification: `3cdce0161fe00d38aca8ba8e2bd0949bbc5899d0`;
-- candidate/released Git tree: `6710fba8e84e96012a0d3cf98439383ab8dc4ffe`;
-- verified Production deployment: `dpl_Gu9mN3xJ61AxBZPdy2RXdKsfZ9py`, `READY`, `target=production`;
-- W01 verified the primary Production alias and `GitHub main SHA = Vercel Production githubCommitSha` for that release;
-- historical rejected candidate `a39918d` remains rejection history, not current status.
-
-Remaining Astra Known Notes are non-blocking and are routed in §5; none expands the commercial Sprint or selects a new roadmap stage.
-
-## First-Live procedure specification release — PR #59
-
-PR #59 turned ADR-0011 into the authoritative implementation/operations-ready amendment and paid-launch runbook procedure without enabling paid Production.
-
-Scoped release evidence:
-
-- W01 Pass A: **PASS WITH NOTES / QA Complete** on approved head `a6c5990a5eff090c196ba65fb71a9f2971d37443`;
-- released `main`: `157e33f064dbca75a3098392901f9017562106fb`;
-- approved/released tree: `a5831dff58e46b5bd2210bc7bc83337cc572162c`;
-- historical PR #59 Production deployment: `dpl_8N4W2xbeQU1k2XxZFQjShDmvSnCc`, independently observed `READY`, `target=production`, matching PR #59 `githubCommitSha`;
-- W01 post-release verification on 2026-09-13: **PASS WITH NOTES**.
-
-W01 independently confirmed approved/released tree equality, empty approved-to-release diff, successful merge CI, documentation-only continuity through PR #61, current main/Production SHA equality at its observation point, and the public paid-off baseline (`enabled=false`, no public price/quota/policy URLs). This closes the **PR #59 specification-release verification only**. It is distinct from Phase 0 external prerequisites, WAF containment verification, first-Live windows, and AC-30.
+| `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` | **Current selected Product Sprint** — versioned gold dataset + semantic quality metrics | **Selected**; next owner `02`; not implementation-ready until `Specified` |
+| `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 commercial/public-launch lifecycle remains open; current AI review authority unchanged |
+| `AGS-EGAI-AR-PAUC-V0-P1` | Paid access/control contract | Preparation released; first-Live procedure Specified/released/release-verified; activation deferred; Phase 0/containment/Live proofs/AC-30 remain open |
+| `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation implemented; eventual public launch still requires its existing approvals/evidence |
+| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Completed bounded free-core launch hardening | Sprint Complete / Production Verified; regression/history reference only |
+| `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed deterministic adoption foundation | Sprint Complete / Production Verified |
+| `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` | Completed UX foundation | Sprint Complete / Production Verified |
 
 ---
 
-# 3. Commercial lifecycle
+# 3. Selected Sprint — Evaluation Trust Foundation
 
-## Phase A–F — preparation milestone COMPLETE
+## 3.1 Product problem
 
-The paid-off commercial preparation release is implemented, independently QA-approved, released, and Production Verified in its scoped fail-closed state. It includes the selected Auth/entitlement/quota/Stripe/provider-control/policy/runbook preparation. The public paid switch remains false.
+Current Architecture Review release evidence proves important safety and structure properties, but it does not yet establish semantic evaluator quality at the level required for stronger Product authority.
 
-The provisional launch inputs remain USD 12/month, 10 reviews per confirmed monthly billing period, the recorded request-cost/provider-budget profile, Stripe Tax-ready Checkout subject to external approval, approved cancellation/refund/support policy, commercial-use-eligible hosting before public paid enablement, and controlled live-QA cancellation/full refund handling. These are launch inputs, not M0 evidence or permanent Product constants.
+Known current harness characteristics:
 
-## Phase G — external prerequisites + controlled Production paid enablement — PENDING / BLOCKED
+- 10 synthetic fixtures A–J;
+- 3 runs each / 30 reviews in the formal full evaluation;
+- current semantic rubric checks grounding, target validity, explanation presence, knowledge discipline, high-level direction, and fixture-focus terms;
+- current hard-violation checks cover invalid Evidence/targets, invalid knowledge ownership, unsupported Known runtime/framework claims, prompt-injection obedience, and related contract failures;
+- formal recovered run: 210/210 current semantic checks and zero hard violations;
+- largest current fixture: eight nodes.
 
-`00` coordinates the evidence matrix. Named operators and restricted evidence records remain required. Rows are `UNVERIFIED`, `BLOCKED`, `PARTIAL`, or `VERIFIED`; secrets, personal data, source IPs, tokens, and financial details do not belong in this public board.
+Missing Product evidence:
 
-Evidence classes: **A** = configuration/external approval; **B** = non-Production Test Mode demonstration; **C** = Production paid-off demonstration; **D** = controlled Live Production demonstration. Test Mode does not substitute for AC-30.
+- issue precision / recall;
+- good-workflow false-positive rate;
+- flawed-workflow false-negative / issue-coverage behavior;
+- top-1 / top-k priority agreement;
+- strength recognition against annotated expectations;
+- acceptable-alternative handling;
+- repeated-run material-finding stability;
+- semantics-preserving representation stability.
 
-The current states below reflect evidence available to `00` at this reconciliation only. External/account facts are not promoted to `VERIFIED` from documentation or past observations alone.
+## 3.2 Included selection scope
 
-| Class / item | Current evidence state | Owner / verifier | Next concrete action |
-|---|---|---|---|
-| A — Release identity | **VERIFIED / PASS WITH NOTES** — PR #59 specification release identity, continuity, CI, current-main/Production relationship at the W01 observation point, and public paid-off baseline independently verified | C01 / W01 | preserve this scoped release evidence; re-check exact current source/deployment identity before any future material Production configuration transition |
-| A — Hosting eligibility | **BLOCKED / UNVERIFIED** — current Vercel team plan label was live-observed as `hobby`; commercial-use eligibility is not inferred from that label alone | 00 + account owner / W01 | account owner supplies current commercial-use eligibility/plan-contract evidence; W01 verifies the evidence before any Live window |
-| A — Public policies / operations | **UNVERIFIED** | 00 + responsible merchant/legal/privacy/tax/refund/support approvers / W01 | provide public HTTPS Terms/Privacy/Support reachability plus written approvals in restricted evidence record |
-| A — Stripe Live configuration | **UNVERIFIED** | C01 + merchant/operator / W01 | verify the approved recurring USD 12 monthly Live Price, bounded Portal configuration, Stripe Tax configuration, and launch configuration without exposing secrets |
-| A — Provider controls | **UNVERIFIED** | C01 + provider operator / W01 | verify dedicated Production provider project/key, warning/critical/hard ceiling, matching cost profile, and exercised alert path |
-| A — Financial QA approval | **UNVERIFIED** | 00 + financial operator / W01 | obtain written authorization for the controlled charge, cancellation, and full-refund procedure and name the restricted operator |
-| B — Test Mode lifecycle | **UNVERIFIED** | C01 + test operator / W01 | complete required Test Mode Checkout/webhook/reconciliation/quota/consume-release/replay/cancellation-recovery evidence under the runbook; not AC-30 |
-| B — Cost guard / entitled kill switch | **UNVERIFIED** | C01 / W01 | prove the required non-Production control paths and synthetic cost-guard fixture before the corresponding Live proofs |
-| C — Production Auth | **UNVERIFIED** | C01 + Auth operator / W01 | verify Production magic-link delivery/session/allowed redirects without recording personal/token values |
-| C — WAF / paid-off baseline | **UNVERIFIED** — paid offer is currently observed fail-closed, but current published Firewall inventory/capacity/operator authority, QA source set, rate-limit effectiveness, and two-source containment evidence are not established | C01 + hosting operator / W01 | inspect current Firewall rule inventory/capacity and operator authority; establish stable exclusive QA source; verify paid-off rate-limit/free-core baseline; then stage §5 containment for W01 verification |
-| D-bootstrap — first Live entitlement / webhook lifecycle | **SPECIFIED / EXECUTION BLOCKED** | 00 authorizes only after prerequisites; C01/config operators execute; W01 verifies | no Live action until all applicable Phase 0 A/B/C prerequisites are VERIFIED and §5 QA containment is independently VERIFIED |
-| D-bootstrap — entitled kill switch | **NOT READY** | W01 | after a legitimate Live QA entitlement exists and switch is returned false, prove `review_disabled`, zero provider invocation, zero quota mutation, free-core smoke |
-| D-bootstrap — cost guard | **NOT READY** | W01 | after kill-switch proof PASS, use the second contained window to prove cost rejection before provider invocation and idempotent reservation release |
-| D — Live financial QA / AC-30 | **NOT READY / NOT COMPLETE** | W01 + authorized operators | only after bootstrap proofs complete, execute the existing real subscription → entitlement → valid consume/non-consumption/cancellation/refund AC-30 sequence |
+`02` is authorized to specify the smallest coherent implementation around:
 
-### First-Live sequencing and procedure — SPECIFIED / RELEASED; execution still blocked
+- versioned benchmark dataset/rubric;
+- reviewable gold annotation model for expected strengths/issues/priority/Evidence/Unknowns/acceptable alternatives and recommendation direction;
+- minimum good/flawed/ambiguous/multiple-valid/adversarial benchmark classes;
+- deterministic scoring/reporting for precision/recall, false positives/negatives, priority agreement, strength recognition, uncertainty preservation, stability, and existing hard violations where annotations support the metric;
+- semantics-preserving stability foundation;
+- reproducible benchmark report metadata;
+- provider-independent dataset/scorer/report tests;
+- explicit bounded provider-backed evaluation only where separately allowed by existing provider/budget governance.
 
-`01` accepted `docs/decisions/ADR-0011-edge-contained-first-live-bootstrap.md` and `02` completed the authoritative procedure in:
+Existing A–J fixtures may be reused with preserved provenance, but must not be silently renamed as expert gold without the required annotation/review evidence.
 
-- `docs/specs/AGS-EGAI-AR-PAUC-V0-P1-FIRST-LIVE-AMENDMENT-20260913.md`;
-- `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`.
+## 3.3 Deferred / Out of Scope
 
-PR #59 released that specification to `main` without enabling paid Production, and W01 has independently verified the specification release PASS WITH NOTES.
+Not selected now:
 
-The specified sequence is:
+- 50 / 100 / 250 / 500+ node provider-backed scale benchmark execution;
+- scoped/hierarchical evaluation implementation;
+- broad large-workflow Search/Filter/Outline;
+- dedicated Architecture Review Workspace redesign;
+- Project / Local Workspace identity;
+- persisted Intent & Constraints;
+- revision / evaluation history;
+- Scenario / Acceptance persistence;
+- Stage 2 Guided Improvement;
+- stronger recommendation authority;
+- Semantic Patch / Apply;
+- Mutation Authority expansion;
+- managed runtime / hosted execution;
+- cloud/team/collaboration;
+- generic multi-framework expansion;
+- commercial activation or Production paid configuration changes.
+
+The packet may carry topology/size metadata for later evidence reuse, but must not claim large-workflow support or silently select a scale architecture.
+
+## 3.4 Why the other candidates were not selected
+
+**Adoption & Context Foundation:** Project/Workspace, Intent, and history add persistence/identity/governance scope. Current evidence does not yet show missing context/history is the dominant review-quality bottleneck.
+
+**Review Workspace / Locate:** strategically valuable, but there is no current Production evidence that provider-backed finding navigation is the main limiting problem. Astra already improved deterministic Locate in the free-core journey.
+
+**Combined quality + context/UX/scale packet:** rejected as larger than necessary. Quality measurement should first reveal which dependency is actually limiting trust.
+
+**No new Product selection:** rejected under the new stakeholder priority because commercial activation can remain fail-closed while independently justified evaluator-quality work advances the core Product.
+
+---
+
+# 4. Commercial lifecycle — OPEN / FAIL-CLOSED / DEFERRED ACTIVATION
+
+Commercial activation is preserved as an open lifecycle but removed from the current execution path.
+
+Current facts remain:
+
+- commercial-enablement preparation release is paid-off Production Verified;
+- Production paid Architecture Review remains disabled / fail-closed;
+- first-Live procedure is Specified / released / W01 release-verified;
+- QA containment is not verified / not ready;
+- PAUC AC-30 is not complete;
+- real paid entitlement/quota/provider/financial behavior is not Production Verified;
+- the connected Vercel team plan label was live-observed as `hobby`; commercial-use eligibility remains a separate evidence requirement;
+- the existing public-launch risks `R-008`, `R-020`, and `R-021` remain unresolved for commercial activation.
+
+The existing procedure remains authoritative:
 
 ```text
 all Phase 0 non-circular prerequisites VERIFIED
 → QA-only edge containment staged and W01-verified while paid-off
-→ first bounded Live window: real app Checkout → signed Live webhook → legitimate entitlement/quota
+→ first bounded Live window: normal app Checkout → signed Live webhook → legitimate entitlement/quota
 → switch false again
 → entitled kill-switch proof while fail-closed
-→ second bounded Live window: cost-guard rejection before any successful provider review
+→ second bounded Live window: cost-guard rejection before provider invocation
 → switch false again
 → existing W01 AC-30 sequence
-→ public transition only through later independent verification
+→ later separately verified public-enable transition
 ```
 
-Specification maturity and execution readiness are deliberately separate:
+None of these steps is authorized merely because the procedure exists or this Product Sprint was selected.
+
+## 4.1 Deferred activation evidence state
+
+The following remain unresolved and must be re-checked fresh when commercial activation is explicitly resumed:
+
+- commercial-use hosting/account/contract eligibility;
+- public policy / merchant / privacy / tax / refund / support approvals;
+- Stripe Live Price / Portal / Tax configuration;
+- provider Production project/key/budget/alerts/hard ceiling;
+- financial QA approval;
+- required Test Mode lifecycle evidence;
+- Production Auth delivery/session/redirect evidence;
+- current Firewall rule inventory/capacity/operator authority;
+- stable exclusive QA egress source and independent containment proof;
+- first-Live entitlement/webhook lifecycle;
+- entitled-user kill switch;
+- cost guard before provider invocation;
+- PAUC AC-30 real subscription/entitlement/quota/cancellation/refund sequence.
+
+Do not promote any of these to `VERIFIED` from stale documentation or previous plan labels.
+
+## 4.2 Resumption rule
+
+Commercial activation may resume only through a later explicit priority decision after Product development has advanced further.
+
+At minimum:
 
 ```text
-Procedure = SPECIFIED / RELEASED / RELEASE-VERIFIED
-Execution readiness = BLOCKED
+current Selected Product Sprint completes its normal lifecycle
+→ 00 reconciles current evidence/priority
+→ 01 explicitly decides whether commercial activation resumes or another Product dependency is selected
 ```
 
-No route/firewall/config/Stripe/provider/entitlement/quota mutation is authorized from specification or release-verification status alone. Phase G remains blocked until the remaining Phase 0 evidence is actually VERIFIED and W01 independently accepts the paid-off containment evidence. Any newly discovered Product/security semantic gap returns to `01`; C01/config operators must not invent a bootstrap bypass.
-
-## Phase H — W01 live paid Production verification / AC-30 — PENDING
-
-W01 executes the existing real Production financial QA only after Phase G is ready. A failed or incomplete AC-30 means Paid Access is not Production Verified and the switch returns fail-closed if safety/accounting is uncertain.
-
-## Phase I — commercial Sprint closure and later selection
-
-```text
-W01 Paid Access Production Verified / AC-30 PASS
-→ 00 commercial Sprint Complete review
-→ 01 Evidence → Gate Review → Explicit Next Selection
-```
-
-No Stage 1.5/Stage 2 capability is automatically selected by commercial enablement.
+Completion of the Evaluation Trust Foundation does **not** automatically authorize Stripe Live, containment, first-Live, AC-30, or public paid enablement.
 
 ---
 
-# 4. Active blocker / current execution board
+# 5. Active execution board
+
+Current Product execution priority:
 
 ```text
-Blocker:
-COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
-
-Related durable risks:
-R-008 / R-020 / R-021
+AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1
+= SELECTED
+→ 02 Specification
 ```
 
-Known current facts:
+Commercial exposure blocker remains real but is currently a **deferred commercial-activation blocker**, not a blocker to this independently justified Product-quality Sprint:
 
-- commercial preparation is paid-off Production Verified;
-- Astra launch hardening is separately Sprint Complete / Production Verified;
-- Production paid Architecture Review remains disabled / fail-closed;
-- deterministic free core remains operational;
-- the real paid entitlement/quota/financial path remains unverified;
-- ADR-0011 sequencing and the first-Live operational amendment/runbook are Specified and released;
-- W01 independently verified the PR #59 specification release PASS WITH NOTES;
-- Phase 0 external evidence remains incomplete;
-- `00` live-observed the connected Vercel team plan label as `hobby` during the prior reconciliation, but commercial-use eligibility remains a separate external verification and is not inferred from a plan label alone;
-- QA containment is not verified / not ready;
-- PAUC AC-30 is not complete.
+```text
+COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
+= OPEN / DEFERRED ACTIVATION
 
-Smallest safe response:
+Related durable risks
+= R-008 / R-020 / R-021
+```
 
-> Keep Production paid review fail-closed. Treat the first-Live procedure and its specification release as verified, but not executable. `00` and named operators now close the remaining Phase 0 external prerequisites. Only after Phase 0 and W01 paid-off containment evidence are VERIFIED may the controlled Live bootstrap begin.
+Evaluator trust risk remains active as a Product evidence gap:
+
+```text
+R-001
+= Critical / WATCH
+= selected Sprint gathers the missing calibration foundation
+= risk is not considered resolved merely because work is selected
+```
 
 | Work / decision | State | Next owner/action |
 |---|---|---|
-| Commercial-enablement preparation release — PR #35 | **COMPLETE / PAID-OFF PRODUCTION VERIFIED** | remain fail-closed |
-| GPT-6 Astra Challenge launch hardening | **SPRINT COMPLETE / PRODUCTION VERIFIED** | regression/history reference only |
-| Post-Astra Gate Review | **COMPLETE — NO NEW CAPABILITY SELECTED** | continue existing Stage 1 paid lifecycle |
-| Public paid Architecture Review launch | **BLOCKED / NOT ENABLED** | close Phase 0 prerequisites + bootstrap/AC-30 evidence |
-| First-Live Product sequencing decision | **COMPLETE — ADR-0011** | no further Product decision unless a new semantic/security gap appears |
-| First-Live operational procedure | **SPECIFIED / RELEASED / RELEASE-VERIFIED — PR #59** | close remaining Phase 0/containment evidence; no Live execution yet |
-| PR #59 specification release verification | **PASS WITH NOTES / COMPLETE** | scoped release evidence only; does not establish containment, Live readiness, or AC-30 |
-| QA edge containment | **NOT VERIFIED / NOT READY** | after relevant Phase 0 evidence, C01/authorized hosting operator stages exact runbook rule; W01 independently verifies while paid-off |
-| Controlled paid enablement | **BLOCKED / PHASE 0 + CONTAINMENT PENDING** | no execution until all prerequisites and containment are VERIFIED |
-| Live financial QA / PAUC AC-30 | **NOT COMPLETE** | W01 after bootstrap Phase G is ready |
-| Commercial Validation Gate M0 | **NOT REACHED** | after Paid Access Production Verified + sufficient real paid evidence |
-| Gate A | **NOT REACHED** | Astra/preparation/bootstrap docs do not satisfy evaluator trust/scale gate |
-| Additional Stage 1.5 capability | **NONE SELECTED** | defer until evidence justifies one |
-| Gate B | **NOT REACHED** | no authority expansion |
-| Stage 2 | **NOT SELECTED** | no Guided Improvement selection |
-| AI Authority | **UNCHANGED** | existing capability-scoped authority only |
-| Mutation Authority | **UNCHANGED** | no semantic apply authority added |
+| Evaluation Trust Foundation | **SELECTED** | `02` completes implementation-ready specification and only then may mark `Specified` |
+| Commercial activation / first-Live / AC-30 | **OPEN / FAIL-CLOSED / DEFERRED** | no Production config/Stripe/WAF/Live action now; re-open only by explicit later priority decision |
+| Gate A | **NOT REACHED** | selected packet prepares evidence only; no promotion |
+| Gate B | **NOT REACHED** | no stronger evaluator authority |
+| Stage 2 | **NOT SELECTED** | no Guided Improvement |
+| AI Authority | **UNCHANGED** | existing capability-scoped review authority only |
+| Mutation Authority | **UNCHANGED** | no semantic apply authority |
 
 ---
 
-# 5. Post-Astra Known Notes / risk classification
+# 6. Known / Inferred / Unknown for current selection
 
-Astra evidence changes confidence in the current free-core journey and launch presentation; it does not change the prerequisites for Gate A, M0, Stage 1.5 selection, Gate B, Stage 2, AI Authority, or Mutation Authority.
+## Known
 
-- **Dependency audit: 4 existing findings (`high 3 / critical 1`)** — exploitability/reachability remains `Unknown` from the Astra evidence. Classify as **conditional security triage**, not an automatic Product Sprint. If current security review proves Production reachability/exploitability, route the smallest remediation and re-evaluate launch impact.
-- **Screen-reader speech / full physical-device matrix not verified** — **deferred accessibility verification / Known Note**. Computed accessible-name/focus evidence remains valid; revisit in focused accessibility QA or related UI work.
-- **Live analytics transport not proven during W01 browser verification** — **conditional business-evidence gap**. Preserve contract/privacy evidence, but do not count unproven live delivery as activation/conversion evidence for M0.
-- **GitHub Actions Node 20 deprecation annotation** — **deferred engineering maintenance signal**. Resolve before upstream deprecation becomes a CI/release blocker; it does not create Product scope now.
+- Astra launch hardening is Sprint Complete / Production Verified;
+- the paid path is currently disabled / fail-closed;
+- the first-Live procedure is released and release-verified but not executed;
+- the formal recovered evaluator run contains 30 successful reviews, 210/210 current semantic checks, and zero hard violations;
+- the current A–J fixture set is synthetic and small, with a largest fixture of eight nodes;
+- the current scorer does not compute gold-set issue precision/recall, good-workflow false positives, flawed-workflow false negatives, or top-issue agreement;
+- durable Product/Roadmap authority requires measured evaluator trust before stronger authority expansion;
+- `R-001` remains Critical / WATCH.
 
-No new durable Risk Register ID/state is required from these notes on current evidence. R-008/R-020/R-021 continue to describe the blocking commercial exposure. Revisit the Risk Register only when a trigger/state materially changes.
+## Inferred
+
+- a versioned gold-dataset/quality-metric foundation is the smallest current dependency for learning whether evaluator quality, context, navigation, or scale should be the next limiting concern;
+- deferring commercial activation creates no new core architecture dependency because the free deterministic core and benchmark/scorer foundation can remain independent of paid/provider availability.
+
+## Unknown
+
+- actual issue precision/recall on a curated gold set;
+- good-workflow false-positive rate;
+- flawed-workflow false-negative behavior;
+- top-issue priority agreement with human Product/Architecture judgement;
+- material finding stability across repeated runs and semantics-preserving variants;
+- large-workflow semantic degradation and the size at which monolithic evaluation becomes insufficient;
+- whether persisted Intent/Constraints materially improves evaluator correctness;
+- whether Review Workspace/Locate is a meaningful provider-backed usability bottleneck;
+- the eventual appropriate commercial-activation date.
+
+Unknown means insufficient evidence, not evidence of absence.
 
 ---
 
-# 6. Coordination discipline
+# 7. Coordination discipline
 
 Current canonical near-term path:
 
 ```text
-Astra bounded packet
-= SPRINT COMPLETE / PRODUCTION VERIFIED
+01 Explicit Next Selection
+= AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1 Selected
 
-Explicit Next Selection
-= NO NEW CAPABILITY / NO NEW ROADMAP PACKET
+→ 02 Specification
+→ C01 Implementation
+→ W01 Independent QA
+→ C01 exact approved release
+→ W01 Production Verification as applicable
+→ 00 Sprint Complete
+→ 01 Evidence / Gate Review / Explicit Next Selection
+```
 
-ADR-0011 sequencing
-= COMPLETE
+Parallel commercial rule:
 
-First-Live amendment/runbook
-= SPECIFIED / RELEASED / W01 RELEASE-VERIFIED
+```text
+Paid Production
+= stay disabled / fail-closed
 
-→ 00 + named operators close Phase 0 commercial/hosting/Auth/Stripe/WAF/provider-control/Test Mode prerequisites
-→ C01 / authorized hosting operator stage the exact QA containment only when its prerequisites are ready
-→ W01 independently verifies containment while paid-off
-→ controlled edge-contained first-Live bootstrap as specified
-→ W01 bootstrap proofs + live paid Production Verification / AC-30
-→ 00 commercial Sprint Complete
-→ 01 Evidence → Gate Review → Explicit Next Selection
+Commercial activation work
+= deferred
+
+Existing activation requirements
+= preserved
 ```
 
 Conditional routing:
 
 ```text
-new Product/commercial/security semantic decision required → 01
-resulting procedure / Product-facing specification gap → 02
-specified implementation/configuration → C01 / authorized operators
+new Product/Architecture/Gate decision → 01
+selected packet specification → 02
+specified implementation → C01
 independent QA / Production verification → W01
-current-state/prerequisite coordination → 00
+lifecycle/current-state coordination → 00
 ```
 
 Rules:
 
-- Preparation release Production Verified is not Paid Access AC-30 Production Verified.
-- Astra Sprint Complete is not commercial Sprint Complete.
-- `Specified` or specification-release verification does not mean external prerequisites are verified or a Live window is authorized.
-- PR #59 post-release verification is complete and is not the same as W01 containment verification, Live bootstrap proof, or AC-30.
 - Stage order is dependency direction, not an automatic queue.
-- M0 is separate from evaluator authority and roadmap promotion.
-- Gate A and Gate B remain NOT REACHED; Stage 2 remains NOT SELECTED.
-- Stage 1.5 remains a selection band; no candidate is selected by list order.
+- The selected benchmark foundation does not pass Gate A.
+- M0 remains separate from evaluator authority and roadmap promotion.
+- Gate B is required before stronger Guided Improvement authority.
+- Stage 2 remains not selected.
+- Commercial activation deferral does not erase or weaken AC-30.
 - AI Authority and Mutation Authority remain unchanged until applicable gates explicitly change them.
 - Do not grow this board into a historical archive; completed detail belongs in packets/PRs/ADRs/evidence documents.
