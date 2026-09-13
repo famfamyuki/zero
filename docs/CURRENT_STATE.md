@@ -1,18 +1,14 @@
 # AgentGraph Studio — Current State Snapshot
 
-Snapshot date: **2026-09-12**  
+Snapshot date: **2026-09-13**  
 Status: **Coordination snapshot; live repository/Production checks win**  
 Scope: Concise top-level lifecycle, blocker, authority state, and scoped evidence needed to understand where development stands.
 
-This file is intentionally **not** a deployment registry, near-term execution plan,
-roadmap, packet copy, risk register, or release-history archive.
-`docs/roadmap/PROGRAM_BOARD.md` owns the active execution sequence and blocker
-routing.
+This file is intentionally **not** a deployment registry, near-term execution plan, roadmap, packet copy, risk register, or release-history archive. `docs/roadmap/PROGRAM_BOARD.md` owns the active execution sequence and blocker routing.
 
 ## 0. Live-state rule
 
-Before Product/Architecture/Roadmap, implementation, QA, release, or current-state
-decisions, re-check as applicable:
+Before Product/Architecture/Roadmap, implementation, QA, release, or current-state decisions, re-check as applicable:
 
 1. latest GitHub `main` / repository reality;
 2. latest Vercel Production deployment and actual Production behavior;
@@ -22,11 +18,7 @@ decisions, re-check as applicable:
 6. this snapshot;
 7. ADRs / historical chats / old SHAs.
 
-**Do not persist a mutable GitHub-main or latest-deployment identity here as a
-current claim.** Updating this documentation can advance `main` and immediately
-make such a claim stale. Obtain live identity from GitHub/Vercel when the decision
-requires it. Scoped historical release identities may remain below when they are
-necessary evidence for a specific lifecycle distinction.
+Do not persist a mutable GitHub-main or latest-deployment identity here as a current claim. Scoped historical release identities may remain when needed to distinguish lifecycle evidence.
 
 Canonical owners:
 
@@ -44,16 +36,7 @@ Canonical owners:
 
 # 1. Stable current-state facts
 
-The documentation/context consolidation series beginning with PR #43 changes
-routing/authority organization only. It does not change application, evaluator,
-provider, billing, entitlement, quota, or runtime behavior. Exact current main and
-Production deployment identity must still be live-checked rather than inferred
-from this statement.
-
-The deterministic free core remains protected independently of paid/provider
-availability, including Builder/Design, Templates, AgentGraph JSON Import/Export,
-CrewAI Static Import entrypoint, Readiness, Execution Preview, Resource Analysis,
-Unified Preflight, and deterministic CrewAI Python export.
+The deterministic free core remains protected independently of paid/provider availability, including Builder/Design, Templates, AgentGraph JSON Import/Export, CrewAI Static Import entrypoint, Readiness, Execution Preview, Resource Analysis, Unified Preflight, and deterministic CrewAI Python export.
 
 Product North Star:
 
@@ -61,18 +44,15 @@ Product North Star:
 Understand → Evaluate → Improve → Verify → Own
 ```
 
-A bounded `GPT-6 Astra Challenge Launch Hardening` packet is now **Selected** for
-the September 18 Product Hunt launch. The selection is limited to current free-core
-first-value clarity, coherent demonstration, truthful launch presentation, and
-changed-path release confidence. It does not change the durable Product definition,
-commercial blocker, roadmap stage status, AI Authority, or Mutation Authority.
+The bounded `GPT-6 Astra Challenge Launch Hardening` packet is now **Sprint Complete / Production Verified**. Its scope remained current free-core first-value clarity, coherent demonstration, truthful launch presentation, accessibility/responsive hardening, and changed-path release confidence. It did not change the durable Product definition, paid lifecycle, roadmap stage status, AI Authority, or Mutation Authority.
+
+The 2026-09-13 post-Astra `01` review completed `Evidence → Gate Review → Explicit Next Selection` and selected **no new capability / no new roadmap packet**. The already-selected Stage 1 Architecture Review / Paid Access lifecycle remains the next dependency to close.
 
 ---
 
 # 2. Current lifecycle summary
 
-`PROGRAM_BOARD.md` is authoritative for the full execution sequence. The current
-summary is:
+`PROGRAM_BOARD.md` is authoritative for the full execution sequence. The current summary is:
 
 ```text
 Commercial-enablement preparation release
@@ -81,14 +61,17 @@ Commercial-enablement preparation release
 Stage 1 Architecture Review + Paid Access public-launch lifecycle
 = OPEN
 = Production paid Architecture Review DISABLED / FAIL-CLOSED
+= first-Live procedure specification + external prerequisites PENDING
 = PAUC AC-30 NOT COMPLETE
 = current commercial Sprint NOT COMPLETE
 
 GPT-6 Astra Challenge Launch Hardening
-= SELECTED
-= SPECIFICATION PENDING
-= target Product Hunt launch 2026-09-18
-= bounded free-core / first-value hardening only
+= SPRINT COMPLETE / PRODUCTION VERIFIED
+= W01 PASS WITH NOTES
+
+Post-Astra Gate Review
+= COMPLETE
+= NO NEW CAPABILITY / NO NEW ROADMAP PACKET SELECTED
 
 Commercial Validation Gate M0
 = NOT REACHED
@@ -112,11 +95,7 @@ Mutation Authority
 = UNCHANGED
 ```
 
-Provider-backed Architecture Review remains restricted to authenticated active paid
-entitlement plus remaining server-enforced quota when the paid path is enabled.
-The provisional launch configuration remains USD 12/month and 10 reviews per
-confirmed monthly Stripe billing period. These are launch configuration, not M0
-commercial-validation evidence or permanent Product constants.
+Provider-backed Architecture Review remains restricted to authenticated active paid entitlement plus remaining server-enforced quota when the paid path is enabled. The provisional launch configuration remains USD 12/month and 10 reviews per confirmed monthly Stripe billing period. These are launch configuration, not M0 evidence or permanent Product constants.
 
 The active commercial blocker remains:
 
@@ -125,104 +104,97 @@ COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 Related durable risks: R-008 / R-020 / R-021
 ```
 
-The launch-hardening selection does not resolve or bypass that blocker. Item-level
-paid prerequisites, first-launch procedure gaps, owner routing, Phase G/H
-sequencing, and next handoff live only in `docs/roadmap/PROGRAM_BOARD.md` and the
-paid-launch runbook. Do not copy them back into this snapshot.
+`01` has resolved the Product/Architecture sequencing part of the first-Live circular dependency in `docs/decisions/ADR-0011-edge-contained-first-live-bootstrap.md`: after all independently satisfiable prerequisites are verified, the first legitimate Live entitlement must be acquired through the normal Production Auth/application Checkout/signed webhook path inside a QA-only edge-contained window, followed by a fail-closed entitled kill-switch proof and a second contained cost-guard proof before the existing AC-30 flow proceeds. This decision authorizes specification of the safe sequence, not public paid enablement.
+
+Exact procedure details and item-level prerequisite evidence remain owned by `PROGRAM_BOARD.md`, the PAUC packet, and the paid-launch runbook.
 
 ---
 
-# 3. PR #35 scoped release evidence baseline
+# 3. Scoped release evidence baselines
 
-This section is retained because current coordination must distinguish the
-already-verified paid-off preparation release from the still-open paid launch. It is
-historical scoped evidence, **not** today's main or deployment identity.
+These are historical scoped evidence, **not** today's mutable main/deployment identity.
+
+## 3.1 Commercial-enablement preparation release — PR #35
 
 ```text
-PR #35
-= MERGED
-
 W01 Pass A approved candidate
 = 107f2db9ac7d9b4f6c02f708ebe7a343b14b00ed
 
-PR #35 released commit at W01 Pass B
+Released commit at W01 Pass B
 = 6c026189657c8211dd1b5922119a252d3335e705
 
 Candidate/released tree
 = b0a8dad3d05b8220025d401f6fdf9ba508b32b63
 
-Candidate-to-released-main file diff
-= EMPTY
-
-W01-verified Production deployment for that scoped release
-= dpl_8we4kQoxMRXhGCdzccpNK81P2H6i
-= READY
-= target=production
-= then-current released main matched githubCommitSha
-
-Architecture Review offer at that verification
-= enabled=false
-= price=null
-= includedReviews=null
-= policyUrls=null
-
 W01 result
 = PASS_B_WITH_NOTES
+= paid-off preparation milestone only
 ```
 
-Meaning preserved:
+Meaning preserved: `Preparation release Production Verified ≠ Paid Access AC-30 Production Verified`.
 
-`Preparation release Production Verified ≠ Paid Access AC-30 Production Verified`.
-The preparation milestone does not close the selected paid-launch packet, satisfy
-M0, promote Gate A, select Stage 1.5, expand AI Authority, or expand Mutation
-Authority.
+## 3.2 Astra launch-hardening release
+
+```text
+W01 Pass A approved candidate
+= 5c3d6784d8b12bea48539ef1e8cd62c5000b9699
+
+Released main at W01 Pass B
+= 3cdce0161fe00d38aca8ba8e2bd0949bbc5899d0
+
+Candidate/released tree
+= 6710fba8e84e96012a0d3cf98439383ab8dc4ffe
+
+W01-verified Production deployment
+= dpl_Gu9mN3xJ61AxBZPdy2RXdKsfZ9py
+= READY
+= target=production
+= then-current GitHub main matched githubCommitSha
+
+W01 result
+= PASS WITH NOTES / Production Verified
+```
+
+The Astra release proved the scoped deterministic/manual first-value journey and related regressions. It did not prove paid billing/entitlement/quota/provider behavior, commercial validation, evaluator promotion readiness, stronger AI authority, or mutation authority.
 
 ---
 
 # 4. Current next authority
 
-Use `docs/roadmap/PROGRAM_BOARD.md` for the exact current next action and evidence
-matrix.
+Use `docs/roadmap/PROGRAM_BOARD.md` for the exact current action/evidence matrix.
 
-For the bounded Astra Challenge launch-hardening packet, the next owner is:
+No new roadmap capability is Selected. The next Product-specification owner is:
 
 ```text
 02 — UX & Implementation Specification
 ```
 
-`02` must inspect the actual Production first-value path and turn the Selected
-scope into an implementation-ready packet before `C01` changes behavior. Missing
-Product decisions return to `01`; implementation must not invent future capability.
-
-In parallel, the selected paid-launch lifecycle remains blocked on
-external/commercial Production readiness plus the documented first-launch procedure
-gap. Keep Production paid Architecture Review fail-closed until the authoritative
-procedure/prerequisite evidence permits controlled enablement.
-
-The durable paid-path handoff remains conceptually:
+Exact handoff target:
 
 ```text
-01 / 02 resolve any required first-launch decision/specification gap
-→ C01 performs only authorized implementation/release actions
-→ W01 independently verifies applicable live paid behavior / AC-30
-→ 00 considers Sprint Complete
-→ 01 performs Evidence → Gate Review → Explicit Next Selection
+ADR-0011
+→ amend the existing AGS-EGAI-AR-PAUC-V0-P1 / paid-launch runbook contract
+→ specify the QA-only edge-contained first-Live bootstrap
+→ define route scope, containment/order, operator authority, evidence,
+   fail-closed/abort/re-enable conditions, financial handling,
+   degraded/public UX behavior, and independent verification expectations
 ```
 
-The bounded launch-hardening path follows the normal lifecycle independently:
+In parallel, `00` coordinates the still-required external commercial/hosting/Auth/Stripe/WAF/provider-control prerequisites. Production paid Architecture Review remains fail-closed until the authoritative procedure and prerequisite evidence allow each controlled step.
+
+The durable paid-path handoff is:
 
 ```text
-01 Selected
-→ 02 Specified
-→ C01 Implementation Complete
-→ W01 QA Complete
-→ C01 exact approved release
-→ W01 Production Verified
-→ 00 bounded packet Sprint Complete
+02 procedure specification
++ 00 external prerequisite closure
+→ applicable independent review
+→ C01 / authorized operators perform only specified actions
+→ W01 live paid Production Verification / AC-30
+→ 00 commercial Sprint Complete
+→ 01 Evidence → Gate Review → Explicit Next Selection
 ```
 
-Do not infer an automatic next Stage from either Sprint completion or challenge
-results.
+Do not infer an automatic next Stage from Astra completion or eventual commercial enablement.
 
 ---
 
@@ -230,53 +202,35 @@ results.
 
 ## Known
 
-- the documentation/context consolidation does not change Product/runtime behavior;
-- the paid-off preparation sub-release remains scoped Production Verified;
+- the paid-off preparation release is scoped Production Verified;
 - the real paid Production path remains outside that scoped verification and AC-30 remains open;
-- the GPT-6 Astra Challenge launch-hardening packet is Selected and awaits `02` specification;
-- the launch-hardening selection does not select Stage 1.5/Stage 2 or change paid-launch requirements;
-- Gate A / M0 are not reached; Stage 1.5/Stage 2 are not selected;
+- Astra launch hardening is Sprint Complete / Production Verified;
+- Astra completion did not satisfy M0, Gate A, Gate B, or select Stage 1.5/Stage 2;
 - AI Authority and Mutation Authority are unchanged;
-- exact live GitHub/Vercel identity is deliberately obtained from live systems rather than this snapshot.
+- the post-Astra `01` decision selected no new capability;
+- ADR-0011 resolves the Product/Architecture sequencing boundary for first-Live bootstrap, while the operational specification and prerequisite evidence remain incomplete;
+- exact live GitHub/Vercel identity must still be obtained from live systems for future decisions.
 
 ## Inferred
 
-- keeping the preparation code deployed while the paid offer stays fail-closed can
-  reduce release coupling without weakening the launch gate, provided later
-enablement still follows the authoritative runbook, Program Board, and fresh
-verification requirements;
-- a narrowly specified first-value/launch-hardening packet can proceed in parallel
-with the blocked paid lifecycle without weakening it, provided the packet remains
-inside its explicit free-core boundaries and normal QA/release path.
+- a QA-only edge-contained Live bootstrap can preserve fail-closed public behavior while allowing the existing real billing/entitlement path to generate the missing legitimate Live entitlement evidence, provided containment and external prerequisites are independently verified before each controlled step;
+- keeping deterministic free-core operation independent from the paid/provider path continues to reduce commercial-release risk without weakening AC-30.
 
 ## Unknown / evidence-dependent
 
-The exact launch-hardening UX changes remain unknown until `02` inspects the actual
-Production first-value path and records observed friction. The unresolved
-external/prerequisite and live paid-path evidence remains owned by
-`PROGRAM_BOARD.md`, `RISK_REGISTER.md`, the active packets, and the paid-launch
-runbook. Unknown means insufficient evidence, not evidence of absence.
+- external commercial approvals and account/operator readiness remain evidence-dependent;
+- current hosting commercial-use eligibility remains unresolved until independently verified/approved;
+- Production WAF/provider-control configuration is not inferred from platform capability;
+- dependency-audit exploitability/reachability remains unestablished by the Astra packet;
+- live analytics transport was not proven by the Astra browser verification and must not be treated as M0 activation/conversion evidence until verified;
+- screen-reader speech and a full physical-device matrix were not verified by the Astra packet.
+
+Unknown means insufficient evidence, not evidence of absence.
 
 ---
 
 # 6. Snapshot discipline
 
-Update this file only when a **small number of stable coordination facts**
-materially change: top-level lifecycle, blocker, authority state, or scoped release
-evidence needed to disambiguate current coordination.
+Update this file only when a small number of stable coordination facts materially change: top-level lifecycle, blocker, authority state, or scoped release evidence needed to disambiguate current coordination.
 
-Do not duplicate:
-
-- latest mutable main/deployment identity;
-- Phase-by-phase execution plans;
-- item-level prerequisite/evidence matrices;
-- full risk definitions;
-- packet Acceptance Criteria;
-- roadmap stages;
-- commercial architecture;
-- transient Preview deployments;
-- historical chat narratives.
-
-Those belong to live systems or their canonical owners. This keeps current-state
-lookup cheap and resistant to stale-context errors for Astra/Codex while preserving
-the full development plan elsewhere.
+Do not duplicate latest mutable main/deployment identity, Phase-by-phase execution plans, item-level prerequisite matrices, full risk definitions, packet AC, roadmap stages, commercial architecture, transient Preview deployments, or historical chat narratives. Those belong to live systems or their canonical owners.
