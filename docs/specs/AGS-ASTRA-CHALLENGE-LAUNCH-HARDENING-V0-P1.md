@@ -557,7 +557,7 @@ No unresolved Product decision blocks implementation.
 01 Selected
 → 02 Specified
 → C01 Implementation Started
-→ C01 Implementation Complete   ← current (2026-09-12)
+→ C01 Implementation Complete   ← current (B-01 correction, 2026-09-13)
 → W01 QA Complete
 → C01 merge/release exact QA-approved revision
 → W01 Production Verified
@@ -569,3 +569,5 @@ No unresolved Product decision blocks implementation.
 The open paid Architecture Review lifecycle remains separate and unchanged.
 
 C01 completed required self-verification. See [implementation evidence](../harness/ASTRA_LAUNCH_IMPLEMENTATION.md). Independent QA and Production verification of the exact candidate remain pending.
+
+W01 rejected candidate `a39918d` for B-01 accessible naming. C01 corrected label associations and added real-finding EN/JA regressions; independent re-QA of the corrected exact candidate is required. No approved revision or release authorization is implied.

@@ -102,7 +102,7 @@ A separate bounded launch-hardening packet is now selected for the GPT-6 Astra C
 ```text
 GPT-6 Astra Challenge Launch Hardening
 = SELECTED
-= Implementation Complete (C01 self-verification, 2026-09-12)
+= Implementation Complete (C01 B-01 correction self-verification, 2026-09-13)
 = target Product Hunt launch 2026-09-18
 = free-core / first-value / presentation hardening only
 = no paid-launch bypass
@@ -132,7 +132,7 @@ Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is 
 | `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 lifecycle open; paid access amendment also applies |
 | `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; external readiness and live AC-30 remain open |
 | `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation code implemented; public content/approval and launch evidence remain prerequisites |
-| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Time-boxed free-core launch hardening for the September 18 GPT-6 Astra Challenge | **Implementation Complete** by `C01` on 2026-09-12; next owner `W01` Pass A for independent QA of the exact candidate; not QA-approved or released |
+| `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Time-boxed free-core launch hardening for the September 18 GPT-6 Astra Challenge | **Implementation Complete** after B-01 correction by `C01` on 2026-09-13; prior candidate rejected by W01; next owner `W01` Pass A for independent QA of the exact candidate; not QA-approved or released |
 | `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed capability contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
 | `AGS-PRODUCT-IDENTITY-REVIEW-JOURNEY-UX-V0-P1` | Completed UX contract / regression reference | Recorded Sprint Complete / Production Verified; not new implementation scope |
 
@@ -164,7 +164,7 @@ Authoritative selection packet:
 
 The packet is intentionally narrower than a roadmap-stage promotion. It may harden the current free-core first-value path, representative demo continuity, truthful launch attribution/metadata, responsive/accessibility behavior, and changed-path Production confidence. It must not add Astra as a contest-driven runtime dependency, enable paid Architecture Review, pull Stage 1.5/Stage 2 forward, expand AI/Mutation authority, add persistence/runtime verification, or bypass the open commercial blocker.
 
-`02` specified the packet; `C01` completed implementation and required self-verification. The exact candidate goes to `W01` Pass A. See [C01 implementation evidence](../harness/ASTRA_LAUNCH_IMPLEMENTATION.md). Independent QA and candidate Production verification remain pending.
+`02` specified the packet; `C01` completed implementation and required self-verification. The exact candidate goes to `W01` Pass A. See [C01 implementation evidence](../harness/ASTRA_LAUNCH_IMPLEMENTATION.md). W01 rejected `a39918d` for B-01 accessible naming. C01 corrected the scoped defect; independent re-QA and candidate Production verification remain pending.
 
 This parallel packet is permitted without closing the commercial Sprint because Program Board planning already allows explicitly selected independent hardening/foundation work while launch is blocked, provided the paid Sprint and AC-30 obligations remain explicit and unchanged.
 

@@ -1,13 +1,23 @@
 # Astra launch hardening — C01 implementation evidence
 
 Packet: [AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1](../specs/AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1.md).
-Owner: C01. Status: **Implementation Complete** (2026-09-12).
+Owner: C01. Status: **Implementation Complete** (B-01 correction, 2026-09-13).
 Next owner: **W01 — Independent QA / Pass A**. Independent QA is not performed by this record.
+
+## W01 B-01 correction — 2026-09-13
+
+W01 rejected `a39918d0afbac460c44666a23cbf8ac47180e49f` with **FAIL / BLOCKED**: the real `RDY_NODE_LABEL_EMPTY:task-research` Locate focused an input with an empty computed accessible name. No approved revision exists for that candidate. C01's earlier passing tests did not cover this generic field-accessibility requirement.
+
+- Root cause: sibling visible labels were not programmatically associated with all newly addressable controls; canonical Output schema coverage was too narrow for packet §5.2 / §10 / AC-13.
+- Correction: connect the existing visible labels via `htmlFor` / DOM `id`; model selector and custom input share the visible label through `aria-labelledby` where appropriate. Apply this across Crew, Agent, Task, Tool, and generated tool-parameter controls. Existing enclosing labels remain unchanged.
+- Prevention: real empty-label findings for Task, Agent, and Tool plus the real empty-Crew-name finding are exercised through ordinary browser clicks in both locales, without callback injection. The tests check focus, exact `Label` / `ラベル名`, label association, computed accessible names of every rendered addressable control, unique DOM IDs, custom model inputs, advanced fields, and return continuity.
+- Actual C01 result: all 20 browser tests and required deterministic checks PASS. The original 16 browser scenarios remain green. Focus wiring, target matching, schema behavior, mobile return, semantics, persistence, provider, and AI/Mutation authority are unchanged by this correction.
+- Closure owner: W01 must independently re-QA the new exact candidate and decide B-01 closure. C01 self-verification does not reverse W01's verdict on the rejected revision or grant QA Complete.
 
 ## Candidate and baseline
 
 - Branch: `codex/astra-launch-hardening-20260912` in an isolated worktree.
-- Base: live GitHub main `a3eea6cb7e709cc32e26026656a18cd0bf01b399`, re-fetched/rechecked at 2026-09-12 23:06 JST.
+- Base: live GitHub main `a3eea6cb7e709cc32e26026656a18cd0bf01b399`, re-fetched/rechecked at 2026-09-13 09:34 JST.
 - The exact committed candidate is identified by the PR head and accompanying W01 handoff; this file does not embed its own containing commit hash.
 - Existing unrelated working changes were preserved. No reset, stash, clean, overwrite, or manual worktree pruning was used.
 - Live main protection required strict `test-typecheck-build`, PR workflow, and enforced administrator protection when inspected.
@@ -39,7 +49,7 @@ All results below are **C01 implementation self-evidence**, not a W01 verdict.
 | 10 | Immediate pointer return and keyboard return reach stable heading after resolution; explicit re-evaluation keeps exact finding absent; no fuzzy matching added. |
 | 11 | Updated JSON downloads and deterministic roundtrip passes; existing browser import/export roundtrip remains green. |
 | 12 | CrewAI Python export opens deterministic generated code in both projects. |
-| 13 | Full 348-test regression suite and original free-core browser tests pass, including static CrewAI import and template discovery. |
+| 13 | Full 348-test regression suite and 20 browser tests pass, including B-01 real-finding accessible-name checks, static CrewAI import and template discovery. |
 | 14 | Existing static/non-runtime disclaimers preserved; diff and bounded metadata copy reviewed. |
 | 15 | Full representative loop passes with external browser requests blocked and service credentials stripped / paid-off server. |
 | 16 | No AI proposals, Apply, provider/model, runtime, or persistence expansion; scoped diff. |
@@ -63,7 +73,7 @@ Windows; Node **22.23.2** from `.node-version`; unchanged package lock; `npm ci`
 | `npm run typecheck` | PASS |
 | `npm run build` | PASS — root route statically generated |
 | `npm run verify` | PASS — deterministic checks, secret signatures, unchanged-source fingerprint |
-| `npm run test:e2e` | PASS — 16 tests; desktop-en 1280×900 and mobile-ja 320×740 |
+| `npm run test:e2e` | PASS — 20 tests; desktop-en 1280×900 and mobile-ja 320×740 |
 | `git diff --check` | PASS |
 
 The local `.harness/verification.json` is self-evidence, not a signed attestation or portable Git identity. Logs/screenshots are local ignored artifacts. Fault cases use test-only mounted React navigation callbacks inside click events; no application test endpoint or persisted identity was added.
@@ -76,7 +86,7 @@ The local `.harness/verification.json` is self-evidence, not a signed attestatio
 - Known: the scoped local checks pass. No packet implementation blocker remains.
 - Known note: dependency installation reported 4 existing audit findings (3 high, 1 critical). The lockfile/dependencies are unchanged; this packet does not claim a dependency-security remediation.
 - Inferred: the verified static build should expose the same metadata after its exact candidate is released; deployment alone is not Production behavior evidence.
-- Unknown: W01's independent verdict and candidate Production behavior. No QA Complete, release approval, Production Verified, or Sprint Complete is claimed.
+- Unknown: W01's independent verdict on the corrected candidate and its Production behavior. The previous candidate's FAIL remains a known historical verdict. No QA Complete, release approval, Production Verified, or Sprint Complete is claimed.
 
 At the pre-handoff baseline observation, Production deployment `dpl_2w3Av3RAmGX61FAi2RnmP4vthkWm` was READY, target production, alias `zero-six-khaki.vercel.app`, and main SHA `a3eea6cb7e709cc32e26026656a18cd0bf01b399`; `/` returned HTTP 200. This is baseline identity, not verification of this candidate.
 

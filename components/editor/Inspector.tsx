@@ -94,8 +94,8 @@ export const Inspector: React.FC<InspectorProps> = ({
           <div className="space-y-4 pt-2">
             {/* Crew Name */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">{t('crewName')}</label>
-              <input data-inspector-field="crew.name"
+              <label htmlFor="inspector-crew-name" className="block text-xs font-medium text-slate-300 mb-1">{t('crewName')}</label>
+              <input id="inspector-crew-name" data-inspector-field="crew.name"
                 type="text"
                 value={crewConfig.name}
                 onChange={(e) => onUpdateCrewConfig({ name: e.target.value })}
@@ -105,8 +105,8 @@ export const Inspector: React.FC<InspectorProps> = ({
 
             {/* Process Type */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">{t('executionProcess')}</label>
-              <select data-inspector-field="crew.process"
+              <label htmlFor="inspector-crew-process" className="block text-xs font-medium text-slate-300 mb-1">{t('executionProcess')}</label>
+              <select id="inspector-crew-process" data-inspector-field="crew.process"
                 value={crewConfig.process}
                 onChange={(e) => onUpdateCrewConfig({ process: e.target.value as 'sequential' | 'hierarchical' })}
                 className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -122,9 +122,9 @@ export const Inspector: React.FC<InspectorProps> = ({
             {/* Manager LLM (Only for Hierarchical) */}
             {crewConfig.process === 'hierarchical' && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('managerLlm')}</label>
+                <label htmlFor="inspector-crew-manager-llm" id="inspector-crew-manager-llm-label" className="block text-xs font-medium text-slate-300 mb-1">{t('managerLlm')}</label>
                 <select
-                  ref={managerLlmRef} data-inspector-field="crew.managerLlm"
+                  ref={managerLlmRef} id="inspector-crew-manager-llm" data-inspector-field="crew.managerLlm"
                   value={isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) ? (crewConfig.managerLlm || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
                   onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
                   className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -141,7 +141,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                   <option value={CUSTOM_MODEL_VALUE}>{t('customModel')}</option>
                 </select>
                 {!isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) && (
-                  <input
+                  <input aria-labelledby="inspector-crew-manager-llm-label" id="inspector-crew-manager-llm-custom"
                     type="text"
                     value={crewConfig.managerLlm || ''}
                     onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value })}
@@ -210,12 +210,12 @@ export const Inspector: React.FC<InspectorProps> = ({
             <summary className="cursor-pointer text-xs font-semibold text-indigo-300">{t('crewGlobalConfig')}</summary>
             <div className="mt-3 space-y-3">
               <div>
-                <label className="mb-1 block text-xs text-slate-300">{t('crewName')}</label>
-                <input data-inspector-field="crew.name" value={crewConfig.name} onChange={(e) => onUpdateCrewConfig({ name: e.target.value })} className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100" />
+                <label htmlFor="inspector-crew-name" className="mb-1 block text-xs text-slate-300">{t('crewName')}</label>
+                <input id="inspector-crew-name" data-inspector-field="crew.name" value={crewConfig.name} onChange={(e) => onUpdateCrewConfig({ name: e.target.value })} className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100" />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-slate-300">{t('executionProcess')}</label>
-                <select data-inspector-field="crew.process"
+                <label htmlFor="inspector-crew-process" className="mb-1 block text-xs text-slate-300">{t('executionProcess')}</label>
+                <select id="inspector-crew-process" data-inspector-field="crew.process"
                   value={crewConfig.process}
                   onChange={(e) => onUpdateCrewConfig({ process: e.target.value as 'sequential' | 'hierarchical' })}
                   className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
@@ -229,8 +229,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
               {crewConfig.process === 'hierarchical' && (
                 <div>
-                  <label className="mb-1 block text-xs text-slate-300">{t('managerLlm')}</label>
-                  <select data-inspector-field="crew.managerLlm"
+                  <label htmlFor="inspector-crew-manager-llm" id="inspector-crew-manager-llm-label" className="mb-1 block text-xs text-slate-300">{t('managerLlm')}</label>
+                  <select id="inspector-crew-manager-llm" data-inspector-field="crew.managerLlm"
                     value={isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) ? (crewConfig.managerLlm || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
                     onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
                     className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-100"
@@ -243,7 +243,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                     <option value={CUSTOM_MODEL_VALUE}>{t('customModel')}</option>
                   </select>
                   {!isKnownModel(crewConfig.managerLlm || DEFAULT_LLM_MODEL) && (
-                    <input data-inspector-field="crew.managerLlm"
+                    <input aria-labelledby="inspector-crew-manager-llm-label" id="inspector-crew-manager-llm-custom" data-inspector-field="crew.managerLlm"
                       value={crewConfig.managerLlm || ''}
                       onChange={(e) => onUpdateCrewConfig({ managerLlm: e.target.value })}
                       placeholder={t('customModelPlaceholder')}
@@ -264,8 +264,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('label')}</label>
-                <input data-inspector-field="node.label"
+                <label htmlFor="inspector-node-label" className="block text-xs font-medium text-slate-300 mb-1">{t('label')}</label>
+                <input id="inspector-node-label" data-inspector-field="node.label"
                   type="text"
                   value={(selectedNode.data as AgentNodeData).label || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { label: e.target.value })}
@@ -274,8 +274,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('role')}</label>
-                <input data-inspector-field="node.role"
+                <label htmlFor="inspector-node-role" className="block text-xs font-medium text-slate-300 mb-1">{t('role')}</label>
+                <input id="inspector-node-role" data-inspector-field="node.role"
                   type="text"
                   value={(selectedNode.data as AgentNodeData).role || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { role: e.target.value })}
@@ -285,9 +285,9 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('llmModel')}</label>
+                <label htmlFor="inspector-node-model" id="inspector-node-model-label" className="block text-xs font-medium text-slate-300 mb-1">{t('llmModel')}</label>
                 <div className="relative">
-                  <select data-inspector-field="node.model"
+                  <select id="inspector-node-model" data-inspector-field="node.model"
                     value={isKnownModel((selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL) ? ((selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL) : CUSTOM_MODEL_VALUE}
                     onChange={(e) => onUpdateNodeData(selectedNode.id, { model: e.target.value === CUSTOM_MODEL_VALUE ? 'custom/' : e.target.value })}
                     className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-indigo-500"
@@ -304,7 +304,7 @@ export const Inspector: React.FC<InspectorProps> = ({
                     <option value={CUSTOM_MODEL_VALUE}>{t('customModel')}</option>
                   </select>
                   {!isKnownModel((selectedNode.data as AgentNodeData).model || DEFAULT_LLM_MODEL) && (
-                    <input data-inspector-field="node.model"
+                    <input aria-labelledby="inspector-node-model-label" id="inspector-node-model-custom" data-inspector-field="node.model"
                       type="text"
                       value={(selectedNode.data as AgentNodeData).model || ''}
                       onChange={(e) => onUpdateNodeData(selectedNode.id, { model: e.target.value })}
@@ -316,8 +316,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('goal')}</label>
-                <textarea data-inspector-field="node.goal"
+                <label htmlFor="inspector-node-goal" className="block text-xs font-medium text-slate-300 mb-1">{t('goal')}</label>
+                <textarea id="inspector-node-goal" data-inspector-field="node.goal"
                   rows={3}
                   value={(selectedNode.data as AgentNodeData).goal || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { goal: e.target.value })}
@@ -327,8 +327,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('backstory')}</label>
-                <textarea data-inspector-field="node.backstory"
+                <label htmlFor="inspector-node-backstory" className="block text-xs font-medium text-slate-300 mb-1">{t('backstory')}</label>
+                <textarea id="inspector-node-backstory" data-inspector-field="node.backstory"
                   rows={3}
                   value={(selectedNode.data as AgentNodeData).backstory || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { backstory: e.target.value })}
@@ -385,8 +385,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('label')}</label>
-                <input data-inspector-field="node.label"
+                <label htmlFor="inspector-node-label" className="block text-xs font-medium text-slate-300 mb-1">{t('label')}</label>
+                <input id="inspector-node-label" data-inspector-field="node.label"
                   type="text"
                   value={(selectedNode.data as TaskNodeData).label || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { label: e.target.value })}
@@ -395,8 +395,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('description')}</label>
-                <textarea data-inspector-field="node.description"
+                <label htmlFor="inspector-node-description" className="block text-xs font-medium text-slate-300 mb-1">{t('description')}</label>
+                <textarea id="inspector-node-description" data-inspector-field="node.description"
                   rows={4}
                   value={(selectedNode.data as TaskNodeData).description || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { description: e.target.value })}
@@ -406,8 +406,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('expectedOutput')}</label>
-                <textarea data-inspector-field="node.expectedOutput"
+                <label htmlFor="inspector-node-expected-output" className="block text-xs font-medium text-slate-300 mb-1">{t('expectedOutput')}</label>
+                <textarea id="inspector-node-expected-output" data-inspector-field="node.expectedOutput"
                   rows={3}
                   value={(selectedNode.data as TaskNodeData).expectedOutput || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { expectedOutput: e.target.value })}
@@ -417,8 +417,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('outputFormat')}</label>
-                <select data-inspector-field="node.outputFormat"
+                <label htmlFor="inspector-node-output-format" className="block text-xs font-medium text-slate-300 mb-1">{t('outputFormat')}</label>
+                <select id="inspector-node-output-format" data-inspector-field="node.outputFormat"
                   value={(selectedNode.data as TaskNodeData).outputFormat || 'text'}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { outputFormat: e.target.value as 'text' | 'json' })}
                   className="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-slate-100 focus:border-emerald-500"
@@ -475,8 +475,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('label')}</label>
-                <input data-inspector-field="node.label"
+                <label htmlFor="inspector-node-label" className="block text-xs font-medium text-slate-300 mb-1">{t('label')}</label>
+                <input id="inspector-node-label" data-inspector-field="node.label"
                   type="text"
                   value={(selectedNode.data as ToolNodeData).label || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { label: e.target.value })}
@@ -485,8 +485,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('toolType')}</label>
-                <select data-inspector-field="node.toolType"
+                <label htmlFor="inspector-node-tool-type" className="block text-xs font-medium text-slate-300 mb-1">{t('toolType')}</label>
+                <select id="inspector-node-tool-type" data-inspector-field="node.toolType"
                   value={(selectedNode.data as ToolNodeData).toolType || 'SerperDevTool'}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { toolType: e.target.value, parameters: {} })}
                   className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:border-amber-500 font-mono"
@@ -507,8 +507,8 @@ export const Inspector: React.FC<InspectorProps> = ({
 
               {getToolParameterDefinitions((selectedNode.data as ToolNodeData).toolType).map((parameter) => (
                 <div key={parameter.key}>
-                  <label className="mb-1 block text-xs font-medium text-slate-300">{lang === 'ja' ? parameter.labelJa : parameter.label}</label>
-                  <input data-inspector-field={`node.parameters.${parameter.key}`}
+                  <label htmlFor={`inspector-tool-parameter-${parameter.key}`} className="mb-1 block text-xs font-medium text-slate-300">{lang === 'ja' ? parameter.labelJa : parameter.label}</label>
+                  <input id={`inspector-tool-parameter-${parameter.key}`} data-inspector-field={`node.parameters.${parameter.key}`}
                     value={(selectedNode.data as ToolNodeData).parameters?.[parameter.key] || ''}
                     onChange={(e) => onUpdateNodeData(selectedNode.id, {
                       parameters: { ...((selectedNode.data as ToolNodeData).parameters || {}), [parameter.key]: e.target.value },
@@ -521,8 +521,8 @@ export const Inspector: React.FC<InspectorProps> = ({
               ))}
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">{t('description')}</label>
-                <textarea data-inspector-field="node.description"
+                <label htmlFor="inspector-node-description" className="block text-xs font-medium text-slate-300 mb-1">{t('description')}</label>
+                <textarea id="inspector-node-description" data-inspector-field="node.description"
                   rows={3}
                   value={(selectedNode.data as ToolNodeData).description || ''}
                   onChange={(e) => onUpdateNodeData(selectedNode.id, { description: e.target.value })}

@@ -25,6 +25,69 @@ async function noOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+async function expectNamedInspectorFields(page: Page) {
+  const inspector = page.locator('aside').filter({ has: page.locator('[data-inspector-field]') });
+  for (const summary of await inspector.locator('details > summary').all()) {
+    if (!(await summary.evaluate((element) => (element.parentElement as HTMLDetailsElement).open))) await summary.click();
+  }
+  for (const control of await inspector.locator('[data-inspector-field], #inspector-crew-manager-llm-custom').all()) {
+    const label = await control.evaluate((element) => {
+      const input = element as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      const reference = input.getAttribute('aria-labelledby');
+      const label = reference ? document.getElementById(reference) : input.labels?.[0];
+      return { text: label?.textContent?.replace(/\s+/g, ' ').trim() ?? '', visible: Boolean(label?.getClientRects().length), uniqueId: !input.id || document.querySelectorAll(`#${CSS.escape(input.id)}`).length === 1 };
+    });
+    expect(label.text).not.toBe('');
+    expect(label.visible).toBe(true);
+    expect(label.uniqueId).toBe(true);
+    await expect(control).toHaveAccessibleName(label.text);
+  }
+}
+
+test('real empty-label findings focus named Task, Agent and Tool controls in both languages', async ({ page }, info) => {
+  const ja = info.project.name.endsWith('ja');
+  const saved = JSON.parse(await readFile('tests/fixtures/graph-roundtrip-v1.json', 'utf8'));
+  const ids = ['task-research', 'agent-primary', 'tool-search'];
+  for (const node of saved.nodes) {
+    if (ids.includes(node.id)) node.data.label = '';
+    if (node.id === 'agent-primary') node.data.model = 'vendor/custom-agent';
+  }
+  saved.crewConfig.managerLlm = 'vendor/custom-manager';
+  await page.addInitScript((artifact) => localStorage.setItem('agentgraph_active_flow', JSON.stringify(artifact)), saved);
+  await page.goto('/');
+  await page.getByRole('button', { name: ja ? 'Preflightを確認' : 'Run Preflight', exact: true }).click();
+  await page.getByRole('tab', { name: ja ? '準備状況' : 'Readiness', exact: true }).click();
+  for (const id of ids) {
+    const finding = page.locator(`[data-review-item="RDY_NODE_LABEL_EMPTY:${id}"]`);
+    await finding.getByRole('button', { name: /Locate in Design|Designで場所を表示/ }).click();
+    const label = page.locator('[data-inspector-field="node.label"]');
+    await expect(label).toBeFocused();
+    await expect(label).toHaveAccessibleName(ja ? 'ラベル名' : 'Label');
+    expect(await label.evaluate((element) => (element as HTMLInputElement).labels?.length)).toBe(1);
+    await expectNamedInspectorFields(page);
+    await noOverflow(page);
+    await page.getByRole('button', { name: ja ? '指摘に戻る' : 'Back to finding', exact: true }).click();
+    await expect(finding).toBeFocused();
+  }
+});
+
+test('real empty-Crew-name finding focuses its visible named control', async ({ page }, info) => {
+  const ja = info.project.name.endsWith('ja');
+  const saved = JSON.parse(await readFile('tests/fixtures/graph-roundtrip-v1.json', 'utf8'));
+  saved.crewConfig.name = '';
+  saved.crewConfig.managerLlm = 'vendor/custom-manager';
+  await page.addInitScript((artifact) => localStorage.setItem('agentgraph_active_flow', JSON.stringify(artifact)), saved);
+  await page.goto('/');
+  await page.getByRole('button', { name: ja ? 'Preflightを確認' : 'Run Preflight', exact: true }).click();
+  await page.getByRole('tab', { name: ja ? '準備状況' : 'Readiness', exact: true }).click();
+  const finding = page.locator('[data-review-item="RDY_CREW_NAME_EMPTY:name"]');
+  await finding.getByRole('button', { name: /Locate in Design|Designで場所を表示/ }).click();
+  await expect(page.locator('[data-inspector-field="crew.name"]')).toBeFocused();
+  await expectNamedInspectorFields(page);
+  await page.getByRole('button', { name: ja ? '指摘に戻る' : 'Back to finding', exact: true }).click();
+  await expect(finding).toBeFocused();
+});
+
 test('representative review loop is keyboard accessible, manual, portable and provider independent', async ({ page }, info) => {
   const ja = info.project.name.endsWith('ja');
   const errors: string[] = [];
