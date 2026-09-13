@@ -48,7 +48,7 @@ The bounded `GPT-6 Astra Challenge Launch Hardening` packet is **Sprint Complete
 
 The 2026-09-13 post-Astra `01` review completed `Evidence → Gate Review → Explicit Next Selection` and selected **no new capability / no new roadmap packet**. The already-selected Stage 1 Architecture Review / Paid Access lifecycle remains the next dependency to close.
 
-The first-Live circular sequencing decision is accepted in ADR-0011, and PR #59 has now released the `02` operational amendment and paid-launch runbook procedure. The procedure is therefore **Specified / released**, but this is not equivalent to execution readiness or public paid enablement. Phase 0 evidence and the applicable independent W01 checks remain prerequisites.
+The first-Live circular sequencing decision is accepted in ADR-0011, and PR #59 released the `02` operational amendment and paid-launch runbook procedure. W01 has independently verified that specification release **PASS WITH NOTES**. The procedure is therefore **Specified / released / release-verified**, but this is not equivalent to execution readiness or public paid enablement. Phase 0 evidence and later independent containment/Live checks remain prerequisites.
 
 ---
 
@@ -64,8 +64,8 @@ Stage 1 Architecture Review + Paid Access public-launch lifecycle
 = OPEN
 = Production paid Architecture Review DISABLED / FAIL-CLOSED
 = first-Live procedure SPECIFIED / RELEASED
+= PR #59 W01 post-release verification PASS WITH NOTES / COMPLETE
 = Phase 0 external prerequisites PENDING
-= PR #59 W01 post-release verification PENDING
 = QA containment NOT VERIFIED / NOT READY
 = PAUC AC-30 NOT COMPLETE
 = current commercial Sprint NOT COMPLETE
@@ -109,7 +109,7 @@ COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER
 Related durable risks: R-008 / R-020 / R-021
 ```
 
-ADR-0011 and the first-Live amendment/runbook now define the exact safe sequence: all non-circular Phase 0 prerequisites must be verified; QA-only edge containment is established and independently verified while paid-off; the first bounded Live window creates the legitimate entitlement through normal Production Auth/application Checkout/signed webhook reconciliation; Production returns fail-closed for entitled kill-switch proof; a second contained window proves the cost guard before provider invocation; only then may the existing AC-30 sequence proceed. This specification does **not** itself authorize any Live window.
+ADR-0011 and the first-Live amendment/runbook define the exact safe sequence: all non-circular Phase 0 prerequisites must be verified; QA-only edge containment is established and independently verified while paid-off; the first bounded Live window creates the legitimate entitlement through normal Production Auth/application Checkout/signed webhook reconciliation; Production returns fail-closed for entitled kill-switch proof; a second contained window proves the cost guard before provider invocation; only then may the existing AC-30 sequence proceed. This specification does **not** itself authorize any Live window.
 
 Item-level prerequisite evidence and execution routing remain owned by `PROGRAM_BOARD.md`, the PAUC packet/amendments, and the paid-launch runbook.
 
@@ -168,18 +168,18 @@ The Astra release proved the scoped deterministic/manual first-value journey and
 W01 Pass A approved candidate
 = a6c5990a5eff090c196ba65fb71a9f2971d37443
 
-Released main observed by C01 / 00
+Released main at PR #59
 = 157e33f064dbca75a3098392901f9017562106fb
 
 Approved/released tree
 = a5831dff58e46b5bd2210bc7bc83337cc572162c
 
-Release status
-= W01 PASS A COMPLETE
-= post-release W01 independent verification PENDING
+W01 post-release result
+= PASS WITH NOTES
+= specification release independently verified
 ```
 
-PR #59 changes the authoritative Security/QA/Production procedure rather than application runtime behavior. C01 and `00` have observed a matching READY Production deployment and a still-disabled public offer, but those observations do not substitute for W01's independent post-release identity/baseline verdict. That narrow release check is separate from later WAF containment, Live bootstrap, and AC-30 verification.
+W01 independently verified approved/released tree equality, the successful PR #59 merge CI, the unchanged operational/runtime content through the later documentation-only PR #61, current main/Production SHA equality at the observation point, and the disabled public paid-off baseline. This closes only the PR #59 specification-release verification. It does **not** verify Phase 0 external prerequisites, WAF containment, first-Live behavior, paid entitlement/quota/provider/financial behavior, or AC-30.
 
 ---
 
@@ -187,19 +187,17 @@ PR #59 changes the authoritative Security/QA/Production procedure rather than ap
 
 Use `docs/roadmap/PROGRAM_BOARD.md` for the exact current action/evidence matrix.
 
-No new roadmap capability is Selected. The first-Live procedure specification is complete, so `02` is no longer the next owner for the currently known procedure gap.
+No new roadmap capability is Selected. The first-Live procedure specification and its narrow post-release verification are complete.
 
-The immediate canonical next verification owner is:
+The immediate coordination owner is:
 
 ```text
-W01 — Independent QA & Production Verification
+00 — Program Control & Current State
 ```
 
-W01's next task is intentionally narrow: independently confirm the PR #59 QA-approved revision was released unchanged, current main/Production identity and primary alias are correct, and the paid-off baseline remains fail-closed. This does **not** include staging or approving QA containment, opening a Live window, exercising Checkout/provider behavior, or executing AC-30.
+`00` coordinates the remaining Phase 0 external evidence packet with named account/configuration/financial operators. Evidence that is not actually observed or independently supported remains `UNVERIFIED`; specification or release-verification text does not make an external prerequisite true.
 
-In parallel, `00` coordinates the Phase 0 external evidence packet with named account/configuration/financial operators. Evidence that is not actually observed or independently supported remains `UNVERIFIED`; specification text does not make an external prerequisite true.
-
-After the PR #59 release check and Phase 0 prerequisites are acceptable, the paid-path sequence is:
+After all applicable Phase 0 prerequisites are independently acceptable, the paid-path sequence is:
 
 ```text
 C01 / authorized hosting operator stage exact QA containment while paid-off
@@ -211,7 +209,7 @@ C01 / authorized hosting operator stage exact QA containment while paid-off
 → 01 performs Evidence → Gate Review → Explicit Next Selection
 ```
 
-Do not infer an automatic next Stage from Astra completion, procedure specification, bootstrap evidence, or eventual commercial enablement.
+Do not infer an automatic next Stage from Astra completion, procedure specification, release verification, bootstrap evidence, or eventual commercial enablement.
 
 ---
 
@@ -227,8 +225,8 @@ Do not infer an automatic next Stage from Astra completion, procedure specificat
 - the post-Astra `01` decision selected no new capability;
 - ADR-0011 resolves the Product/Architecture sequencing boundary for first-Live bootstrap;
 - PR #59 released the Specified first-Live operational amendment/runbook without enabling paid Production;
-- PR #59 has W01 Pass A approval, while independent post-release verification remains pending;
-- exact live GitHub/Vercel identity must still be obtained from live systems for future decisions.
+- W01 independently verified the PR #59 specification release PASS WITH NOTES, scoped to release identity/continuity and the public paid-off baseline;
+- exact live GitHub/Vercel identity must still be obtained from live systems for future decisions and material Production transitions.
 
 ## Inferred
 
