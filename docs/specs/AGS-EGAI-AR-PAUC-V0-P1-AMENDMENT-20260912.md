@@ -43,9 +43,7 @@ The historical classification that the first-launch circular dependency was proc
 - `docs/specs/AGS-EGAI-AR-PAUC-V0-P1-FIRST-LIVE-AMENDMENT-20260913.md`;
 - `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`.
 
-The first-Live procedure is now specified as a QA-only edge-contained sequence. Actual execution remains blocked until the amendment/runbook Phase 0 external prerequisites and W01 containment proof are complete. `Specified` therefore does not mean paid Production is enabled or currently safe to enable.
-
-At the time the 2026-09-13 first-Live amendment was authored, ADR-0011 was carried by PR #58 and was not yet merged to `main`; the first-Live amendment is intentionally dependent on that accepted 01 decision and must not be merged ahead of it.
+ADR-0011 is now Accepted on current `main`. The first-Live procedure is specified as a QA-only edge-contained sequence. Actual execution remains blocked until the scoped amendment/runbook prerequisites and W01 containment proof are complete.
 
 ## 4. Preserved boundaries
 
