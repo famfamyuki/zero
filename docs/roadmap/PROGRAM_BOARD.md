@@ -116,7 +116,7 @@ Explicit Next Selection
 = NO NEW CAPABILITY / NO NEW ROADMAP PACKET
 ```
 
-No new Product Sprint is manufactured while the already-selected commercial lifecycle remains open. The smallest sufficient next work is closure of the existing `COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER`, including specification of the first-Live bootstrap procedure selected in `docs/decisions/ADR-0011-edge-contained-first-live-bootstrap.md` and completion of the remaining external prerequisites.
+No new Product Sprint is manufactured while the already-selected commercial lifecycle remains open. The smallest sufficient next work is closure of the existing `COMMERCIAL_PRODUCTION_VERIFICATION_BLOCKER`. The first-Live sequencing decision is accepted in ADR-0011 and the operational amendment/runbook are now **Specified and released** by PR #59; execution remains blocked on Phase 0 evidence plus the required independent W01 release/containment verification.
 
 Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is not reached by technical readiness, Astra launch hardening, or launch participation alone.
 
@@ -124,12 +124,12 @@ Commercial Validation Gate M0 remains separate from Stage/Gate promotion and is 
 
 # 2. Packet index
 
-`Specified` in packet headers describes specification maturity, not release completion. Live repository/Production evidence wins.
+`Specified` in packet headers describes specification maturity, not release completion or execution readiness. Live repository/Production evidence wins.
 
 | Packet | Role in current plan | Recorded lifecycle / remaining work |
 |---|---|---|
 | `AGS-EGAI-AR-V0-P1` | Base Architecture Review contract | Stage 1 lifecycle open; paid-access amendment applies |
-| `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; first-Live procedure amendment + external readiness + live AC-30 remain open |
+| `AGS-EGAI-AR-PAUC-V0-P1` | Active paid access/control contract | Preparation released; first-Live amendment **Specified/released**; Phase 0 external readiness, W01 release/containment verification, controlled Live proofs, and AC-30 remain open |
 | `AGS-EGAI-AR-COMMERCIAL-POLICY-UX-V0-P1` | Coupled policy UX amendment | Preparation code implemented; public content/approval and launch evidence remain prerequisites |
 | `AGS-ASTRA-CHALLENGE-LAUNCH-HARDENING-V0-P1` | Completed bounded free-core launch hardening | **Sprint Complete / Production Verified** on 2026-09-13; regression/history reference only |
 | `AGS-CREWAI-STATIC-IMPORT-V0-P1` | Completed capability contract / regression reference | Sprint Complete / Production Verified |
@@ -162,6 +162,20 @@ Scoped completion evidence:
 
 Remaining Astra Known Notes are non-blocking and are routed in §5; none expands the commercial Sprint or selects a new roadmap stage.
 
+## First-Live procedure specification release — PR #59
+
+PR #59 turned ADR-0011 into the authoritative implementation/operations-ready amendment and paid-launch runbook procedure without enabling paid Production.
+
+Scoped release facts handed over by C01 and live-rechecked by `00` during this reconciliation:
+
+- W01 Pass A: **PASS WITH NOTES / QA Complete** on approved head `a6c5990a5eff090c196ba65fb71a9f2971d37443`;
+- released `main`: `157e33f064dbca75a3098392901f9017562106fb`;
+- approved/released tree: `a5831dff58e46b5bd2210bc7bc83337cc572162c`;
+- Vercel deployment `dpl_8N4W2xbeQU1k2XxZFQjShDmvSnCc` is live-observed `READY`, `target=production`, on the primary aliases with matching `githubCommitSha`;
+- public Architecture Review offer remains live-observed `enabled=false`, `price=null`, `includedReviews=null`, `policyUrls=null`.
+
+These are **release facts, not W01 Production Verified**. Because PR #59 materially changes Security/QA/Production operational authority, it is outside the pure-documentation maintenance fast path. W01 must independently perform the narrow post-release identity/baseline verification before this semantic documentation release is classified Production Verified. That check is distinct from later WAF containment verification, first-Live windows, and AC-30.
+
 ---
 
 # 3. Commercial lifecycle
@@ -174,49 +188,60 @@ The provisional launch inputs remain USD 12/month, 10 reviews per confirmed mont
 
 ## Phase G — external prerequisites + controlled Production paid enablement — PENDING / BLOCKED
 
-`00` coordinates the evidence matrix. Named operators and restricted evidence records remain required. Rows are `UNVERIFIED`, `BLOCKED`, or `VERIFIED`; secrets, personal data, source IPs, tokens, and financial details do not belong in this public board.
+`00` coordinates the evidence matrix. Named operators and restricted evidence records remain required. Rows are `UNVERIFIED`, `BLOCKED`, `PARTIAL`, or `VERIFIED`; secrets, personal data, source IPs, tokens, and financial details do not belong in this public board.
 
 Evidence classes: **A** = configuration/external approval; **B** = non-Production Test Mode demonstration; **C** = Production paid-off demonstration; **D** = controlled Live Production demonstration. Test Mode does not substitute for AC-30.
 
-| Class / item | Environment and prerequisites | Owner / verifier | Required completion evidence / state |
+The current states below reflect evidence available to `00` at this reconciliation only. External/account facts are not promoted to `VERIFIED` from documentation or past observations alone.
+
+| Class / item | Current evidence state | Owner / verifier | Next concrete action |
 |---|---|---|---|
-| A — Release identity | exact current candidate/revision | C01 / W01 | required checks, approved change set, READY/target/domain/SHA evidence |
-| A — Hosting eligibility | Production account + intended commercial scope | 00 + account owner / W01 | current commercial-use hosting eligibility; observed Hobby state remains unresolved |
-| A — Public policies / operations | public HTTPS destinations + external approvals | 00 + responsible approvers / W01 | Terms/Privacy/Support reachability and merchant/legal/privacy/tax/refund/support approval |
-| A — Stripe Live configuration | Production-linked Live account | C01 + merchant/operator / W01 | approved monthly Price, bounded Portal and Tax configuration |
-| A — Provider controls | dedicated Production provider project | C01 + provider operator / W01 | budget/warning/critical/hard-ceiling configuration and exercised alert path |
-| A — Financial QA approval | before any Live charge | 00 + financial operator / W01 | written charge/cancel/full-refund handling approval |
-| B — Test Mode lifecycle | isolated local/Preview Test Mode | C01 + test operator / W01 | Checkout, signed reconciliation, quota, consume/release, replay, cancellation/recovery; not AC-30 |
-| B — Cost guard / entitled kill switch | Test Mode entitlement | C01 / W01 | zero-call cost rejection + reservation release; disabled-path zero call/quota; not Live proof |
-| C — Production Auth | Production paid-off | C01 + Auth operator / W01 | magic-link/session/redirect evidence without secrets |
-| C — WAF / disabled baseline | Production paid-off | C01 + hosting operator / W01 | required rate-limit/effectiveness, disabled paid path, free-core smoke |
-| D-bootstrap — first Live entitlement / webhook lifecycle | all non-circular A/B/C prerequisites verified; QA-only edge containment specified and verified | 02 specifies; C01/config operators execute; W01 verifies | **SEQUENCING DECIDED / PROCEDURE SPECIFICATION PENDING** — real Production Auth + normal application Checkout + signed Live webhook under a QA-only edge-contained window; no manual entitlement/quota or fake webhook |
-| D-bootstrap — entitled kill switch | legitimate Live QA entitlement exists; paid switch returned false | W01 | `review_disabled`, zero provider invocation, zero quota consumption, free-core smoke |
-| D-bootstrap — cost guard | same legitimate Live entitlement; second QA-only contained window | W01 | cost rejection before any successful provider review; zero provider invocation + idempotent reservation release |
-| D — Live financial QA / AC-30 | Phase G prerequisites/bootstrap proofs complete; controlled enablement authorized | W01 + authorized operators | real subscription → entitlement → reservation → valid consume, non-consumption failure, lifecycle/abuse/WAF/kill-switch checks, cancellation/full refund, release identity |
+| A — Release identity | **PARTIAL — C01/00 release facts observed; W01 post-release verification pending** | C01 / W01 | W01 independently confirm approved/released tree identity, main CI, READY/production/domain/SHA equality, and paid-off unchanged baseline for PR #59 |
+| A — Hosting eligibility | **BLOCKED / UNVERIFIED** — current Vercel team plan label was live-observed as `hobby`; commercial-use eligibility is not inferred from that label alone | 00 + account owner / W01 | account owner supplies current commercial-use eligibility/plan-contract evidence; W01 verifies the evidence before any Live window |
+| A — Public policies / operations | **UNVERIFIED** | 00 + responsible merchant/legal/privacy/tax/refund/support approvers / W01 | provide public HTTPS Terms/Privacy/Support reachability plus written approvals in restricted evidence record |
+| A — Stripe Live configuration | **UNVERIFIED** | C01 + merchant/operator / W01 | verify the approved recurring USD 12 monthly Live Price, bounded Portal configuration, Stripe Tax configuration, and launch configuration without exposing secrets |
+| A — Provider controls | **UNVERIFIED** | C01 + provider operator / W01 | verify dedicated Production provider project/key, warning/critical/hard ceiling, matching cost profile, and exercised alert path |
+| A — Financial QA approval | **UNVERIFIED** | 00 + financial operator / W01 | obtain written authorization for the controlled charge, cancellation, and full-refund procedure and name the restricted operator |
+| B — Test Mode lifecycle | **UNVERIFIED** | C01 + test operator / W01 | complete required Test Mode Checkout/webhook/reconciliation/quota/consume-release/replay/cancellation-recovery evidence under the runbook; not AC-30 |
+| B — Cost guard / entitled kill switch | **UNVERIFIED** | C01 / W01 | prove the required non-Production control paths and synthetic cost-guard fixture before the corresponding Live proofs |
+| C — Production Auth | **UNVERIFIED** | C01 + Auth operator / W01 | verify Production magic-link delivery/session/allowed redirects without recording personal/token values |
+| C — WAF / paid-off baseline | **UNVERIFIED** — paid offer is currently observed fail-closed, but current published Firewall inventory/capacity/operator authority, QA source set, rate-limit effectiveness, and two-source containment evidence are not established | C01 + hosting operator / W01 | inspect current Firewall rule inventory/capacity and operator authority; establish stable exclusive QA source; verify paid-off rate-limit/free-core baseline; then stage §5 containment for W01 verification |
+| D-bootstrap — first Live entitlement / webhook lifecycle | **SPECIFIED / EXECUTION BLOCKED** | 00 authorizes only after prerequisites; C01/config operators execute; W01 verifies | no Live action until all Phase 0 A/B/C prerequisites are VERIFIED, PR #59 release verification is accepted, and §5 QA containment is independently VERIFIED |
+| D-bootstrap — entitled kill switch | **NOT READY** | W01 | after a legitimate Live QA entitlement exists and switch is returned false, prove `review_disabled`, zero provider invocation, zero quota mutation, free-core smoke |
+| D-bootstrap — cost guard | **NOT READY** | W01 | after kill-switch proof PASS, use the second contained window to prove cost rejection before provider invocation and idempotent reservation release |
+| D — Live financial QA / AC-30 | **NOT READY / NOT COMPLETE** | W01 + authorized operators | only after bootstrap proofs complete, execute the existing real subscription → entitlement → valid consume/non-consumption/cancellation/refund AC-30 sequence |
 
-### 01 first-launch sequencing decision — COMPLETE; 02 procedure specification required
+### First-Live sequencing and procedure — SPECIFIED / RELEASED; execution still blocked
 
-`01` accepted `docs/decisions/ADR-0011-edge-contained-first-live-bootstrap.md`.
+`01` accepted `docs/decisions/ADR-0011-edge-contained-first-live-bootstrap.md` and `02` completed the authoritative procedure in:
 
-Product/Architecture boundary:
+- `docs/specs/AGS-EGAI-AR-PAUC-V0-P1-FIRST-LIVE-AMENDMENT-20260913.md`;
+- `docs/runbooks/ARCHITECTURE_REVIEW_PAID_LAUNCH.md`.
+
+PR #59 released that specification to `main` without enabling paid Production.
+
+The specified sequence is:
 
 ```text
-all independently satisfiable A/B/C prerequisites VERIFIED
-→ QA-only edge containment installed + independently evidenced
+all Phase 0 non-circular prerequisites VERIFIED
+→ QA-only edge containment staged and W01-verified while paid-off
 → first bounded Live window: real app Checkout → signed Live webhook → legitimate entitlement/quota
 → switch false again
 → entitled kill-switch proof while fail-closed
 → second bounded Live window: cost-guard rejection before any successful provider review
-→ only then continue into existing W01 AC-30 sequence
-→ public access remains blocked until final independent verification
+→ switch false again
+→ existing W01 AC-30 sequence
+→ public transition only through later independent verification
 ```
 
-The containment mechanism must keep non-QA traffic out of paid/billing routes while preserving the public deterministic free core. Exact route scope, firewall rule ordering, operator authority, public degraded-state behavior, abort/disable/re-enable conditions, financial handling, and final containment-removal verification are **not** invented here; `02` must make the existing PAUC/runbook implementation-ready. Restricted operator evidence remains outside repository docs.
+Specification maturity and execution readiness are deliberately separate:
 
-This resolves the `01` safety/sequencing decision but **does not unblock execution yet**. Phase G remains BLOCKED until `02` specifies the procedure, applicable independent review is complete, and all external prerequisites are actually evidenced.
+```text
+Procedure = SPECIFIED / RELEASED
+Execution readiness = BLOCKED
+```
 
-Any discovered Product/security semantic gap returns to `01`; `C01` must not create a bootstrap bypass.
+No route/firewall/config/Stripe/provider/entitlement/quota mutation is authorized from specification status alone. Phase G remains blocked until the Phase 0 evidence is actually VERIFIED and W01 independently accepts the paid-off containment evidence. Any newly discovered Product/security semantic gap returns to `01`; C01/config operators must not invent a bootstrap bypass.
 
 ## Phase H — W01 live paid Production verification / AC-30 — PENDING
 
@@ -251,25 +276,30 @@ Known current facts:
 - Production paid Architecture Review remains disabled / fail-closed;
 - deterministic free core remains operational;
 - the real paid entitlement/quota/financial path remains unverified;
-- Vercel team was live-observed on 2026-09-13 as Hobby, so the existing commercial-use hosting prerequisite remains unresolved;
+- ADR-0011 sequencing and the first-Live operational amendment/runbook are now Specified and released;
+- Phase 0 evidence remains incomplete;
+- `00` live-observed the connected Vercel team plan label as `hobby` during this reconciliation, but commercial-use eligibility remains a separate external verification and is not inferred from a plan label alone;
 - PAUC AC-30 is not complete;
-- the circular first-launch Product sequencing decision is resolved by ADR-0011, but the `02` operational specification and prerequisite evidence remain incomplete.
+- PR #59 has W01 Pass A approval, but the post-release W01 identity/baseline verification remains pending and is separate from later containment/Live/AC-30 verification.
 
 Smallest safe response:
 
-> Keep Production paid review fail-closed. Do not select a new roadmap capability. `02` specifies the ADR-0011 QA-only first-Live bootstrap inside the existing PAUC/runbook contract while `00` closes external prerequisites. Only after that procedure and evidence are independently acceptable may the controlled paid path advance to W01 AC-30.
+> Keep Production paid review fail-closed. Treat the first-Live procedure as Specified but not executable. W01 first performs the narrow PR #59 post-release identity/baseline verification; in parallel `00` and named operators close the Phase 0 external prerequisites. Only after Phase 0 and W01 paid-off containment evidence are VERIFIED may the controlled Live bootstrap begin.
 
 | Work / decision | State | Next owner/action |
 |---|---|---|
 | Commercial-enablement preparation release — PR #35 | **COMPLETE / PAID-OFF PRODUCTION VERIFIED** | remain fail-closed |
 | GPT-6 Astra Challenge launch hardening | **SPRINT COMPLETE / PRODUCTION VERIFIED** | regression/history reference only |
 | Post-Astra Gate Review | **COMPLETE — NO NEW CAPABILITY SELECTED** | continue existing Stage 1 paid lifecycle |
-| Public paid Architecture Review launch | **BLOCKED / NOT ENABLED** | close external prerequisites + first-Live procedure spec/evidence |
-| First-Live Product sequencing decision | **COMPLETE — ADR-0011** | `02` specifies exact procedure in existing PAUC/runbook authority |
-| Controlled paid enablement | **BLOCKED / PROCEDURE SPECIFICATION + PREREQUISITES PENDING** | no execution until specified and independently acceptable |
-| Live financial QA / PAUC AC-30 | **NOT COMPLETE** | `W01` after Phase G is ready |
+| Public paid Architecture Review launch | **BLOCKED / NOT ENABLED** | close Phase 0 prerequisites + bootstrap/AC-30 evidence |
+| First-Live Product sequencing decision | **COMPLETE — ADR-0011** | no further Product decision unless a new semantic/security gap appears |
+| First-Live operational procedure | **SPECIFIED / RELEASED — PR #59** | W01 post-release verification, then Phase 0/containment evidence; no Live execution yet |
+| PR #59 semantic documentation release | **W01 PASS A COMPLETE / PASS B PENDING** | W01 independently verify exact released revision/Production identity and paid-off unchanged baseline only |
+| QA edge containment | **NOT VERIFIED / NOT READY** | after relevant Phase 0 evidence, C01/authorized hosting operator stages exact runbook rule; W01 independently verifies while paid-off |
+| Controlled paid enablement | **BLOCKED / PHASE 0 + CONTAINMENT PENDING** | no execution until all prerequisites and containment are VERIFIED |
+| Live financial QA / PAUC AC-30 | **NOT COMPLETE** | W01 after bootstrap Phase G is ready |
 | Commercial Validation Gate M0 | **NOT REACHED** | after Paid Access Production Verified + sufficient real paid evidence |
-| Gate A | **NOT REACHED** | Astra/preparation do not satisfy evaluator trust/scale gate |
+| Gate A | **NOT REACHED** | Astra/preparation/bootstrap docs do not satisfy evaluator trust/scale gate |
 | Additional Stage 1.5 capability | **NONE SELECTED** | defer until evidence justifies one |
 | Gate B | **NOT REACHED** | no authority expansion |
 | Stage 2 | **NOT SELECTED** | no Guided Improvement selection |
@@ -302,11 +332,18 @@ Astra bounded packet
 Explicit Next Selection
 = NO NEW CAPABILITY / NO NEW ROADMAP PACKET
 
-→ 02 specify ADR-0011 first-Live bootstrap within existing PAUC/runbook
-→ 00 + named operators close external commercial/hosting/Auth/Stripe/WAF/provider-control prerequisites
-→ W01 independently reviews/verifies required evidence and exact procedure revision
+ADR-0011 sequencing
+= COMPLETE
+
+First-Live amendment/runbook
+= SPECIFIED / RELEASED by PR #59
+
+→ W01 narrow PR #59 post-release identity + paid-off baseline verification
+→ 00 + named operators close Phase 0 commercial/hosting/Auth/Stripe/WAF/provider-control/Test Mode prerequisites
+→ C01 / authorized hosting operator stage the exact QA containment only when its prerequisites are ready
+→ W01 independently verifies containment while paid-off
 → controlled edge-contained first-Live bootstrap as specified
-→ W01 live paid Production Verification / AC-30
+→ W01 bootstrap proofs + live paid Production Verification / AC-30
 → 00 commercial Sprint Complete
 → 01 Evidence → Gate Review → Explicit Next Selection
 ```
@@ -318,16 +355,18 @@ new Product/commercial/security semantic decision required → 01
 resulting procedure / Product-facing specification gap → 02
 specified implementation/configuration → C01 / authorized operators
 independent QA / Production verification → W01
+current-state/prerequisite coordination → 00
 ```
 
 Rules:
 
 - Preparation release Production Verified is not Paid Access AC-30 Production Verified.
 - Astra Sprint Complete is not commercial Sprint Complete.
+- `Specified` does not mean external prerequisites are verified or a Live window is authorized.
+- PR #59 post-release verification is not the same as W01 containment verification, Live bootstrap proof, or AC-30.
 - Stage order is dependency direction, not an automatic queue.
 - M0 is separate from evaluator authority and roadmap promotion.
 - Gate A and Gate B remain NOT REACHED; Stage 2 remains NOT SELECTED.
 - Stage 1.5 remains a selection band; no candidate is selected by list order.
 - AI Authority and Mutation Authority remain unchanged until applicable gates explicitly change them.
-- ADR-0011 authorizes **specification of the safe sequence**, not unrestricted paid execution; Production remains fail-closed until the lifecycle permits each controlled step.
 - Do not grow this board into a historical archive; completed detail belongs in packets/PRs/ADRs/evidence documents.
