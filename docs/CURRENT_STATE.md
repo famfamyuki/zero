@@ -49,25 +49,27 @@ The bounded `GPT-6 Astra Challenge Launch Hardening` packet is **Sprint Complete
 
 The first-Live sequencing decision remains accepted in ADR-0011. PR #59 released the `02` operational amendment and paid-launch runbook procedure, and W01 independently verified that specification release **PASS WITH NOTES**. The procedure is **Specified / released / release-verified**, but Phase 0 evidence, QA containment, first-Live behavior, and PAUC AC-30 remain unverified/incomplete.
 
-A new stakeholder priority now defers final commercial activation until AgentGraph Studio's Product development has advanced further. `01` preserved the entire commercial safety contract and selected the next Product Sprint instead of enabling billing now.
+A stakeholder priority now defers final commercial activation until AgentGraph Studio's Product development has advanced further. `01` preserved the entire commercial safety contract and selected the Evaluation Trust Product Sprint instead of enabling billing now.
 
-Current explicit Product selection:
+Current Product packet:
 
 ```text
 AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1
-= SELECTED
+= SPECIFIED
 
 Capability
 = Architecture Review Evaluation Trust Foundation v0
 = Gold Dataset + Quality Metrics
 
 Next owner
-= 02 — UX & Implementation Specification
+= C01 — Current Sprint Implementation
 ```
 
-Decision authority:
+Selection authority:
 
 `docs/decisions/ADR-0012-select-architecture-review-evaluation-trust-foundation.md`
+
+The `02` specification was completed against live GitHub `main` `7a6783d6037759243e17680d024b6b4e6e642894` and the current evaluator/fixture/harness reality. That SHA is specification-baseline evidence, not a durable claim about today's future mutable main.
 
 ---
 
@@ -95,9 +97,9 @@ GPT-6 Astra Challenge Launch Hardening
 = W01 PASS WITH NOTES
 
 Architecture Review Evaluation Trust Foundation v0
-= SELECTED
-= next owner 02
-= not yet Specified
+= SPECIFIED
+= next owner C01
+= implementation not yet complete
 
 Commercial Validation Gate M0
 = NOT REACHED
@@ -129,14 +131,14 @@ Related durable risks: R-008 / R-020 / R-021
 
 It is currently a deferred **commercial-activation blocker**, not a blocker to the independently justified Evaluation Trust Product Sprint while the paid path remains disabled.
 
-The currently selected Product risk/evidence target is:
+The current Product risk/evidence target is:
 
 ```text
 R-001 — Evaluator semantic quality may be insufficient for stronger recommendation authority
 = Critical / WATCH
 ```
 
-Selection of work does not resolve the risk. The Sprint is intended to make the missing evidence measurable.
+Specification completion does not resolve the risk. The Sprint must still implement and later gather measurement evidence.
 
 ---
 
@@ -155,14 +157,14 @@ However, the current harness does not yet measure the core semantic-quality ques
 - good-workflow false positives;
 - flawed-workflow false negatives / issue coverage;
 - top-1 / top-k priority agreement;
-- strength recognition against annotated expectations;
+- strength recognition against reviewed expectations;
 - acceptable alternative interpretations;
 - repeated-run material-finding stability;
 - semantics-preserving variant stability.
 
 The current fixtures are also small; the largest current A–J fixture contains eight nodes. This establishes that large-workflow behavior remains **Unknown**, not that a scoped/hierarchical scale solution is already required.
 
-Therefore `01` selected a bounded benchmark/gold-dataset foundation rather than simultaneously selecting large-workflow scale architecture, Workspace persistence, Intent/Constraints, revision/history, Review Workspace, or Stage 2 Guided Improvement.
+`02` has now specified the bounded foundation needed to measure those questions. The contract retains the current release-safety checks, adds versioned candidate/human-approved annotation states, deterministic matching/scoring, report/version metadata, and separate repeated-run vs representation-stability semantics. It deliberately does not invent permanent Gate thresholds or a second LLM judge.
 
 ---
 
@@ -171,26 +173,24 @@ Therefore `01` selected a bounded benchmark/gold-dataset foundation rather than 
 The immediate owner is:
 
 ```text
-02 — UX & Implementation Specification
+C01 — Current Sprint Implementation
 ```
 
-`02` must turn `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` into an implementation-ready `Specified` packet without inventing broader Product authority.
+C01 must implement `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` exactly as Specified without inventing Product behavior.
 
-Expected `02` specification areas include:
+Implementation scope includes:
 
-- versioned benchmark dataset / rubric schema;
-- annotation provenance/review status and acceptable-alternative representation;
-- exact issue/strength matching semantics;
-- precision/recall/false-positive/false-negative/priority/stability metric definitions;
-- semantics-preserving variant definition;
-- offline dataset/scorer/report validation tests;
-- reproducible benchmark report metadata;
-- compatibility with the current A–J release-evaluation harness;
-- explicit bounded provider-backed run procedure only if justified under existing provider/budget governance;
-- Acceptance Criteria / Test Matrix / traceability;
-- strict Deferred / Out of Scope boundaries.
+- repository-owned strict benchmark dataset/rubric/scorer/report contracts;
+- A–J fixture fingerprint/provenance validation;
+- candidate vs human-approved-gold annotation eligibility without fabricated review provenance;
+- deterministic issue/strength/Unknown matching, including target/Evidence/recommendation support;
+- precision/recall, good FP, flawed FN/coverage, top-1/top-3, strength, Unknown, and stability metrics with exact N/A/exclusion handling;
+- two explicit non-semantic variants: layout-only position change and node/edge collection ordering;
+- provider-independent offline quality validation/scorer/report tests;
+- compatibility with the existing A–J hard/safety release harness;
+- an optional provider-backed quality command only with explicit spend ceiling and existing provider/data governance.
 
-`02` does **not** own a Gate decision and must not silently add Project/Workspace, persisted Intent, large-scale evaluator architecture, Guided Improvement, Semantic Patch, or commercial activation.
+C01 must not relabel candidate annotations as expert gold without real human review provenance, add a permanent promotion threshold, change the Production evaluator/model/prompt to improve scores, or pull in Project/Workspace, persisted Intent, scale architecture, Guided Improvement, Semantic Patch, or commercial activation.
 
 Normal lifecycle remains:
 
@@ -311,26 +311,29 @@ This closes only the PR #59 specification-release verification. It does not veri
 
 - deterministic free-core operation remains independent of the disabled paid path;
 - Astra launch hardening is Sprint Complete / Production Verified;
-- Production paid Architecture Review remains disabled / fail-closed at the current inspected Production state;
-- commercial activation is now explicitly deferred while the safety requirements remain preserved;
+- Production paid Architecture Review remains disabled / fail-closed at the last inspected Production state relevant to the prior decision;
+- commercial activation is explicitly deferred while its safety requirements remain preserved;
 - PAUC AC-30 remains incomplete and Paid Access Production Verified remains NO;
-- `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` is the new Selected Product packet;
+- `AGS-AR-EVALUATION-TRUST-FOUNDATION-V0-P1` is now Specified and routes to C01;
+- the specification retains the current hard/safety evaluation and adds deterministic quality/stability measurement contracts;
+- A–J seed annotations remain candidate unless real human review provenance is present;
 - Gate A and Gate B are not reached; Stage 2 is not selected;
 - AI Authority and Mutation Authority are unchanged;
 - the current Architecture Review formal evidence has 30 successful reviews, 210/210 current semantic checks, and zero hard violations;
-- the current evaluator scoring does not establish gold-set precision/recall, false-positive/false-negative behavior, or top-issue agreement;
+- the current evaluator scoring does not yet establish gold-set precision/recall, false-positive/false-negative behavior, or top-issue agreement;
 - the current A–J fixture set does not provide representative large-workflow scale evidence.
 
 ## Inferred
 
-- building the benchmark/gold foundation first is the smallest way to determine whether the next real dependency is evaluator quality, context, navigation, or scale;
+- implementing the benchmark/gold foundation first is the smallest way to determine whether the next real dependency is evaluator quality, context, navigation, or scale;
 - commercial activation can remain deferred without creating a new core architecture dependency because the selected benchmark foundation and deterministic free core do not require public paid enablement.
 
 ## Unknown / evidence-dependent
 
-- actual issue precision/recall on a versioned curated gold set;
+- actual issue precision/recall on human-approved benchmark annotations;
 - good-workflow false-positive rate and flawed-workflow false-negative behavior;
 - top-issue priority agreement and material finding stability;
+- how many A–J annotations will achieve human-approved-gold status and whether new fixtures are later needed after measured evidence;
 - large-workflow quality/latency/failure behavior and the size at which scoped/hierarchical evaluation would become necessary;
 - whether persisted Intent/Constraints materially improves evaluator correctness;
 - whether provider-backed Review Workspace/Locate is a meaningful usability bottleneck;
